@@ -1,4 +1,4 @@
-import adapter from "@hono/vite-dev-server/cloudflare";
+import adapter from "@hono/vite-dev-server/node";
 import ssg from "@hono/vite-ssg";
 import tailwindcss from "@tailwindcss/vite";
 import honox from "honox/vite";
