@@ -17,6 +17,50 @@ export default defineConfig({
 	// The output directory for your css system
 	outdir: "styled-system",
 
+	// Force-generate the `colorPalette` utility for every palette.
+	// Components (Badge, Button, ...) pass `colorPalette` as a runtime value to
+	// `css()`, so the PostCSS extractor cannot statically discover which palettes
+	// are used and would only emit the gray default. Without this, every badge
+	// renders with the same fallback color regardless of its colorPalette prop.
+	staticCss: {
+		// utilities: ["colorPalette"],
+		recipes: {
+			absoluteCenter: ["*"],
+			alert: ["*"],
+			badge: ["*"],
+			breadcrumb: ["*"],
+			button: ["*"],
+			card: ["*"],
+			checkbox: ["*"],
+			collapsible: ["*"],
+			combobox: ["*"],
+			dialog: ["*"],
+			drawer: ["*"],
+			field: ["*"],
+			fieldset: ["*"],
+			group: ["*"],
+			heading: ["*"],
+			hoverCard: ["*"],
+			input: ["*"],
+			menu: ["*"],
+			popover: ["*"],
+			progress: ["*"],
+			segmentGroup: ["*"],
+			skeleton: ["*"],
+			slider: ["*"],
+			spinner: ["*"],
+			splitter: ["*"],
+			switch: ["*"],
+			table: ["*"],
+			tabs: ["*"],
+			text: ["*"],
+			textarea: ["*"],
+			toast: ["*"],
+			toggleGroup: ["*"],
+			tooltip: ["*"],
+		},
+	},
+
 	// Disable JSX framework (using Hono JSX instead)
 	jsxFramework: undefined,
 

@@ -1,6 +1,10 @@
 import { animationStyles } from "./animation-styles";
+import { amber } from "./colors/amber";
+import { blue } from "./colors/blue";
 import { cyan } from "./colors/cyan";
 import { green } from "./colors/green";
+import { orange } from "./colors/orange";
+import { purple } from "./colors/purple";
 import { red } from "./colors/red";
 import { slate } from "./colors/slate";
 import { conditions } from "./conditions";
@@ -51,12 +55,28 @@ const config = {
 						_dark: "{colors.gray.10}",
 					},
 				},
+
+				error: {
+					value: "{colors.red.11}",
+				},
 			},
 
 			border: {
+				DEFAULT: {
+					value: {
+						_light: "{colors.gray.4}",
+						_dark: "{colors.gray.4}",
+					},
+				},
+				error: {
+					value: "{colors.red.9}",
+				},
+			},
+
+			canvas: {
 				value: {
-					_light: "{colors.gray.4}",
-					_dark: "{colors.gray.4}",
+					_light: "{colors.gray.1}",
+					_dark: "{colors.gray.1}",
 				},
 			},
 
@@ -67,10 +87,14 @@ const config = {
 				},
 			},
 
+			blue,
 			cyan,
 			gray: slate,
-			red,
 			green,
+			orange,
+			purple,
+			red,
+			amber,
 		},
 
 		shadows,

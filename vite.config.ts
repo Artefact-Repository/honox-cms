@@ -1,8 +1,19 @@
+import {
+	existsSync,
+	mkdirSync,
+	readdirSync,
+	renameSync,
+	statSync,
+} from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import adapter from "@hono/vite-dev-server/node";
 import ssg from "@hono/vite-ssg";
 import honox, { devServerDefaultOptions } from "honox/vite";
 import { defineConfig } from "vite";
 import pandaConfig from "./panda.config";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const config = defineConfig(({ mode }) =>
 	mode === "client" ? clientConfig : mainConfig,
@@ -70,6 +81,11 @@ const mainConfig = {
 };
 
 const clientConfig = {
+	resolve: {
+		alias: {
+			"styled-system": path.resolve(__dirname, "styled-system"),
+		},
+	},
 	oxc: {
 		jsx: {
 			importSource: "hono/jsx/dom",

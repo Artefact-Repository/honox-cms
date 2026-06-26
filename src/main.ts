@@ -107,15 +107,20 @@ if (values.static) {
 					setHeader(name: string, value: string) {
 						this.headers[name.toLowerCase()] = value;
 					},
-					writeHead(status: number, headers: any) {
+					writeHead(
+						status: number,
+						headers: Record<string, string | string[] | undefined>,
+					) {
 						this.statusCode = status;
 						if (headers) {
 							for (const [k, v] of Object.entries(headers)) {
-								this.setHeader(k, v as string);
+								if (v !== undefined) {
+									this.setHeader(k, Array.isArray(v) ? v.join(", ") : v);
+								}
 							}
 						}
 					},
-					end(content: any) {
+					end(content: string | Uint8Array | ReadableStream) {
 						resolve(
 							new Response(content, {
 								status: this.statusCode,

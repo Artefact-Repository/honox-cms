@@ -104,6 +104,14 @@ export const keyframes = defineKeyframes({
 		from: { scale: "1" },
 		to: { scale: "0.95" },
 	},
+	spin: {
+		from: {
+			transform: "rotate(0deg)",
+		},
+		to: {
+			transform: "rotate(360deg)",
+		},
+	},
 	"bg-position": {
 		from: {
 			backgroundPosition: "var(--animate-from, 1rem) 0",
@@ -120,6 +128,14 @@ export const keyframes = defineKeyframes({
 		to: {
 			insetInlineStart: "var(--animate-to-x)",
 			insetBlockStart: "var(--animate-to-y)",
+		},
+	},
+	pulse: {
+		"0%, 100%": {
+			opacity: "1",
+		},
+		"50%": {
+			opacity: "0.5",
 		},
 	},
 });

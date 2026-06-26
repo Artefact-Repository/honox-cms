@@ -1,0 +1,5 @@
+[jsx]
+runtime = "classic"
+pragma = "h"
+fragment = "Fragment"
+importSource = "hono/jsx"
