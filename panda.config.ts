@@ -17,6 +17,9 @@ export default defineConfig({
 	// The output directory for your css system
 	outdir: "styled-system",
 
+	// Disable JSX framework (using Hono JSX instead)
+	jsxFramework: undefined,
+
 	plugins: [
 		{
 			name: "Remove Panda Preset Colors",
