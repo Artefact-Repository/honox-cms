@@ -20,32 +20,85 @@ const vite = await createServer({
 	appType: "custom",
 });
 
-const { default: app } = await vite.ssrLoadModule("./app/server.ts");
+	// Map for file extensions to MIME types
+	const getMimeType = (filePath: string): string => {
+		if (filePath.endsWith(".js")) return "application/javascript";
+		if (filePath.endsWith(".css")) return "text/css";
+		if (filePath.endsWith(".html")) return "text/html";
+		if (filePath.endsWith(".json")) return "application/json";
+		if (filePath.endsWith(".svg")) return "image/svg+xml";
+		if (filePath.endsWith(".png")) return "image/png";
+		if (filePath.endsWith(".jpg") || filePath.endsWith(".jpeg"))
+			return "image/jpeg";
+		if (filePath.endsWith(".gif")) return "image/gif";
+		if (filePath.endsWith(".ico")) return "image/x-icon";
+		if (filePath.endsWith(".woff")) return "font/woff";
+		if (filePath.endsWith(".woff2")) return "font/woff2";
+		if (filePath.endsWith(".ttf")) return "font/ttf";
+		if (filePath.endsWith(".eot")) return "application/vnd.ms-fontobject";
+		return "application/octet-stream";
+	};
+
+	const server = Bun.serve({
+		port,
+		fetch(req) {
+			const url = new URL(req.url);
+			const pathname = url.pathname;
 
 const server = Bun.serve({
 	fetch: async (request) => {
 		const url = new URL(request.url);
 
-		return new Promise<Response>((resolve) => {
-			const req = {
-				url: url.pathname + url.search,
-				method: request.method,
-				headers: Object.fromEntries(request.headers),
-			};
-			const res = {
-				statusCode: 200,
-				headers: {} as Record<string, string>,
-				getHeader(name: string) {
-					return this.headers[name.toLowerCase()];
-				},
-				setHeader(name: string, value: string) {
-					this.headers[name.toLowerCase()] = value;
-				},
-				writeHead(status: number, headers: any) {
-					this.statusCode = status;
-					if (headers) {
-						for (const [k, v] of Object.entries(headers)) {
-							this.setHeader(k, v as string);
+			for (const path of pathsToTry) {
+				if (existsSync(path) && !path.endsWith("/")) {
+					const file = Bun.file(path);
+					const mimeType = getMimeType(path);
+					return new Response(file, {
+						headers: { "Content-Type": mimeType },
+					});
+				}
+			}
+
+			return new Response("Not Found", { status: 404 });
+		},
+	});
+
+	console.log(`Static server running at ${server.url}`);
+} else {
+	const { createServer } = await import("vite");
+
+	const vite = await createServer({
+		server: { middlewareMode: true, hmr: false },
+		appType: "custom",
+	});
+
+	const { default: app } = await vite.ssrLoadModule("./app/server.ts");
+
+	const server = Bun.serve({
+		fetch: async (request) => {
+			const url = new URL(request.url);
+
+			return new Promise<Response>((resolve) => {
+				const req = {
+					url: url.pathname + url.search,
+					method: request.method,
+					headers: Object.fromEntries(request.headers),
+				};
+				const res = {
+					statusCode: 200,
+					headers: {} as Record<string, string>,
+					getHeader(name: string) {
+						return this.headers[name.toLowerCase()];
+					},
+					setHeader(name: string, value: string) {
+						this.headers[name.toLowerCase()] = value;
+					},
+					writeHead(status: number, headers: any) {
+						this.statusCode = status;
+						if (headers) {
+							for (const [k, v] of Object.entries(headers)) {
+								this.setHeader(k, v as string);
+							}
 						}
 					}
 				},
