@@ -1,0 +1,52 @@
+# yaml-language-server: $schema=https://unpkg.com/@sveltia/cms/schema/sveltia-cms.json
+
+# Sveltia CMS Configuration
+# Documentation: https://sveltiacms.app/en/docs/config-basics
+
+# Backend Configuration
+# Options: github, gitlab, gitea
+# Update with your repository details
+backend:
+  name: github
+  repo: your-username/your-repo
+  branch: main  # or master, depending on your default branch
+
+# Media Storage
+# Media files will be stored in /public/media and accessible at /media
+media_folder: /public/media
+public_folder: /media
+
+# Collections - Define your content types here
+# Example: Blog Posts
+collections:
+  - name: posts
+    label: Posts
+    label_singular: Post
+    folder: /content/posts
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Date, name: date, widget: datetime, type: date, default: "" }
+      - { label: Description, name: description, widget: string }
+      - { label: Body, name: body, widget: markdown }
+      - label: Featured Image
+        name: image
+        widget: image
+        required: false
+      - label: Tags
+        name: tags
+        widget: list
+        required: false
+      - label: Draft
+        name: draft
+        widget: boolean
+        default: false
+
+# Uncomment and configure for multilingual sites
+# i18n:
+#   - locale: en
+#     label: English
+#   - locale: zh
+#     label: 中文
+#   default_locale: en
