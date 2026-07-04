@@ -8,7 +8,7 @@
 # Update with your repository details
 backend:
   name: github
-  repo: your-username/your-repo
+  repo: yum-chen/honox-ts
   branch: main  # or master, depending on your default branch
 
 # Media Storage
