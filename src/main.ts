@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
 
@@ -57,19 +57,25 @@ if (values.static) {
 			const url = new URL(req.url);
 			const pathname = url.pathname;
 
+			// Normalize: /blog → /blog/index.html (try index.html for directory-like requests)
 			const pathsToTry = [
-				join(process.cwd(), "dist", pathname),
-				join(process.cwd(), "dist", `${pathname}.html`),
 				join(process.cwd(), "dist", pathname, "index.html"),
+				join(process.cwd(), "dist", `${pathname}.html`),
+				join(process.cwd(), "dist", pathname),
 			];
 
-			for (const path of pathsToTry) {
-				if (existsSync(path) && !path.endsWith("/")) {
-					const file = Bun.file(path);
-					const mimeType = getMimeType(path);
-					return new Response(file, {
-						headers: { "Content-Type": mimeType },
-					});
+			for (const candidate of pathsToTry) {
+				try {
+					const stat = statSync(candidate);
+					if (stat.isFile()) {
+						const file = Bun.file(candidate);
+						const mimeType = getMimeType(candidate);
+						return new Response(file, {
+							headers: { "Content-Type": mimeType },
+						});
+					}
+				} catch {
+					// file doesn't exist, try next candidate
 				}
 			}
 
