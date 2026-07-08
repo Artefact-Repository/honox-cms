@@ -1,3 +1,4 @@
+import { radioGroup } from "./radio-group";
 import { absoluteCenter } from "./absolute-center";
 import { alert } from "./alert";
 import { avatar } from "./avatar";
@@ -33,20 +34,21 @@ import { toggleGroup } from "./toggle-group";
 import { tooltip } from "./tooltip";
 
 export const recipes = {
-	absoluteCenter,
-	badge,
-	button,
-	group,
-	heading,
-	spinner,
-	text,
-	textarea,
-	skeleton,
+    absoluteCenter,
+    badge,
+    button,
+    group,
+    heading,
+    spinner,
+    text,
+    textarea,
+    skeleton,
 };
 
 export const slotRecipes = {
 	avatar,
 	toggleGroup,
+	radioGroup,
 	segmentGroup,
 	alert,
 	splitter,

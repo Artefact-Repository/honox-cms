@@ -29,6 +29,7 @@ import {
 	SegmentGroup,
 	Skeleton,
 	SkeletonCircle,
+	RadioGroup,
 	SkeletonText,
 	Slider,
 	Spinner,
@@ -234,6 +235,89 @@ export default createRoute((c) => {
 						<Avatar variant="subtle" name="Subtle" colorPalette="blue" />
 						<Avatar variant="outline" name="Outline" colorPalette="blue" />
 						<Avatar variant="surface" name="Surface" colorPalette="blue" />
+					</div>
+				</div>
+			</div>
+
+			{/* RadioGroup Examples */}
+			<div
+				class={css({
+					mt: "8",
+					display: "flex",
+					flexDirection: "column",
+					gap: "4",
+					alignItems: "center",
+					maxWidth: "xl",
+					mx: "auto",
+				})}
+			>
+				<Heading as="h2" class={css({ fontSize: "xl", mb: "4" })}>
+					RadioGroup Component Examples
+				</Heading>
+				<div
+					class={css({
+						width: "full",
+						display: "flex",
+						flexDirection: "column",
+						gap: "8",
+					})}
+				>
+					<div
+						class={css({ display: "flex", flexDirection: "column", gap: "2" })}
+					>
+						<Text size="sm" class={css({ color: "fg.muted" })}>
+							Basic RadioGroup (Interactive)
+						</Text>
+						<RadioGroup
+							defaultValue="react"
+							items={[
+								{ label: "React", value: "react" },
+								{ label: "Solid", value: "solid" },
+								{ label: "Svelte", value: "svelte" },
+								{ label: "Vue", value: "vue" },
+							]}
+						/>
+					</div>
+
+					<div
+						class={css({ display: "flex", flexDirection: "column", gap: "2" })}
+					>
+						<Text size="sm" class={css({ color: "fg.muted" })}>
+							RadioGroup with Disabled Item
+						</Text>
+						<RadioGroup
+							defaultValue="apple"
+							items={[
+								{ label: "Apple", value: "apple" },
+								{ label: "Banana", value: "banana", disabled: true },
+								{ label: "Cherry", value: "cherry" },
+							]}
+						/>
+					</div>
+
+					<div
+						class={css({ display: "flex", flexDirection: "column", gap: "2" })}
+					>
+						<Text size="sm" class={css({ color: "fg.muted" })}>
+							Sizes
+						</Text>
+						<div class={css({ display: "flex", gap: "8" })}>
+							<RadioGroup
+								size="sm"
+								defaultValue="sm"
+								items={[{ label: "Small", value: "sm" }]}
+							/>
+							<RadioGroup
+								size="md"
+								defaultValue="md"
+								items={[{ label: "Medium", value: "md" }]}
+							/>
+							<RadioGroup
+								size="lg"
+								defaultValue="lg"
+								items={[{ label: "Large", value: "lg" }]}
+							/>
+						</div>
 					</div>
 				</div>
 			</div>
