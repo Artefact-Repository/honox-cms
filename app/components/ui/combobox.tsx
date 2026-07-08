@@ -17,7 +17,8 @@ export function Combobox(props: ComboboxProps) {
 		rest.open !== undefined ||
 		rest.inputValue !== undefined ||
 		rest.onToggle !== undefined ||
-		rest.onInputChange !== undefined;
+		rest.onInputChange !== undefined ||
+		rest.onItemSelect !== undefined;
 	const isInteractive = shouldHydrate(interactive, hasSignal);
 
 	if (isInteractive) {
