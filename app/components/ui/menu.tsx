@@ -16,6 +16,7 @@ import {
 	MenuSeparator as Separator,
 	MenuTrigger as Trigger,
 } from "./menu-primitive";
+import { shouldHydrate } from "./island-utils";
 
 // ============= Flattened API Types =============
 
@@ -168,7 +169,7 @@ function MenuRoot(props: MenuProps) {
 		trigger,
 		items,
 		defaultOpen = false,
-		interactive = true,
+		interactive,
 		class: classProp,
 		contentClass,
 		positionerClass,
@@ -178,7 +179,7 @@ function MenuRoot(props: MenuProps) {
 
 	const styles = menu(variantProps);
 
-	if (interactive) {
+	if (shouldHydrate(interactive, true)) {
 		return (
 			<InteractiveMenuRoot open={defaultOpen}>
 				{trigger && <Trigger asChild>{trigger}</Trigger>}

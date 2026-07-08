@@ -4,6 +4,7 @@ import {
 	type TooltipBaseProps,
 	type TooltipRootProps,
 } from "./tooltip-primitive";
+import { shouldHydrate } from "./island-utils";
 
 export interface TooltipProps extends TooltipRootProps {
 	/**
@@ -19,7 +20,7 @@ export interface TooltipProps extends TooltipRootProps {
 export function Tooltip(props: TooltipBaseProps & { interactive?: boolean }) {
 	const { interactive, ...rest } = props;
 
-	const isInteractive = interactive !== false;
+	const isInteractive = shouldHydrate(interactive, true);
 
 	if (isInteractive) {
 		return <TooltipIsland {...rest} />;
