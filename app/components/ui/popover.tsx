@@ -17,6 +17,7 @@ import {
 	PopoverTitle as Title,
 	PopoverTrigger as Trigger,
 } from "./popover-primitive";
+import { shouldHydrate } from "./island-utils";
 
 interface PopoverProps extends PopoverRootProps {
 	interactive?: boolean; // keep — forces island hydration (default true)
@@ -32,9 +33,9 @@ interface PopoverProps extends PopoverRootProps {
 }
 
 function Root(props: PopoverProps) {
-	const { interactive = true, ...rest } = props;
+	const { interactive, ...rest } = props;
 
-	if (interactive) {
+	if (shouldHydrate(interactive, true)) {
 		return <PopoverIsland {...rest} />;
 	}
 

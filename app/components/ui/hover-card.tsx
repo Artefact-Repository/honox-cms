@@ -10,6 +10,7 @@ import {
 	HoverCardTrigger as Trigger,
 } from "./hover-card-primitive";
 import { Text } from "./text";
+import { shouldHydrate } from "./island-utils";
 
 interface HoverCardProps extends HoverCardRootProps {
 	interactive?: boolean; // keep — forces island hydration (default true)
@@ -21,8 +22,8 @@ interface HoverCardProps extends HoverCardRootProps {
 }
 
 function Root(props: HoverCardProps) {
-	const { interactive = true, ...rest } = props;
-	if (interactive) return <HoverCardIsland {...rest} />;
+	const { interactive, ...rest } = props;
+	if (shouldHydrate(interactive, true)) return <HoverCardIsland {...rest} />;
 	return <RootPrimitive {...rest} />;
 }
 
