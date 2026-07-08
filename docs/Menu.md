@@ -35,6 +35,18 @@ A list of actions or options that appears when triggered, supporting items, sepa
 
 > Note: `submenu` entries are not supported by the simplified API and fall back to plain text. Use the primitive sub-components for nested menus.
 
+# Hydration
+
+**Tier 1 — auto-interactive by default.** A `Menu` opens on trigger and needs client-side JavaScript for open/close state, keyboard navigation, and outside-click dismissal, so it hydrates as an island by default. Pass `interactive={false}` to render a static, inert menu with no client JS.
+
+| `interactive` prop | Result |
+| :--- | :--- |
+| omitted | Hydrates as an island (default) |
+| `true` | Hydrates as an island |
+| `false` | Static — no client JS |
+
+All interactivity decisions in the library route through the shared `shouldHydrate()` helper in `app/components/ui/island-utils.ts`.
+
 # Usage
 
 ## Basic Menu

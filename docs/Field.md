@@ -25,6 +25,27 @@ A foundational component for form fields, managing labels, helper text, error me
 | `validator`     | `(val: string) => boolean \| string` | Custom validation function (forces interactive mode).                                         |
 | `interactive`   | `boolean`                            | Forces hydration as an island.                                                                |
 
+# Hydration
+
+**Tier 2 — smart auto-detect.** A `Field` renders as static HTML and ships no client JS unless a behavioral signal is present — this is the "Smart Switcher" pattern described below. Pass `interactive={true}` to force hydration, or `interactive={false}` to force a static render.
+
+It hydrates as an island when **any** of the following signals is present (or `interactive={true}` is set):
+
+- `onValueChange`
+- `value` (controlled)
+- `defaultValue` (uncontrolled initial value)
+- `validator`
+- `minLength`
+
+| `interactive` prop | Result |
+| :--- | :--- |
+| omitted, **no** signal | Static — no client JS |
+| omitted, a signal present | Hydrates as an island |
+| `true` | Hydrates as an island |
+| `false` | Static — no client JS |
+
+All interactivity decisions in the library route through the shared `shouldHydrate()` helper in `app/components/ui/island-utils.ts`.
+
 # Usage
 
 ## Smart Switcher

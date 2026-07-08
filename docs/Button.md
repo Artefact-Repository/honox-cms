@@ -27,6 +27,25 @@ A clickable component for triggering actions and user interactions. Includes var
 | `children` | `any`     | Buttons to be grouped.                  |
 | `attached` | `boolean` | Whether to attach the buttons together. |
 
+# Hydration
+
+**Tier 2 — smart auto-detect.** `Button`, `IconButton`, and `CloseButton` render as static HTML and ship no client JS unless a behavioral signal is present. Pass `interactive={true}` to force hydration, or `interactive={false}` to force a static render.
+
+It hydrates as an island when **any** of the following signals is present (or `interactive={true}` is set):
+
+- `onClick`
+- `onPointerDown`
+- `onSubmit`
+
+| `interactive` prop | Result |
+| :--- | :--- |
+| omitted, **no** signal | Static — no client JS |
+| omitted, a signal present | Hydrates as an island |
+| `true` | Hydrates as an island |
+| `false` | Static — no client JS |
+
+All interactivity decisions in the library route through the shared `shouldHydrate()` helper in `app/components/ui/island-utils.ts`.
+
 # Usage
 
 ## Basic Button

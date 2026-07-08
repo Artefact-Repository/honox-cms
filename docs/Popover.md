@@ -23,6 +23,18 @@ An interactive element that displays additional content in a layer over its anch
 | :-------- | :-------- | :------------------------------------------------------- |
 | `asChild` | `boolean` | Whether to merge props onto the immediate child element. |
 
+# Hydration
+
+**Tier 1 — auto-interactive by default.** A `Popover` is an overlay that needs client-side JavaScript for positioning, open/close state, focus handling, and outside-click dismissal, so it hydrates as an island by default. Pass `interactive={false}` to render a static, always-open/closed popover shell with no client JS.
+
+| `interactive` prop | Result |
+| :--- | :--- |
+| omitted | Hydrates as an island (default) |
+| `true` | Hydrates as an island |
+| `false` | Static — no client JS |
+
+All interactivity decisions in the library route through the shared `shouldHydrate()` helper in `app/components/ui/island-utils.ts`.
+
 # Usage
 
 ```tsx

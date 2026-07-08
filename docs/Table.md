@@ -28,6 +28,23 @@ A flexible component for displaying tabular data.
 | `render` | `(row, index) => JSX.Element` | Custom render function for the cell. |
 | `align` | `"start" \| "center" \| "end"` | Text alignment for the column. |
 
+# Hydration
+
+**Tier 2 — smart auto-detect.** A `Table` renders as static HTML and ships no client JS unless a behavioral signal is present. Pass `interactive={true}` to force hydration, or `interactive={false}` to force a static render.
+
+It hydrates as an island when **any** of the following signals is present (or `interactive={true}` is set):
+
+- any row in `rows` defines an `onClick` handler
+
+| `interactive` prop | Result |
+| :--- | :--- |
+| omitted, no row `onClick` | Static — no client JS |
+| a row has `onClick` | Hydrates as an island |
+| `true` | Hydrates as an island |
+| `false` | Static — no client JS |
+
+All interactivity decisions in the library route through the shared `shouldHydrate()` helper in `app/components/ui/island-utils.ts`.
+
 # Usage
 
 ```tsx

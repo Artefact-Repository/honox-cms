@@ -30,6 +30,18 @@ A layout component that divides content into resizable panels separated by drag 
 | `class` | `string` | Custom CSS classes for the panel. |
 | `style` | `Record<string, string \| number>` | Inline styles for the panel. |
 
+# Hydration
+
+**Tier 1 — auto-interactive by default.** A `Splitter` has no meaningful static fallback — drag-to-resize requires client-side JavaScript — so it hydrates as an island by default. Pass `interactive={false}` to render a static, non-resizable splitter that ships no client JS.
+
+| `interactive` prop | Result |
+| :--- | :--- |
+| omitted | Hydrates as an island (default) |
+| `true` | Hydrates as an island |
+| `false` | Static — no client JS |
+
+All interactivity decisions in the library route through the shared `shouldHydrate()` helper in `app/components/ui/island-utils.ts`.
+
 # Usage
 
 ## Basic Splitter

@@ -23,6 +23,25 @@ An interactive component that can be expanded or collapsed to show or hide conte
 | `indicatorClass`     | `string`                      | Indicator element class name.                                            |
 | `id`                 | `string`                      | ID for the collapsible.                                                  |
 
+# Hydration
+
+**Tier 2 — smart auto-detect (hydrates by default).** A `Collapsible` hydrates as an island by default because it has no meaningful static fallback — expanding/collapsing requires client-side JavaScript. Pass `interactive={false}` to force a static, always-open (or always-closed) render with no client JS.
+
+It also hydrates when **any** of the following signals is present (or `interactive={true}` is set):
+
+- `onOpenChange`
+- `open` (controlled)
+- `defaultOpen` (uncontrolled initial state)
+
+| `interactive` prop | Result |
+| :--- | :--- |
+| omitted (default) | Hydrates as an island |
+| a signal present | Hydrates as an island |
+| `true` | Hydrates as an island |
+| `false` | Static — no client JS |
+
+All interactivity decisions in the library route through the shared `shouldHydrate()` helper in `app/components/ui/island-utils.ts`.
+
 # Usage
 
 ## Basic Collapsible

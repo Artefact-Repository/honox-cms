@@ -23,6 +23,18 @@ A panel that slides in from the edge of the screen to present content or actions
 
 Additional props (e.g. `open`, `defaultOpen`, `onOpenChange`, `id`) are forwarded to the underlying drawer primitive.
 
+# Hydration
+
+**Tier 1 — auto-interactive by default.** A `Drawer` has no meaningful static fallback — slide-in transitions, open/close state, focus handling, and ESC dismissal all require client-side JavaScript — so it hydrates as an island by default. Pass `interactive={false}` to render a static, inert drawer shell that ships no client JS.
+
+| `interactive` prop | Result |
+| :--- | :--- |
+| omitted | Hydrates as an island (default) |
+| `true` | Hydrates as an island |
+| `false` | Static — no client JS |
+
+All interactivity decisions in the library route through the shared `shouldHydrate()` helper in `app/components/ui/island-utils.ts`.
+
 # Usage
 
 ## Basic Drawer

@@ -26,6 +26,27 @@ Additional tab state props (e.g. `value`, `defaultValue`, `onValueChange`, `orie
 | `content` | `string \| JSX.Element` | The panel content shown when active. |
 | `disabled` | `boolean` | Whether the tab is disabled. |
 
+# Hydration
+
+**Tier 2 — smart auto-detect.** A bare `Tabs` (no selection state) renders as static HTML and ships no client JS. To get a working, switchable tablist, provide a behavioral signal or force hydration. Pass `interactive={true}` to always hydrate, or `interactive={false}` to force a static render.
+
+It hydrates as an island when **any** of the following signals is present (or `interactive={true}` is set):
+
+- `value` (controlled selection)
+- `defaultValue` (uncontrolled initial selection)
+- `onValueChange`
+
+> Note: a `<Tabs items={…} />` with none of these signals renders the first tab statically — no switching. Add `defaultValue` (or `value` / `onValueChange`) for interactivity.
+
+| `interactive` prop | Result |
+| :--- | :--- |
+| omitted, **no** signal | Static — no client JS |
+| omitted, a signal present | Hydrates as an island |
+| `true` | Hydrates as an island |
+| `false` | Static — no client JS |
+
+All interactivity decisions in the library route through the shared `shouldHydrate()` helper in `app/components/ui/island-utils.ts`.
+
 # Usage
 
 ## Basic Tabs
