@@ -2,10 +2,16 @@ import { useEffect, useId, useState } from "hono/jsx";
 import { Root, type RootProps } from "../components/ui/radio-group-primitive";
 
 function RadioGroupIsland(props: RootProps) {
-	const { value: valueProp, defaultValue, onValueChange, id: idProp, ...rest } = props;
+	const {
+		value: valueProp,
+		defaultValue,
+		onValueChange,
+		id: idProp,
+		...rest
+	} = props;
 	const [value, setValue] = useState(valueProp ?? defaultValue);
-    const fallbackId = useId();
-    const id = idProp || fallbackId;
+	const fallbackId = useId();
+	const id = idProp || fallbackId;
 
 	useEffect(() => {
 		if (valueProp !== undefined) {
@@ -42,7 +48,10 @@ function RadioGroupIsland(props: RootProps) {
 
 				const control = item.querySelector('[data-part="item-control"]');
 				if (control) {
-					control.setAttribute("data-state", isChecked ? "checked" : "unchecked");
+					control.setAttribute(
+						"data-state",
+						isChecked ? "checked" : "unchecked",
+					);
 				}
 			});
 

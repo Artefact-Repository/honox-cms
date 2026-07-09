@@ -58,6 +58,18 @@ export interface DrawerProps extends RootProps {
 	cancel?: JSX.Element;
 	confirm?: JSX.Element;
 	closable?: boolean;
+	/** Drawer variant: a standard panel or an alert dialog. Default: "dialog". */
+	role?: "dialog" | "alertdialog";
+	/** Accessible name for the drawer when no `title` is provided. */
+	"aria-label"?: string;
+	/** Close when Escape is pressed. Default: true. */
+	closeOnEscape?: boolean;
+	/** Close when the backdrop is clicked / interaction occurs outside. Default: true. */
+	closeOnInteractOutside?: boolean;
+	/** Element to focus when the drawer opens. Defaults to the first focusable. */
+	initialFocusEl?: () => HTMLElement | null;
+	/** Element to focus when the drawer closes. Defaults to the trigger. */
+	finalFocusEl?: () => HTMLElement | null;
 }
 
 export function Drawer(props: DrawerProps) {
@@ -72,6 +84,8 @@ export function Drawer(props: DrawerProps) {
 		closable = true,
 		children,
 		rootRef: rootRefProp,
+		role,
+		"aria-label": ariaLabel,
 		...rest
 	} = props;
 
@@ -79,11 +93,11 @@ export function Drawer(props: DrawerProps) {
 	const rootRef = rootRefProp || localRef;
 
 	return (
-		<Root {...rest} rootRef={rootRef}>
+		<Root {...rest} rootRef={rootRef} dialogRole={role}>
 			{trigger && <Trigger asChild>{trigger}</Trigger>}
 			<Backdrop />
 			<Positioner>
-				<Content>
+				<Content aria-label={ariaLabel}>
 					{closable && (
 						<CloseTrigger asChild>
 							<IconButton variant="plain" size="sm" aria-label="Close">

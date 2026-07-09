@@ -32,7 +32,9 @@ const RadioGroupRoot = (props: RadioGroupProps) => {
 		rest.value !== undefined ||
 		rest.defaultValue !== undefined ||
 		rest.onValueChange !== undefined;
-	const Component = shouldHydrate(interactive, hasSignal) ? RadioGroupIsland : Root;
+	const Component = shouldHydrate(interactive, hasSignal)
+		? RadioGroupIsland
+		: Root;
 
 	return (
 		<Component {...rest}>

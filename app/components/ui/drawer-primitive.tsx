@@ -3,7 +3,6 @@ import {
 	cloneElement,
 	createContext,
 	useContext,
-	useEffect,
 	useId,
 	useRef,
 	useState,
@@ -11,6 +10,7 @@ import {
 import { css, cx } from "styled-system/css";
 import type { DrawerVariantProps } from "styled-system/recipes";
 import { drawer } from "styled-system/recipes";
+import { hasPart, useOverlay } from "./overlay-a11y";
 
 type DrawerStyles = ReturnType<typeof drawer>;
 
@@ -19,6 +19,7 @@ interface DrawerContextValue {
 	open?: boolean;
 	onOpenChange?: (open: boolean) => void;
 	id: string;
+	dialogRole?: "dialog" | "alertdialog";
 }
 
 const DrawerContext = createContext<DrawerContextValue | null>(null);
@@ -33,11 +34,19 @@ export interface RootProps extends DrawerVariantProps, PropsWithChildren {
 	onOpenChange?: (open: boolean) => void;
 	id?: string;
 	rootRef?: any;
+	dialogRole?: "dialog" | "alertdialog";
 }
 
 export function Root(props: RootProps) {
 	const [variantProps, localProps] = drawer.splitVariantProps(props);
-	const { children, open, onOpenChange, id: idProp, rootRef } = localProps;
+	const {
+		children,
+		open,
+		onOpenChange,
+		id: idProp,
+		rootRef,
+		dialogRole,
+	} = localProps;
 	const styles = drawer(variantProps);
 	const generatedId = useId();
 	const id = idProp || generatedId;
@@ -47,6 +56,7 @@ export function Root(props: RootProps) {
 		open,
 		onOpenChange,
 		id,
+		dialogRole,
 	};
 
 	return (
@@ -143,21 +153,59 @@ export function Positioner(props: PositionerProps) {
 
 export interface ContentProps extends PropsWithChildren {
 	class?: string;
+	"aria-label"?: string;
 }
 
 export function Content(props: ContentProps) {
-	const { children, class: classProp, ...restProps } = props;
+	const {
+		children,
+		class: classProp,
+		"aria-label": ariaLabel,
+		...restProps
+	} = props;
 	const context = useDrawerContext();
 	const styles = context?.styles || drawer();
 	const open = context?.open;
 	const id = context?.id;
+	const role = context?.dialogRole ?? "dialog";
+
+	const titleId = id ? `${id}-title` : undefined;
+	const descriptionId = id ? `${id}-description` : undefined;
+
+	// Accessible name resolution (WAI-ARIA):
+	//  - explicit `aria-label` wins
+	//  - else reference the visible Title via `aria-labelledby` (Title renders id `${id}-title`)
+	//  - else fall back to a role-based default so screen readers always get *something*
+	//    (this avoids pointing `aria-labelledby` at a non-existent element when `title` is omitted)
+	//
+	// Detection is by component TYPE reference (`hasPart(children, Title)`), not by a
+	// `data-part` prop, because the `data-part="title"` marker is applied inside `Title`'s
+	// render and is not present on the `<Title>` element's props at this point.
+	const titleRendered = hasPart(children, Title);
+	const hasDescription = hasPart(children, Description);
+	const describedBy =
+		descriptionId && hasDescription ? descriptionId : undefined;
+
+	const nameProps = ariaLabel
+		? { "aria-label": ariaLabel }
+		: titleRendered
+			? { "aria-labelledby": titleId }
+			: { "aria-label": role === "alertdialog" ? "Alert" : "Dialog" };
+
+	// Dev aid: a drawer must have an accessible name (WAI-ARIA). Warn client-side only.
+	if (typeof window !== "undefined" && !ariaLabel && !titleRendered) {
+		console.warn(
+			"[Drawer] Missing accessible name: provide a `title` or `aria-label` so screen readers can identify the drawer.",
+		);
+	}
+
 	return (
 		<div
-			role="dialog"
+			role={role}
 			data-part="content"
 			aria-modal="true"
-			aria-labelledby={id ? `${id}-title` : undefined}
-			aria-describedby={id ? `${id}-description` : undefined}
+			{...nameProps}
+			{...(describedBy ? { "aria-describedby": describedBy } : {})}
 			class={cx(
 				styles.content,
 				"drawer__content",
@@ -233,6 +281,7 @@ export function Title(props: TitleProps) {
 	return (
 		<h2
 			id={id ? `${id}-title` : undefined}
+			data-part="title"
 			class={cx(styles.title, "drawer__title", classProp)}
 			{...restProps}
 		>
@@ -254,6 +303,7 @@ export function Description(props: DescriptionProps) {
 	return (
 		<div
 			id={id ? `${id}-description` : undefined}
+			data-part="description"
 			class={cx(styles.description, "drawer__description", classProp)}
 			{...restProps}
 		>
@@ -335,9 +385,21 @@ export function ActionTrigger(props: ActionTriggerProps) {
 	);
 }
 
-// Interactive version with state management and event listeners
+// Interactive version with state management and full a11y behavior
+// (focus trap, Escape, inert background, scroll lock, focus return).
+// The behavior layer itself lives in `./overlay-a11y` (`useOverlay`) and is
+// shared with Dialog so nested overlays cooperate on `inert` and focus.
+
 export interface InteractiveDrawerProps extends RootProps {
 	defaultOpen?: boolean;
+	/** Close when Escape is pressed. Default: true. */
+	closeOnEscape?: boolean;
+	/** Close when the backdrop is clicked / interaction occurs outside. Default: true. */
+	closeOnInteractOutside?: boolean;
+	/** Element to focus when the drawer opens. Defaults to the first focusable. */
+	initialFocusEl?: () => HTMLElement | null;
+	/** Element to focus when the drawer closes. Defaults to the trigger. */
+	finalFocusEl?: () => HTMLElement | null;
 }
 
 export function InteractiveDrawer(props: InteractiveDrawerProps) {
@@ -346,6 +408,11 @@ export function InteractiveDrawer(props: InteractiveDrawerProps) {
 		onOpenChange: onOpenChangeProp,
 		defaultOpen,
 		id: idProp,
+		dialogRole,
+		closeOnEscape = true,
+		closeOnInteractOutside = true,
+		initialFocusEl,
+		finalFocusEl,
 		...rest
 	} = props;
 	const [isOpen, setIsOpen] = useState(openProp ?? defaultOpen ?? false);
@@ -357,8 +424,6 @@ export function InteractiveDrawer(props: InteractiveDrawerProps) {
 	const rootId = idProp || `drawer-${fallbackId}`;
 	const rootRef = useRef<HTMLElement>(null);
 
-	const handleOpenChangeRef = useRef<(nextOpen: boolean) => void>(() => {});
-
 	const handleOpenChange = (nextOpen: boolean) => {
 		if (!isControlled) {
 			setIsOpen(nextOpen);
@@ -366,103 +431,16 @@ export function InteractiveDrawer(props: InteractiveDrawerProps) {
 		onOpenChangeProp?.(nextOpen);
 	};
 
-	// Store the handler in a ref
-	useEffect(() => {
-		handleOpenChangeRef.current = handleOpenChange;
-	}, [isControlled, onOpenChangeProp]);
-
-	// Attach event listeners using event delegation
-	useEffect(() => {
-		const root = rootRef.current;
-		if (!root) return;
-
-		// Handle all clicks via event delegation
-		const handleClick = (e: Event) => {
-			const target = (e.target as HTMLElement).closest(
-				"[data-part]",
-			) as HTMLElement;
-			if (!target) return;
-			const dataPart = target.getAttribute("data-part");
-
-			const getElements = () => {
-				return {
-					positioners: Array.from(
-						root.querySelectorAll<HTMLElement>('[data-part="positioner"]'),
-					),
-					backdrops: Array.from(
-						root.querySelectorAll<HTMLElement>('[data-part="backdrop"]'),
-					),
-					contents: Array.from(
-						root.querySelectorAll<HTMLElement>('[data-part="content"]'),
-					),
-				};
-			};
-
-			const hide = () => {
-				const { positioners, backdrops, contents } = getElements();
-				root.setAttribute("data-state", "closed");
-				positioners.forEach((p) => {
-					p.style.cssText =
-						"display: none !important; visibility: hidden !important;";
-					p.setAttribute("data-state", "closed");
-				});
-				backdrops.forEach((b) => {
-					b.style.cssText =
-						"display: none !important; visibility: hidden !important;";
-					b.setAttribute("data-state", "closed");
-				});
-				contents.forEach((c) => {
-					c.setAttribute("data-state", "closed");
-					c.style.cssText =
-						"display: none !important; visibility: hidden !important;";
-				});
-			};
-
-			const show = () => {
-				const { positioners, backdrops, contents } = getElements();
-				root.setAttribute("data-state", "open");
-				positioners.forEach((p) => {
-					p.style.cssText =
-						"display: flex !important; visibility: visible !important;";
-					p.setAttribute("data-state", "open");
-				});
-				backdrops.forEach((b) => {
-					b.style.cssText =
-						"display: block !important; visibility: visible !important;";
-					b.setAttribute("data-state", "open");
-				});
-				contents.forEach((c) => {
-					c.setAttribute("data-state", "open");
-					c.style.cssText =
-						"display: flex !important; visibility: visible !important;";
-				});
-			};
-
-			if (dataPart === "backdrop") {
-				hide();
-				handleOpenChangeRef.current?.(false);
-			} else if (dataPart === "trigger") {
-				const currentOpen = root.getAttribute("data-state") === "open";
-				const nextOpen = !currentOpen;
-				if (nextOpen) show();
-				else hide();
-				handleOpenChangeRef.current?.(nextOpen);
-			} else if (
-				dataPart === "close-trigger" ||
-				dataPart === "action-trigger"
-			) {
-				hide();
-				handleOpenChangeRef.current?.(false);
-			}
-		};
-
-		// Use event delegation on root
-		root.addEventListener("click", handleClick);
-
-		return () => {
-			root.removeEventListener("click", handleClick);
-		};
-	}, []);
+	// Click delegation + focus trap / Escape / inert / scroll lock / focus return.
+	useOverlay({
+		rootRef,
+		open,
+		closeOnEscape,
+		closeOnInteractOutside,
+		onChange: handleOpenChange,
+		initialFocusEl,
+		finalFocusEl,
+	});
 
 	return (
 		<Root
@@ -471,6 +449,7 @@ export function InteractiveDrawer(props: InteractiveDrawerProps) {
 			open={open}
 			onOpenChange={handleOpenChange}
 			rootRef={rootRef}
+			dialogRole={dialogRole}
 		/>
 	);
 }

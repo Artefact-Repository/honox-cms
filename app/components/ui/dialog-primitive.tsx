@@ -3,7 +3,6 @@ import {
 	cloneElement,
 	createContext,
 	useContext,
-	useEffect,
 	useId,
 	useRef,
 	useState,
@@ -11,6 +10,7 @@ import {
 import { css, cx } from "styled-system/css";
 import type { DialogVariantProps } from "styled-system/recipes";
 import { dialog } from "styled-system/recipes";
+import { hasPart, useOverlay } from "./overlay-a11y";
 
 type DialogStyles = ReturnType<typeof dialog>;
 
@@ -39,7 +39,14 @@ export interface RootProps extends DialogVariantProps, PropsWithChildren {
 
 export function Root(props: RootProps) {
 	const [variantProps, localProps] = dialog.splitVariantProps(props);
-	const { children, open, onOpenChange, id: idProp, rootRef, dialogRole } = localProps;
+	const {
+		children,
+		open,
+		onOpenChange,
+		id: idProp,
+		rootRef,
+		dialogRole,
+	} = localProps;
 	const styles = dialog(variantProps);
 	const generatedId = useId();
 	const id = idProp || generatedId;
@@ -144,26 +151,18 @@ export function Positioner(props: PositionerProps) {
 	);
 }
 
-// Recursively check whether a `data-part="<part>"` element exists in the
-// rendered children tree. Used to decide whether the dialog actually has a
-// Title / Description so we can wire `aria-labelledby` / `aria-describedby`
-// correctly (and avoid pointing those attributes at non-existent elements).
-function hasPart(node: unknown, part: string): boolean {
-	if (node == null || typeof node !== "object") return false;
-	if (Array.isArray(node)) return node.some((c) => hasPart(c, part));
-	const el = node as { props?: { "data-part"?: string; children?: unknown } };
-	if (el.props?.["data-part"] === part) return true;
-	if (el.props?.children != null) return hasPart(el.props.children, part);
-	return false;
-}
-
 export interface ContentProps extends PropsWithChildren {
 	class?: string;
 	"aria-label"?: string;
 }
 
 export function Content(props: ContentProps) {
-	const { children, class: classProp, "aria-label": ariaLabel, ...restProps } = props;
+	const {
+		children,
+		class: classProp,
+		"aria-label": ariaLabel,
+		...restProps
+	} = props;
 	const context = useDialogContext();
 	const styles = context?.styles || dialog();
 	const open = context?.open;
@@ -178,9 +177,14 @@ export function Content(props: ContentProps) {
 	//  - else reference the visible Title via `aria-labelledby` (Title renders id `${id}-title`)
 	//  - else fall back to a role-based default so screen readers always get *something*
 	//    (this avoids pointing `aria-labelledby` at a non-existent element when `title` is omitted)
-	const titleRendered = hasPart(children, "title");
+	//
+	// Detection is by component TYPE reference (`hasPart(children, Title)`), not by a
+	// `data-part` prop, because the `data-part="title"` marker is applied inside `Title`'s
+	// render and is not present on the `<Title>` element's props at this point.
+	const titleRendered = hasPart(children, Title);
+	const hasDescription = hasPart(children, Description);
 	const describedBy =
-		descriptionId && hasPart(children, "description") ? descriptionId : undefined;
+		descriptionId && hasDescription ? descriptionId : undefined;
 
 	const nameProps = ariaLabel
 		? { "aria-label": ariaLabel }
@@ -383,47 +387,8 @@ export function ActionTrigger(props: ActionTriggerProps) {
 
 // Interactive version with state management and full a11y behavior
 // (focus trap, Escape, inert background, scroll lock, focus return).
-
-// Selector for focusable elements inside the dialog content.
-const FOCUSABLE_SELECTOR =
-	'a[href],area[href],button:not([disabled]),input:not([disabled]),' +
-	'select:not([disabled]),textarea:not([disabled]),iframe:not([disabled]),' +
-	'object:not([disabled]),embed,[tabindex]:not([tabindex="-1"]),' +
-	'[contenteditable]:not([contenteditable="false"])';
-
-// Stack of currently-open dialog root elements (topmost = last).
-// Drives focus trapping (only the topmost handles keys) and inert math
-// so a nested dialog correctly disables the page AND its parent.
-const openDialogRoots: HTMLElement[] = [];
-
-function getFocusable(container: HTMLElement): HTMLElement[] {
-	return Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
-		(el) => !el.hasAttribute("disabled") && (el.offsetParent !== null || el === document.activeElement),
-	);
-}
-
-// Inert every sibling along the ancestor chain of each open dialog,
-// except the path to a dialog and except ancestors of any open dialog.
-function applyInert() {
-	document.querySelectorAll<HTMLElement>("[inert]").forEach((el) => (el.inert = false));
-	for (const root of openDialogRoots) {
-		const path = new Set<HTMLElement>();
-		let p: HTMLElement | null = root;
-		while (p && p !== document.body) {
-			path.add(p);
-			p = p.parentElement;
-		}
-		let node: HTMLElement | null = root.parentElement;
-		while (node && node !== document.body) {
-			for (const sib of Array.from(node.children)) {
-				if (path.has(sib as HTMLElement)) continue;
-				const protects = openDialogRoots.some((r) => sib === r || sib.contains(r));
-				if (!protects) (sib as HTMLElement).inert = true;
-			}
-			node = node.parentElement;
-		}
-	}
-}
+// The behavior layer itself lives in `./overlay-a11y` (`useOverlay`) and is
+// shared with Drawer so nested overlays cooperate on `inert` and focus.
 
 export interface InteractiveDialogProps extends RootProps {
 	defaultOpen?: boolean;
@@ -459,8 +424,6 @@ export function InteractiveDialog(props: InteractiveDialogProps) {
 	const rootId = idProp || `dialog-${fallbackId}`;
 	const rootRef = useRef<HTMLElement>(null);
 
-	const handleOpenChangeRef = useRef<(nextOpen: boolean) => void>(() => {});
-
 	const handleOpenChange = (nextOpen: boolean) => {
 		if (!isControlled) {
 			setIsOpen(nextOpen);
@@ -468,164 +431,16 @@ export function InteractiveDialog(props: InteractiveDialogProps) {
 		onOpenChangeProp?.(nextOpen);
 	};
 
-	// Store the handler in a ref
-	useEffect(() => {
-		handleOpenChangeRef.current = handleOpenChange;
-	}, [isControlled, onOpenChangeProp]);
-
-	// Click delegation (open / close). Backdrop dismiss is gated by closeOnInteractOutside.
-	useEffect(() => {
-		const root = rootRef.current;
-		if (!root) return;
-
-		const handleClick = (e: Event) => {
-			const target = (e.target as HTMLElement).closest(
-				"[data-part]",
-			) as HTMLElement;
-			if (!target) return;
-			const dataPart = target.getAttribute("data-part");
-
-			const getElements = () => {
-				return {
-					positioners: Array.from(
-						root.querySelectorAll<HTMLElement>('[data-part="positioner"]'),
-					),
-					backdrops: Array.from(
-						root.querySelectorAll<HTMLElement>('[data-part="backdrop"]'),
-					),
-					contents: Array.from(
-						root.querySelectorAll<HTMLElement>('[data-part="content"]'),
-					),
-				};
-			};
-
-			const hide = () => {
-				const { positioners, backdrops, contents } = getElements();
-				root.setAttribute("data-state", "closed");
-				positioners.forEach((p) => {
-					p.style.cssText =
-						"display: none !important; visibility: hidden !important;";
-					p.setAttribute("data-state", "closed");
-				});
-				backdrops.forEach((b) => {
-					b.style.cssText =
-						"display: none !important; visibility: hidden !important;";
-					b.setAttribute("data-state", "closed");
-				});
-				contents.forEach((c) => {
-					c.setAttribute("data-state", "closed");
-					c.style.cssText =
-						"display: none !important; visibility: hidden !important;";
-				});
-			};
-
-			const show = () => {
-				const { positioners, backdrops, contents } = getElements();
-				root.setAttribute("data-state", "open");
-				positioners.forEach((p) => {
-					p.style.cssText =
-						"display: flex !important; visibility: visible !important;";
-					p.setAttribute("data-state", "open");
-				});
-				backdrops.forEach((b) => {
-					b.style.cssText =
-						"display: block !important; visibility: visible !important;";
-					b.setAttribute("data-state", "open");
-				});
-				contents.forEach((c) => {
-					c.setAttribute("data-state", "open");
-					c.style.cssText =
-						"display: flex !important; visibility: visible !important;";
-				});
-			};
-
-			if (dataPart === "backdrop") {
-				if (closeOnInteractOutside) {
-					hide();
-					handleOpenChangeRef.current?.(false);
-				}
-			} else if (dataPart === "trigger") {
-				const currentOpen = root.getAttribute("data-state") === "open";
-				const nextOpen = !currentOpen;
-				if (nextOpen) show();
-				else hide();
-				handleOpenChangeRef.current?.(nextOpen);
-			} else if (
-				dataPart === "close-trigger" ||
-				dataPart === "action-trigger"
-			) {
-				hide();
-				handleOpenChangeRef.current?.(false);
-			}
-		};
-
-		root.addEventListener("click", handleClick);
-
-		return () => {
-			root.removeEventListener("click", handleClick);
-		};
-	}, [closeOnInteractOutside]);
-
-	// Accessibility behavior layer: focus trap, Escape, inert background, scroll lock,
-	// focus return to trigger on close. Runs whenever `open` changes.
-	useEffect(() => {
-		if (!open) return;
-		const root = rootRef.current;
-		if (!root) return;
-		const content = root.querySelector<HTMLElement>('[data-part="content"]');
-		if (!content) return;
-
-		const prevFocus = document.activeElement as HTMLElement | null;
-		openDialogRoots.push(root);
-		applyInert();
-		const prevOverflow = document.body.style.overflow;
-		document.body.style.overflow = "hidden";
-
-		// Move focus into the dialog (initialFocusEl > first focusable > content)
-		const focusables = getFocusable(content);
-		(initialFocusEl?.() ?? focusables[0] ?? content).focus();
-
-		const onKeyDown = (e: KeyboardEvent) => {
-			// Only the topmost (most recently opened) dialog handles keys
-			if (openDialogRoots[openDialogRoots.length - 1] !== root) return;
-
-			if (e.key === "Escape") {
-				if (closeOnEscape) {
-					e.preventDefault();
-					handleOpenChangeRef.current?.(false);
-				}
-				return;
-			}
-			if (e.key === "Tab") {
-				const f = getFocusable(content);
-				if (f.length === 0) {
-					e.preventDefault();
-					content.focus();
-					return;
-				}
-				const first = f[0];
-				const last = f[f.length - 1];
-				if (e.shiftKey && document.activeElement === first) {
-					e.preventDefault();
-					last.focus();
-				} else if (!e.shiftKey && document.activeElement === last) {
-					e.preventDefault();
-					first.focus();
-				}
-			}
-		};
-		root.addEventListener("keydown", onKeyDown);
-
-		return () => {
-			root.removeEventListener("keydown", onKeyDown);
-			const i = openDialogRoots.indexOf(root);
-			if (i !== -1) openDialogRoots.splice(i, 1);
-			applyInert();
-			if (openDialogRoots.length === 0) document.body.style.overflow = prevOverflow;
-			// Return focus to the trigger (or finalFocusEl) on close
-			(finalFocusEl?.() ?? prevFocus)?.focus?.();
-		};
-	}, [open, closeOnEscape, initialFocusEl, finalFocusEl]);
+	// Click delegation + focus trap / Escape / inert / scroll lock / focus return.
+	useOverlay({
+		rootRef,
+		open,
+		closeOnEscape,
+		closeOnInteractOutside,
+		onChange: handleOpenChange,
+		initialFocusEl,
+		finalFocusEl,
+	});
 
 	return (
 		<Root
