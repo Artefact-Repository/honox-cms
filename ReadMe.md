@@ -69,7 +69,7 @@ Sveltia CMS is configured in `public/admin/config.yml`. You can use it **locally
 - **Bitbucket:** `name: bitbucket`
 - **Azure:** `name: azure`
 
-See [Sveltia CMS docs](https://github.com/sveltia/sveltia-cms) for details.
+See [Sveltia CMS docs](https://sveltiacms.app/en/docs/backends) for details.
 
 ---
 
