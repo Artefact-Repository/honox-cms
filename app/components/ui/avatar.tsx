@@ -1,6 +1,6 @@
 import { InteractiveAvatar } from "../../islands/avatar";
-import { shouldHydrate } from "./island-utils";
 import { AvatarBase, type AvatarBaseProps } from "./avatar-primitive";
+import { shouldHydrate } from "./island-utils";
 
 export interface AvatarProps extends AvatarBaseProps {
 	interactive?: boolean;
