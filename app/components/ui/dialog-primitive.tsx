@@ -19,6 +19,7 @@ interface DialogContextValue {
 	open?: boolean;
 	onOpenChange?: (open: boolean) => void;
 	id: string;
+	dialogRole?: "dialog" | "alertdialog";
 }
 
 const DialogContext = createContext<DialogContextValue | null>(null);
@@ -33,11 +34,12 @@ export interface RootProps extends DialogVariantProps, PropsWithChildren {
 	onOpenChange?: (open: boolean) => void;
 	id?: string;
 	rootRef?: any;
+	dialogRole?: "dialog" | "alertdialog";
 }
 
 export function Root(props: RootProps) {
 	const [variantProps, localProps] = dialog.splitVariantProps(props);
-	const { children, open, onOpenChange, id: idProp, rootRef } = localProps;
+	const { children, open, onOpenChange, id: idProp, rootRef, dialogRole } = localProps;
 	const styles = dialog(variantProps);
 	const generatedId = useId();
 	const id = idProp || generatedId;
@@ -47,6 +49,7 @@ export function Root(props: RootProps) {
 		open,
 		onOpenChange,
 		id,
+		dialogRole,
 	};
 
 	return (
@@ -143,6 +146,7 @@ export function Positioner(props: PositionerProps) {
 
 export interface ContentProps extends PropsWithChildren {
 	class?: string;
+	"aria-label"?: string;
 }
 
 export function Content(props: ContentProps) {
@@ -151,12 +155,15 @@ export function Content(props: ContentProps) {
 	const styles = context?.styles || dialog();
 	const open = context?.open;
 	const id = context?.id;
+	const hasAriaLabel = "aria-label" in restProps;
 	return (
 		<div
-			role="dialog"
+			role={context?.dialogRole ?? "dialog"}
 			data-part="content"
 			aria-modal="true"
-			aria-labelledby={id ? `${id}-title` : undefined}
+			{...(hasAriaLabel
+				? {}
+				: { "aria-labelledby": id ? `${id}-title` : undefined })}
 			aria-describedby={id ? `${id}-description` : undefined}
 			class={cx(
 				styles.content,
@@ -335,9 +342,60 @@ export function ActionTrigger(props: ActionTriggerProps) {
 	);
 }
 
-// Interactive version with state management and event listeners
+// Interactive version with state management and full a11y behavior
+// (focus trap, Escape, inert background, scroll lock, focus return).
+
+// Selector for focusable elements inside the dialog content.
+const FOCUSABLE_SELECTOR =
+	'a[href],area[href],button:not([disabled]),input:not([disabled]),' +
+	'select:not([disabled]),textarea:not([disabled]),iframe:not([disabled]),' +
+	'object:not([disabled]),embed,[tabindex]:not([tabindex="-1"]),' +
+	'[contenteditable]:not([contenteditable="false"])';
+
+// Stack of currently-open dialog root elements (topmost = last).
+// Drives focus trapping (only the topmost handles keys) and inert math
+// so a nested dialog correctly disables the page AND its parent.
+const openDialogRoots: HTMLElement[] = [];
+
+function getFocusable(container: HTMLElement): HTMLElement[] {
+	return Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
+		(el) => !el.hasAttribute("disabled") && (el.offsetParent !== null || el === document.activeElement),
+	);
+}
+
+// Inert every sibling along the ancestor chain of each open dialog,
+// except the path to a dialog and except ancestors of any open dialog.
+function applyInert() {
+	document.querySelectorAll<HTMLElement>("[inert]").forEach((el) => (el.inert = false));
+	for (const root of openDialogRoots) {
+		const path = new Set<HTMLElement>();
+		let p: HTMLElement | null = root;
+		while (p && p !== document.body) {
+			path.add(p);
+			p = p.parentElement;
+		}
+		let node: HTMLElement | null = root.parentElement;
+		while (node && node !== document.body) {
+			for (const sib of Array.from(node.children)) {
+				if (path.has(sib as HTMLElement)) continue;
+				const protects = openDialogRoots.some((r) => sib === r || sib.contains(r));
+				if (!protects) (sib as HTMLElement).inert = true;
+			}
+			node = node.parentElement;
+		}
+	}
+}
+
 export interface InteractiveDialogProps extends RootProps {
 	defaultOpen?: boolean;
+	/** Close when Escape is pressed. Default: true. */
+	closeOnEscape?: boolean;
+	/** Close when the backdrop is clicked / interaction occurs outside. Default: true. */
+	closeOnInteractOutside?: boolean;
+	/** Element to focus when the dialog opens. Defaults to the first focusable. */
+	initialFocusEl?: () => HTMLElement | null;
+	/** Element to focus when the dialog closes. Defaults to the trigger. */
+	finalFocusEl?: () => HTMLElement | null;
 }
 
 export function InteractiveDialog(props: InteractiveDialogProps) {
@@ -346,6 +404,11 @@ export function InteractiveDialog(props: InteractiveDialogProps) {
 		onOpenChange: onOpenChangeProp,
 		defaultOpen,
 		id: idProp,
+		dialogRole,
+		closeOnEscape = true,
+		closeOnInteractOutside = true,
+		initialFocusEl,
+		finalFocusEl,
 		...rest
 	} = props;
 	const [isOpen, setIsOpen] = useState(openProp ?? defaultOpen ?? false);
@@ -371,12 +434,11 @@ export function InteractiveDialog(props: InteractiveDialogProps) {
 		handleOpenChangeRef.current = handleOpenChange;
 	}, [isControlled, onOpenChangeProp]);
 
-	// Attach event listeners using event delegation
+	// Click delegation (open / close). Backdrop dismiss is gated by closeOnInteractOutside.
 	useEffect(() => {
 		const root = rootRef.current;
 		if (!root) return;
 
-		// Handle all clicks via event delegation
 		const handleClick = (e: Event) => {
 			const target = (e.target as HTMLElement).closest(
 				"[data-part]",
@@ -439,8 +501,10 @@ export function InteractiveDialog(props: InteractiveDialogProps) {
 			};
 
 			if (dataPart === "backdrop") {
-				hide();
-				handleOpenChangeRef.current?.(false);
+				if (closeOnInteractOutside) {
+					hide();
+					handleOpenChangeRef.current?.(false);
+				}
 			} else if (dataPart === "trigger") {
 				const currentOpen = root.getAttribute("data-state") === "open";
 				const nextOpen = !currentOpen;
@@ -456,13 +520,73 @@ export function InteractiveDialog(props: InteractiveDialogProps) {
 			}
 		};
 
-		// Use event delegation on root
 		root.addEventListener("click", handleClick);
 
 		return () => {
 			root.removeEventListener("click", handleClick);
 		};
-	}, []);
+	}, [closeOnInteractOutside]);
+
+	// Accessibility behavior layer: focus trap, Escape, inert background, scroll lock,
+	// focus return to trigger on close. Runs whenever `open` changes.
+	useEffect(() => {
+		if (!open) return;
+		const root = rootRef.current;
+		if (!root) return;
+		const content = root.querySelector<HTMLElement>('[data-part="content"]');
+		if (!content) return;
+
+		const prevFocus = document.activeElement as HTMLElement | null;
+		openDialogRoots.push(root);
+		applyInert();
+		const prevOverflow = document.body.style.overflow;
+		document.body.style.overflow = "hidden";
+
+		// Move focus into the dialog (initialFocusEl > first focusable > content)
+		const focusables = getFocusable(content);
+		(initialFocusEl?.() ?? focusables[0] ?? content).focus();
+
+		const onKeyDown = (e: KeyboardEvent) => {
+			// Only the topmost (most recently opened) dialog handles keys
+			if (openDialogRoots[openDialogRoots.length - 1] !== root) return;
+
+			if (e.key === "Escape") {
+				if (closeOnEscape) {
+					e.preventDefault();
+					handleOpenChangeRef.current?.(false);
+				}
+				return;
+			}
+			if (e.key === "Tab") {
+				const f = getFocusable(content);
+				if (f.length === 0) {
+					e.preventDefault();
+					content.focus();
+					return;
+				}
+				const first = f[0];
+				const last = f[f.length - 1];
+				if (e.shiftKey && document.activeElement === first) {
+					e.preventDefault();
+					last.focus();
+				} else if (!e.shiftKey && document.activeElement === last) {
+					e.preventDefault();
+					first.focus();
+				}
+			}
+		};
+		root.addEventListener("keydown", onKeyDown);
+
+		return () => {
+			root.removeEventListener("keydown", onKeyDown);
+			const i = openDialogRoots.indexOf(root);
+			if (i !== -1) openDialogRoots.splice(i, 1);
+			applyInert();
+			if (openDialogRoots.length === 0) document.body.style.overflow = prevOverflow;
+			// Return focus to the trigger (or finalFocusEl) on close
+			(finalFocusEl?.() ?? prevFocus)?.focus?.();
+		};
+	}, [open, closeOnEscape, initialFocusEl, finalFocusEl]);
 
 	return (
 		<Root
@@ -471,6 +595,7 @@ export function InteractiveDialog(props: InteractiveDialogProps) {
 			open={open}
 			onOpenChange={handleOpenChange}
 			rootRef={rootRef}
+			dialogRole={dialogRole}
 		/>
 	);
 }
