@@ -57,7 +57,7 @@ export function shouldHydrate(interactive: unknown, hasSignal: boolean): boolean
 > **Core rule: `shouldHydrate(interactive, true)`**
 
 These components *are* interaction — their entire value depends on client JS
-(overlays, modals, drag handles, expand/collapse, async image loading). They hydrate
+(overlays, modals, drag handles, expand/collapse). They hydrate
 unless the caller explicitly passes `interactive={false}`.
 
 Applies to:
@@ -66,7 +66,6 @@ Applies to:
 - Modals / drawers / drag (dialog, drawer, splitter)
 - Expand / collapse (collapsible)
 - Pure client singletons (toast)
-- Components needing client load states (avatar: a `src` implies async loading)
 
 ### Tier-2 — Smart auto-detect
 
@@ -82,6 +81,9 @@ Applies to:
 - Form controls (button, checkbox, switch, textarea, field, slider, combobox, radio-group)
 - Selectable groups (tabs, segment-group, toggle-group)
 - Tables with row clicks (table)
+- Avatar with a `src` (the async image load / error lifecycle is a client-only cue)
+- Pagination / tags-input (state + handlers; a `type="link"` pagination that supplies
+  `getPageUrl` is pure navigation and stays static)
 
 ### Tier-3 — Presentational
 
@@ -117,7 +119,6 @@ Applies to:
 | `menu` | `shouldHydrate(interactive, true)` | Always hydrates | ✅ `menu.tsx` |
 | `collapsible` | `shouldHydrate(interactive, true)` | Always hydrates (expand/collapse needs JS) | ✅ `collapsible.tsx` (Tier-1) |
 | `toast` | Always island (client singleton) | No prop, always an island | ✅ `toast.tsx` |
-| `avatar` | `shouldHydrate(interactive, Boolean(src))` | `src` present or `interactive` truthy | ✅ `avatar.tsx` |
 
 ### Tier-2 (smart auto-detect)
 
@@ -136,6 +137,9 @@ Applies to:
 | `field` | `value` / `defaultValue` / `onValueChange` / `validator` / `minLength` | ✅ `field.tsx` |
 | `combobox` | `open` / `inputValue` / `onToggle` / `onInputChange` / `onItemSelect` | ✅ `combobox.tsx` |
 | `radio-group` | `value` / `defaultValue` / `onValueChange` | ✅ `radio-group.tsx` |
+| `avatar` | `src` (async image load / error lifecycle) | ✅ `avatar.tsx` (Tier-2) |
+| `pagination` | `onPageChange`, or non-link `page` / `defaultPage` / `pageSize` / `defaultPageSize` | ✅ `pagination.tsx` |
+| `tags-input` | `onValueChange` / `onInputValueChange` / `value` / `inputValue` / `defaultValue` / `defaultInputValue` | ✅ `tags-input.tsx` |
 
 ### Tier-3 (presentational)
 
@@ -161,16 +165,12 @@ Applies to:
 ### Tier-1 conditions
 
 - The component's core interaction (opening an overlay, dragging a splitter, expand/collapse,
-  modal focus-trap, async image loading) **cannot be expressed in pure HTML**, so `hasSignal`
+  modal focus-trap) **cannot be expressed in pure HTML**, so `hasSignal`
   defaults to `true`.
 - The only legal opt-out is `interactive={false}` (e.g. force-disabling an overlay inside a
   purely static document).
 - `toast` is special: it is a global client singleton (`toaster.create(...)`), and does not
   expose an `interactive` prop.
-- `avatar` is special: when `src` is present it needs client handling of load/error states,
-  so `src` acts as an implicit signal via `shouldHydrate(interactive, Boolean(src))`.
-  Note: an explicit `interactive={false}` suppresses hydration even when `src` exists
-  (consistent with the library-wide "`false` wins" semantics).
 
 ### Tier-2 conditions
 
@@ -192,8 +192,22 @@ Decision principles:
 2. **Uncontrolled initial value** (`defaultValue` / `defaultChecked`) → needs JS to hold internal state.
 3. **Event handlers** (`onChange` / `onClick` / `onValueChange` / `onItemSelect` …) → needs JS to respond.
 4. **Validation / constraints** (`validator` / `minLength`) → needs JS to execute.
-5. Any one of the above being present makes `hasSignal` true, which triggers hydration;
+5. **Async / client-only cues** — `src` on `avatar` (implies a load/error lifecycle),
+   or any prop whose only purpose is a client-side effect (media, intersection, lazy
+   loading). These cannot resolve without JS, so they count as a signal.
+6. Any one of the above being present makes `hasSignal` true, which triggers hydration;
    if all are absent, the component renders as pure static markup.
+
+> **`avatar` is special among Tier-2 components:** its signal is the async-load cue `src`.
+> When `src` is present the image needs client-side load/error handling, so
+> `shouldHydrate(interactive, Boolean(src))` hydrates it; an `avatar` with no `src` (e.g. a
+> initials fallback) stays static. An explicit `interactive={false}` suppresses hydration even
+> when `src` exists (consistent with the library-wide "`false` wins" semantics).
+
+> **`pagination` link-mode exception:** a `type="link"` pagination that supplies `getPageUrl`
+> is pure navigation (each page is an anchor), so it stays static unless an explicit
+> `onPageChange` handler is supplied. Only in button mode (or with `onPageChange`) do the
+> `page` / `defaultPage` / `pageSize` / `defaultPageSize` props count as signals.
 
 ### Tier-3 conditions
 
@@ -209,7 +223,7 @@ Decision principles:
 Walk the list in order; stop at the first match:
 
 1. **Does its existence depend entirely on client JS?**
-   Overlay / modal / drag / expand-collapse / async-media loading → **Tier-1**, use
+   Overlay / modal / drag / expand-collapse → **Tier-1**, use
    `shouldHydrate(interactive, true)`.
 2. **Is it a form control or a visually-selectable component that may be controlled or
    uncontrolled?**
@@ -238,6 +252,8 @@ The following divergences were resolved during convention rollout; kept here for
 | 3 | `avatar` | Ad-hoc `if (rest.src || interactive)` | Switched to `shouldHydrate(interactive, Boolean(rest.src))`, unified entry point |
 | 4 | `badge` / `heading` / `text` / `fieldset` | Dead `interactive` prop declared, leaked onto the DOM via `restProps` (`interactive="true"`) | Removed the `interactive` prop declaration |
 | 5 | `collapsible` | Tier not documented explicitly | Added a `# Hydration` section to `docs/Collapsible.md`, marking it Tier-1 |
+| 6 | `tags-input` | Bare `if (isInteractive)` branch, no `interactive` prop, no `shouldHydrate`, and `defaultValue` / `defaultInputValue` omitted from the signal set (an uncontrolled tags-input rendered static) | Switched to `shouldHydrate(interactive, hasSignal)`, added the `interactive` knob, extended the signal set to include `defaultValue` / `defaultInputValue` |
+| 7 | `pagination` / `avatar` | Missing from the tier tables (`pagination` absent entirely; `avatar` mis-classified as Tier-1) and `pagination` over-hydrated in link mode | Added `pagination` + `tags-input` to Tier-2; moved `avatar` to Tier-2 (load-cue signal); gated `pagination` link-mode so pure-navigation stays static |
 
 > Note: item 4 was a real bug — `badge` / `heading` / `text` / `fieldset` would render
 > `interactive` as an invalid HTML attribute on the DOM; it was prioritised for repair.
