@@ -55,12 +55,18 @@ function Pagination(props: PaginationProps) {
 		...rest
 	} = props;
 
+	// A `type="link"` pagination that supplies `getPageUrl` is pure navigation —
+	// each page is an anchor with an href, so it needs no client JS. Only an
+	// explicit `onPageChange` handler (button-mode behaviour) forces hydration.
+	const isLinkMode = type === "link" && getPageUrl !== undefined;
+
 	const hasSignal =
 		onPageChange !== undefined ||
-		page !== undefined ||
-		defaultPage !== undefined ||
-		pageSize !== undefined ||
-		defaultPageSize !== undefined;
+		(!isLinkMode &&
+			(page !== undefined ||
+				defaultPage !== undefined ||
+				pageSize !== undefined ||
+				defaultPageSize !== undefined));
 	const isInteractive = shouldHydrate(interactive, hasSignal);
 
 	const rootProps = {
