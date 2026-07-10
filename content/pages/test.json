@@ -172,6 +172,18 @@
       "description": "desc",
       "triggerText": "Hover me",
       "showArrow": true
+    },
+    {
+      "type": "field",
+      "children": [],
+      "disabled": false,
+      "label": "label",
+      "helperText": "helper",
+      "errorText": "error",
+      "defaultValue": "123",
+      "invalid": false,
+      "required": true,
+      "readOnly": false
     }
   ]
 }
