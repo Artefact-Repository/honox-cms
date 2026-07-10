@@ -48,6 +48,7 @@ export {
 export { Slider, type SliderProps } from "./slider";
 export { Spinner, type SpinnerProps } from "./spinner";
 export { type PanelConfig, Splitter, type SplitterProps } from "./splitter";
+export { Stack, type StackProps } from "./stack";
 export { Switch, type SwitchProps } from "./switch";
 export {
 	Table,

@@ -34,6 +34,7 @@ import {
 	SkeletonText,
 	Slider,
 	Spinner,
+	Stack,
 	Splitter,
 	Switch,
 	Table,
@@ -1075,6 +1076,71 @@ export default createRoute((c) => {
 							<Button variant="outline">Top</Button>
 							<Button variant="outline">Bottom</Button>
 						</Group>
+					</div>
+				</div>
+			</div>
+
+			{/* Stack Examples */}
+			<div
+				class={css({
+					mt: "8",
+					display: "flex",
+					flexDirection: "column",
+					gap: "4",
+					alignItems: "center",
+					maxWidth: "xl",
+					mx: "auto",
+				})}
+			>
+				<Heading as="h2" class={css({ fontSize: "xl", mb: "4" })}>
+					Stack Component Examples
+				</Heading>
+
+				<div
+					class={css({
+						display: "flex",
+						flexDirection: "column",
+						gap: "8",
+						width: "full",
+					})}
+				>
+					<div class={css({ textAlign: "center" })}>
+						<Text size="sm" class={css({ mb: "2", color: "fg.muted" })}>
+							Horizontal Stack (Default)
+						</Text>
+						<Stack gap="4" justify="center">
+							<div class={css({ boxSize: "10", bg: "red.9", rounded: "md" })} />
+							<div class={css({ boxSize: "10", bg: "blue.9", rounded: "md" })} />
+							<div
+								class={css({ boxSize: "10", bg: "green.9", rounded: "md" })}
+							/>
+						</Stack>
+					</div>
+
+					<div class={css({ textAlign: "center" })}>
+						<Text size="sm" class={css({ mb: "2", color: "fg.muted" })}>
+							Vertical Stack
+						</Text>
+						<Stack direction="vertical" gap="2" align="center">
+							<div class={css({ h: "10", w: "20", bg: "red.9", rounded: "md" })} />
+							<div
+								class={css({ h: "10", w: "20", bg: "blue.9", rounded: "md" })}
+							/>
+							<div
+								class={css({ h: "10", w: "20", bg: "green.9", rounded: "md" })}
+							/>
+						</Stack>
+					</div>
+
+					<div class={css({ textAlign: "center" })}>
+						<Text size="sm" class={css({ mb: "2", color: "fg.muted" })}>
+							Stack with Spacing and Alignment
+						</Text>
+						<Stack gap="10" align="end" justify="between" class={css({ border: "1px solid", p: "4", borderColor: "border" })}>
+							<Text>Item 1</Text>
+							<Text>Item 2</Text>
+							<Text>Item 3</Text>
+						</Stack>
 					</div>
 				</div>
 			</div>

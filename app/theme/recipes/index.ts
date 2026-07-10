@@ -24,6 +24,7 @@ import { segmentGroup } from "./segment-group";
 import { skeleton } from "./skeleton";
 import { slider } from "./slider";
 import { spinner } from "./spinner";
+import { stack } from "./stack";
 import { splitter } from "./splitter";
 import { switchRecipe } from "./switch";
 import { table } from "./table";
@@ -42,6 +43,7 @@ export const recipes = {
 	group,
 	heading,
 	spinner,
+	stack,
 	text,
 	textarea,
 	skeleton,
