@@ -28,14 +28,15 @@
           "title": "Mountain Cabin Adventure",
           "description": "Experience nature in its purest form.",
           "body": "Located high in the Cascades, our cozy cabin provides a warm fire and majestic views.",
+          "footer": "",
           "image": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&q=80",
           "imagePosition": "top",
           "children": [
             {
               "type": "checkbox",
-              "label": "I agree to the Cabin Terms & Conditions",
+              "colorPalette": "blue",
               "checked": true,
-              "colorPalette": "blue"
+              "label": "I agree to the Cabin Terms & Conditions"
             },
             {
               "type": "button",
@@ -54,19 +55,21 @@
         },
         {
           "type": "collapsible",
-          "triggerText": "Click to expand details",
-          "showIndicator": true,
-          "indicatorPlacement": "end",
+          "content": "Content",
+          "trigger": "Trigger of Collapsile",
           "open": false,
           "children": [
             {
               "type": "alert",
-              "status": "warning",
               "variant": "subtle",
               "title": "Limited Spots",
-              "description": "Cabins are filling up fast for the winter season!"
+              "description": "Cabins are filling up fast for the winter season!",
+              "status": "warning"
             }
-          ]
+          ],
+          "triggerText": "Click to expand details",
+          "showIndicator": true,
+          "indicatorPlacement": "end"
         },
         {
           "type": "heading",
@@ -79,10 +82,22 @@
           "label": "Choose Your Favorite Framework",
           "placeholder": "Select a framework...",
           "items": [
-            { "label": "Hono", "value": "hono" },
-            { "label": "React", "value": "react" },
-            { "label": "Svelte", "value": "svelte" },
-            { "label": "Vue", "value": "vue" }
+            {
+              "label": "Hono",
+              "value": "hono"
+            },
+            {
+              "label": "React",
+              "value": "react"
+            },
+            {
+              "label": "Svelte",
+              "value": "svelte"
+            },
+            {
+              "label": "Vue",
+              "value": "vue"
+            }
           ]
         },
         {
@@ -100,6 +115,11 @@
               "type": "dialog",
               "title": "Terms of Service",
               "description": "Please read our terms before proceeding.",
+              "body": "",
+              "footer": "",
+              "trigger": "",
+              "cancel": "",
+              "confirm": "",
               "triggerText": "View Terms (Dialog)",
               "confirmText": "Accept",
               "cancelText": "Decline",
@@ -109,6 +129,11 @@
               "type": "drawer",
               "title": "Feedback Panel",
               "description": "We would love to hear from you.",
+              "body": "",
+              "footer": "",
+              "trigger": "",
+              "cancel": "",
+              "confirm": "",
               "triggerText": "Give Feedback (Drawer)",
               "confirmText": "Submit",
               "cancelText": "Cancel"
