@@ -82,7 +82,7 @@
           "label": "Choose Your Favorite Framework",
           "items": [
             {
-              "label": "Hono",
+              "label": "HonoX",
               "value": "hono"
             },
             {
