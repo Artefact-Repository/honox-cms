@@ -141,6 +141,18 @@
           ]
         }
       ]
+    },
+    {
+      "type": "drawer",
+      "title": "TitleDrawer",
+      "description": "Description",
+      "body": "Body",
+      "footer": "Footer",
+      "interactive": true,
+      "trigger": "TriggerDrawer",
+      "cancel": "",
+      "confirm": "",
+      "closable": true
     }
   ]
 }
