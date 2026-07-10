@@ -16,12 +16,22 @@ import {
 	Heading,
 	HoverCard,
 	Menu,
+	PaginatedTable,
+	Pagination,
+	Popover,
+	Progress,
+	RadioGroup,
+	SegmentGroup,
+	Skeleton,
+	Slider,
 	Stack,
+	Switch,
 	Text,
 } from "./ui";
 
 interface ComponentBlock {
 	type: string;
+	// biome-ignore lint/suspicious/noExplicitAny: component properties are parsed from dynamic JSON
 	[key: string]: any;
 }
 
@@ -354,6 +364,109 @@ function RenderBlock({ block }: { block: ComponentBlock }) {
 					{...menuProps}
 				/>
 			);
+		}
+		case "popover": {
+			const {
+				triggerText,
+				title,
+				description,
+				body,
+				footer,
+				showArrow,
+				closable,
+				children,
+				...popoverProps
+			} = props;
+			const trigger = triggerText ? (
+				<Button variant="outline">{triggerText}</Button>
+			) : undefined;
+			const content = children ? (
+				<PageRenderer content={children} />
+			) : undefined;
+			return (
+				<Popover
+					interactive
+					trigger={trigger}
+					title={title}
+					description={description}
+					body={body}
+					footer={footer}
+					showArrow={showArrow}
+					closable={closable}
+					{...popoverProps}
+				>
+					{content}
+				</Popover>
+			);
+		}
+		case "skeleton": {
+			const { variant, noOfLines, loaded, children, ...skeletonProps } = props;
+			if (variant === "text") {
+				return (
+					<Skeleton
+						loaded={loaded}
+						class={css({ width: "full" })}
+						{...skeletonProps}
+					>
+						{children ? (
+							<PageRenderer content={children} />
+						) : (
+							<div
+								class={css({
+									display: "flex",
+									flexDirection: "column",
+									gap: "2",
+									width: "full",
+								})}
+							>
+								{Array.from({ length: noOfLines || 3 }).map((_, index) => (
+									<Skeleton
+										key={index}
+										class={css({
+											height: "4",
+											width: "full",
+											_last: { maxWidth: "80%" },
+										})}
+									/>
+								))}
+							</div>
+						)}
+					</Skeleton>
+				);
+			}
+			return (
+				<Skeleton
+					circle={variant === "circle"}
+					loaded={loaded}
+					{...skeletonProps}
+				>
+					{children && <PageRenderer content={children} />}
+				</Skeleton>
+			);
+		}
+		case "paginatedTable":
+		case "paginated-table": {
+			return <PaginatedTable {...props} />;
+		}
+		case "pagination": {
+			return <Pagination interactive {...props} />;
+		}
+		case "progress": {
+			return <Progress {...props} />;
+		}
+		case "radioGroup":
+		case "radio-group": {
+			return <RadioGroup interactive {...props} />;
+		}
+		case "segmentGroup":
+		case "segment-group": {
+			return <SegmentGroup interactive {...props} />;
+		}
+		case "slider": {
+			return <Slider interactive {...props} />;
+		}
+		case "switch": {
+			return <Switch interactive {...props} />;
 		}
 		default:
 			return (

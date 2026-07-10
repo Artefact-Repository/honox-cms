@@ -246,6 +246,129 @@ collections:
                                   - { label: Value, name: value, widget: string, required: false }
                                   - { label: Disabled, name: disabled, widget: boolean, default: false }
                                   - { label: Checked, name: checked, widget: boolean, default: false }
+                          - label: Popover
+                            name: popover
+                            widget: object
+                            fields: &popover_fields
+                              - { label: Trigger Text, name: triggerText, widget: string, default: "Click me" }
+                              - { label: Title, name: title, widget: string, required: false }
+                              - { label: Description, name: description, widget: string, required: false }
+                              - { label: Body, name: body, widget: string, required: false }
+                              - { label: Footer, name: footer, widget: string, required: false }
+                              - { label: Show Arrow, name: showArrow, widget: boolean, default: true }
+                              - { label: Closable, name: closable, widget: boolean, default: true }
+                          - label: Skeleton
+                            name: skeleton
+                            widget: object
+                            fields: &skeleton_fields
+                              - label: Variant
+                                name: variant
+                                widget: select
+                                options: [box, circle, text]
+                                default: box
+                              - { label: No Of Lines, name: noOfLines, widget: number, default: 3, required: false }
+                              - { label: Loaded, name: loaded, widget: boolean, default: false }
+                          - label: Paginated Table
+                            name: paginatedTable
+                            widget: object
+                            fields: &paginatedtable_fields []
+                          - label: Pagination
+                            name: pagination
+                            widget: object
+                            fields: &pagination_fields
+                              - { label: Count, name: count, widget: number, default: 100 }
+                              - { label: Page Size, name: pageSize, widget: number, default: 10, required: false }
+                              - { label: Default Page, name: defaultPage, widget: number, default: 1, required: false }
+                              - { label: Sibling Count, name: siblingCount, widget: number, default: 1, required: false }
+                              - { label: Boundary Count, name: boundaryCount, widget: number, default: 1, required: false }
+                          - label: Progress
+                            name: progress
+                            widget: object
+                            fields: &progress_fields
+                              - { label: Label, name: label, widget: string, required: false }
+                              - { label: Value, name: value, widget: number, default: 50 }
+                              - { label: Min, name: min, widget: number, default: 0, required: false }
+                              - { label: Max, name: max, widget: number, default: 100, required: false }
+                              - { label: Show Value Text, name: showValueText, widget: boolean, default: false }
+                              - label: Type
+                                name: type
+                                widget: select
+                                options: [linear, circular]
+                                default: linear
+                              - label: Color Palette
+                                name: colorPalette
+                                widget: select
+                                options: [blue, green, red, purple, orange, amber, cyan, slate]
+                                required: false
+                          - label: Radio Group
+                            name: radioGroup
+                            widget: object
+                            fields: &radiogroup_fields
+                              - { label: Label, name: label, widget: string, required: false }
+                              - { label: Default Value, name: defaultValue, widget: string, required: false }
+                              - label: Items
+                                name: items
+                                widget: list
+                                fields:
+                                  - { label: Label, name: label, widget: string }
+                                  - { label: Value, name: value, widget: string }
+                                  - { label: Disabled, name: disabled, widget: boolean, default: false }
+                              - label: Size
+                                name: size
+                                widget: select
+                                options: [sm, md, lg]
+                                default: md
+                              - label: Color Palette
+                                name: colorPalette
+                                widget: select
+                                options: [blue, green, red, purple, orange, amber, cyan, slate]
+                                required: false
+                          - label: Segment Group
+                            name: segmentGroup
+                            widget: object
+                            fields: &segmentgroup_fields
+                              - { label: Label, name: label, widget: string, required: false }
+                              - { label: Default Value, name: defaultValue, widget: string, required: false }
+                              - label: Items
+                                name: items
+                                widget: list
+                                fields:
+                                  - { label: Label, name: label, widget: string }
+                                  - { label: Value, name: value, widget: string }
+                                  - { label: Disabled, name: disabled, widget: boolean, default: false }
+                          - label: Slider
+                            name: slider
+                            widget: object
+                            fields: &slider_fields
+                              - { label: Label, name: label, widget: string, required: false }
+                              - { label: Default Value, name: defaultValue, widget: number, default: 30 }
+                              - { label: Min, name: min, widget: number, default: 0 }
+                              - { label: Max, name: max, widget: number, default: 100 }
+                              - { label: Step, name: step, widget: number, default: 1 }
+                              - { label: Show Value Text, name: showValueText, widget: boolean, default: false }
+                              - label: Color Palette
+                                name: colorPalette
+                                widget: select
+                                options: [blue, green, red, purple, orange, amber, cyan, slate]
+                                required: false
+                          - label: Switch
+                            name: switch
+                            widget: object
+                            fields: &switch_fields
+                              - { label: Label, name: label, widget: string, required: false }
+                              - { label: Checked, name: checked, widget: boolean, default: false }
+                              - { label: Disabled, name: disabled, widget: boolean, default: false }
+                              - { label: Invalid, name: invalid, widget: boolean, default: false }
+                              - label: Size
+                                name: size
+                                widget: select
+                                options: [sm, md, lg]
+                                default: md
+                              - label: Color Palette
+                                name: colorPalette
+                                widget: select
+                                options: [blue, green, red, purple, orange, amber, cyan, slate]
+                                required: false
 
                   - label: Card
                     name: card
@@ -367,6 +490,40 @@ collections:
                         types: *leaf_components
                         required: false
 
+                  - label: Popover
+                    name: popover
+                    widget: object
+                    fields:
+                      - { label: Trigger Text, name: triggerText, widget: string, default: "Click me" }
+                      - { label: Title, name: title, widget: string, required: false }
+                      - { label: Description, name: description, widget: string, required: false }
+                      - { label: Body, name: body, widget: string, required: false }
+                      - { label: Footer, name: footer, widget: string, required: false }
+                      - { label: Show Arrow, name: showArrow, widget: boolean, default: true }
+                      - { label: Closable, name: closable, widget: boolean, default: true }
+                      - label: Children
+                        name: children
+                        widget: list
+                        types: *leaf_components
+                        required: false
+
+                  - label: Skeleton
+                    name: skeleton
+                    widget: object
+                    fields:
+                      - label: Variant
+                        name: variant
+                        widget: select
+                        options: [box, circle, text]
+                        default: box
+                      - { label: No Of Lines, name: noOfLines, widget: number, default: 3, required: false }
+                      - { label: Loaded, name: loaded, widget: boolean, default: false }
+                      - label: Children
+                        name: children
+                        widget: list
+                        types: *leaf_components
+                        required: false
+
                   - label: Menu
                     name: menu
                     widget: object
@@ -400,6 +557,34 @@ collections:
                     name: combobox
                     widget: object
                     fields: *combobox_fields
+                  - label: Paginated Table
+                    name: paginatedTable
+                    widget: object
+                    fields: *paginatedtable_fields
+                  - label: Pagination
+                    name: pagination
+                    widget: object
+                    fields: *pagination_fields
+                  - label: Progress
+                    name: progress
+                    widget: object
+                    fields: *progress_fields
+                  - label: Radio Group
+                    name: radioGroup
+                    widget: object
+                    fields: *radiogroup_fields
+                  - label: Segment Group
+                    name: segmentGroup
+                    widget: object
+                    fields: *segmentgroup_fields
+                  - label: Slider
+                    name: slider
+                    widget: object
+                    fields: *slider_fields
+                  - label: Switch
+                    name: switch
+                    widget: object
+                    fields: *switch_fields
 
           # ==========================================
           # 2. CARD
@@ -546,7 +731,47 @@ collections:
                 required: false
 
           # ==========================================
-          # 10. MENU
+          # 10. POPOVER
+          # ==========================================
+          - label: Popover
+            name: popover
+            widget: object
+            fields:
+              - { label: Trigger Text, name: triggerText, widget: string, default: "Click me" }
+              - { label: Title, name: title, widget: string, required: false }
+              - { label: Description, name: description, widget: string, required: false }
+              - { label: Body, name: body, widget: string, required: false }
+              - { label: Footer, name: footer, widget: string, required: false }
+              - { label: Show Arrow, name: showArrow, widget: boolean, default: true }
+              - { label: Closable, name: closable, widget: boolean, default: true }
+              - label: Children
+                name: children
+                widget: list
+                types: *nestable_components
+                required: false
+
+          # ==========================================
+          # 11. SKELETON
+          # ==========================================
+          - label: Skeleton
+            name: skeleton
+            widget: object
+            fields:
+              - label: Variant
+                name: variant
+                widget: select
+                options: [box, circle, text]
+                default: box
+              - { label: No Of Lines, name: noOfLines, widget: number, default: 3, required: false }
+              - { label: Loaded, name: loaded, widget: boolean, default: false }
+              - label: Children
+                name: children
+                widget: list
+                types: *nestable_components
+                required: false
+
+          # ==========================================
+          # 12. MENU
           # ==========================================
           - label: Menu
             name: menu
@@ -584,3 +809,31 @@ collections:
             name: combobox
             widget: object
             fields: *combobox_fields
+          - label: Paginated Table
+            name: paginatedTable
+            widget: object
+            fields: *paginatedtable_fields
+          - label: Pagination
+            name: pagination
+            widget: object
+            fields: *pagination_fields
+          - label: Progress
+            name: progress
+            widget: object
+            fields: *progress_fields
+          - label: Radio Group
+            name: radioGroup
+            widget: object
+            fields: *radiogroup_fields
+          - label: Segment Group
+            name: segmentGroup
+            widget: object
+            fields: *segmentgroup_fields
+          - label: Slider
+            name: slider
+            widget: object
+            fields: *slider_fields
+          - label: Switch
+            name: switch
+            widget: object
+            fields: *switch_fields
