@@ -196,6 +196,56 @@ collections:
                                 fields:
                                   - { label: Label, name: label, widget: string }
                                   - { label: Value, name: value, widget: string }
+                          - label: Field
+                            name: field
+                            widget: object
+                            fields: &field_fields
+                              - { label: Label, name: label, widget: string, required: false }
+                              - { label: Helper Text, name: helperText, widget: string, required: false }
+                              - { label: Error Text, name: errorText, widget: string, required: false }
+                              - { label: Default Value, name: defaultValue, widget: string, required: false }
+                              - { label: Disabled, name: disabled, widget: boolean, default: false }
+                              - { label: Invalid, name: invalid, widget: boolean, default: false }
+                              - { label: Required, name: required, widget: boolean, default: false }
+                              - { label: Read Only, name: readOnly, widget: boolean, default: false }
+                          - label: Fieldset
+                            name: fieldset
+                            widget: object
+                            fields: &fieldset_fields
+                              - { label: Legend, name: legend, widget: string, required: false }
+                              - { label: Helper Text, name: helperText, widget: string, required: false }
+                              - { label: Error Text, name: errorText, widget: string, required: false }
+                              - { label: Disabled, name: disabled, widget: boolean, default: false }
+                              - { label: Invalid, name: invalid, widget: boolean, default: false }
+                          - label: Group
+                            name: group
+                            widget: object
+                            fields: &group_fields
+                              - { label: Attached, name: attached, widget: boolean, default: false }
+                              - { label: Grow, name: grow, widget: boolean, default: false }
+                              - { label: Orientation, name: orientation, widget: select, options: [horizontal, vertical], default: horizontal }
+                          - label: HoverCard
+                            name: hoverCard
+                            widget: object
+                            fields: &hovercard_fields
+                              - { label: Trigger Text, name: triggerText, widget: string, default: "Hover me" }
+                              - { label: Show Arrow, name: showArrow, widget: boolean, default: false }
+                              - { label: Title, name: title, widget: string, required: false }
+                              - { label: Description, name: description, widget: string, required: false }
+                          - label: Menu
+                            name: menu
+                            widget: object
+                            fields: &menu_fields
+                              - { label: Trigger Text, name: triggerText, widget: string, default: "Open Menu" }
+                              - label: Items
+                                name: items
+                                widget: list
+                                fields:
+                                  - { label: Type, name: type, widget: select, options: [item, separator, checkbox, radio], default: item }
+                                  - { label: Label, name: label, widget: string, required: false }
+                                  - { label: Value, name: value, widget: string, required: false }
+                                  - { label: Disabled, name: disabled, widget: boolean, default: false }
+                                  - { label: Checked, name: checked, widget: boolean, default: false }
 
                   - label: Card
                     name: card
@@ -256,6 +306,71 @@ collections:
                         widget: list
                         types: *leaf_components
                         required: false
+
+                  - label: Field
+                    name: field
+                    widget: object
+                    fields:
+                      - { label: Label, name: label, widget: string, required: false }
+                      - { label: Helper Text, name: helperText, widget: string, required: false }
+                      - { label: Error Text, name: errorText, widget: string, required: false }
+                      - { label: Default Value, name: defaultValue, widget: string, required: false }
+                      - { label: Disabled, name: disabled, widget: boolean, default: false }
+                      - { label: Invalid, name: invalid, widget: boolean, default: false }
+                      - { label: Required, name: required, widget: boolean, default: false }
+                      - { label: Read Only, name: readOnly, widget: boolean, default: false }
+                      - label: Children
+                        name: children
+                        widget: list
+                        types: *leaf_components
+                        required: false
+
+                  - label: Fieldset
+                    name: fieldset
+                    widget: object
+                    fields:
+                      - { label: Legend, name: legend, widget: string, required: false }
+                      - { label: Helper Text, name: helperText, widget: string, required: false }
+                      - { label: Error Text, name: errorText, widget: string, required: false }
+                      - { label: Disabled, name: disabled, widget: boolean, default: false }
+                      - { label: Invalid, name: invalid, widget: boolean, default: false }
+                      - label: Children
+                        name: children
+                        widget: list
+                        types: *leaf_components
+                        required: false
+
+                  - label: Group
+                    name: group
+                    widget: object
+                    fields:
+                      - { label: Attached, name: attached, widget: boolean, default: false }
+                      - { label: Grow, name: grow, widget: boolean, default: false }
+                      - { label: Orientation, name: orientation, widget: select, options: [horizontal, vertical], default: horizontal }
+                      - label: Children
+                        name: children
+                        widget: list
+                        types: *leaf_components
+                        required: false
+
+                  - label: HoverCard
+                    name: hoverCard
+                    widget: object
+                    fields:
+                      - { label: Trigger Text, name: triggerText, widget: string, default: "Hover me" }
+                      - { label: Show Arrow, name: showArrow, widget: boolean, default: false }
+                      - { label: Title, name: title, widget: string, required: false }
+                      - { label: Description, name: description, widget: string, required: false }
+                      - label: Children
+                        name: children
+                        widget: list
+                        types: *leaf_components
+                        required: false
+
+                  - label: Menu
+                    name: menu
+                    widget: object
+                    fields: *menu_fields
 
                   - label: Button
                     name: button
@@ -357,6 +472,86 @@ collections:
                 widget: list
                 types: *nestable_components
                 required: false
+
+          # ==========================================
+          # 6. FIELD
+          # ==========================================
+          - label: Field
+            name: field
+            widget: object
+            fields:
+              - { label: Label, name: label, widget: string, required: false }
+              - { label: Helper Text, name: helperText, widget: string, required: false }
+              - { label: Error Text, name: errorText, widget: string, required: false }
+              - { label: Default Value, name: defaultValue, widget: string, required: false }
+              - { label: Disabled, name: disabled, widget: boolean, default: false }
+              - { label: Invalid, name: invalid, widget: boolean, default: false }
+              - { label: Required, name: required, widget: boolean, default: false }
+              - { label: Read Only, name: readOnly, widget: boolean, default: false }
+              - label: Children
+                name: children
+                widget: list
+                types: *nestable_components
+                required: false
+
+          # ==========================================
+          # 7. FIELDSET
+          # ==========================================
+          - label: Fieldset
+            name: fieldset
+            widget: object
+            fields:
+              - { label: Legend, name: legend, widget: string, required: false }
+              - { label: Helper Text, name: helperText, widget: string, required: false }
+              - { label: Error Text, name: errorText, widget: string, required: false }
+              - { label: Disabled, name: disabled, widget: boolean, default: false }
+              - { label: Invalid, name: invalid, widget: boolean, default: false }
+              - label: Children
+                name: children
+                widget: list
+                types: *nestable_components
+                required: false
+
+          # ==========================================
+          # 8. GROUP
+          # ==========================================
+          - label: Group
+            name: group
+            widget: object
+            fields:
+              - { label: Attached, name: attached, widget: boolean, default: false }
+              - { label: Grow, name: grow, widget: boolean, default: false }
+              - { label: Orientation, name: orientation, widget: select, options: [horizontal, vertical], default: horizontal }
+              - label: Children
+                name: children
+                widget: list
+                types: *nestable_components
+                required: false
+
+          # ==========================================
+          # 9. HOVERCARD
+          # ==========================================
+          - label: HoverCard
+            name: hoverCard
+            widget: object
+            fields:
+              - { label: Trigger Text, name: triggerText, widget: string, default: "Hover me" }
+              - { label: Show Arrow, name: showArrow, widget: boolean, default: false }
+              - { label: Title, name: title, widget: string, required: false }
+              - { label: Description, name: description, widget: string, required: false }
+              - label: Children
+                name: children
+                widget: list
+                types: *nestable_components
+                required: false
+
+          # ==========================================
+          # 10. MENU
+          # ==========================================
+          - label: Menu
+            name: menu
+            widget: object
+            fields: *menu_fields
 
           # ==========================================
           # LEAVES AND OTHER COMPONENTS AT ROOT

@@ -10,7 +10,12 @@ import {
 	Combobox,
 	Dialog,
 	Drawer,
+	Field,
+	Fieldset,
+	Group,
 	Heading,
+	HoverCard,
+	Menu,
 	Stack,
 	Text,
 } from "./ui";
@@ -233,6 +238,121 @@ function RenderBlock({ block }: { block: ComponentBlock }) {
 				>
 					{children && <PageRenderer content={children} />}
 				</Drawer>
+			);
+		}
+		case "field": {
+			const {
+				label,
+				helperText,
+				errorText,
+				defaultValue,
+				disabled,
+				invalid,
+				required,
+				readOnly,
+				children,
+				...fieldProps
+			} = props;
+			return (
+				<Field
+					interactive
+					label={label}
+					helperText={helperText}
+					errorText={errorText}
+					defaultValue={defaultValue}
+					disabled={disabled}
+					invalid={invalid}
+					required={required}
+					readOnly={readOnly}
+					{...fieldProps}
+				>
+					{children && <PageRenderer content={children} />}
+				</Field>
+			);
+		}
+		case "fieldset": {
+			const {
+				legend,
+				helperText,
+				errorText,
+				disabled,
+				invalid,
+				children,
+				...fieldsetProps
+			} = props;
+			return (
+				<Fieldset
+					legend={legend}
+					helperText={helperText}
+					errorText={errorText}
+					disabled={disabled}
+					invalid={invalid}
+					{...fieldsetProps}
+				>
+					{children && <PageRenderer content={children} />}
+				</Fieldset>
+			);
+		}
+		case "group": {
+			const { attached, grow, orientation, children, ...groupProps } = props;
+			return (
+				<Group
+					attached={attached}
+					grow={grow}
+					orientation={orientation}
+					{...groupProps}
+				>
+					{children && <PageRenderer content={children} />}
+				</Group>
+			);
+		}
+		case "hover-card":
+		case "hoverCard": {
+			const {
+				triggerText,
+				showArrow,
+				title,
+				description,
+				children,
+				...hoverCardProps
+			} = props;
+			const trigger = triggerText ? (
+				<Button variant="outline">{triggerText}</Button>
+			) : undefined;
+			const content =
+				children || title || description ? (
+					<>
+						{title && <Text fontWeight="bold">{title}</Text>}
+						{description && (
+							<Text size="sm" class={css({ color: "fg.muted", mt: "1" })}>
+								{description}
+							</Text>
+						)}
+						{children && <PageRenderer content={children} />}
+					</>
+				) : undefined;
+			return (
+				<HoverCard
+					interactive
+					trigger={trigger}
+					showArrow={showArrow}
+					content={content}
+					{...hoverCardProps}
+				/>
+			);
+		}
+		case "menu": {
+			const { triggerText, items, ...menuProps } = props;
+			const trigger = triggerText ? (
+				<Button variant="outline">{triggerText}</Button>
+			) : undefined;
+			return (
+				<Menu
+					interactive
+					trigger={trigger}
+					items={items || []}
+					{...menuProps}
+				/>
 			);
 		}
 		default:
