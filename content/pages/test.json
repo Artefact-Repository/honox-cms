@@ -25,18 +25,12 @@
         },
         {
           "type": "card",
-          "title": "Mountain Cabin Adventure",
-          "description": "Experience nature in its purest form.",
-          "body": "Located high in the Cascades, our cozy cabin provides a warm fire and majestic views.",
-          "footer": "",
-          "image": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&q=80",
-          "imagePosition": "top",
           "children": [
             {
               "type": "checkbox",
               "colorPalette": "blue",
-              "checked": true,
-              "label": "I agree to the Cabin Terms & Conditions"
+              "label": "I agree to the Cabin Terms & Conditions",
+              "checked": true
             },
             {
               "type": "button",
@@ -45,7 +39,13 @@
               "colorPalette": "green",
               "size": "md"
             }
-          ]
+          ],
+          "title": "Mountain Cabin Adventure",
+          "description": "Experience nature in its purest form.",
+          "body": "Located high in the Cascades, our cozy cabin provides a warm fire and majestic views.",
+          "image": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&q=80",
+          "imagePosition": "top",
+          "footer": ""
         },
         {
           "type": "heading",
@@ -55,9 +55,6 @@
         },
         {
           "type": "collapsible",
-          "content": "Content",
-          "trigger": "Trigger of Collapsile",
-          "open": false,
           "children": [
             {
               "type": "alert",
@@ -69,7 +66,10 @@
           ],
           "triggerText": "Click to expand details",
           "showIndicator": true,
-          "indicatorPlacement": "end"
+          "indicatorPlacement": "end",
+          "open": false,
+          "content": "Content",
+          "trigger": "Trigger of Collapsile"
         },
         {
           "type": "heading",
@@ -80,7 +80,6 @@
         {
           "type": "combobox",
           "label": "Choose Your Favorite Framework",
-          "placeholder": "Select a framework...",
           "items": [
             {
               "label": "Hono",
@@ -98,7 +97,8 @@
               "label": "Vue",
               "value": "vue"
             }
-          ]
+          ],
+          "placeholder": "Select a framework..."
         },
         {
           "type": "heading",
@@ -115,12 +115,12 @@
               "type": "dialog",
               "title": "Terms of Service",
               "description": "Please read our terms before proceeding.",
+              "triggerText": "View Terms (Dialog)",
               "body": "",
               "footer": "",
               "trigger": "",
               "cancel": "",
               "confirm": "",
-              "triggerText": "View Terms (Dialog)",
               "confirmText": "Accept",
               "cancelText": "Decline",
               "role": "dialog"
@@ -129,12 +129,12 @@
               "type": "drawer",
               "title": "Feedback Panel",
               "description": "We would love to hear from you.",
+              "triggerText": "Give Feedback (Drawer)",
               "body": "",
               "footer": "",
               "trigger": "",
               "cancel": "",
               "confirm": "",
-              "triggerText": "Give Feedback (Drawer)",
               "confirmText": "Submit",
               "cancelText": "Cancel"
             }
@@ -147,12 +147,31 @@
       "title": "TitleDrawer",
       "description": "Description",
       "body": "Body",
+      "triggerText": "triggg",
+      "confirmText": "",
+      "cancelText": "",
       "footer": "Footer",
       "interactive": true,
       "trigger": "TriggerDrawer",
       "cancel": "",
       "confirm": "",
       "closable": true
+    },
+    {
+      "type": "hoverCard",
+      "children": [
+        {
+          "type": "alert",
+          "title": "alert",
+          "description": "desc",
+          "variant": "subtle",
+          "status": "info"
+        }
+      ],
+      "title": "ttl",
+      "description": "desc",
+      "triggerText": "Hover me",
+      "showArrow": true
     }
   ]
 }
