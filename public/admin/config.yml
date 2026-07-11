@@ -274,11 +274,16 @@ collections:
                             name: skeleton
                             widget: object
                             fields: &skeleton_fields
-                              - label: Variant
-                                name: variant
+                              - label: Shape
+                                name: shape
                                 widget: select
                                 options: [box, circle, text]
                                 default: box
+                              - label: Animation
+                                name: variant
+                                widget: select
+                                options: [pulse, shine, none]
+                                default: pulse
                               - { label: No Of Lines, name: noOfLines, widget: number, default: 3, required: false }
                               - { label: Loaded, name: loaded, widget: boolean, default: false }
                           - label: Paginated Table
@@ -538,11 +543,16 @@ collections:
                     name: skeleton
                     widget: object
                     fields:
-                      - label: Variant
-                        name: variant
+                      - label: Shape
+                        name: shape
                         widget: select
                         options: [box, circle, text]
                         default: box
+                      - label: Animation
+                        name: variant
+                        widget: select
+                        options: [pulse, shine, none]
+                        default: pulse
                       - { label: No Of Lines, name: noOfLines, widget: number, default: 3, required: false }
                       - { label: Loaded, name: loaded, widget: boolean, default: false }
                       - label: Children
@@ -802,11 +812,16 @@ collections:
             name: skeleton
             widget: object
             fields:
-              - label: Variant
-                name: variant
+              - label: Shape
+                name: shape
                 widget: select
                 options: [box, circle, text]
                 default: box
+              - label: Animation
+                name: variant
+                widget: select
+                options: [pulse, shine, none]
+                default: pulse
               - { label: No Of Lines, name: noOfLines, widget: number, default: 3, required: false }
               - { label: Loaded, name: loaded, widget: boolean, default: false }
               - label: Children

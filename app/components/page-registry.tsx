@@ -454,39 +454,19 @@ const registry: Record<string, BlockRenderer> = {
 
 	skeleton: (b) => {
 		const { children } = b;
-		const { variant, noOfLines, loaded, ...rest } = propsOf(b);
-		if (variant === "text") {
-			return (
-				<Skeleton loaded={loaded} class={css({ width: "full" })} {...rest}>
-					{children ? (
-						renderChildren(children as ComponentBlock[])
-					) : (
-						<div
-							class={css({
-								display: "flex",
-								flexDirection: "column",
-								gap: "2",
-								width: "full",
-							})}
-						>
-							{Array.from({ length: noOfLines || 3 }).map((_, index) => (
-								<Skeleton
-									key={index}
-									class={css({
-										height: "4",
-										width: "full",
-										_last: { maxWidth: "80%" },
-									})}
-								/>
-							))}
-						</div>
-					)}
-				</Skeleton>
-			);
-		}
+		const { shape, variant, noOfLines, loaded, ...rest } = propsOf(b);
+		const resolvedShape = shape || (variant === "text" || variant === "circle" ? variant : "children");
+		const resolvedVariant = (variant === "text" || variant === "circle") ? undefined : variant;
+
 		return (
-			<Skeleton circle={variant === "circle"} loaded={loaded} {...rest}>
-				{renderChildren(children as ComponentBlock[])}
+			<Skeleton
+				shape={resolvedShape as any}
+				variant={resolvedVariant as any}
+				noOfLines={noOfLines}
+				loaded={loaded}
+				{...rest}
+			>
+				{children ? renderChildren(children as ComponentBlock[]) : undefined}
 			</Skeleton>
 		);
 	},
