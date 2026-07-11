@@ -1858,12 +1858,8 @@ export default createRoute((c) => {
 					Tooltip Component Examples
 				</Heading>
 				<div class={css({ display: "flex", gap: "8" })}>
-					<Tooltip content="This is a static tooltip" interactive={false}>
-						<Button variant="outline">Static Tooltip</Button>
-					</Tooltip>
-
-					<Tooltip content="This is an interactive tooltip" interactive={true}>
-						<Button variant="outline">Interactive Tooltip</Button>
+					<Tooltip content="This is a tooltip">
+						<Button variant="outline">Tooltip</Button>
 					</Tooltip>
 
 					<Tooltip content="Tooltip with Arrow" showArrow>
