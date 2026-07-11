@@ -2,7 +2,11 @@ import { useState } from "hono/jsx";
 import { cx } from "styled-system/css";
 import type { TextareaVariantProps } from "styled-system/recipes";
 import { textarea } from "styled-system/recipes";
-import { FieldRoot, useFieldContext } from "./field-primitive";
+import {
+	FieldRoot,
+	type ValidatorFn,
+	useFieldContext,
+} from "./field-primitive";
 
 export interface TextareaPrimitiveProps extends TextareaVariantProps {
 	children?: any;
@@ -63,7 +67,8 @@ export interface TextareaProps extends TextareaPrimitiveProps {
 	label?: string;
 	helperText?: string;
 	errorText?: string;
-	validator?: (value: string) => boolean | string;
+	validator?: ValidatorFn | string;
+	validatorSource?: string;
 	minLength?: number;
 }
 
@@ -73,6 +78,7 @@ export function Textarea(props: TextareaProps) {
 		helperText,
 		errorText,
 		validator,
+		validatorSource,
 		minLength,
 		class: className,
 		id,
@@ -95,6 +101,7 @@ export function Textarea(props: TextareaProps) {
 			value={value}
 			onValueChange={onValueChange}
 			validator={validator}
+			validatorSource={validatorSource}
 			minLength={minLength}
 			class={className}
 			label={label}

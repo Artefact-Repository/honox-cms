@@ -43,7 +43,8 @@ export interface FieldProps extends FieldVariantProps {
 	value?: string;
 	onValueChange?: (value: string) => void;
 	minLength?: number;
-	validator?: (value: string) => boolean | string;
+	validator?: ValidatorFn | string;
+	validatorSource?: string;
 	interactive?: boolean;
 	defaultValue?: string;
 	[key: string]: unknown;
@@ -51,16 +52,33 @@ export interface FieldProps extends FieldVariantProps {
 
 export const useFieldContext = () => useContext(FieldContext);
 
+export type ValidatorFn = (value: string) => boolean | string;
+
+const resolveValidator = (
+	validator?: ValidatorFn | string,
+): ValidatorFn | undefined => {
+	if (typeof validator !== "string") return validator;
+	// Function props don't survive island hydration (JSON.stringify silently
+	// drops them), so components/ui/{field,textarea}.tsx also send a
+	// `validatorSource` string alongside the live `validator` function. Only
+	// the browser ever hits this branch post-hydration, once `validator`
+	// itself has been dropped — never during SSR, since Workers-style
+	// runtimes disallow dynamic code generation. The source must not close
+	// over any outer variables, since it's rebuilt with no lexical scope.
+	return new Function(`return (${validator})`)() as ValidatorFn;
+};
+
 export const validateField = (
 	value: string | undefined,
 	minLength?: number,
-	validator?: (value: string) => boolean | string,
+	validator?: ValidatorFn | string,
 ) => {
 	let isInvalid = false;
 	let errorText: string | undefined;
+	const resolvedValidator = resolveValidator(validator);
 
-	if (validator && value !== undefined) {
-		const result = validator(value);
+	if (resolvedValidator && value !== undefined) {
+		const result = resolvedValidator(value);
 		if (result === false) {
 			isInvalid = true;
 		} else if (typeof result === "string") {
@@ -94,10 +112,12 @@ export function FieldRoot(props: FieldProps) {
 		onValueChange,
 		minLength,
 		validator,
+		validatorSource,
 		interactive: _interactive,
 		defaultValue,
 		...restProps
 	} = localProps;
+	const effectiveValidator = validator ?? validatorSource;
 
 	const [internalValue, setInternalValue] = useState(valueProp ?? defaultValue);
 
@@ -121,7 +141,7 @@ export function FieldRoot(props: FieldProps) {
 	let { isInvalid, errorText } = validateField(
 		initialValue,
 		minLength,
-		validator,
+		effectiveValidator,
 	);
 
 	if (invalidProp !== undefined) {
