@@ -135,6 +135,7 @@
           "title": "Real-Time Dashboards",
           "description": "Live metrics, zero refresh",
           "body": "Track every KPI as it happens with sub-second latency streaming straight from your data warehouse.",
+          "image": "",
           "imagePosition": "top"
         },
         {
@@ -197,6 +198,7 @@
       "title": "“Pulse cut our incident response time by 60%.”",
       "description": "Jane Cooper — VP Engineering, Acme Corp",
       "body": "We used to stitch together five tools to know something was wrong. Now Pulse tells us before our customers do.",
+      "image": "",
       "imagePosition": "top"
     },
     {
@@ -292,6 +294,15 @@
             }
           ],
           "triggerText": "Can I cancel anytime?",
+          "trigger": [
+            {
+              "type": "button",
+              "text": "Cancel",
+              "variant": "solid",
+              "colorPalette": "",
+              "size": "md"
+            }
+          ],
           "showIndicator": true,
           "indicatorPlacement": "end",
           "open": false
