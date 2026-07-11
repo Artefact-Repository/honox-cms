@@ -6,6 +6,7 @@ import { breadcrumb } from "./breadcrumb";
 import { button } from "./button";
 import { card } from "./card";
 import { checkbox } from "./checkbox";
+import { code } from "./code";
 import { collapsible } from "./collapsible";
 import { combobox } from "./combobox";
 import { dialog } from "./dialog";
@@ -46,6 +47,7 @@ export const recipes = {
 	text,
 	textarea,
 	skeleton,
+	code,
 };
 
 export const slotRecipes = {

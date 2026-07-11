@@ -35,6 +35,7 @@ export default defineConfig({
 			button: ["*"],
 			card: ["*"],
 			checkbox: ["*"],
+			code: ["*"],
 			collapsible: ["*"],
 			combobox: ["*"],
 			dialog: ["*"],

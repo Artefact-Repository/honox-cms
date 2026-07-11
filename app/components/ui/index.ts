@@ -20,6 +20,7 @@ export {
 } from "./button";
 export { Card, type CardProps } from "./card";
 export { Checkbox, type CheckboxProps } from "./checkbox";
+export { Code, type CodeProps } from "./code";
 export { Collapsible, type CollapsibleProps } from "./collapsible";
 export { Combobox, type ComboboxProps } from "./combobox";
 export { Dialog, type DialogProps } from "./dialog";

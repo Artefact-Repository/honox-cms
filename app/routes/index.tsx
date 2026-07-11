@@ -12,6 +12,7 @@ import {
 	Card,
 	Checkbox,
 	CloseButton,
+	Code,
 	Collapsible,
 	Combobox,
 	Dialog,
@@ -241,6 +242,87 @@ export default createRoute((c) => {
 						<Avatar variant="outline" name="Outline" colorPalette="blue" />
 						<Avatar variant="surface" name="Surface" colorPalette="blue" />
 					</div>
+				</div>
+			</div>
+
+			{/* Code Examples */}
+			<div
+				class={css({
+					mt: "8",
+					display: "flex",
+					flexDirection: "column",
+					gap: "4",
+					alignItems: "center",
+				})}
+			>
+				<Heading as="h2" class={css({ fontSize: "xl", mb: "4" })}>
+					Code Component Examples
+				</Heading>
+
+				{/* Code Sizes */}
+				<Text size="sm" class={css({ color: "fg.muted" })}>
+					Code Sizes
+				</Text>
+				<div
+					class={css({
+						display: "flex",
+						gap: "4",
+						alignItems: "center",
+						flexWrap: "wrap",
+						justifyContent: "center",
+					})}
+				>
+					<Code size="sm">console.log("sm")</Code>
+					<Code size="md">console.log("md")</Code>
+					<Code size="lg">console.log("lg")</Code>
+					<Code size="xl">console.log("xl")</Code>
+				</div>
+
+				{/* Code Variants */}
+				<Text size="sm" class={css({ color: "fg.muted", mt: "4" })}>
+					Code Variants
+				</Text>
+				<div
+					class={css({
+						display: "flex",
+						gap: "4",
+						alignItems: "center",
+						flexWrap: "wrap",
+						justifyContent: "center",
+					})}
+				>
+					<Code variant="solid">solid</Code>
+					<Code variant="subtle">subtle</Code>
+					<Code variant="surface">surface</Code>
+					<Code variant="outline">outline</Code>
+					<Code variant="plain">plain</Code>
+				</div>
+
+				{/* Code Colors */}
+				<Text size="sm" class={css({ color: "fg.muted", mt: "4" })}>
+					Code Colors
+				</Text>
+				<div
+					class={css({
+						display: "flex",
+						gap: "4",
+						alignItems: "center",
+						flexWrap: "wrap",
+						justifyContent: "center",
+					})}
+				>
+					<Code colorPalette="blue" variant="solid">
+						blue solid
+					</Code>
+					<Code colorPalette="green" variant="subtle">
+						green subtle
+					</Code>
+					<Code colorPalette="red" variant="surface">
+						red surface
+					</Code>
+					<Code colorPalette="orange" variant="outline">
+						orange outline
+					</Code>
 				</div>
 			</div>
 
