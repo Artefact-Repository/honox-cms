@@ -1023,6 +1023,80 @@ export function DatePickerStructure(props: DatePickerFlattenedProps) {
 							)}
 						</DatePickerContext>
 					</DatePickerView>
+					<DatePickerView view="month">
+						<DatePickerContext>
+							{(datePicker) => (
+								<>
+									<DatePickerViewControl>
+										<DatePickerPrevTrigger />
+										<DatePickerViewTrigger>
+											{datePicker.focusedValue.year}
+										</DatePickerViewTrigger>
+										<DatePickerNextTrigger />
+									</DatePickerViewControl>
+									<DatePickerTable>
+										<DatePickerTableBody>
+											{datePicker
+												.getMonthsGrid({ columns: 4, format: "short" })
+												.map((row, rowId) => (
+													<DatePickerTableRow key={rowId}>
+														{row.map((month) => (
+															<DatePickerTableCell
+																key={month.value}
+																value={month.value}
+															>
+																<DatePickerTableCellTrigger>
+																	{month.label}
+																</DatePickerTableCellTrigger>
+															</DatePickerTableCell>
+														))}
+													</DatePickerTableRow>
+												))}
+										</DatePickerTableBody>
+									</DatePickerTable>
+								</>
+							)}
+						</DatePickerContext>
+					</DatePickerView>
+					<DatePickerView view="year">
+						<DatePickerContext>
+							{(datePicker) => {
+								const startYear =
+									Math.floor(datePicker.focusedValue.year / 10) * 10;
+								return (
+									<>
+										<DatePickerViewControl>
+											<DatePickerPrevTrigger />
+											<DatePickerViewTrigger>
+												{`${startYear} - ${startYear + 9}`}
+											</DatePickerViewTrigger>
+											<DatePickerNextTrigger />
+										</DatePickerViewControl>
+										<DatePickerTable>
+											<DatePickerTableBody>
+												{datePicker
+													.getYearsGrid({ columns: 4 })
+													.map((row, rowId) => (
+														<DatePickerTableRow key={rowId}>
+															{row.map((year) => (
+																<DatePickerTableCell
+																	key={year.value}
+																	value={year.value}
+																>
+																	<DatePickerTableCellTrigger>
+																		{year.label}
+																	</DatePickerTableCellTrigger>
+																</DatePickerTableCell>
+															))}
+														</DatePickerTableRow>
+													))}
+											</DatePickerTableBody>
+										</DatePickerTable>
+									</>
+								);
+							}}
+						</DatePickerContext>
+					</DatePickerView>
 				</DatePickerContent>
 			</DatePickerPositioner>
 		</>

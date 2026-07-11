@@ -14,6 +14,7 @@ interface RadioGroupContextValue {
 	value?: string;
 	onValueChange?: (details: { value: string }) => void;
 	id: string;
+	name?: string;
 	disabled?: boolean;
 	readOnly?: boolean;
 }
@@ -73,6 +74,7 @@ function Root(props: RootProps) {
 		value: value ?? defaultValue,
 		onValueChange,
 		id,
+		name,
 		disabled,
 		readOnly,
 	};
@@ -132,7 +134,7 @@ function Item(props: ItemProps) {
 
 	return (
 		<ItemContext.Provider value={{ value, disabled: isDisabled }}>
-			<div
+			<label
 				class={cx(context.styles.item, className)}
 				role="radio"
 				aria-checked={isChecked}
@@ -145,7 +147,7 @@ function Item(props: ItemProps) {
 				{...rest}
 			>
 				{children}
-			</div>
+			</label>
 		</ItemContext.Provider>
 	);
 }
@@ -206,7 +208,7 @@ function ItemHiddenInput() {
 			tabIndex={-1}
 			checked={isChecked}
 			disabled={item?.disabled}
-			name={context.id}
+			name={context.name || context.id}
 			value={item?.value}
 			style={{
 				border: "0px",

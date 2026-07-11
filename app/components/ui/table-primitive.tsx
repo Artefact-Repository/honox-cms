@@ -217,7 +217,7 @@ export function TableBase<T = Record<string, unknown>>(props: TableProps<T>) {
 					<Row
 						key={rowIndex}
 						class={row.class || rowClass}
-						{...(interactive && row.onClick ? { onclick: row.onClick } : {})}
+						{...(interactive && row.onClick ? { onClick: row.onClick } : {})}
 						{...(row.disabled ? { "data-disabled": true } : {})}
 					>
 						{columns.map((column) => (

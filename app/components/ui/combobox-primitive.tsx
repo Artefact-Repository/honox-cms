@@ -362,13 +362,22 @@ export function List(props: PropsWithChildren<{ class?: string }>) {
 export function Item(
 	props: PropsWithChildren<{
 		value: string;
+		itemValue?: string;
 		disabled?: boolean;
 		index?: number;
 		class?: string;
 		[key: string]: any;
 	}>,
 ) {
-	const { children, value, disabled, index, class: classProp, ...rest } = props;
+	const {
+		children,
+		value,
+		itemValue,
+		disabled,
+		index,
+		class: classProp,
+		...rest
+	} = props;
 	const context = useComboboxContext();
 	const isHighlighted = context?.highlightedIndex === index;
 	const isSelected = context?.inputValue === value;
@@ -384,6 +393,7 @@ export function Item(
 				data-scope="combobox"
 				data-part="item"
 				data-value={value}
+				data-item-value={itemValue ?? value}
 				data-disabled={disabled ? "" : undefined}
 				data-highlighted={isHighlighted ? "" : undefined}
 				data-state={isSelected ? "checked" : "unchecked"}
@@ -561,6 +571,7 @@ export function ComboboxStructure(props: ComboboxFlattenedProps) {
 								<Item
 									key={item.value}
 									value={item.label}
+									itemValue={item.value}
 									disabled={item.disabled}
 									index={index}
 								>
@@ -618,7 +629,9 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 	const handleToggleRef = useRef<() => void>(() => {});
 	const handleCloseRef = useRef<() => void>(() => {});
 	const handleInputChangeRef = useRef<(val: string) => void>(() => {});
-	const handleItemSelectRef = useRef<(val: string) => void>(() => {});
+	const handleItemSelectRef = useRef<(label: string, val: string) => void>(
+		() => {},
+	);
 
 	const handleToggle = () => {
 		if (!isControlled) {
@@ -642,8 +655,8 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 		props.onInputChange?.(val);
 	};
 
-	const handleItemSelect = (val: string) => {
-		setInputValue(val);
+	const handleItemSelect = (label: string, val: string) => {
+		setInputValue(label);
 		setHighlightedIndex(-1);
 		if (!isControlled) {
 			setIsOpen(false);
@@ -713,15 +726,16 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 					handleInputChangeRef.current("");
 				}
 			} else if (dataPart === "item" && !isDisabled) {
-				const value = target.getAttribute("data-value") || "";
+				const label = target.getAttribute("data-value") || "";
+				const value = target.getAttribute("data-item-value") || label;
 				const inputElement = root.querySelector(
 					'[data-part="input"]',
 				) as HTMLInputElement | null;
 				if (inputElement) {
-					inputElement.value = value;
-					setInputValue(value);
+					inputElement.value = label;
+					setInputValue(label);
 				}
-				handleItemSelectRef.current?.(value);
+				handleItemSelectRef.current?.(label, value);
 			}
 		};
 
@@ -802,14 +816,17 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 					) as HTMLElement | null;
 					if (highlightedItem) {
 						e.preventDefault();
-						const value = highlightedItem.getAttribute("data-value") || "";
+						const label = highlightedItem.getAttribute("data-value") || "";
+						const value =
+							highlightedItem.getAttribute("data-item-value") || label;
 						const input = root.querySelector(
 							'[data-part="input"]',
 						) as HTMLInputElement;
 						if (input) {
-							input.value = value;
+							input.value = label;
 						}
-						handleItemSelectRef.current(value);
+						setInputValue(label);
+						handleItemSelectRef.current(label, value);
 					}
 				}
 			} else if (e.key === "Escape") {

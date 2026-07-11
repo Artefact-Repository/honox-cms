@@ -18,6 +18,7 @@ interface SegmentGroupContextValue {
 	value?: string;
 	onValueChange?: (value: string) => void;
 	id: string;
+	name?: string;
 	orientation: "horizontal" | "vertical";
 	disabled?: boolean;
 }
@@ -81,6 +82,7 @@ export function Root(props: RootProps) {
 		value: value ?? defaultValue,
 		onValueChange,
 		id,
+		name,
 		orientation,
 		disabled,
 	};
@@ -234,7 +236,7 @@ export function ItemHiddenInput() {
 			tabIndex={-1}
 			checked={isChecked}
 			disabled={item?.disabled}
-			name={context.id}
+			name={context.name || context.id}
 			value={item?.value}
 			style={{
 				border: "0px",
