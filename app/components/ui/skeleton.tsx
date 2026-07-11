@@ -4,17 +4,28 @@ import { stack } from "styled-system/patterns";
 import { type SkeletonVariantProps, skeleton } from "styled-system/recipes";
 
 interface SkeletonProps
-	extends PropsWithChildren<SkeletonVariantProps>,
+	extends PropsWithChildren<Omit<SkeletonVariantProps, "variant">>,
 		Omit<import("hono/jsx").JSX.IntrinsicElements["div"], "children" | "width" | "height" | "size"> {
 	class?: string;
 	width?: string | number;
 	height?: string | number;
 	size?: string | number;
+	variant?: "pulse" | "shine" | "none" | "circle" | "text";
+	noOfLines?: number;
+	gap?: string | number;
 }
 
 function Skeleton(props: SkeletonProps) {
 	const [variantProps, localProps] = skeleton.splitVariantProps(props);
-	const { children, class: classProp, width, height, size, ...restProps } = localProps;
+	const { children, class: classProp, width, height, size, noOfLines, gap, ...restProps } = localProps;
+
+	// Check if the user specified the visual variant ("circle" or "text") via the variant prop or explicitly
+	const isCircle = variantProps.circle || props.variant === "circle";
+	const isText = props.variant === "text";
+
+	if (isText) {
+		return <SkeletonText noOfLines={noOfLines} gap={gap} class={classProp} {...restProps} />;
+	}
 
 	const styles: Record<string, any> = {};
 	if (size !== undefined) {
@@ -29,9 +40,22 @@ function Skeleton(props: SkeletonProps) {
 
 	const hasStyles = Object.keys(styles).length > 0;
 
+	// Resolve animation variant. If it is circle/text shape variant, default animation is pulse
+	const resolvedVariant = (props.variant === "circle" || props.variant === "text")
+		? undefined
+		: props.variant;
+
 	return (
 		<div
-			class={cx(skeleton(variantProps), hasStyles ? css(styles) : undefined, classProp)}
+			class={cx(
+				skeleton({
+					...variantProps,
+					circle: isCircle,
+					variant: resolvedVariant,
+				}),
+				hasStyles ? css(styles) : undefined,
+				classProp,
+			)}
 			{...restProps}
 		>
 			{children}

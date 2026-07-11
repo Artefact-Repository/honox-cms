@@ -32,3 +32,27 @@ test("Skeleton component renders with width and height props", async () => {
 	expect(htmlString).toContain("w_40");
 	expect(htmlString).toContain("h_6");
 });
+
+test("Skeleton component renders with variant='circle' prop", async () => {
+	const html = (await Skeleton({
+		variant: "circle",
+		size: "10",
+	})) as unknown as { toString: () => string };
+	const htmlString = html.toString();
+	expect(htmlString).toContain("skeleton");
+	expect(htmlString).toContain("skeleton--circle_true");
+	expect(htmlString).toContain("size_10");
+});
+
+test("Skeleton component renders with variant='text' prop", async () => {
+	const html = (await Skeleton({
+		variant: "text",
+		noOfLines: 2,
+	})) as unknown as { toString: () => string };
+	const htmlString = html.toString();
+	expect(htmlString).toContain("skeleton");
+	// Should render multiple lines (as Skeletons inside a stack)
+	const skeletonOccurrences = (htmlString.match(/class="[^"]*skeleton/g) || []).length;
+	// 2 inner lines = 2 skeletons total
+	expect(skeletonOccurrences).toBe(2);
+});
