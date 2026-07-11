@@ -196,6 +196,19 @@ collections:
                                 fields:
                                   - { label: Label, name: label, widget: string }
                                   - { label: Value, name: value, widget: string }
+                          - label: Select
+                            name: select
+                            widget: object
+                            fields: &select_fields
+                              - { label: Label, name: label, widget: string }
+                              - { label: Placeholder, name: placeholder, widget: string, required: false }
+                              - { label: Multiple, name: multiple, widget: boolean, default: false }
+                              - label: Items
+                                name: items
+                                widget: list
+                                fields:
+                                  - { label: Label, name: label, widget: string }
+                                  - { label: Value, name: value, widget: string }
                           - label: Field
                             name: field
                             widget: object
@@ -557,6 +570,10 @@ collections:
                     name: combobox
                     widget: object
                     fields: *combobox_fields
+                  - label: Select
+                    name: select
+                    widget: object
+                    fields: *select_fields
                   - label: Paginated Table
                     name: paginatedTable
                     widget: object
@@ -809,6 +826,10 @@ collections:
             name: combobox
             widget: object
             fields: *combobox_fields
+          - label: Select
+            name: select
+            widget: object
+            fields: *select_fields
           - label: Paginated Table
             name: paginatedTable
             widget: object

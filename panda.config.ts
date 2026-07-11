@@ -25,6 +25,7 @@ export default defineConfig({
 	staticCss: {
 		// utilities: ["colorPalette"],
 		recipes: {
+			select: ["*"],
 			pagination: ["*"],
 			absoluteCenter: ["*"],
 			avatar: ["*"],

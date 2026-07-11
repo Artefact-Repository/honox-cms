@@ -30,6 +30,7 @@ import {
 	Progress,
 	RadioGroup,
 	SegmentGroup,
+	Select,
 	Skeleton,
 	SkeletonCircle,
 	SkeletonText,
@@ -1021,6 +1022,19 @@ export default createRoute((c) => {
 					Combobox Component Examples
 				</Heading>
 				<Combobox
+					interactive
+					items={items}
+					label="Framework"
+					placeholder="Select a Framework"
+				/>
+			</div>
+
+			{/* Select Examples */}
+			<div class={css({ mt: "8" })}>
+				<Heading as="h2" class={css({ fontSize: "xl", mb: "4" })}>
+					Select Component Examples
+				</Heading>
+				<Select
 					interactive
 					items={items}
 					label="Framework"

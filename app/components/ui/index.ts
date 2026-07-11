@@ -38,6 +38,7 @@ export { Popover, type PopoverProps } from "./popover";
 export { Progress, type ProgressProps } from "./progress";
 export { RadioGroup, type RadioGroupProps } from "./radio-group";
 export { SegmentGroup, type SegmentGroupProps } from "./segment-group";
+export { Select, type SelectProps } from "./select";
 export {
 	Skeleton,
 	SkeletonCircle,

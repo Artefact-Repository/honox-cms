@@ -22,6 +22,7 @@ import {
 	Progress,
 	RadioGroup,
 	SegmentGroup,
+	Select,
 	Skeleton,
 	Slider,
 	Stack,
@@ -461,6 +462,19 @@ function RenderBlock({ block }: { block: ComponentBlock }) {
 		case "segmentGroup":
 		case "segment-group": {
 			return <SegmentGroup interactive {...props} />;
+		}
+		case "select": {
+			const { label, placeholder, items, multiple, ...selectProps } = props;
+			return (
+				<Select
+					interactive
+					label={label}
+					placeholder={placeholder}
+					items={items || []}
+					multiple={multiple}
+					{...selectProps}
+				/>
+			);
 		}
 		case "slider": {
 			return <Slider interactive {...props} />;
