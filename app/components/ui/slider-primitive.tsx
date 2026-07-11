@@ -378,7 +378,6 @@ export interface InteractiveSliderProps extends RootProps {
 }
 
 export function InteractiveSlider(props: InteractiveSliderProps) {
-	console.log(`[Slider] InteractiveSlider component rendering`);
 	const {
 		value: valueProp,
 		defaultValue,
@@ -397,7 +396,6 @@ export function InteractiveSlider(props: InteractiveSliderProps) {
 	// Create a deterministic ID based on props if possible
 	const fallbackId = useId();
 	const rootId = rootProps.id || `slider-${fallbackId}`;
-	console.log(`[Slider] rootId: ${rootId}`);
 	const initialValue = toValueArray(
 		valueProp,
 		toValueArray(defaultValue, [min]),
@@ -419,11 +417,9 @@ export function InteractiveSlider(props: InteractiveSliderProps) {
 	>(() => () => {});
 
 	useEffect(() => {
-		console.log(`[Slider] Main useEffect running for rootId: ${rootId}`);
 		valueRef.current = currentValue;
 		const root = document.getElementById(rootId);
 		if (!root) {
-			console.log(`[Slider] Root element not found for ID: ${rootId}`);
 			return;
 		}
 
@@ -609,11 +605,9 @@ export function InteractiveSlider(props: InteractiveSliderProps) {
 			document.removeEventListener("touchend", handleEnd);
 		};
 		const handleControlPointerDownImpl = (e: MouseEvent | TouchEvent) => {
-			console.log(`[Slider] handleControlPointerDown called`);
 			const point = "touches" in e ? e.touches[0] : e;
 			if (!point) return;
 			const newValue = getValueFromPoint(point.clientX, point.clientY);
-			console.log(`[Slider] New value from point: ${newValue}`);
 			if (newValue === null) return;
 
 			const values = valueRef.current ?? [min];
@@ -639,9 +633,6 @@ export function InteractiveSlider(props: InteractiveSliderProps) {
 		handleControlPointerDown.current = handleControlPointerDownImpl;
 
 		const handleThumbKeyDownImpl = (index: number) => (e: KeyboardEvent) => {
-			console.log(
-				`[Slider] handleThumbKeyDown for thumb ${index}, key: ${e.key}`,
-			);
 			const stepValue = e.shiftKey ? step * 10 : step;
 			let newValue = (valueRef.current ?? [min])[index] ?? min;
 			if (e.key === "ArrowRight" || e.key === "ArrowUp") {
@@ -655,12 +646,10 @@ export function InteractiveSlider(props: InteractiveSliderProps) {
 			} else {
 				return;
 			}
-			console.log(`[Slider] New value: ${newValue}`);
 			e.preventDefault();
 			updateThumbValue(index, newValue);
 		};
 		handleThumbKeyDownFactory.current = handleThumbKeyDownImpl;
-		console.log(`[Slider] Handlers initialized for rootId: ${rootId}`);
 	}, [
 		currentValue,
 		isControlled,
@@ -676,26 +665,20 @@ export function InteractiveSlider(props: InteractiveSliderProps) {
 	useEffect(() => {
 		const root = document.getElementById(rootId);
 		if (!root) {
-			console.log(`[Slider] Root element not found: ${rootId}`);
 			return;
 		}
 
 		const control = root.querySelector<HTMLElement>('[data-part="control"]');
 		if (!control) {
-			console.log(`[Slider] Control element not found in root: ${rootId}`);
 			return;
 		}
 
 		const thumbs = Array.from(
 			root.querySelectorAll<HTMLElement>('[data-part="thumb"]'),
 		);
-		console.log(
-			`[Slider] Found ${thumbs.length} thumb(s) and control, attaching listeners`,
-		);
 
 		// Attach event listeners to control element
 		const handleControlDown = (e: Event) => {
-			console.log(`[Slider] Control pointer down event`);
 			if (handleControlPointerDown.current) {
 				handleControlPointerDown.current(e as MouseEvent | TouchEvent);
 			}
@@ -714,7 +697,6 @@ export function InteractiveSlider(props: InteractiveSliderProps) {
 
 		thumbs.forEach((thumb, index) => {
 			const handler = (e: Event) => {
-				console.log(`[Slider] Thumb ${index} keydown event`);
 				if (handleThumbKeyDownFactory.current) {
 					handleThumbKeyDownFactory.current(index)(e as KeyboardEvent);
 				}
@@ -723,7 +705,6 @@ export function InteractiveSlider(props: InteractiveSliderProps) {
 			thumbKeydownListeners.push({ thumb, handler });
 		});
 
-		console.log(`[Slider] Event listeners attached successfully`);
 
 		return () => {
 			control.removeEventListener("mousedown", handleControlDown);
@@ -734,7 +715,6 @@ export function InteractiveSlider(props: InteractiveSliderProps) {
 		};
 	}, [rootId]);
 
-	console.log(`[Slider] InteractiveSlider rendering Root with id=${rootId}`);
 	return (
 		<Root
 			{...rootProps}
