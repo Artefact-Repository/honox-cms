@@ -150,9 +150,26 @@ const registry: Record<string, BlockRenderer> = {
 			indicatorPlacement,
 			open,
 			disabled,
+			trigger: cmsTrigger,
 			...rest
 		} = propsOf(b);
-		const trigger = triggerText || "Toggle";
+
+		let trigger: any;
+		if (cmsTrigger) {
+			if (Array.isArray(cmsTrigger)) {
+				if (cmsTrigger.length > 0) {
+					trigger = renderBlocks(cmsTrigger)[0];
+				}
+			} else if (typeof cmsTrigger === "object") {
+				trigger = renderBlocks([cmsTrigger])[0];
+			} else if (typeof cmsTrigger === "string") {
+				trigger = cmsTrigger;
+			}
+		}
+		if (!trigger) {
+			trigger = triggerText || "Toggle";
+		}
+
 		const indicator = showIndicator ? (
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -210,11 +227,26 @@ const registry: Record<string, BlockRenderer> = {
 			confirmText,
 			cancelText,
 			role,
+			trigger: cmsTrigger,
 			...rest
 		} = propsOf(b);
-		const trigger = triggerText ? (
-			<Button variant="outline">{triggerText}</Button>
-		) : undefined;
+
+		let trigger: any;
+		if (cmsTrigger) {
+			if (Array.isArray(cmsTrigger)) {
+				if (cmsTrigger.length > 0) {
+					trigger = renderBlocks(cmsTrigger)[0];
+				}
+			} else if (typeof cmsTrigger === "object") {
+				trigger = renderBlocks([cmsTrigger])[0];
+			} else if (typeof cmsTrigger === "string") {
+				trigger = cmsTrigger;
+			}
+		}
+		if (!trigger && triggerText) {
+			trigger = <Button variant="outline">{triggerText}</Button>;
+		}
+
 		const confirm = confirmText ? <Button>{confirmText}</Button> : undefined;
 		const cancel = cancelText ? (
 			<Button variant="outline">{cancelText}</Button>
@@ -244,11 +276,26 @@ const registry: Record<string, BlockRenderer> = {
 			triggerText,
 			confirmText,
 			cancelText,
+			trigger: cmsTrigger,
 			...rest
 		} = propsOf(b);
-		const trigger = triggerText ? (
-			<Button variant="outline">{triggerText}</Button>
-		) : undefined;
+
+		let trigger: any;
+		if (cmsTrigger) {
+			if (Array.isArray(cmsTrigger)) {
+				if (cmsTrigger.length > 0) {
+					trigger = renderBlocks(cmsTrigger)[0];
+				}
+			} else if (typeof cmsTrigger === "object") {
+				trigger = renderBlocks([cmsTrigger])[0];
+			} else if (typeof cmsTrigger === "string") {
+				trigger = cmsTrigger;
+			}
+		}
+		if (!trigger && triggerText) {
+			trigger = <Button variant="outline">{triggerText}</Button>;
+		}
+
 		const confirm = confirmText ? <Button>{confirmText}</Button> : undefined;
 		const cancel = cancelText ? (
 			<Button variant="outline">{cancelText}</Button>
@@ -477,15 +524,24 @@ function renderUnknown(block: ComponentBlock): JSX.Element {
 	return <div data-unknown-component={block.type} />;
 }
 
-function RenderBlock({ block }: { block: ComponentBlock }): JSX.Element {
+function RenderBlock({
+	block,
+	...extraProps
+}: {
+	block: ComponentBlock;
+	[key: string]: any;
+}): JSX.Element {
 	const render = registry[resolveType(block.type)];
-	return render ? render(block) : renderUnknown(block);
+	return render ? render({ ...block, ...extraProps }) : renderUnknown(block);
 }
 
-function renderBlocks(content?: ComponentBlock[] | null): JSX.Element[] {
+function renderBlocks(
+	content?: ComponentBlock[] | null,
+	extraProps?: any,
+): JSX.Element[] {
 	if (!content || !Array.isArray(content)) return [];
 	return content.map((block, index) => (
-		<RenderBlock key={`${block.type}-${index}`} block={block} />
+		<RenderBlock key={`${block.type}-${index}`} block={block} {...extraProps} />
 	));
 }
 

@@ -402,7 +402,12 @@ collections:
                     name: collapsible
                     widget: object
                     fields: &collapsible_fields
-                      - { label: Trigger Text, name: triggerText, widget: string }
+                      - { label: Trigger Text, name: triggerText, widget: string, required: false }
+                      - label: Trigger
+                        name: trigger
+                        widget: list
+                        types: *leaf_components
+                        required: false
                       - { label: Show Indicator, name: showIndicator, widget: boolean, default: true }
                       - { label: Indicator Placement, name: indicatorPlacement, widget: select, options: [start, end], default: end }
                       - { label: Open, name: open, widget: boolean, default: false }
@@ -418,7 +423,12 @@ collections:
                     fields: &dialog_fields
                       - { label: Title, name: title, widget: string }
                       - { label: Description, name: description, widget: string, required: false }
-                      - { label: Trigger Text, name: triggerText, widget: string }
+                      - { label: Trigger Text, name: triggerText, widget: string, required: false }
+                      - label: Trigger
+                        name: trigger
+                        widget: list
+                        types: *leaf_components
+                        required: false
                       - { label: Confirm Text, name: confirmText, widget: string, required: false }
                       - { label: Cancel Text, name: cancelText, widget: string, required: false }
                       - { label: Role, name: role, widget: select, options: [dialog, alertdialog], default: dialog }
@@ -434,7 +444,12 @@ collections:
                     fields: &drawer_fields
                       - { label: Title, name: title, widget: string }
                       - { label: Description, name: description, widget: string, required: false }
-                      - { label: Trigger Text, name: triggerText, widget: string }
+                      - { label: Trigger Text, name: triggerText, widget: string, required: false }
+                      - label: Trigger
+                        name: trigger
+                        widget: list
+                        types: *leaf_components
+                        required: false
                       - { label: Confirm Text, name: confirmText, widget: string, required: false }
                       - { label: Cancel Text, name: cancelText, widget: string, required: false }
                       - label: Children
@@ -628,7 +643,12 @@ collections:
             name: collapsible
             widget: object
             fields:
-              - { label: Trigger Text, name: triggerText, widget: string }
+              - { label: Trigger Text, name: triggerText, widget: string, required: false }
+              - label: Trigger
+                name: trigger
+                widget: list
+                types: *nestable_components
+                required: false
               - { label: Show Indicator, name: showIndicator, widget: boolean, default: true }
               - { label: Indicator Placement, name: indicatorPlacement, widget: select, options: [start, end], default: end }
               - { label: Open, name: open, widget: boolean, default: false }
@@ -647,7 +667,12 @@ collections:
             fields:
               - { label: Title, name: title, widget: string }
               - { label: Description, name: description, widget: string, required: false }
-              - { label: Trigger Text, name: triggerText, widget: string }
+              - { label: Trigger Text, name: triggerText, widget: string, required: false }
+              - label: Trigger
+                name: trigger
+                widget: list
+                types: *nestable_components
+                required: false
               - { label: Confirm Text, name: confirmText, widget: string, required: false }
               - { label: Cancel Text, name: cancelText, widget: string, required: false }
               - { label: Role, name: role, widget: select, options: [dialog, alertdialog], default: dialog }
@@ -666,7 +691,12 @@ collections:
             fields:
               - { label: Title, name: title, widget: string }
               - { label: Description, name: description, widget: string, required: false }
-              - { label: Trigger Text, name: triggerText, widget: string }
+              - { label: Trigger Text, name: triggerText, widget: string, required: false }
+              - label: Trigger
+                name: trigger
+                widget: list
+                types: *nestable_components
+                required: false
               - { label: Confirm Text, name: confirmText, widget: string, required: false }
               - { label: Cancel Text, name: cancelText, widget: string, required: false }
               - label: Children
