@@ -1140,21 +1140,12 @@ export default createRoute((c) => {
 				</Heading>
 
 				<Text size="sm" class={css({ color: "fg.muted", mb: "2" })}>
-					Interactive DatePicker (Hydrated Island)
+					DatePicker
 				</Text>
 				<DatePicker
 					interactive
 					placeholder="Select Date"
 					defaultValue={["2026-07-28"]}
-				/>
-
-				<Text size="sm" class={css({ color: "fg.muted", mt: "4", mb: "2" })}>
-					Static DatePicker (Server Renders Initial State)
-				</Text>
-				<DatePicker
-					interactive={false}
-					placeholder="Static Date"
-					defaultValue={["2024-12-25"]}
 				/>
 			</div>
 
