@@ -83,10 +83,7 @@ export function applyInert() {
  * the `data-part` marker is applied inside the component's render and is NOT
  * present on the component element's props at the point `Content` inspects them.
  */
-export function hasPart(
-	node: unknown,
-	cmp: (...args: unknown[]) => unknown,
-): boolean {
+export function hasPart(node: unknown, cmp: unknown): boolean {
 	if (node == null || typeof node !== "object") return false;
 	if (Array.isArray(node)) return node.some((c) => hasPart(c, cmp));
 	const el = node as { type?: unknown; props?: { children?: unknown } };

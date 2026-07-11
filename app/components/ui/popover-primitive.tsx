@@ -321,6 +321,12 @@ export function InteractivePopoverRoot(props: PopoverRootProps) {
 			return;
 		}
 
+		// The effect body runs once per mount (see `useSliderContext`'s island /
+		// `useOverlay` for the same convention elsewhere in this codebase) — state
+		// updates do not re-run it, so "is it open right now" is read off the DOM
+		// via `data-state` rather than captured in a closure that would go stale.
+		const isCurrentlyOpen = () => root.getAttribute("data-state") === "open";
+
 		const getPositioners = () =>
 			Array.from(
 				root.querySelectorAll<HTMLElement>('[data-part="positioner"]'),
@@ -328,6 +334,7 @@ export function InteractivePopoverRoot(props: PopoverRootProps) {
 
 		const openPopover = () => {
 			prevFocusRef.current = document.activeElement as HTMLElement | null;
+			root.setAttribute("data-state", "open");
 			getPositioners().forEach((p) => {
 				p.style.cssText = "display: block !important;";
 			});
@@ -341,6 +348,7 @@ export function InteractivePopoverRoot(props: PopoverRootProps) {
 		};
 
 		const closePopover = () => {
+			root.setAttribute("data-state", "closed");
 			getPositioners().forEach((p) => {
 				p.style.cssText = "display: none !important;";
 			});
@@ -353,7 +361,7 @@ export function InteractivePopoverRoot(props: PopoverRootProps) {
 			const dataPart = target.getAttribute("data-part");
 
 			if (dataPart === "trigger") {
-				const nextOpen = !isOpen;
+				const nextOpen = !isCurrentlyOpen();
 				if (nextOpen) {
 					openPopover();
 				} else {
@@ -367,18 +375,25 @@ export function InteractivePopoverRoot(props: PopoverRootProps) {
 		};
 
 		const handleDocumentPointerDown = (e: Event) => {
-			if (!isOpen || !closeOnInteractOutsideRef.current) return;
+			if (!isCurrentlyOpen() || !closeOnInteractOutsideRef.current) return;
 			if (root.contains(e.target as Node)) return;
 			closePopover();
 			handleOpenChangeRef.current?.(false);
 		};
 
 		const handleKeyDown = (e: KeyboardEvent) => {
-			if (!isOpen || e.key !== "Escape" || !closeOnEscapeRef.current) return;
+			if (
+				!isCurrentlyOpen() ||
+				e.key !== "Escape" ||
+				!closeOnEscapeRef.current
+			)
+				return;
 			e.preventDefault();
 			closePopover();
 			handleOpenChangeRef.current?.(false);
 		};
+
+		if (isCurrentlyOpen()) openPopover();
 
 		root.addEventListener("click", handleClick);
 		document.addEventListener("mousedown", handleDocumentPointerDown);
@@ -389,10 +404,10 @@ export function InteractivePopoverRoot(props: PopoverRootProps) {
 			document.removeEventListener("mousedown", handleDocumentPointerDown);
 			document.removeEventListener("keydown", handleKeyDown);
 		};
-	}, [rootId, isOpen]);
+	}, [rootId]);
 
 	return (
-		<div id={rootId}>
+		<div id={rootId} data-state={isOpen ? "open" : "closed"}>
 			<PopoverRoot {...rest} open={isOpen}>
 				{children}
 			</PopoverRoot>
