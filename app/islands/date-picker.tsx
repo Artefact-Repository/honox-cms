@@ -1,14 +1,14 @@
-import { useEffect, useRef, useState, useId } from "hono/jsx";
+import { useEffect, useId, useRef, useState } from "hono/jsx";
 import {
 	CalendarDate,
-	fromJSDate,
 	DatePickerRoot,
 	type DatePickerRootProps,
-	parseDate,
-	parseValue,
-	parseSingleDate,
-	getMonthWeeks,
 	DatePickerStructure,
+	fromJSDate,
+	getMonthWeeks,
+	parseDate,
+	parseSingleDate,
+	parseValue,
 } from "../components/ui/date-picker-primitive";
 
 export default function DatePickerIsland(props: DatePickerRootProps) {
@@ -183,7 +183,7 @@ export default function DatePickerIsland(props: DatePickerRootProps) {
 
 	const handlePresetClick = (presetType: string) => {
 		const today = new Date();
-		let start = new Date();
+		const start = new Date();
 		if (presetType === "last3Days") {
 			start.setDate(today.getDate() - 3);
 		} else if (presetType === "last7Days") {

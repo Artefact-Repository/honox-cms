@@ -22,14 +22,7 @@ interface PopoverContextValue {
 	onToggle?: () => void;
 }
 
-const PopoverContext = createContext<PopoverContextValue | null>(null);
-
-const usePopoverContext = () => {
-	const context = useContext(PopoverContext);
-	return context;
-};
-
-export interface PopoverRootProps extends PropsWithChildren {
+interface PopoverRootProps extends PropsWithChildren {
 	id?: string;
 	open?: boolean;
 	onClose?: () => void;
@@ -40,7 +33,60 @@ export interface PopoverRootProps extends PropsWithChildren {
 	closeOnInteractOutside?: boolean;
 }
 
-export function PopoverRoot(props: PopoverRootProps) {
+interface PopoverTriggerProps extends PropsWithChildren {
+	class?: string;
+	asChild?: boolean;
+	[key: string]: unknown;
+}
+
+interface PopoverPositionerProps extends PropsWithChildren {
+	class?: string;
+	[key: string]: unknown;
+}
+
+interface PopoverContentProps extends PropsWithChildren {
+	class?: string;
+	[key: string]: unknown;
+}
+
+interface PopoverTitleProps extends PropsWithChildren {
+	class?: string;
+}
+
+interface PopoverDescriptionProps extends PropsWithChildren {
+	class?: string;
+}
+
+interface PopoverCloseTriggerProps extends PropsWithChildren {
+	class?: string;
+	asChild?: boolean;
+}
+
+interface PopoverAnchorProps extends PropsWithChildren {
+	class?: string;
+	asChild?: boolean;
+	[key: string]: unknown;
+}
+
+interface PopoverIndicatorProps extends PropsWithChildren {
+	class?: string;
+	asChild?: boolean;
+	[key: string]: unknown;
+}
+
+interface InteractivePopoverProps extends PopoverRootProps {
+	defaultOpen?: boolean;
+	onOpenChange?: (details: { open: boolean }) => void;
+}
+
+const PopoverContext = createContext<PopoverContextValue | null>(null);
+
+const usePopoverContext = () => {
+	const context = useContext(PopoverContext);
+	return context;
+};
+
+function Root(props: PopoverRootProps) {
 	const { id: idProp, open = false, children, onClose, onToggle } = props;
 	const autoId = useId();
 	const id = idProp || autoId;
@@ -53,18 +99,42 @@ export function PopoverRoot(props: PopoverRootProps) {
 	);
 }
 
-export interface PopoverTriggerProps extends PropsWithChildren {
-	class?: string;
-	asChild?: boolean;
-	[key: string]: unknown;
+function RootProvider(props: PopoverRootProps) {
+	return <Root {...props} />;
 }
 
-export function PopoverTrigger(props: PopoverTriggerProps) {
+function Anchor(props: PopoverAnchorProps) {
+	const { children, class: classProp, asChild, ...restProps } = props;
+	const context = usePopoverContext();
+	const styles = context?.styles || popover();
+
+	const anchorProps = {
+		"data-scope": "popover",
+		"data-part": "anchor",
+		...restProps,
+	};
+
+	if (asChild && typeof children === "object" && children !== null) {
+		const child = children as any;
+		return cloneElement(child, {
+			...anchorProps,
+			class: cx(styles.anchor, classProp, child.props?.class),
+		});
+	}
+
+	return (
+		<div class={cx(styles.anchor, classProp)} {...anchorProps}>
+			{children}
+		</div>
+	);
+}
+
+function Trigger(props: PopoverTriggerProps) {
 	const { children, class: classProp, asChild, ...restProps } = props;
 	const context = usePopoverContext();
 	const id = context?.id;
 	const open = context?.open;
-	const styles = context?.styles;
+	const styles = context?.styles || popover();
 
 	const triggerProps = {
 		id: id ? `popover-trigger-${id}` : undefined,
@@ -72,6 +142,7 @@ export function PopoverTrigger(props: PopoverTriggerProps) {
 		"aria-expanded": open ? "true" : "false",
 		"aria-controls": open && id ? `popover-content-${id}` : undefined,
 		"data-state": open ? "open" : "closed",
+		"data-scope": "popover",
 		"data-part": "trigger",
 		...restProps,
 	};
@@ -80,36 +151,36 @@ export function PopoverTrigger(props: PopoverTriggerProps) {
 		const child = children as any;
 		return cloneElement(child, {
 			...triggerProps,
-			class: cx(styles?.trigger, classProp, child.props?.class),
+			class: cx(styles.trigger, classProp, child.props?.class),
 		});
 	}
 
 	return (
-		<button type="button" {...triggerProps}>
+		<button
+			type="button"
+			class={cx(styles.trigger, classProp)}
+			{...triggerProps}
+		>
 			{children}
 		</button>
 	);
 }
 
-export interface PopoverPositionerProps extends PropsWithChildren {
-	class?: string;
-	[key: string]: unknown;
-}
-
-export function PopoverPositioner(props: PopoverPositionerProps) {
+function Positioner(props: PopoverPositionerProps) {
 	const { children, class: classProp, ...restProps } = props;
 	const context = usePopoverContext();
 	const open = context?.open;
-	const styles = context?.styles;
+	const styles = context?.styles || popover();
 
 	return (
 		<div
 			class={cx(
-				styles?.positioner,
+				styles.positioner,
 				classProp,
 				!open && css({ display: "none" }),
 			)}
 			data-state={open ? "open" : "closed"}
+			data-scope="popover"
 			data-part="positioner"
 			style={{
 				position: "absolute",
@@ -124,31 +195,27 @@ export function PopoverPositioner(props: PopoverPositionerProps) {
 	);
 }
 
-export interface PopoverContentProps extends PropsWithChildren {
-	class?: string;
-	[key: string]: unknown;
-}
-
-export function PopoverContent(props: PopoverContentProps) {
+function Content(props: PopoverContentProps) {
 	const { children, class: classProp, ...restProps } = props;
 	const context = usePopoverContext();
 	const id = context?.id;
 	const open = context?.open;
-	const styles = context?.styles;
+	const styles = context?.styles || popover();
 
 	const titleId = id ? `popover-title-${id}` : undefined;
 	const descriptionId = id ? `popover-description-${id}` : undefined;
-	const titleRendered = hasPart(children, PopoverTitle);
-	const hasDescription = hasPart(children, PopoverDescription);
+	const titleRendered = hasPart(children, Title);
+	const hasDescription = hasPart(children, Description);
 
 	return (
 		<div
 			id={id ? `popover-content-${id}` : undefined}
 			role="dialog"
+			data-scope="popover"
 			data-part="content"
 			{...(titleRendered ? { "aria-labelledby": titleId } : {})}
 			{...(hasDescription ? { "aria-describedby": descriptionId } : {})}
-			class={cx(styles?.content, classProp)}
+			class={cx(styles.content, classProp)}
 			data-state={open ? "open" : "closed"}
 			tabIndex={-1}
 			{...restProps}
@@ -158,52 +225,65 @@ export function PopoverContent(props: PopoverContentProps) {
 	);
 }
 
-export function PopoverHeader(props: PropsWithChildren<{ class?: string }>) {
+function Header(props: PropsWithChildren<{ class?: string }>) {
 	const { children, class: classProp, ...restProps } = props;
 	const context = usePopoverContext();
-	const styles = context?.styles;
+	const styles = context?.styles || popover();
 	return (
-		<header class={cx(styles?.header, classProp)} {...restProps}>
+		<header
+			class={cx(styles.header, classProp)}
+			data-scope="popover"
+			data-part="header"
+			{...restProps}
+		>
 			{children}
 		</header>
 	);
 }
 
-export function PopoverBody(props: PropsWithChildren<{ class?: string }>) {
+function Body(props: PropsWithChildren<{ class?: string }>) {
 	const { children, class: classProp, ...restProps } = props;
 	const context = usePopoverContext();
-	const styles = context?.styles;
+	const styles = context?.styles || popover();
 	return (
-		<div class={cx(styles?.body, classProp)} {...restProps}>
+		<div
+			class={cx(styles.body, classProp)}
+			data-scope="popover"
+			data-part="body"
+			{...restProps}
+		>
 			{children}
 		</div>
 	);
 }
 
-export function PopoverFooter(props: PropsWithChildren<{ class?: string }>) {
+function Footer(props: PropsWithChildren<{ class?: string }>) {
 	const { children, class: classProp, ...restProps } = props;
 	const context = usePopoverContext();
-	const styles = context?.styles;
+	const styles = context?.styles || popover();
 	return (
-		<footer class={cx(styles?.footer, classProp)} {...restProps}>
+		<footer
+			class={cx(styles.footer, classProp)}
+			data-scope="popover"
+			data-part="footer"
+			{...restProps}
+		>
 			{children}
 		</footer>
 	);
 }
 
-export interface PopoverTitleProps extends PropsWithChildren {
-	class?: string;
-}
-
-export function PopoverTitle(props: PopoverTitleProps) {
+function Title(props: PopoverTitleProps) {
 	const { children, class: classProp, ...restProps } = props;
 	const context = usePopoverContext();
 	const id = context?.id;
-	const styles = context?.styles;
+	const styles = context?.styles || popover();
 	return (
 		<h2
 			id={id ? `popover-title-${id}` : undefined}
-			class={cx(styles?.title, classProp)}
+			class={cx(styles.title, classProp)}
+			data-scope="popover"
+			data-part="title"
 			{...restProps}
 		>
 			{children}
@@ -211,19 +291,17 @@ export function PopoverTitle(props: PopoverTitleProps) {
 	);
 }
 
-export interface PopoverDescriptionProps extends PropsWithChildren {
-	class?: string;
-}
-
-export function PopoverDescription(props: PopoverDescriptionProps) {
+function Description(props: PopoverDescriptionProps) {
 	const { children, class: classProp, ...restProps } = props;
 	const context = usePopoverContext();
 	const id = context?.id;
-	const styles = context?.styles;
+	const styles = context?.styles || popover();
 	return (
 		<p
 			id={id ? `popover-description-${id}` : undefined}
-			class={cx(styles?.description, classProp)}
+			class={cx(styles.description, classProp)}
+			data-scope="popover"
+			data-part="description"
 			{...restProps}
 		>
 			{children}
@@ -231,18 +309,14 @@ export function PopoverDescription(props: PopoverDescriptionProps) {
 	);
 }
 
-export interface PopoverCloseTriggerProps extends PropsWithChildren {
-	class?: string;
-	asChild?: boolean;
-}
-
-export function PopoverCloseTrigger(props: PopoverCloseTriggerProps) {
+function CloseTrigger(props: PopoverCloseTriggerProps) {
 	const { children, class: classProp, asChild, ...restProps } = props;
 	const context = usePopoverContext();
-	const styles = context?.styles;
+	const styles = context?.styles || popover();
 
 	const triggerProps = {
 		"aria-label": "Close",
+		"data-scope": "popover",
 		"data-part": "close-trigger",
 		...restProps,
 	};
@@ -251,14 +325,14 @@ export function PopoverCloseTrigger(props: PopoverCloseTriggerProps) {
 		const child = children as any;
 		return cloneElement(child, {
 			...triggerProps,
-			class: cx(styles?.closeTrigger, classProp, child.props?.class),
+			class: cx(styles.closeTrigger, classProp, child.props?.class),
 		});
 	}
 
 	return (
 		<button
 			type="button"
-			class={cx(styles?.closeTrigger, classProp)}
+			class={cx(styles.closeTrigger, classProp)}
 			{...triggerProps}
 		>
 			{children}
@@ -266,34 +340,83 @@ export function PopoverCloseTrigger(props: PopoverCloseTriggerProps) {
 	);
 }
 
-export function PopoverArrow(props: PropsWithChildren<{ class?: string }>) {
+function Arrow(props: PropsWithChildren<{ class?: string }>) {
 	const { children, class: classProp, ...restProps } = props;
 	const context = usePopoverContext();
-	const styles = context?.styles;
+	const styles = context?.styles || popover();
 	return (
-		<div class={cx(styles?.arrow, classProp)} {...restProps}>
+		<div
+			class={cx(styles.arrow, classProp)}
+			data-scope="popover"
+			data-part="arrow"
+			{...restProps}
+		>
 			{children}
 		</div>
 	);
 }
 
-export function PopoverArrowTip(props: { class?: string }) {
+function ArrowTip(props: { class?: string }) {
 	const { class: classProp, ...restProps } = props;
 	const context = usePopoverContext();
-	const styles = context?.styles;
-	return <div class={cx(styles?.arrowTip, classProp)} {...restProps} />;
+	const styles = context?.styles || popover();
+	return (
+		<div
+			class={cx(styles.arrowTip, classProp)}
+			data-scope="popover"
+			data-part="arrow-tip"
+			{...restProps}
+		/>
+	);
 }
 
-export function InteractivePopoverRoot(props: PopoverRootProps) {
+function Indicator(props: PopoverIndicatorProps) {
+	const { children, class: classProp, asChild, ...restProps } = props;
+	const context = usePopoverContext();
+	const styles = context?.styles || popover();
+	const open = context?.open;
+
+	const indicatorProps = {
+		"data-scope": "popover",
+		"data-part": "indicator",
+		"data-state": open ? "open" : "closed",
+		...restProps,
+	};
+
+	if (asChild && typeof children === "object" && children !== null) {
+		const child = children as any;
+		return cloneElement(child, {
+			...indicatorProps,
+			class: cx(styles.indicator, classProp, child.props?.class),
+		});
+	}
+
+	return (
+		<div class={cx(styles.indicator, classProp)} {...indicatorProps}>
+			{children}
+		</div>
+	);
+}
+
+function Context(props: { children: (context: any) => any }) {
+	const context = usePopoverContext();
+	return props.children(context);
+}
+
+function InteractivePopoverRoot(props: InteractivePopoverProps) {
 	const {
 		open: openProp,
 		children,
 		id: idProp,
 		closeOnEscape = true,
 		closeOnInteractOutside = true,
+		defaultOpen,
+		onOpenChange,
 		...rest
 	} = props;
-	const [isOpen, setIsOpen] = useState(openProp ?? false);
+	const [isOpen, setIsOpen] = useState(openProp ?? defaultOpen ?? false);
+	const isControlled = openProp !== undefined;
+	const open = isControlled ? openProp : isOpen;
 
 	const fallbackId = useId();
 	const rootId = idProp || `popover-${fallbackId}`;
@@ -305,12 +428,15 @@ export function InteractivePopoverRoot(props: PopoverRootProps) {
 	const prevFocusRef = useRef<HTMLElement | null>(null);
 
 	const handleOpenChange = (nextOpen: boolean) => {
-		setIsOpen(nextOpen);
+		if (!isControlled) {
+			setIsOpen(nextOpen);
+		}
+		onOpenChange?.({ open: nextOpen });
 	};
 
 	useEffect(() => {
 		handleOpenChangeRef.current = handleOpenChange;
-	}, []);
+	}, [isControlled, onOpenChange]);
 
 	useEffect(() => {
 		if (typeof document === "undefined") {
@@ -322,12 +448,6 @@ export function InteractivePopoverRoot(props: PopoverRootProps) {
 			return;
 		}
 
-		// The effect body runs once per mount (see `useSliderContext`'s island /
-		// `useOverlay` for the same convention elsewhere in this codebase) — state
-		// updates do not re-run it, so "is it open right now" is read off the DOM
-		// via `data-state` rather than captured in a closure that would go stale.
-		const isCurrentlyOpen = () => root.getAttribute("data-state") === "open";
-
 		const getPositioners = () =>
 			Array.from(
 				root.querySelectorAll<HTMLElement>('[data-part="positioner"]'),
@@ -338,25 +458,143 @@ export function InteractivePopoverRoot(props: PopoverRootProps) {
 			root.setAttribute("data-state", "open");
 			getPositioners().forEach((p) => {
 				p.style.cssText = "display: block !important;";
+				p.setAttribute("data-state", "open");
 			});
 			const content = root.querySelector<HTMLElement>('[data-part="content"]');
 			if (content) {
+				content.setAttribute("data-state", "open");
 				const focusable = getFocusable(content);
 				(focusable[0] ?? content).focus();
 			}
+			const trigger = root.querySelector<HTMLElement>(
+				'[data-part="trigger"]',
+			);
+			if (trigger) {
+				trigger.setAttribute("data-state", "open");
+				trigger.setAttribute("aria-expanded", "true");
+			}
+			const indicators = root.querySelectorAll<HTMLElement>(
+				'[data-part="indicator"]',
+			);
+			indicators.forEach((i) => {
+				i.setAttribute("data-state", "open");
+			});
 		};
 
 		const closePopover = () => {
 			root.setAttribute("data-state", "closed");
 			getPositioners().forEach((p) => {
 				p.style.cssText = "display: none !important;";
+				p.setAttribute("data-state", "closed");
 			});
-			const trigger = root.querySelector<HTMLElement>('[data-part="trigger"]');
+			const content = root.querySelector<HTMLElement>(
+				'[data-part="content"]',
+			);
+			if (content) {
+				content.setAttribute("data-state", "closed");
+			}
+			const trigger = root.querySelector<HTMLElement>(
+				'[data-part="trigger"]',
+			);
+			if (trigger) {
+				trigger.setAttribute("data-state", "closed");
+				trigger.setAttribute("aria-expanded", "false");
+			}
+			const indicators = root.querySelectorAll<HTMLElement>(
+				'[data-part="indicator"]',
+			);
+			indicators.forEach((i) => {
+				i.setAttribute("data-state", "closed");
+			});
+			(trigger ?? prevFocusRef.current)?.focus();
+		};
+
+		if (open) {
+			openPopover();
+		} else {
+			closePopover();
+		}
+	}, [rootId, open]);
+
+	useEffect(() => {
+		if (typeof document === "undefined") {
+			return;
+		}
+
+		const root = document.getElementById(rootId);
+		if (!root) {
+			return;
+		}
+
+		const isCurrentlyOpen = () => root.getAttribute("data-state") === "open";
+
+		const openPopover = () => {
+			prevFocusRef.current = document.activeElement as HTMLElement | null;
+			root.setAttribute("data-state", "open");
+			const positioners = Array.from(
+				root.querySelectorAll<HTMLElement>('[data-part="positioner"]'),
+			);
+			positioners.forEach((p) => {
+				p.style.cssText = "display: block !important;";
+				p.setAttribute("data-state", "open");
+			});
+			const content = root.querySelector<HTMLElement>(
+				'[data-part="content"]',
+			);
+			if (content) {
+				content.setAttribute("data-state", "open");
+				const focusable = getFocusable(content);
+				(focusable[0] ?? content).focus();
+			}
+			const trigger = root.querySelector<HTMLElement>(
+				'[data-part="trigger"]',
+			);
+			if (trigger) {
+				trigger.setAttribute("data-state", "open");
+				trigger.setAttribute("aria-expanded", "true");
+			}
+			const indicators = root.querySelectorAll<HTMLElement>(
+				'[data-part="indicator"]',
+			);
+			indicators.forEach((i) => {
+				i.setAttribute("data-state", "open");
+			});
+		};
+
+		const closePopover = () => {
+			root.setAttribute("data-state", "closed");
+			const positioners = Array.from(
+				root.querySelectorAll<HTMLElement>('[data-part="positioner"]'),
+			);
+			positioners.forEach((p) => {
+				p.style.cssText = "display: none !important;";
+				p.setAttribute("data-state", "closed");
+			});
+			const content = root.querySelector<HTMLElement>(
+				'[data-part="content"]',
+			);
+			if (content) {
+				content.setAttribute("data-state", "closed");
+			}
+			const trigger = root.querySelector<HTMLElement>(
+				'[data-part="trigger"]',
+			);
+			if (trigger) {
+				trigger.setAttribute("data-state", "closed");
+				trigger.setAttribute("aria-expanded", "false");
+			}
+			const indicators = root.querySelectorAll<HTMLElement>(
+				'[data-part="indicator"]',
+			);
+			indicators.forEach((i) => {
+				i.setAttribute("data-state", "closed");
+			});
 			(trigger ?? prevFocusRef.current)?.focus();
 		};
 
 		const handleClick = (e: Event) => {
-			const target = e.target as HTMLElement;
+			const target = (e.target as HTMLElement).closest("[data-part]") as HTMLElement;
+			if (!target) return;
 			const dataPart = target.getAttribute("data-part");
 
 			if (dataPart === "trigger") {
@@ -388,8 +626,6 @@ export function InteractivePopoverRoot(props: PopoverRootProps) {
 			handleOpenChangeRef.current?.(false);
 		};
 
-		if (isCurrentlyOpen()) openPopover();
-
 		root.addEventListener("click", handleClick);
 		document.addEventListener("mousedown", handleDocumentPointerDown);
 		document.addEventListener("keydown", handleKeyDown);
@@ -402,10 +638,44 @@ export function InteractivePopoverRoot(props: PopoverRootProps) {
 	}, [rootId]);
 
 	return (
-		<div id={rootId} data-state={isOpen ? "open" : "closed"}>
-			<PopoverRoot {...rest} open={isOpen}>
+		<div id={rootId} data-state={open ? "open" : "closed"}>
+			<Root {...rest} open={open}>
 				{children}
-			</PopoverRoot>
+			</Root>
 		</div>
 	);
 }
+
+export type {
+	PopoverStyles,
+	PopoverContextValue,
+	PopoverRootProps,
+	PopoverTriggerProps,
+	PopoverPositionerProps,
+	PopoverContentProps,
+	PopoverTitleProps,
+	PopoverDescriptionProps,
+	PopoverCloseTriggerProps,
+	PopoverAnchorProps,
+	PopoverIndicatorProps,
+	InteractivePopoverProps,
+};
+export {
+	Root,
+	RootProvider,
+	Anchor,
+	Trigger,
+	Positioner,
+	Arrow,
+	ArrowTip,
+	Content,
+	CloseTrigger,
+	Header,
+	Body,
+	Footer,
+	Title,
+	Description,
+	Indicator,
+	Context,
+	InteractivePopoverRoot,
+};

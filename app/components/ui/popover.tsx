@@ -4,22 +4,26 @@ import PopoverIsland from "../../islands/popover";
 import { IconButton } from "./button";
 import { shouldHydrate } from "./island-utils";
 import {
-	PopoverArrow as Arrow,
-	PopoverArrowTip as ArrowTip,
-	PopoverBody as Body,
-	PopoverCloseTrigger as CloseTrigger,
-	PopoverContent as Content,
-	PopoverDescription as Description,
-	PopoverFooter as Footer,
-	PopoverHeader as Header,
-	type PopoverRootProps,
-	PopoverPositioner as Positioner,
-	PopoverRoot as RootPrimitive,
-	PopoverTitle as Title,
-	PopoverTrigger as Trigger,
+	Anchor,
+	Arrow,
+	ArrowTip,
+	Body,
+	CloseTrigger,
+	Content,
+	Context,
+	Description,
+	Footer,
+	Header,
+	Indicator,
+	type InteractivePopoverProps,
+	Positioner,
+	Root as RootPrimitive,
+	RootProvider,
+	Title,
+	Trigger,
 } from "./popover-primitive";
 
-interface PopoverProps extends PopoverRootProps {
+interface PopoverProps extends InteractivePopoverProps {
 	interactive?: boolean; // keep — forces island hydration (default true)
 	trigger?: JSX.Element; // rendered asChild inside PopoverTrigger
 	showArrow?: boolean; // render Arrow + ArrowTip (default true)
@@ -30,16 +34,6 @@ interface PopoverProps extends PopoverRootProps {
 	closable?: boolean; // render CloseTrigger (default true)
 	closeIcon?: JSX.Element; // custom close icon; defaults to built-in X
 	children?: JSX.Element; // extra content after body
-}
-
-function Root(props: PopoverProps) {
-	const { interactive, ...rest } = props;
-
-	if (shouldHydrate(interactive, true)) {
-		return <PopoverIsland {...rest} />;
-	}
-
-	return <RootPrimitive {...rest} />;
 }
 
 const DefaultCloseIcon = () => (
@@ -58,6 +52,16 @@ const DefaultCloseIcon = () => (
 		<path d="M18 6 6 18M6 6l12 12" />
 	</svg>
 );
+
+function Root(props: PopoverProps) {
+	const { interactive, ...rest } = props;
+
+	if (shouldHydrate(interactive, true)) {
+		return <PopoverIsland {...rest} />;
+	}
+
+	return <RootPrimitive {...rest} />;
+}
 
 function Popover(props: PopoverProps) {
 	const {
@@ -111,5 +115,44 @@ function Popover(props: PopoverProps) {
 	);
 }
 
-export { Popover, type PopoverProps };
-export default Popover;
+const PopoverComponent = Object.assign(Popover, {
+	Root,
+	RootProvider,
+	Anchor,
+	Trigger,
+	Positioner,
+	Arrow,
+	ArrowTip,
+	Content,
+	CloseTrigger,
+	Header,
+	Body,
+	Footer,
+	Title,
+	Description,
+	Indicator,
+	Context,
+});
+
+export {
+	Anchor,
+	Arrow,
+	ArrowTip,
+	Body,
+	CloseTrigger,
+	Content,
+	Context,
+	Description,
+	Footer,
+	Header,
+	Indicator,
+	PopoverComponent as Popover,
+	type PopoverProps,
+	Positioner,
+	Root,
+	RootProvider,
+	Title,
+	Trigger,
+};
+
+export default PopoverComponent;
