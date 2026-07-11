@@ -720,7 +720,8 @@ function MonthSelect(props: PropsWithChildren<{ class?: string }>) {
 function YearSelect(props: PropsWithChildren<{ class?: string }>) {
 	const { children, class: classProp, ...rest } = props;
 	const context = useDatePickerContext();
-	const currentYear = context?.focusedDate.getFullYear() || new Date().getFullYear();
+	const currentYear =
+		context?.focusedDate.getFullYear() || new Date().getFullYear();
 	const years = Array.from({ length: 20 }, (_, i) => currentYear - 10 + i);
 
 	return (
