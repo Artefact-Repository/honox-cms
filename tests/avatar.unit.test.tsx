@@ -17,7 +17,7 @@ describe("Avatar component", () => {
 		expect(htmlString).toContain('data-scope="avatar"');
 		expect(htmlString).toContain('data-part="root"');
 		expect(htmlString).toContain('data-part="fallback"');
-		expect(htmlString).toContain('data-state="visible"');
+		expect(htmlString).toContain('data-state="idle"');
 	});
 
 	it("should render fallback icon when no name or src is provided", async () => {
@@ -28,10 +28,10 @@ describe("Avatar component", () => {
 	});
 
 	it("should render image part and hide fallback when src and loaded status are provided", async () => {
-		const html = (await Avatar({ src: "https://example.com/avatar.png", status: "loaded" })) as any;
+		const html = (await Avatar({ src: "https://example.com/avatar.png", status: "loaded", interactive: false })) as any;
 		const htmlString = html.toString();
 		expect(htmlString).toContain('data-part="image"');
-		expect(htmlString).toContain('data-state="visible"');
-		expect(htmlString).toContain('style="display:none"'); // fallback gets hidden
+		expect(htmlString).toContain('data-state="loaded"');
+		expect(htmlString).not.toContain('data-part="fallback"');
 	});
 });

@@ -1,3 +1,4 @@
+import { input } from "./input";
 import { absoluteCenter } from "./absolute-center";
 import { alert } from "./alert";
 import { avatar } from "./avatar";
@@ -38,16 +39,17 @@ import { toggleGroup } from "./toggle-group";
 import { tooltip } from "./tooltip";
 
 export const recipes = {
-	absoluteCenter,
-	badge,
-	button,
-	group,
-	heading,
-	spinner,
-	text,
-	textarea,
-	skeleton,
-	code,
+    absoluteCenter,
+    badge,
+    button,
+    group,
+    heading,
+    spinner,
+    text,
+    textarea,
+    skeleton,
+    code,
+    input
 };
 
 export const slotRecipes = {

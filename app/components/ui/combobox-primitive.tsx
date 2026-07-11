@@ -14,7 +14,7 @@ import { combobox } from "styled-system/recipes";
 
 type ComboboxStyles = ReturnType<typeof combobox>;
 
-interface ComboboxContextValue {
+export interface ComboboxContextValue {
 	styles: ComboboxStyles;
 	open: boolean;
 	inputValue: string;
@@ -34,10 +34,17 @@ interface ComboboxContextValue {
 
 const ComboboxContext = createContext<ComboboxContextValue | null>(null);
 
-const useComboboxContext = () => {
+export const useComboboxContext = () => {
 	const context = useContext(ComboboxContext);
 	return context;
 };
+
+export const ItemContext = createContext<{
+	value: string;
+	disabled?: boolean;
+} | null>(null);
+
+export const useComboboxItemContext = () => useContext(ItemContext);
 
 export interface ComboboxItem {
 	label: string;
@@ -112,7 +119,7 @@ export function Root(props: RootProps) {
 			}}
 		>
 			<div
-				id={id}
+				id={rootId}
 				data-scope="combobox"
 				data-part="root"
 				class={cx(styles.root, classProp)}
@@ -123,6 +130,10 @@ export function Root(props: RootProps) {
 			</div>
 		</ComboboxContext.Provider>
 	);
+}
+
+export function RootProvider(props: RootProps) {
+	return <Root {...props} />;
 }
 
 export function Label(
@@ -363,36 +374,25 @@ export function Item(
 	const isSelected = context?.inputValue === value;
 
 	return (
-		<div
-			id={context?.rootId ? `${context.rootId}-item-${index}` : undefined}
-			role="option"
-			tabIndex={-1}
-			aria-disabled={disabled}
-			aria-selected={isSelected}
-			data-scope="combobox"
-			data-part="item"
-			data-value={value}
-			data-disabled={disabled ? "" : undefined}
-			data-highlighted={isHighlighted ? "" : undefined}
-			data-state={isSelected ? "checked" : "unchecked"}
-			class={cx(context?.styles.item, classProp)}
-			onClick={() => {
-				if (!disabled) {
-					context?.onItemSelect?.(value);
-				}
-			}}
-			onKeyDown={(e) => {
-				if (e.key === "Enter" || e.key === " ") {
-					if (!disabled) {
-						context?.onItemSelect?.(value);
-					}
-					e.preventDefault();
-				}
-			}}
-			{...rest}
-		>
-			{children}
-		</div>
+		<ItemContext.Provider value={{ value, disabled }}>
+			<div
+				id={context?.rootId ? `${context.rootId}-item-${index}` : undefined}
+				role="option"
+				tabIndex={-1}
+				aria-disabled={disabled}
+				aria-selected={isSelected}
+				data-scope="combobox"
+				data-part="item"
+				data-value={value}
+				data-disabled={disabled ? "" : undefined}
+				data-highlighted={isHighlighted ? "" : undefined}
+				data-state={isSelected ? "checked" : "unchecked"}
+				class={cx(context?.styles.item, classProp)}
+				{...rest}
+			>
+				{children}
+			</div>
+		</ItemContext.Provider>
 	);
 }
 
@@ -406,15 +406,17 @@ export function ItemText(
 ) {
 	const { children, class: classProp, index, value, disabled, ...rest } = props;
 	const context = useComboboxContext();
+	const item = useComboboxItemContext();
+	const itemValue = value || item?.value || "";
+	const isSelected = context?.inputValue === itemValue;
 	const isHighlighted = context?.highlightedIndex === index;
-	const isSelected = context?.inputValue === value;
 
 	return (
 		<span
 			data-scope="combobox"
 			data-part="item-text"
 			data-state={isSelected ? "checked" : "unchecked"}
-			data-disabled={disabled ? "" : undefined}
+			data-disabled={disabled || item?.disabled ? "" : undefined}
 			data-highlighted={isHighlighted ? "" : undefined}
 			class={cx(context?.styles.itemText, classProp)}
 			{...rest}
@@ -429,7 +431,9 @@ export function ItemIndicator(
 ) {
 	const { children, class: classProp, value, ...rest } = props;
 	const context = useComboboxContext();
-	const isSelected = context?.inputValue === value;
+	const item = useComboboxItemContext();
+	const itemValue = value || item?.value || "";
+	const isSelected = context?.inputValue === itemValue;
 
 	return (
 		<div
@@ -504,6 +508,11 @@ export function Empty(props: PropsWithChildren<{ class?: string }>) {
 			{children}
 		</div>
 	);
+}
+
+export function Context(props: { children: (context: any) => any }) {
+	const context = useComboboxContext();
+	return props.children(context);
 }
 
 export interface ComboboxFlattenedProps extends RootProps {
