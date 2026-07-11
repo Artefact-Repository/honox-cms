@@ -894,6 +894,25 @@ export default createRoute((c) => {
 						{ type: "item", label: "Delete", value: "delete", disabled: true },
 					]}
 				/>
+
+				<Text size="sm" class={css({ color: "fg.muted", mt: "4", mb: "2" })}>
+					Menu with Radio Group (Interactive)
+				</Text>
+				<Menu
+					trigger={<Button variant="outline">Sort By</Button>}
+					items={[
+						{
+							type: "radio-group",
+							value: "name",
+							label: "Sort Order",
+							items: [
+								{ type: "radio", label: "Name", value: "name" },
+								{ type: "radio", label: "Date", value: "date" },
+								{ type: "radio", label: "Size", value: "size" },
+							],
+						},
+					]}
+				/>
 			</div>
 
 			{/* Slider Examples */}

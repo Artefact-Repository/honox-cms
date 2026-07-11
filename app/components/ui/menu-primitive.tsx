@@ -43,6 +43,17 @@ export interface MenuRootProps extends MenuVariantProps, PropsWithChildren {
 	onClose?: () => void;
 }
 
+interface MenuRadioGroupContextValue {
+	value?: string;
+	onValueChange?: (details: { value: string }) => void;
+}
+
+const MenuRadioGroupContext =
+	createContext<MenuRadioGroupContextValue | null>(null);
+
+export const useMenuRadioGroupContext = () =>
+	useContext(MenuRadioGroupContext);
+
 export function MenuRoot(props: MenuRootProps) {
 	const [variantProps, localProps] = menu.splitVariantProps(props);
 	const { id: idProp, open = false, children, onClose } = localProps;
@@ -384,7 +395,11 @@ export interface MenuRadioItemGroupProps extends MenuItemGroupProps {
 
 export function MenuRadioItemGroup(props: MenuRadioItemGroupProps) {
 	const { children, value, onValueChange, ...restProps } = props;
-	return <MenuItemGroup {...restProps}>{children}</MenuItemGroup>;
+	return (
+		<MenuRadioGroupContext.Provider value={{ value, onValueChange }}>
+			<MenuItemGroup {...restProps}>{children}</MenuItemGroup>
+		</MenuRadioGroupContext.Provider>
+	);
 }
 
 export interface MenuRadioItemProps extends MenuItemProps {
@@ -395,12 +410,14 @@ export interface MenuRadioItemProps extends MenuItemProps {
 export function MenuRadioItem(props: MenuRadioItemProps) {
 	const { children, value, checked, class: classProp, ...restProps } = props;
 	const context = useMenuContext();
+	const radioGroup = useMenuRadioGroupContext();
+	const isChecked = checked ?? radioGroup?.value === value;
 
 	return (
 		<div
 			role="menuitemradio"
-			aria-checked={checked ? "true" : "false"}
-			data-state={checked ? "checked" : "unchecked"}
+			aria-checked={isChecked ? "true" : "false"}
+			data-state={isChecked ? "checked" : "unchecked"}
 			data-part="item"
 			data-value={value}
 			class={cx(context.styles.item, classProp)}

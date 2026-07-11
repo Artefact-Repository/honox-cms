@@ -10,6 +10,7 @@ import {
 } from "hono/jsx";
 import { css, cx } from "styled-system/css";
 import { popover } from "styled-system/recipes";
+import { getFocusable, hasPart } from "./overlay-a11y";
 
 type PopoverStyles = ReturnType<typeof popover>;
 
@@ -33,6 +34,10 @@ export interface PopoverRootProps extends PropsWithChildren {
 	open?: boolean;
 	onClose?: () => void;
 	onToggle?: () => void;
+	/** Close when Escape is pressed. Default: true. */
+	closeOnEscape?: boolean;
+	/** Close when interaction occurs outside the popover. Default: true. */
+	closeOnInteractOutside?: boolean;
 }
 
 export function PopoverRoot(props: PopoverRootProps) {
@@ -131,10 +136,18 @@ export function PopoverContent(props: PopoverContentProps) {
 	const open = context?.open;
 	const styles = context?.styles;
 
+	const titleId = id ? `popover-title-${id}` : undefined;
+	const descriptionId = id ? `popover-description-${id}` : undefined;
+	const titleRendered = hasPart(children, PopoverTitle);
+	const hasDescription = hasPart(children, PopoverDescription);
+
 	return (
 		<div
 			id={id ? `popover-content-${id}` : undefined}
 			role="dialog"
+			data-part="content"
+			{...(titleRendered ? { "aria-labelledby": titleId } : {})}
+			{...(hasDescription ? { "aria-describedby": descriptionId } : {})}
 			class={cx(styles?.content, classProp)}
 			data-state={open ? "open" : "closed"}
 			tabIndex={-1}
@@ -178,25 +191,40 @@ export function PopoverFooter(props: PropsWithChildren<{ class?: string }>) {
 	);
 }
 
-export function PopoverTitle(props: PropsWithChildren<{ class?: string }>) {
+export interface PopoverTitleProps extends PropsWithChildren {
+	class?: string;
+}
+
+export function PopoverTitle(props: PopoverTitleProps) {
 	const { children, class: classProp, ...restProps } = props;
 	const context = usePopoverContext();
+	const id = context?.id;
 	const styles = context?.styles;
 	return (
-		<h2 class={cx(styles?.title, classProp)} {...restProps}>
+		<h2
+			id={id ? `popover-title-${id}` : undefined}
+			class={cx(styles?.title, classProp)}
+			{...restProps}
+		>
 			{children}
 		</h2>
 	);
 }
 
-export function PopoverDescription(
-	props: PropsWithChildren<{ class?: string }>,
-) {
+export interface PopoverDescriptionProps extends PropsWithChildren {
+	class?: string;
+}
+
+export function PopoverDescription(props: PopoverDescriptionProps) {
 	const { children, class: classProp, ...restProps } = props;
 	const context = usePopoverContext();
+	const id = context?.id;
 	const styles = context?.styles;
 	return (
-		<p class={cx(styles?.description, classProp)} {...restProps}>
+		<p
+			id={id ? `popover-description-${id}` : undefined}
+			class={cx(styles?.description, classProp)}
+			{...restProps}>
 			{children}
 		</p>
 	);
@@ -256,12 +284,24 @@ export function PopoverArrowTip(props: { class?: string }) {
 }
 
 export function InteractivePopoverRoot(props: PopoverRootProps) {
-	const { open: openProp, children, id: idProp, ...rest } = props;
+	const {
+		open: openProp,
+		children,
+		id: idProp,
+		closeOnEscape = true,
+		closeOnInteractOutside = true,
+		...rest
+	} = props;
 	const [isOpen, setIsOpen] = useState(openProp ?? false);
 
 	const fallbackId = useId();
 	const rootId = idProp || `popover-${fallbackId}`;
 	const handleOpenChangeRef = useRef<(nextOpen: boolean) => void>(() => {});
+	const closeOnEscapeRef = useRef(closeOnEscape);
+	closeOnEscapeRef.current = closeOnEscape;
+	const closeOnInteractOutsideRef = useRef(closeOnInteractOutside);
+	closeOnInteractOutsideRef.current = closeOnInteractOutside;
+	const prevFocusRef = useRef<HTMLElement | null>(null);
 
 	const handleOpenChange = (nextOpen: boolean) => {
 		setIsOpen(nextOpen);
@@ -281,9 +321,33 @@ export function InteractivePopoverRoot(props: PopoverRootProps) {
 			return;
 		}
 
-		const positioners = Array.from(
-			root.querySelectorAll<HTMLElement>('[data-part="positioner"]'),
-		);
+		const getPositioners = () =>
+			Array.from(
+				root.querySelectorAll<HTMLElement>('[data-part="positioner"]'),
+			);
+
+		const openPopover = () => {
+			prevFocusRef.current = document.activeElement as HTMLElement | null;
+			getPositioners().forEach((p) => {
+				p.style.cssText = "display: block !important;";
+			});
+			const content = root.querySelector<HTMLElement>(
+				'[data-part="content"]',
+			);
+			if (content) {
+				const focusable = getFocusable(content);
+				(focusable[0] ?? content).focus();
+			}
+		};
+
+		const closePopover = () => {
+			getPositioners().forEach((p) => {
+				p.style.cssText = "display: none !important;";
+			});
+			const trigger = root.querySelector<HTMLElement>('[data-part="trigger"]');
+			(trigger ?? prevFocusRef.current)?.focus();
+		};
+
 		const handleClick = (e: Event) => {
 			const target = e.target as HTMLElement;
 			const dataPart = target.getAttribute("data-part");
@@ -291,27 +355,39 @@ export function InteractivePopoverRoot(props: PopoverRootProps) {
 			if (dataPart === "trigger") {
 				const nextOpen = !isOpen;
 				if (nextOpen) {
-					positioners.forEach((p) => {
-						p.style.cssText = "display: block !important;";
-					});
+					openPopover();
 				} else {
-					positioners.forEach((p) => {
-						p.style.cssText = "display: none !important;";
-					});
+					closePopover();
 				}
 				handleOpenChangeRef.current?.(nextOpen);
 			} else if (dataPart === "close-trigger") {
-				positioners.forEach((p) => {
-					p.style.cssText = "display: none !important;";
-				});
+				closePopover();
 				handleOpenChangeRef.current?.(false);
 			}
 		};
 
+		const handleDocumentPointerDown = (e: Event) => {
+			if (!isOpen || !closeOnInteractOutsideRef.current) return;
+			if (root.contains(e.target as Node)) return;
+			closePopover();
+			handleOpenChangeRef.current?.(false);
+		};
+
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (!isOpen || e.key !== "Escape" || !closeOnEscapeRef.current) return;
+			e.preventDefault();
+			closePopover();
+			handleOpenChangeRef.current?.(false);
+		};
+
 		root.addEventListener("click", handleClick);
+		document.addEventListener("mousedown", handleDocumentPointerDown);
+		document.addEventListener("keydown", handleKeyDown);
 
 		return () => {
 			root.removeEventListener("click", handleClick);
+			document.removeEventListener("mousedown", handleDocumentPointerDown);
+			document.removeEventListener("keydown", handleKeyDown);
 		};
 	}, [rootId, isOpen]);
 

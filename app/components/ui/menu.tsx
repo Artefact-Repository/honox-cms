@@ -12,6 +12,7 @@ import {
 	MenuItemIndicator as ItemIndicator,
 	MenuItemText as ItemText,
 	MenuPositioner as Positioner,
+	MenuRadioItem as RadioItem,
 	MenuRadioItemGroup as RadioItemGroup,
 	MenuRoot as RootPrimitive,
 	MenuSeparator as Separator,
@@ -117,6 +118,21 @@ function renderMenuItem(item: MenuItem, index: number): JSX.Element {
 					)}
 					<ItemText>{checkboxItem.label}</ItemText>
 				</CheckboxItem>
+			);
+		}
+
+		case "radio": {
+			const radioItem = item as MenuRadioItem;
+			return (
+				<RadioItem
+					key={radioItem.value}
+					value={radioItem.value}
+					checked={radioItem.checked}
+					disabled={radioItem.disabled}
+				>
+					{radioItem.icon && <ItemIndicator>{radioItem.icon}</ItemIndicator>}
+					<ItemText>{radioItem.label}</ItemText>
+				</RadioItem>
 			);
 		}
 
