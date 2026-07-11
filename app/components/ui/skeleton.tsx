@@ -5,7 +5,10 @@ import { type SkeletonVariantProps, skeleton } from "styled-system/recipes";
 
 interface SkeletonProps
 	extends PropsWithChildren<Omit<SkeletonVariantProps, "circle">>,
-		Omit<import("hono/jsx").JSX.IntrinsicElements["div"], "children" | "width" | "height" | "size"> {
+		Omit<
+			import("hono/jsx").JSX.IntrinsicElements["div"],
+			"children" | "width" | "height" | "size"
+		> {
 	class?: string;
 	width?: string | number;
 	height?: string | number;
@@ -27,7 +30,18 @@ function getPandaSize(val: string | number) {
 
 function Skeleton(props: SkeletonProps) {
 	const [variantProps, localProps] = skeleton.splitVariantProps(props);
-	const { children, class: classProp, style: styleProp, width, height, size, shape = "children", noOfLines, gap, ...restProps } = localProps;
+	const {
+		children,
+		class: classProp,
+		style: styleProp,
+		width,
+		height,
+		size,
+		shape = "children",
+		noOfLines,
+		gap,
+		...restProps
+	} = localProps;
 
 	// Check if the shape is circle or text
 	const isCircle = shape === "circle";
@@ -70,7 +84,9 @@ function Skeleton(props: SkeletonProps) {
 		const styleString = [
 			...Object.entries(styles).map(([k, v]) => `${k}:${v}`),
 			styleProp,
-		].filter(Boolean).join(";");
+		]
+			.filter(Boolean)
+			.join(";");
 		finalStyle = styleString || undefined;
 	} else {
 		finalStyle = Object.keys(styles).length > 0 ? styles : undefined;
@@ -123,7 +139,12 @@ function SkeletonText(props: SkeletonTextProps) {
 					key={index}
 					height="4"
 					style={{
-						maxWidth: index === noOfLines - 1 ? (noOfLines === 1 ? "100%" : "80%") : undefined,
+						maxWidth:
+							index === noOfLines - 1
+								? noOfLines === 1
+									? "100%"
+									: "80%"
+								: undefined,
 					}}
 					{...skeletonProps}
 				/>
@@ -132,7 +153,4 @@ function SkeletonText(props: SkeletonTextProps) {
 	);
 }
 
-export {
-	Skeleton,
-	type SkeletonProps,
-};
+export { Skeleton, type SkeletonProps };
