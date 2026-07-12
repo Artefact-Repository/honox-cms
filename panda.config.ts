@@ -68,6 +68,8 @@ export default defineConfig({
 			toast: ["*"],
 			toggleGroup: ["*"],
 			tooltip: ["*"],
+			gridRow: ["*"],
+			gridCol: ["*"],
 		},
 		patterns: {
 			stack: ["*"],

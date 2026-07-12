@@ -14,6 +14,8 @@ import { dialog } from "./dialog";
 import { drawer } from "./drawer";
 import { field } from "./field";
 import { fieldset } from "./fieldset";
+import { gridCol } from "./grid-col";
+import { gridRow } from "./grid-row";
 import { group } from "./group";
 import { heading } from "./heading";
 import { hoverCard } from "./hover-card";
@@ -52,6 +54,8 @@ export const recipes = {
 	code,
 	input,
 	datePicker,
+	gridCol,
+	gridRow,
 };
 
 export const slotRecipes = {
