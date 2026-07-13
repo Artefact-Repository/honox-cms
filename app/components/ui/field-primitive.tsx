@@ -135,11 +135,8 @@ export function FieldRoot(props: FieldProps) {
 	const id = idProp || autoId;
 	const styles = field(variantProps);
 
-	// Compute validation - use defaultValue for initial SSR render
-	const initialValue =
-		valueProp !== undefined ? valueProp : (defaultValue ?? "");
 	let { isInvalid, errorText } = validateField(
-		initialValue,
+		value ?? "",
 		minLength,
 		effectiveValidator,
 	);
@@ -228,7 +225,7 @@ export function FieldRoot(props: FieldProps) {
 					/>
 				)}
 				{helperText && <FieldHelperText>{helperText}</FieldHelperText>}
-				<FieldErrorText />
+				<FieldErrorText>{errorText || errorTextProp}</FieldErrorText>
 			</div>
 		</FieldContext.Provider>
 	);
@@ -280,17 +277,19 @@ export function FieldHelperText(props: { children?: Child; class?: string }) {
 export function FieldErrorText(props: { children?: Child; class?: string }) {
 	const context = useFieldContext();
 	const styles = field();
-	if (context?.invalid) {
+	const content = props.children || context?.errorText;
+	if (context?.invalid && content) {
 		return (
 			<div
 				id={context?.errorTextId}
+				aria-live="polite"
 				class={cx(styles.errorText, props.class)}
 				data-disabled={context?.disabled ? "" : undefined}
 				data-invalid={context?.invalid ? "" : undefined}
 				data-readonly={context?.readOnly ? "" : undefined}
 				data-required={context?.required ? "" : undefined}
 			>
-				{props.children || context.errorText}
+				{content}
 			</div>
 		);
 	}

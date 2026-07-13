@@ -25,6 +25,22 @@ test("Field - Flattened API renders basic structure", () => {
 	expect(html).toContain('id="field::test-field::helper-text"');
 });
 
+test("Field - JSX errorText is rendered and announced", () => {
+	const html = (
+		<Field
+			id="jsx-error-field"
+			label="Username"
+			invalid
+			errorText={<span>Username is taken</span>}
+		/>
+	).toString();
+
+	expect(html).toContain("Username is taken");
+	expect(html).toContain('aria-live="polite"');
+	expect(html).toContain('id="field::jsx-error-field::error-text"');
+	expect(html).toContain('aria-describedby="field::jsx-error-field::error-text"');
+});
+
 test("Field - Flattened API validation (minLength)", () => {
 	const html = (
 		<Field
