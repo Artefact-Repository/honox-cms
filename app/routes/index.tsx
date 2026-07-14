@@ -1988,7 +1988,7 @@ export default createRoute((c) => {
 								<Text>This content is collapsed by default.</Text>
 							</div>
 						}
-						class={css({ width: "full", border: "1px solid border", p: "4" })}
+						class={css({ width: "full", border: "1px solid {colors.border}", p: "4" })}
 						triggerClass={css({
 							cursor: "pointer",
 							width: "full",
@@ -2030,7 +2030,7 @@ export default createRoute((c) => {
 								</Text>
 							</div>
 						}
-						class={css({ width: "full", border: "1px solid border", p: "4" })}
+						class={css({ width: "full", border: "1px solid {colors.border}", p: "4" })}
 						contentClass={css({ mt: "4" })}
 					/>
 
@@ -2067,7 +2067,7 @@ export default createRoute((c) => {
 								<Text>Advanced configuration options go here.</Text>
 							</div>
 						}
-						class={css({ width: "full", border: "1px solid border", p: "4" })}
+						class={css({ width: "full", border: "1px solid {colors.border}", p: "4" })}
 						triggerClass={css({
 							cursor: "pointer",
 							width: "full",

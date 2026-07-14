@@ -37,6 +37,7 @@ export const switchRecipe = defineSlotRecipe({
 			},
 		},
 		control: {
+			border: "0.5px solid {colors.gray.subtle.bg}",
 			display: "inline-flex",
 			gap: "0.5rem",
 			flexShrink: 0,
@@ -59,6 +60,7 @@ export const switchRecipe = defineSlotRecipe({
 			},
 		},
 		thumb: {
+			border: "0.5px solid {colors.gray.sutble.bg}",
 			display: "flex",
 			alignItems: "center",
 			justifyContent: "center",
@@ -67,7 +69,7 @@ export const switchRecipe = defineSlotRecipe({
 			transitionDuration: "fast",
 			transitionTimingFunction: "default",
 			borderRadius: "inherit",
-			transform: "translateX(0)",
+			transform: "translateX(-0.75px) translateY(-0.75px)",
 			_checked: {
 				transform: "translateX(calc(var(--switch-x) + 5px))",
 			},
@@ -82,7 +84,7 @@ export const switchRecipe = defineSlotRecipe({
 			solid: {
 				control: {
 					borderRadius: "full",
-					bg: "gray.subtle.bg",
+					bg: "{colors.gray.6}",
 					_peerFocusVisible: {
 						outline: "2px solid",
 						outlineColor: "colorPalette.solid.bg",
@@ -93,7 +95,7 @@ export const switchRecipe = defineSlotRecipe({
 					},
 				},
 				thumb: {
-					bg: "colorPalette.solid.bg",
+					bg: "white",
 					_peerChecked: {
 						bg: "colorPalette.solid.fg",
 					},

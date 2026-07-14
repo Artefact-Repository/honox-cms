@@ -17,13 +17,7 @@ export default defineConfig({
 	// The output directory for your css system
 	outdir: "styled-system",
 
-	// Force-generate the `colorPalette` utility for every palette.
-	// Components (Badge, Button, ...) pass `colorPalette` as a runtime value to
-	// `css()`, so the PostCSS extractor cannot statically discover which palettes
-	// are used and would only emit the gray default. Without this, every badge
-	// renders with the same fallback color regardless of its colorPalette prop.
 	staticCss: {
-		utilities: ["colorPalette"],
 		// Every recipe here must keep `["*"]`: none of them (aside from alert,
 		// button, skeleton, input) declare a `jsx: [...]` mapping in their recipe
 		// definition, so Panda's static extractor cannot associate `<Foo size="sm">`
