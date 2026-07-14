@@ -1703,7 +1703,7 @@ export default createRoute((c) => {
 						}
 					>
 						<Text size="sm">
-							Specializes in building high-performance web applications with
+							Specialises in building high-performance web applications with
 							Hono and React.
 						</Text>
 					</Card>

@@ -57,7 +57,7 @@ if (values.static) {
 			const url = new URL(req.url);
 			const pathname = url.pathname;
 
-			// Normalize: /blog → /blog/index.html (try index.html for directory-like requests)
+			// Normalise: /blog → /blog/index.html (try index.html for directory-like requests)
 			const pathsToTry = [
 				join(process.cwd(), "dist", pathname, "index.html"),
 				join(process.cwd(), "dist", `${pathname}.html`),

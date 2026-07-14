@@ -59,7 +59,7 @@ export default function MyPage() {
 
 ## IconButton
 
-A button optimized for icons.
+A button optimised for icons.
 
 ```tsx
 import { IconButton } from "../components/ui";

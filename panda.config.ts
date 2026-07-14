@@ -11,7 +11,7 @@ export default defineConfig({
 	// Files to exclude
 	exclude: [],
 
-	// Useful for theme customization
+	// Useful for theme customisation
 	theme: { extend: { ...theme.config } },
 
 	// The output directory for your css system

@@ -26,7 +26,7 @@ export interface SplitterProps {
 	size?: { id: string | number; size: number }[];
 	onSizeChange?: (sizes: { id: string | number; size: number }[]) => void;
 
-	// Resize trigger customization
+	// Resize trigger customisation
 	resizeTriggerClass?: string;
 
 	// Styling

@@ -37,7 +37,7 @@ The component renders a visually hidden native `<select>` alongside the custom U
 | `onClear` | `() => void` | Called when the clear button empties the selection. |
 | `onOpenChange` | `(open: boolean) => void` | Called when the dropdown opens or closes. |
 
-> Callback props only work when the Select is composed from client-side code (inside another island). Props serialized from a server-rendered route must be plain data.
+> Callback props only work when the Select is composed from client-side code (inside another island). Props serialised from a server-rendered route must be plain data.
 
 ## SelectItem
 

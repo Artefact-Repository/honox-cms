@@ -26,7 +26,7 @@ The Page Builder supports a rich palette of over 25+ layout, typography, decorat
 * **Badge**: Colored metadata labels with custom color palettes and styles.
 * **Card**: A rich container supporting nested blocks, headers, footers, and top/bottom/left/right image positions.
 * **Progress**: Renders linear or circular progress indicators.
-* **Skeleton**: Highly customizable placeholder skeletons (supports circle and multi-line text shapes).
+* **Skeleton**: Highly customisable placeholder skeletons (supports circle and multi-line text shapes).
 
 ### 4. Interactive & Overlays
 * **Button**: Primary clickable targets supporting custom palettes, sizes, and styling variants.
@@ -52,7 +52,7 @@ The Page Builder supports a rich palette of over 25+ layout, typography, decorat
 
 ### 1. CMS Schema Definitions (`public/admin/config.yml`)
 
-We utilize advanced **YAML Anchors and Aliases** (`&` and `*`) to solve the challenge of infinite recursion in YAML specifications.
+We utilise advanced **YAML Anchors and Aliases** (`&` and `*`) to solve the challenge of infinite recursion in YAML specifications.
 
 * **Base Anchors** (`button_fields`, `checkbox_fields`, etc.) are declared once.
 * **Level 1 Components** define flat elements and a `Stack`/`Collapsible` container that supports **Level 2 Components** (`*l2_components`).

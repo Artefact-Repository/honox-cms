@@ -20,7 +20,7 @@ test("unknown component type renders a safe marker and never dumps JSON", () => 
   expect(html).not.toContain("leaked");
 });
 
-test("resolveType normalizes kebab aliases to canonical camelCase keys", () => {
+test("resolveType normalises kebab aliases to canonical camelCase keys", () => {
   expect(resolveType("hover-card")).toBe("hoverCard");
   expect(resolveType("paginated-table")).toBe("paginatedTable");
   expect(resolveType("radio-group")).toBe("radioGroup");
