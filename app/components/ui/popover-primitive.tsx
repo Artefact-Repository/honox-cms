@@ -426,6 +426,7 @@ function InteractivePopoverRoot(props: InteractivePopoverProps) {
 	const closeOnInteractOutsideRef = useRef(closeOnInteractOutside);
 	closeOnInteractOutsideRef.current = closeOnInteractOutside;
 	const prevFocusRef = useRef<HTMLElement | null>(null);
+	const isFirstRender = useRef(true);
 
 	const handleOpenChange = (nextOpen: boolean) => {
 		if (!isControlled) {
@@ -479,7 +480,7 @@ function InteractivePopoverRoot(props: InteractivePopoverProps) {
 			});
 		};
 
-		const closePopover = () => {
+		const closePopover = (shouldFocus = true) => {
 			root.setAttribute("data-state", "closed");
 			getPositioners().forEach((p) => {
 				p.style.setProperty("display", "none", "important");
@@ -500,14 +501,18 @@ function InteractivePopoverRoot(props: InteractivePopoverProps) {
 			indicators.forEach((i) => {
 				i.setAttribute("data-state", "closed");
 			});
-			(trigger ?? prevFocusRef.current)?.focus();
+			if (shouldFocus) {
+				(trigger ?? prevFocusRef.current)?.focus();
+			}
 		};
 
 		if (open) {
 			openPopover();
 		} else {
-			closePopover();
+			const shouldFocus = !isFirstRender.current;
+			closePopover(shouldFocus);
 		}
+		isFirstRender.current = false;
 	}, [rootId, open]);
 
 	useEffect(() => {
