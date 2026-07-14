@@ -897,17 +897,51 @@ export default createRoute((c) => {
 			</Stack>
 
 			{/* Select Examples */}
-			<div class={css({ mt: "8" })}>
+			<Stack
+				direction="column"
+				gap="4"
+				class={css({ mt: "8", maxWidth: "xl", mx: "auto" })}
+			>
 				<Heading as="h2" class={css({ fontSize: "xl", mb: "4" })}>
 					Select Component Examples
 				</Heading>
 				<Select
-					interactive
 					items={items}
 					label="Framework"
 					placeholder="Select a Framework"
+					allowClear
 				/>
-			</div>
+				<Select
+					multiple
+					items={items}
+					label="Frameworks (multiple)"
+					placeholder="Select frameworks"
+					defaultValue={["hono"]}
+					allowClear
+				/>
+				<Select
+					items={[
+						{ label: "React", value: "react" },
+						{ label: "Solid", value: "solid", disabled: true },
+						{ label: "Hono", value: "hono" },
+					]}
+					label="With a disabled option"
+					placeholder="Solid is disabled"
+				/>
+				<Select
+					items={items}
+					size="sm"
+					variant="surface"
+					label="Small surface variant"
+					placeholder="Select a Framework"
+				/>
+				<Select
+					items={items}
+					invalid
+					label="Invalid state"
+					placeholder="This field has an error"
+				/>
+			</Stack>
 
 			{/* Group Examples */}
 			<Stack

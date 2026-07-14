@@ -36,8 +36,10 @@ export function SelectRoot(props: SelectProps) {
 		return <SelectIsland {...rest} />;
 	}
 
+	const selectedValues = rest.selectedValues ?? rest.defaultValue;
+
 	return (
-		<Root {...rest}>
+		<Root {...rest} selectedValues={selectedValues}>
 			<SelectStructure {...rest} />
 		</Root>
 	);
