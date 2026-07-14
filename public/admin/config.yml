@@ -625,6 +625,37 @@ collections:
                     widget: object
                     fields: *switch_fields
 
+                  - label: Grid
+                    name: grid
+                    widget: object
+                    fields: &grid_fields
+                      - &grid_columns { label: Columns, name: columns, widget: string, required: false }
+                      - &grid_rows { label: Rows, name: rows, widget: string, required: false }
+                      - &grid_gap { label: Gap, name: gap, widget: select, options: ["0", "0.5", "1", "1.5", "2", "2.5", "3", "4", "5", "6", "7", "8", "9", "10", "12", "14", "16", "20"], default: "2" }
+                      - &grid_min_child_width { label: Min Child Width, name: minChildWidth, widget: string, required: false }
+                      - label: Children
+                        name: children
+                        widget: list
+                        types: *leaf_components
+                        required: false
+
+          # ==========================================
+          # 1b. GRID
+          # ==========================================
+          - label: Grid
+            name: grid
+            widget: object
+            fields:
+              - *grid_columns
+              - *grid_rows
+              - *grid_gap
+              - *grid_min_child_width
+              - label: Children
+                name: children
+                widget: list
+                types: *nestable_components
+                required: false
+
           # ==========================================
           # 2. CARD
           # ==========================================

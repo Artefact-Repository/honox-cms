@@ -58,7 +58,8 @@ export default function InteractiveMenuRoot(props: MenuRootProps) {
 		).filter((el) => el.closest('[data-part="content"]') === content);
 	};
 
-	const ownsTarget = (el: HTMLElement) => el.closest(ROOT_SELECTOR)?.id === rootId;
+	const ownsTarget = (el: HTMLElement) =>
+		el.closest(ROOT_SELECTOR)?.id === rootId;
 
 	const setItemChecked = (item: HTMLElement, checked: boolean) => {
 		item.setAttribute("aria-checked", String(checked));
@@ -151,7 +152,10 @@ export default function InteractiveMenuRoot(props: MenuRootProps) {
 		positioner.style.left = `${Math.max(0, x)}px`;
 	};
 
-	const handleOpen = (e?: MouseEvent, focusItem: "first" | "last" = "first") => {
+	const handleOpen = (
+		e?: MouseEvent,
+		focusItem: "first" | "last" = "first",
+	) => {
 		setIsOpen(true);
 		onOpenChange?.(true);
 		setTimeout(() => {
@@ -251,7 +255,10 @@ export default function InteractiveMenuRoot(props: MenuRootProps) {
 
 			if (
 				!isOpen &&
-				(e.key === "Enter" || e.key === " " || e.key === "ArrowDown" || e.key === "ArrowUp")
+				(e.key === "Enter" ||
+					e.key === " " ||
+					e.key === "ArrowDown" ||
+					e.key === "ArrowUp")
 			) {
 				if (eventTarget.closest('[data-part="trigger"]')) {
 					handleOpen(undefined, e.key === "ArrowUp" ? "last" : "first");
@@ -319,9 +326,7 @@ export default function InteractiveMenuRoot(props: MenuRootProps) {
 		const handleReposition = () => {
 			// Context menus are anchored to the pointer, not the trigger; leave
 			// them where they opened.
-			if (
-				triggerRef.current?.getAttribute("data-part") !== "context-trigger"
-			) {
+			if (triggerRef.current?.getAttribute("data-part") !== "context-trigger") {
 				updatePosition();
 			}
 		};

@@ -28,7 +28,7 @@ export { Dialog, type DialogProps } from "./dialog";
 export { Drawer, type DrawerProps } from "./drawer";
 export { Field, type FieldProps } from "./field";
 export { Fieldset, type FieldsetProps } from "./fieldset";
-export { Col, type ColProps, Row, type RowProps } from "./grid";
+export { Grid, type GridProps } from "./grid";
 export { Group, type GroupProps } from "./group";
 export { Heading, type HeadingProps } from "./heading";
 export { HoverCard, type HoverCardProps } from "./hover-card";
