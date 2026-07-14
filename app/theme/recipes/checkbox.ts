@@ -19,7 +19,7 @@ export const checkbox = defineSlotRecipe({
 			alignItems: "center",
 			justifyContent: "center",
 			flexShrink: 0,
-			borderWidth: "1px",
+			borderWidth: "2px",
 			borderColor: "transparent",
 			borderRadius: "l1",
 			cursor: "pointer",
@@ -58,7 +58,7 @@ export const checkbox = defineSlotRecipe({
 		variant: {
 			solid: {
 				control: {
-					borderColor: "border",
+					borderColor: "colorPalette.surface.border",
 					_checked: {
 						bg: "colorPalette.solid.bg",
 						borderColor: "colorPalette.solid.bg",
