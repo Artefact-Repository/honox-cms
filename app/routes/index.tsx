@@ -20,6 +20,8 @@ import {
 	Drawer,
 	Field,
 	Fieldset,
+	Col as GridCol,
+	Row as GridRow,
 	Group,
 	Heading,
 	HoverCard,
@@ -1035,6 +1037,319 @@ export default createRoute((c) => {
 							<Text>Item 2</Text>
 							<Text>Item 3</Text>
 						</Stack>
+					</div>
+				</Stack>
+			</Stack>
+
+			{/* Grid Component Examples */}
+			<Stack
+				direction="column"
+				gap="4"
+				align="center"
+				class={css({ mt: "8", maxWidth: "3xl", mx: "auto", px: "4" })}
+			>
+				<Heading as="h2" class={css({ fontSize: "xl", mb: "4" })}>
+					Grid (GridRow, GridCol) Component Examples
+				</Heading>
+
+				<Stack direction="column" gap="8" class={css({ width: "full" })}>
+					{/* Basic 24-Column Grid */}
+					<div class={css({ textAlign: "center", width: "full" })}>
+						<Text size="sm" class={css({ mb: "3", color: "fg.muted" })}>
+							Basic 24-Column Grid Layout
+						</Text>
+						<GridRow class={css({ gap: "y.4" })}>
+							<GridCol span={12}>
+								<div
+									class={css({
+										p: "3",
+										bg: "blue.9",
+										color: "white",
+										rounded: "md",
+										fontWeight: "bold",
+									})}
+								>
+									span={12}
+								</div>
+							</GridCol>
+							<GridCol span={12}>
+								<div
+									class={css({
+										p: "3",
+										bg: "blue.9",
+										color: "white",
+										rounded: "md",
+										fontWeight: "bold",
+									})}
+								>
+									span={12}
+								</div>
+							</GridCol>
+
+							<GridCol span={8}>
+								<div
+									class={css({
+										p: "3",
+										bg: "green.9",
+										color: "white",
+										rounded: "md",
+										fontWeight: "bold",
+									})}
+								>
+									span={8}
+								</div>
+							</GridCol>
+							<GridCol span={8}>
+								<div
+									class={css({
+										p: "3",
+										bg: "green.9",
+										color: "white",
+										rounded: "md",
+										fontWeight: "bold",
+									})}
+								>
+									span={8}
+								</div>
+							</GridCol>
+							<GridCol span={8}>
+								<div
+									class={css({
+										p: "3",
+										bg: "green.9",
+										color: "white",
+										rounded: "md",
+										fontWeight: "bold",
+									})}
+								>
+									span={8}
+								</div>
+							</GridCol>
+
+							<GridCol span={6}>
+								<div
+									class={css({
+										p: "3",
+										bg: "red.9",
+										color: "white",
+										rounded: "md",
+										fontWeight: "bold",
+									})}
+								>
+									span={6}
+								</div>
+							</GridCol>
+							<GridCol span={6}>
+								<div
+									class={css({
+										p: "3",
+										bg: "red.9",
+										color: "white",
+										rounded: "md",
+										fontWeight: "bold",
+									})}
+								>
+									span={6}
+								</div>
+							</GridCol>
+							<GridCol span={6}>
+								<div
+									class={css({
+										p: "3",
+										bg: "red.9",
+										color: "white",
+										rounded: "md",
+										fontWeight: "bold",
+									})}
+								>
+									span={6}
+								</div>
+							</GridCol>
+							<GridCol span={6}>
+								<div
+									class={css({
+										p: "3",
+										bg: "red.9",
+										color: "white",
+										rounded: "md",
+										fontWeight: "bold",
+									})}
+								>
+									span={6}
+								</div>
+							</GridCol>
+						</GridRow>
+					</div>
+
+					{/* Grid with Gutters */}
+					<div class={css({ textAlign: "center", width: "full" })}>
+						<Text size="sm" class={css({ mb: "3", color: "fg.muted" })}>
+							Grid Layout with Gutters (16px horizontal, 16px vertical)
+						</Text>
+						<GridRow gutter={[16, 16]}>
+							<GridCol span={6}>
+								<div
+									class={css({
+										p: "3",
+										bg: "purple.9",
+										color: "white",
+										rounded: "md",
+										fontWeight: "bold",
+									})}
+								>
+									Col 1
+								</div>
+							</GridCol>
+							<GridCol span={6}>
+								<div
+									class={css({
+										p: "3",
+										bg: "purple.9",
+										color: "white",
+										rounded: "md",
+										fontWeight: "bold",
+									})}
+								>
+									Col 2
+								</div>
+							</GridCol>
+							<GridCol span={6}>
+								<div
+									class={css({
+										p: "3",
+										bg: "purple.9",
+										color: "white",
+										rounded: "md",
+										fontWeight: "bold",
+									})}
+								>
+									Col 3
+								</div>
+							</GridCol>
+							<GridCol span={6}>
+								<div
+									class={css({
+										p: "3",
+										bg: "purple.9",
+										color: "white",
+										rounded: "md",
+										fontWeight: "bold",
+									})}
+								>
+									Col 4
+								</div>
+							</GridCol>
+						</GridRow>
+					</div>
+
+					{/* Responsive Grid */}
+					<div class={css({ textAlign: "center", width: "full" })}>
+						<Text size="sm" class={css({ mb: "3", color: "fg.muted" })}>
+							Responsive Grid Layout (xs=24, md=12, lg=8)
+						</Text>
+						<GridRow gutter={[16, 16]}>
+							<GridCol xs={24} md={12} lg={8}>
+								<div
+									class={css({
+										p: "3",
+										bg: "amber.9",
+										color: "white",
+										rounded: "md",
+										fontWeight: "bold",
+									})}
+								>
+									Col A
+								</div>
+							</GridCol>
+							<GridCol xs={24} md={12} lg={8}>
+								<div
+									class={css({
+										p: "3",
+										bg: "amber.9",
+										color: "white",
+										rounded: "md",
+										fontWeight: "bold",
+									})}
+								>
+									Col B
+								</div>
+							</GridCol>
+							<GridCol xs={24} md={24} lg={8}>
+								<div
+									class={css({
+										p: "3",
+										bg: "amber.9",
+										color: "white",
+										rounded: "md",
+										fontWeight: "bold",
+									})}
+								>
+									Col C
+								</div>
+							</GridCol>
+						</GridRow>
+					</div>
+
+					{/* Grid Offsets */}
+					<div class={css({ textAlign: "center", width: "full" })}>
+						<Text size="sm" class={css({ mb: "3", color: "fg.muted" })}>
+							Grid Layout with Offsets
+						</Text>
+						<GridRow gutter={[16, 16]}>
+							<GridCol span={8}>
+								<div
+									class={css({
+										p: "3",
+										bg: "teal.9",
+										color: "white",
+										rounded: "md",
+										fontWeight: "bold",
+									})}
+								>
+									span={8}
+								</div>
+							</GridCol>
+							<GridCol span={8} offset={8}>
+								<div
+									class={css({
+										p: "3",
+										bg: "teal.9",
+										color: "white",
+										rounded: "md",
+										fontWeight: "bold",
+									})}
+								>
+									span={8} offset={8}
+								</div>
+							</GridCol>
+
+							<GridCol span={6} offset={6}>
+								<div
+									class={css({
+										p: "3",
+										bg: "teal.9",
+										color: "white",
+										rounded: "md",
+										fontWeight: "bold",
+									})}
+								>
+									span={6} offset={6}
+								</div>
+							</GridCol>
+							<GridCol span={6} offset={6}>
+								<div
+									class={css({
+										p: "3",
+										bg: "teal.9",
+										color: "white",
+										rounded: "md",
+										fontWeight: "bold",
+									})}
+								>
+									span={6} offset={6}
+								</div>
+							</GridCol>
+						</GridRow>
 					</div>
 				</Stack>
 			</Stack>
