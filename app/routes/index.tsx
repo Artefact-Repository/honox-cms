@@ -101,11 +101,57 @@ export default createRoute((c) => {
 					<Button size="lg">Large</Button>
 				</Stack>
 
-				<Stack gap="4" align="center">
+				<Text size="sm" class={css({ color: "fg.muted", mt: "4" })}>
+					Loading Buttons
+				</Text>
+				<Stack gap="4" justify="center" wrap="wrap">
+					<Button loading>Spinner only</Button>
 					<Button loading loadingText="Saving...">
 						Save
 					</Button>
-					<Button loading>Spinner only</Button>
+					<Button loading loadingText="Uploading..." spinnerPlacement="end">
+						Upload
+					</Button>
+					<Button
+						loading
+						spinner={<Spinner color="blue.9" />}
+						loadingText="Searching..."
+					>
+						Search
+					</Button>
+				</Stack>
+
+				<Stack gap="4" justify="center" wrap="wrap">
+					<Button loading variant="solid" colorPalette="blue">
+						Solid Loading
+					</Button>
+					<Button loading variant="outline" colorPalette="green">
+						Outline Loading
+					</Button>
+					<Button loading variant="subtle" colorPalette="red">
+						Subtle Loading
+					</Button>
+					<Button loading variant="surface" colorPalette="purple">
+						Surface Loading
+					</Button>
+				</Stack>
+
+				<Stack gap="4" justify="center" wrap="wrap">
+					<Button loading size="xs">
+						XS Loading
+					</Button>
+					<Button loading size="sm">
+						SM Loading
+					</Button>
+					<Button loading size="md">
+						MD Loading
+					</Button>
+					<Button loading size="lg">
+						LG Loading
+					</Button>
+				</Stack>
+
+				<Stack gap="4" align="center">
 					<Button interactive onclick="alert('Hello!')">
 						Interactive
 					</Button>
@@ -1988,7 +2034,11 @@ export default createRoute((c) => {
 								<Text>This content is collapsed by default.</Text>
 							</div>
 						}
-						class={css({ width: "full", border: "1px solid {colors.border}", p: "4" })}
+						class={css({
+							width: "full",
+							border: "1px solid {colors.border}",
+							p: "4",
+						})}
 						triggerClass={css({
 							cursor: "pointer",
 							width: "full",
@@ -2030,7 +2080,11 @@ export default createRoute((c) => {
 								</Text>
 							</div>
 						}
-						class={css({ width: "full", border: "1px solid {colors.border}", p: "4" })}
+						class={css({
+							width: "full",
+							border: "1px solid {colors.border}",
+							p: "4",
+						})}
 						contentClass={css({ mt: "4" })}
 					/>
 
@@ -2067,7 +2121,11 @@ export default createRoute((c) => {
 								<Text>Advanced configuration options go here.</Text>
 							</div>
 						}
-						class={css({ width: "full", border: "1px solid {colors.border}", p: "4" })}
+						class={css({
+							width: "full",
+							border: "1px solid {colors.border}",
+							p: "4",
+						})}
 						triggerClass={css({
 							cursor: "pointer",
 							width: "full",
