@@ -2,22 +2,27 @@
 
 # Introduction
 
-A list of actions or options that appears when triggered, supporting items, separators, checkboxes, and radio groups.
+A list of actions or options that appears when triggered. Highly refined, production-ready, and lightweight component supporting custom placements, automatic screen overflow collision adjustment, arrow tips, and customizable trigger modes (hover, click, context menu).
 
 # Props
 
 ## Menu
 
-| Prop | Type | Description |
-| :--- | :--- | :--- |
-| `trigger` | `JSX.Element` | Element that opens the menu when activated. |
-| `items` | `MenuItem[]` | The menu items to render. |
-| `defaultOpen` | `boolean` | Whether the menu is open by default. Default: `false`. |
-| `interactive` | `boolean` | Enable client-side hydration. Default: `true`. |
-| `size` | `"xs" \| "sm" \| "md" \| "lg" \| "xl"` | The size of the menu. |
-| `class` | `string` | Custom CSS classes for the root element. |
-| `contentClass` | `string` | Custom CSS classes for the content element. |
-| `positionerClass` | `string` | Custom CSS classes for the positioner element. |
+| Prop | Type | Description | Default |
+| :--- | :--- | :--- | :--- |
+| `trigger` | `JSX.Element` | Element that opens the menu when activated. | - |
+| `items` | `MenuItem[]` | The menu items to render. | - |
+| `defaultOpen` | `boolean` | Whether the menu is open by default. | `false` |
+| `interactive` | `boolean` | Enable client-side hydration. | `true` |
+| `arrow` | `boolean` | Show a pointer arrow pointing from the popover content to the trigger. | `false` |
+| `placement` | `string` | Dropdown placement: `"bottom"` \| `"bottom-start"` \| `"bottom-end"` \| `"top"` \| `"top-start"` \| `"top-end"` \| `"left"` \| `"left-start"` \| `"left-end"` \| `"right"` \| `"right-start"` \| `"right-end"`. Supports standard camelCase aliases like `"bottomLeft"`. | `"bottom-start"` |
+| `triggerMode` | `("click" \| "hover" \| "contextMenu")[] \| string` | Trigger interaction modes to open/close the menu. | `["click"]` |
+| `mouseEnterDelay` | `number` | The delay in ms before opening when `triggerMode` includes `"hover"`. | `150` |
+| `mouseLeaveDelay` | `number` | The delay in ms before closing when `triggerMode` includes `"hover"`. | `100` |
+| `size` | `"xs" \| "sm" \| "md" \| "lg" \| "xl"` | The size of the menu. | `"md"` |
+| `class` | `string` | Custom CSS classes for the root element. | - |
+| `contentClass` | `string` | Custom CSS classes for the content element. | - |
+| `positionerClass` | `string` | Custom CSS classes for the positioner element. | - |
 
 ### MenuItem
 
@@ -32,8 +37,6 @@ A list of actions or options that appears when triggered, supporting items, sepa
 | `items` | `MenuItem[]` | Nested items (for `radio-group`, `submenu`). |
 | `disabled` | `boolean` | Whether the item is disabled. |
 | `class` | `string` | Custom CSS classes for the item. |
-
-> Note: `submenu` entries are not supported by the simplified API and fall back to plain text. Use the primitive sub-components for nested menus.
 
 # Usage
 
@@ -59,6 +62,31 @@ export default function MyPage() {
             { type: "radio", label: "Dark", value: "dark" },
           ],
         },
+      ]}
+    />
+  );
+}
+```
+
+## Refined Custom Placements, Arrows, and Hover Trigger
+
+```tsx
+import { Menu, Button } from "../components/ui";
+
+export default function PlacementPage() {
+  return (
+    <Menu
+      trigger={<Button>Hover Me</Button>}
+      placement="bottomRight"
+      triggerMode="hover"
+      arrow={true}
+      mouseEnterDelay={100}
+      mouseLeaveDelay={150}
+      items={[
+        { type: "item", label: "Profile", value: "profile" },
+        { type: "item", label: "Settings", value: "settings" },
+        { type: "separator" },
+        { type: "item", label: "Logout", value: "logout" },
       ]}
     />
   );

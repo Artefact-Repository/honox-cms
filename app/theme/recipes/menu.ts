@@ -109,6 +109,23 @@ export const menu = defineSlotRecipe({
 				},
 			},
 		},
+		arrow: {
+			"--arrow-size": "var(--sizes-3, 12px)",
+			"--arrow-background": "var(--colors-gray-surface-bg, white)",
+			position: "absolute",
+			width: "var(--arrow-size)",
+			height: "var(--arrow-size)",
+			zIndex: "1",
+		},
+		arrowTip: {
+			background: "var(--arrow-background)",
+			width: "var(--arrow-size)",
+			height: "var(--arrow-size)",
+			transform: "rotate(45deg)",
+			borderTopWidth: "1px",
+			borderInlineStartWidth: "1px",
+			borderColor: "var(--colors-border, #e2e8f0)",
+		},
 	},
 	defaultVariants: {
 		size: "md",

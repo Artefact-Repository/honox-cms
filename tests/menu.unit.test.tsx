@@ -52,4 +52,32 @@ describe("Menu Unit Tests", () => {
 		expect(html).toContain("More");
 		expect(html).not.toContain("not supported in simplified API");
 	});
+
+	test("should render arrow and arrow tip when arrow is true", () => {
+		const html = (
+			<Menu.Root
+				interactive={false}
+				arrow={true}
+				items={[{ type: "item", label: "Item 1", value: "item-1" }]}
+			/>
+		).toString();
+
+		expect(html).toContain('data-part="arrow"');
+		expect(html).toContain('data-part="arrow-tip"');
+	});
+
+	test("should support placement and triggerMode attributes", () => {
+		const html = (
+			<Menu.Root
+				interactive={true}
+				trigger={<button>Open</button>}
+				placement="bottomRight"
+				triggerMode="hover"
+				items={[{ type: "item", label: "Item 1", value: "item-1" }]}
+			/>
+		).toString();
+
+		expect(html).toContain('data-part="trigger"');
+		expect(html).toContain('role="menu"');
+	});
 });

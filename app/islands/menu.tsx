@@ -3,7 +3,19 @@ import { MenuRoot, type MenuRootProps } from "../components/ui/menu-primitive";
 
 const ROOT_SELECTOR = '[data-scope="menu"][data-part="root"]';
 
-export default function InteractiveMenuRoot(props: MenuRootProps) {
+export interface InteractiveMenuRootProps extends MenuRootProps {
+	placement?: string;
+	trigger?:
+		| ("click" | "hover" | "contextMenu")[]
+		| "click"
+		| "hover"
+		| "contextMenu";
+	mouseEnterDelay?: number;
+	mouseLeaveDelay?: number;
+	arrow?: boolean;
+}
+
+export default function InteractiveMenuRoot(props: InteractiveMenuRootProps) {
 	const {
 		open: openProp,
 		children,
@@ -11,12 +23,21 @@ export default function InteractiveMenuRoot(props: MenuRootProps) {
 		onOpenChange,
 		onSelect,
 		onClose,
+		placement = "bottom-start",
+		trigger: triggerMode = ["click"],
+		mouseEnterDelay = 150,
+		mouseLeaveDelay = 100,
+		arrow,
 		...rest
 	} = props;
 	const [isOpen, setIsOpen] = useState(openProp ?? false);
 
 	const fallbackId = useId();
-	const rootId = idProp || `menu-${fallbackId}`;
+	const rootIdRef = useRef<string | null>(null);
+	if (!rootIdRef.current) {
+		rootIdRef.current = idProp || `menu-${fallbackId}`;
+	}
+	const rootId = rootIdRef.current;
 
 	const rootRef = useRef<HTMLElement | null>(null);
 	const triggerRef = useRef<HTMLElement | null>(null);
@@ -27,24 +48,8 @@ export default function InteractiveMenuRoot(props: MenuRootProps) {
 	// which would otherwise reset the DOM to the initial props.
 	const checkedOverridesRef = useRef<Map<string, boolean>>(new Map());
 
-	// Update refs after render
-	useEffect(() => {
-		if (typeof document === "undefined") return;
-
-		const root = document.getElementById(rootId);
-		if (!root) return;
-
-		rootRef.current = root;
-		triggerRef.current = root.querySelector<HTMLElement>(
-			'[data-part="trigger"], [data-part="context-trigger"], [data-part="trigger-item"]',
-		);
-		contentRef.current = root.querySelector<HTMLElement>(
-			'[data-part="content"]',
-		);
-		positionerRef.current = root.querySelector<HTMLElement>(
-			'[data-part="positioner"]',
-		);
-	}, [rootId]);
+	const isOpenRef = useRef(isOpen);
+	isOpenRef.current = isOpen;
 
 	// Items that belong to this menu level (submenu items live in their own
 	// nested content and are handled by their own island).
@@ -106,6 +111,37 @@ export default function InteractiveMenuRoot(props: MenuRootProps) {
 		});
 	};
 
+	const normalizePlacement = (p: string): string => {
+		switch (p) {
+			case "bottomLeft":
+				return "bottom-start";
+			case "bottomRight":
+				return "bottom-end";
+			case "topLeft":
+				return "top-start";
+			case "topRight":
+				return "top-end";
+			case "leftTop":
+				return "left-start";
+			case "leftBottom":
+				return "left-end";
+			case "rightTop":
+				return "right-start";
+			case "rightBottom":
+				return "right-end";
+			case "bottomCenter":
+				return "bottom";
+			case "topCenter":
+				return "top";
+			case "leftCenter":
+				return "left";
+			case "rightCenter":
+				return "right";
+			default:
+				return p;
+		}
+	};
+
 	const updatePosition = (e?: MouseEvent) => {
 		const trigger = triggerRef.current;
 		const positioner = positionerRef.current;
@@ -121,8 +157,8 @@ export default function InteractiveMenuRoot(props: MenuRootProps) {
 		const menuWidth = content?.offsetWidth || 200;
 		const menuHeight = content?.offsetHeight || 200;
 
-		let x: number;
-		let y: number;
+		let x = 0;
+		let y = 0;
 
 		if (part === "context-trigger" && e) {
 			// Context menu: open at the pointer.
@@ -140,12 +176,148 @@ export default function InteractiveMenuRoot(props: MenuRootProps) {
 				y = Math.max(0, window.innerHeight - menuHeight);
 			}
 		} else {
-			// Dropdown: open below the trigger, flip above when it overflows.
+			// Dropdown: open relative to the trigger.
+			const norm = normalizePlacement(placement);
 			const rect = trigger.getBoundingClientRect();
+
 			x = rect.left;
 			y = rect.bottom + 4;
-			if (x + menuWidth > window.innerWidth) x = rect.right - menuWidth;
-			if (y + menuHeight > window.innerHeight) y = rect.top - menuHeight - 4;
+
+			if (norm.startsWith("bottom")) {
+				y = rect.bottom + 4;
+				if (norm === "bottom-start") {
+					x = rect.left;
+				} else if (norm === "bottom-end") {
+					x = rect.right - menuWidth;
+				} else {
+					x = rect.left + rect.width / 2 - menuWidth / 2;
+				}
+			} else if (norm.startsWith("top")) {
+				y = rect.top - menuHeight - 4;
+				if (norm === "top-start") {
+					x = rect.left;
+				} else if (norm === "top-end") {
+					x = rect.right - menuWidth;
+				} else {
+					x = rect.left + rect.width / 2 - menuWidth / 2;
+				}
+			} else if (norm.startsWith("left")) {
+				x = rect.left - menuWidth - 4;
+				if (norm === "left-start") {
+					y = rect.top;
+				} else if (norm === "left-end") {
+					y = rect.bottom - menuHeight;
+				} else {
+					y = rect.top + rect.height / 2 - menuHeight / 2;
+				}
+			} else if (norm.startsWith("right")) {
+				x = rect.right + 4;
+				if (norm === "right-start") {
+					y = rect.top;
+				} else if (norm === "right-end") {
+					y = rect.bottom - menuHeight;
+				} else {
+					y = rect.top + rect.height / 2 - menuHeight / 2;
+				}
+			}
+
+			// Collision detection & auto-adjustment (flip alignment if it overflows)
+			if (y < 0 && norm.startsWith("top")) {
+				y = rect.bottom + 4;
+			} else if (
+				y + menuHeight > window.innerHeight &&
+				norm.startsWith("bottom")
+			) {
+				y = rect.top - menuHeight - 4;
+			}
+
+			if (x < 0 && norm.startsWith("left")) {
+				x = rect.right + 4;
+			} else if (
+				x + menuWidth > window.innerWidth &&
+				norm.startsWith("right")
+			) {
+				x = rect.left - menuWidth - 4;
+			}
+
+			x = Math.max(0, Math.min(x, window.innerWidth - menuWidth));
+			y = Math.max(0, Math.min(y, window.innerHeight - menuHeight));
+
+			const arrowEl = rootRef.current?.querySelector<HTMLElement>(
+				'[data-part="arrow"]',
+			);
+			if (arrowEl) {
+				arrowEl.style.display = "block";
+				if (norm.startsWith("bottom")) {
+					arrowEl.style.top = "-6px";
+					arrowEl.style.bottom = "auto";
+					arrowEl.style.left =
+						norm === "bottom-end"
+							? "calc(100% - 24px)"
+							: norm === "bottom-start"
+								? "24px"
+								: "calc(50% - 6px)";
+					arrowEl.style.right = "auto";
+					const tip = arrowEl.querySelector<HTMLElement>(
+						'[data-part="arrow-tip"]',
+					);
+					if (tip) {
+						tip.style.transform = "rotate(45deg)";
+						tip.style.borderWidth = "1px 0 0 1px";
+					}
+				} else if (norm.startsWith("top")) {
+					arrowEl.style.bottom = "-6px";
+					arrowEl.style.top = "auto";
+					arrowEl.style.left =
+						norm === "top-end"
+							? "calc(100% - 24px)"
+							: norm === "top-start"
+								? "24px"
+								: "calc(50% - 6px)";
+					arrowEl.style.right = "auto";
+					const tip = arrowEl.querySelector<HTMLElement>(
+						'[data-part="arrow-tip"]',
+					);
+					if (tip) {
+						tip.style.transform = "rotate(225deg)";
+						tip.style.borderWidth = "1px 0 0 1px";
+					}
+				} else if (norm.startsWith("left")) {
+					arrowEl.style.right = "-6px";
+					arrowEl.style.left = "auto";
+					arrowEl.style.top =
+						norm === "left-end"
+							? "calc(100% - 24px)"
+							: norm === "left-start"
+								? "24px"
+								: "calc(50% - 6px)";
+					arrowEl.style.bottom = "auto";
+					const tip = arrowEl.querySelector<HTMLElement>(
+						'[data-part="arrow-tip"]',
+					);
+					if (tip) {
+						tip.style.transform = "rotate(135deg)";
+						tip.style.borderWidth = "1px 0 0 1px";
+					}
+				} else if (norm.startsWith("right")) {
+					arrowEl.style.left = "-6px";
+					arrowEl.style.right = "auto";
+					arrowEl.style.top =
+						norm === "right-end"
+							? "calc(100% - 24px)"
+							: norm === "right-start"
+								? "24px"
+								: "calc(50% - 6px)";
+					arrowEl.style.bottom = "auto";
+					const tip = arrowEl.querySelector<HTMLElement>(
+						'[data-part="arrow-tip"]',
+					);
+					if (tip) {
+						tip.style.transform = "rotate(315deg)";
+						tip.style.borderWidth = "1px 0 0 1px";
+					}
+				}
+			}
 		}
 
 		positioner.style.top = `${Math.max(0, y)}px`;
@@ -175,14 +347,40 @@ export default function InteractiveMenuRoot(props: MenuRootProps) {
 
 	useEffect(() => {
 		if (typeof document === "undefined") return;
+		if (isOpen) {
+			applyCheckedOverrides();
+			updatePosition();
+		}
+	}, [isOpen]);
 
-		const root = rootRef.current;
+	useEffect(() => {
+		if (typeof document === "undefined") return;
+
+		const root = document.getElementById(rootId);
 		if (!root) return;
+
+		rootRef.current = root;
+		triggerRef.current = root.querySelector<HTMLElement>(
+			'[data-part="trigger"], [data-part="context-trigger"], [data-part="trigger-item"]',
+		);
+		contentRef.current = root.querySelector<HTMLElement>(
+			'[data-part="content"]',
+		);
+		positionerRef.current = root.querySelector<HTMLElement>(
+			'[data-part="positioner"]',
+		);
 
 		// State changes re-render the subtree from the original props; restore
 		// any client-side checkbox/radio toggles.
 		applyCheckedOverrides();
-		if (isOpen) updatePosition();
+
+		let openTimer: any = null;
+		let closeTimer: any = null;
+
+		const clearTimers = () => {
+			if (openTimer) clearTimeout(openTimer);
+			if (closeTimer) clearTimeout(closeTimer);
+		};
 
 		const handleClick = (e: MouseEvent) => {
 			const target = (e.target as HTMLElement).closest<HTMLElement>(
@@ -198,7 +396,7 @@ export default function InteractiveMenuRoot(props: MenuRootProps) {
 				if (!ownsTarget(target) || target.hasAttribute("data-disabled")) {
 					return;
 				}
-				if (isOpen) handleClose();
+				if (isOpenRef.current) handleClose();
 				else handleOpen(e);
 			} else if (dataPart === "item") {
 				if (target.hasAttribute("data-disabled")) return;
@@ -230,13 +428,18 @@ export default function InteractiveMenuRoot(props: MenuRootProps) {
 				'[data-part="context-trigger"]',
 			);
 			if (target && ownsTarget(target)) {
-				e.preventDefault();
-				handleOpen(e);
+				if (
+					triggerActions.includes("contextMenu") ||
+					target.getAttribute("data-part") === "context-trigger"
+				) {
+					e.preventDefault();
+					handleOpen(e);
+				}
 			}
 		};
 
 		const handleMouseOver = (e: MouseEvent) => {
-			if (!isOpen) return;
+			if (!isOpenRef.current) return;
 			const item = (e.target as HTMLElement).closest<HTMLElement>(
 				'[data-part="item"], [data-part="trigger-item"]',
 			);
@@ -254,7 +457,7 @@ export default function InteractiveMenuRoot(props: MenuRootProps) {
 			if (eventTarget.closest(ROOT_SELECTOR)?.id !== rootId) return;
 
 			if (
-				!isOpen &&
+				!isOpenRef.current &&
 				(e.key === "Enter" ||
 					e.key === " " ||
 					e.key === "ArrowDown" ||
@@ -267,7 +470,7 @@ export default function InteractiveMenuRoot(props: MenuRootProps) {
 				return;
 			}
 
-			if (isOpen) {
+			if (isOpenRef.current) {
 				const items = getItems();
 				const currentIndex = items.indexOf(
 					document.activeElement as HTMLElement,
@@ -318,7 +521,7 @@ export default function InteractiveMenuRoot(props: MenuRootProps) {
 		};
 
 		const handleClickOutside = (e: MouseEvent) => {
-			if (isOpen && root && !root.contains(e.target as Node)) {
+			if (isOpenRef.current && root && !root.contains(e.target as Node)) {
 				handleClose();
 			}
 		};
@@ -326,19 +529,35 @@ export default function InteractiveMenuRoot(props: MenuRootProps) {
 		const handleReposition = () => {
 			// Context menus are anchored to the pointer, not the trigger; leave
 			// them where they opened.
-			if (triggerRef.current?.getAttribute("data-part") !== "context-trigger") {
+			if (
+				isOpenRef.current &&
+				triggerRef.current?.getAttribute("data-part") !== "context-trigger"
+			) {
 				updatePosition();
 			}
 		};
 
-		root.addEventListener("click", handleClick as any);
-		root.addEventListener("contextmenu", handleContextMenu as any);
-		root.addEventListener("mouseover", handleMouseOver as any);
+		const handleScroll = () => {
+			if (isOpenRef.current) {
+				handleClose();
+			}
+		};
+
+		root.addEventListener("click", handleClick);
+		root.addEventListener("contextmenu", handleContextMenu);
+		root.addEventListener("mouseover", handleMouseOver);
 		root.addEventListener("keydown", handleKeyDown);
 		window.addEventListener("mousedown", handleClickOutside);
-		if (isOpen) {
-			window.addEventListener("scroll", handleReposition, true);
-			window.addEventListener("resize", handleReposition);
+		window.addEventListener("scroll", handleScroll, true);
+		window.addEventListener("resize", handleReposition);
+
+		if (triggerActions.includes("hover") && triggerEl) {
+			triggerEl.addEventListener("mouseenter", handleTriggerMouseEnter);
+			triggerEl.addEventListener("mouseleave", handleTriggerMouseLeave);
+			if (contentEl) {
+				contentEl.addEventListener("mouseenter", handleContentMouseEnter);
+				contentEl.addEventListener("mouseleave", handleContentMouseLeave);
+			}
 		}
 
 		return () => {
@@ -347,10 +566,19 @@ export default function InteractiveMenuRoot(props: MenuRootProps) {
 			root.removeEventListener("mouseover", handleMouseOver as any);
 			root.removeEventListener("keydown", handleKeyDown);
 			window.removeEventListener("mousedown", handleClickOutside);
-			window.removeEventListener("scroll", handleReposition, true);
+			window.removeEventListener("scroll", handleScroll, true);
 			window.removeEventListener("resize", handleReposition);
+			if (triggerActions.includes("hover") && triggerEl) {
+				triggerEl.removeEventListener("mouseenter", handleTriggerMouseEnter);
+				triggerEl.removeEventListener("mouseleave", handleTriggerMouseLeave);
+				if (contentEl) {
+					contentEl.removeEventListener("mouseenter", handleContentMouseEnter);
+					contentEl.removeEventListener("mouseleave", handleContentMouseLeave);
+				}
+			}
+			clearTimers();
 		};
-	}, [rootId, isOpen]);
+	}, [rootId]);
 
 	return (
 		<div

@@ -11,6 +11,8 @@ import {
 	MenuItemGroupLabel as ItemGroupLabel,
 	MenuItemIndicator as ItemIndicator,
 	MenuItemText as ItemText,
+	MenuArrow,
+	MenuArrowTip,
 	MenuPositioner as Positioner,
 	MenuRadioItem as RadioItem,
 	MenuRadioItemGroup as RadioItemGroup,
@@ -95,6 +97,15 @@ interface MenuProps extends MenuVariantProps {
 	contentClass?: string;
 	positionerClass?: string;
 	children?: any;
+	arrow?: boolean;
+	placement?: string;
+	triggerMode?:
+		| ("click" | "hover" | "contextMenu")[]
+		| "click"
+		| "hover"
+		| "contextMenu";
+	mouseEnterDelay?: number;
+	mouseLeaveDelay?: number;
 }
 
 // ============= Rendering Functions =============
@@ -188,6 +199,11 @@ function MenuRoot(props: MenuProps) {
 		contentClass,
 		positionerClass,
 		children,
+		arrow,
+		placement,
+		triggerMode = ["click"],
+		mouseEnterDelay,
+		mouseLeaveDelay,
 		...variantProps
 	} = props;
 
@@ -195,11 +211,23 @@ function MenuRoot(props: MenuProps) {
 
 	if (shouldHydrate(interactive, true)) {
 		return (
-			<InteractiveMenuRoot open={defaultOpen}>
+			<InteractiveMenuRoot
+				open={defaultOpen}
+				placement={placement}
+				trigger={triggerMode}
+				mouseEnterDelay={mouseEnterDelay}
+				mouseLeaveDelay={mouseLeaveDelay}
+				arrow={arrow}
+			>
 				{trigger && <Trigger asChild>{trigger}</Trigger>}
 				{children}
 				{items && (
 					<Positioner class={cx(styles.positioner, positionerClass)}>
+						{arrow && (
+							<MenuArrow>
+								<MenuArrowTip />
+							</MenuArrow>
+						)}
 						<Content class={cx(styles.content, contentClass)}>
 							{items.map((item, index) => renderMenuItem(item, index))}
 						</Content>
@@ -215,6 +243,11 @@ function MenuRoot(props: MenuProps) {
 			{children}
 			{items && (
 				<Positioner class={cx(styles.positioner, positionerClass)}>
+					{arrow && (
+						<MenuArrow>
+							<MenuArrowTip />
+						</MenuArrow>
+					)}
 					<Content class={cx(styles.content, contentClass)}>
 						{items.map((item, index) => renderMenuItem(item, index))}
 					</Content>
@@ -238,6 +271,8 @@ export const Menu = Object.assign(MenuRoot, {
 	ItemIndicator: ItemIndicator,
 	ItemGroupLabel: ItemGroupLabel,
 	RadioItemGroup: RadioItemGroup,
+	Arrow: MenuArrow,
+	ArrowTip: MenuArrowTip,
 });
 
 export {

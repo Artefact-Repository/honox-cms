@@ -517,7 +517,12 @@ export function MenuArrow(props: PropsWithChildren<{ class?: string }>) {
 	const { children, class: classProp, ...restProps } = props;
 	const context = useMenuContext();
 	return (
-		<div class={cx(context.styles.arrow, classProp)} {...restProps}>
+		<div
+			class={cx(context.styles.arrow, classProp)}
+			data-scope="menu"
+			data-part="arrow"
+			{...restProps}
+		>
 			{children}
 		</div>
 	);
@@ -526,7 +531,14 @@ export function MenuArrow(props: PropsWithChildren<{ class?: string }>) {
 export function MenuArrowTip(props: { class?: string }) {
 	const { class: classProp, ...restProps } = props;
 	const context = useMenuContext();
-	return <div class={cx(context.styles.arrowTip, classProp)} {...restProps} />;
+	return (
+		<div
+			class={cx(context.styles.arrowTip, classProp)}
+			data-scope="menu"
+			data-part="arrow-tip"
+			{...restProps}
+		/>
+	);
 }
 
 export { MenuContext as Context };
