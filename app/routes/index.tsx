@@ -14,6 +14,7 @@ import {
 	CloseButton,
 	Code,
 	Collapsible,
+	ColorPicker,
 	Combobox,
 	DatePicker,
 	Dialog,
@@ -326,6 +327,54 @@ export default createRoute((c) => {
 						<Avatar variant="subtle" name="Subtle" colorPalette="blue" />
 						<Avatar variant="outline" name="Outline" colorPalette="blue" />
 						<Avatar variant="surface" name="Surface" colorPalette="blue" />
+					</Stack>
+				</Stack>
+			</Stack>
+
+			{/* ColorPicker Examples */}
+			<Stack
+				direction="column"
+				gap="4"
+				align="center"
+				class={css({ mt: "8", maxWidth: "xl", mx: "auto" })}
+			>
+				<Heading as="h2" class={css({ fontSize: "xl", mb: "4" })}>
+					ColorPicker Component Examples
+				</Heading>
+
+				<Stack direction="column" gap="8" class={css({ width: "full" })}>
+					{/* Inline ColorPicker */}
+					<Stack direction="column" gap="2">
+						<Text size="sm" class={css({ color: "fg.muted" })}>
+							Inline ColorPicker (Static SSR & Default Preset Group)
+						</Text>
+						<ColorPicker
+							value="#7c3aed"
+							interactive={false}
+							label="Favorite Color"
+							presets={[
+								"#ef4444",
+								"#f97316",
+								"#eab308",
+								"#22c55e",
+								"#3b82f6",
+								"#7c3aed",
+								"#000000",
+							]}
+						/>
+					</Stack>
+
+					{/* Interactive ColorPicker as Trigger / Popover */}
+					<Stack direction="column" gap="2" align="center">
+						<Text size="sm" class={css({ color: "fg.muted" })}>
+							Interactive ColorPicker (Swatch Trigger + Popover)
+						</Text>
+						<ColorPicker
+							interactive
+							trigger
+							value="#eab308"
+							label="Popover Trigger Picker"
+						/>
 					</Stack>
 				</Stack>
 			</Stack>

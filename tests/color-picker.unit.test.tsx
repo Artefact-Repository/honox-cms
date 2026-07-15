@@ -1,0 +1,53 @@
+import { describe, expect, it } from "bun:test";
+import { ColorPicker } from "../app/components/ui/color-picker";
+
+describe("ColorPicker component", () => {
+	it("should render a static color picker under SSR correctly with expected parts", async () => {
+		const html = (await ColorPicker({
+			value: "#ff0000",
+			interactive: false,
+			presets: ["#ff0000", "#00ff00", "#0000ff"],
+		})) as any;
+		const htmlString = html.toString();
+
+		expect(htmlString).toContain('data-scope="colorPicker"');
+		expect(htmlString).toContain('data-part="root"');
+		expect(htmlString).toContain('data-part="control"');
+		expect(htmlString).toContain('data-part="area"');
+		expect(htmlString).toContain('data-part="areaBackground"');
+		expect(htmlString).toContain('data-part="areaThumb"');
+		expect(htmlString).toContain('data-part="channel-slider"');
+		expect(htmlString).toContain('data-part="channel-slider-label"');
+		expect(htmlString).toContain('data-part="channel-slider-track"');
+		expect(htmlString).toContain('data-part="channel-slider-thumb"');
+		expect(htmlString).toContain('data-part="swatch-group"');
+		expect(htmlString).toContain('data-part="swatch"');
+	});
+
+	it("should render active format views and inputs correctly", async () => {
+		const html = (await ColorPicker({
+			value: "#00ff00",
+			format: "hex",
+			interactive: false,
+		})) as any;
+		const htmlString = html.toString();
+
+		expect(htmlString).toContain('data-part="view"');
+		expect(htmlString).toContain('data-format="hex"');
+		expect(htmlString).toContain('data-part="channel-input"');
+		expect(htmlString).toContain('data-channel="hex"');
+		expect(htmlString).toContain('value="#00ff00"');
+	});
+
+	it("should render label when provided", async () => {
+		const html = (await ColorPicker({
+			label: "Choose your favorite color",
+			value: "#0000ff",
+			interactive: false,
+		})) as any;
+		const htmlString = html.toString();
+
+		expect(htmlString).toContain('data-part="label"');
+		expect(htmlString).toContain("Choose your favorite color");
+	});
+});
