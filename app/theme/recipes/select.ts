@@ -38,11 +38,6 @@ export const select = defineSlotRecipe({
 			width: "full",
 			zIndex: "dropdown",
 			display: "none",
-			position: "absolute",
-			top: "100%",
-			insetStart: "0",
-			width: "full",
-			zIndex: "dropdown",
 			_open: {
 				display: "block",
 			},
