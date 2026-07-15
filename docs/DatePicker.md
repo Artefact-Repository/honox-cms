@@ -8,13 +8,15 @@ The component is **headless by design**: `app/components/ui/date-picker-primitiv
 
 # What's new in this revision
 
-- **Keyboard-first calendar grid.** Full arrow-key, <kbd>Home</kbd>/<kbd>End</kbd>, <kbd>PageUp</kbd>/<kbd>PageDown</kbd> (with <kbd>Shift</kbd> for years), <kbd>Enter</kbd>/<kbd>Space</kbd> navigation, with a roving tab stop so the panel never traps focus across 42 cells.
-- **Range hover preview.** While picking a range, hovering a day previews the spanned interval in the accent colour — the same affordance users expect from native OS pickers.
-- **Free-text typing.** The input is now uncontrolled; you can type a full `YYYY-MM-DD` value and commit on <kbd>Enter</kbd> or blur. Invalid or out-of-range input reverts instead of fighting the caret.
-- **Week numbers.** Pass `showWeekNumbers` to render ISO-8601 week numbers in a dedicated column.
-- **Clear trigger only when needed.** The clear button appears only when a value is present, reducing visual noise.
-- **Accessible grid.** The calendar is exposed as an ARIA `grid` (`role="grid"` / `row` / `gridcell` / `columnheader` / `rowheader`) with `aria-selected` and `aria-current="date"`, and focus moves into the grid when opened from the keyboard.
-- **Fixed popup animation.** The open/close animation now references the real `fade-in` / `fade-out` keyframes (previously a no-op due to a name mismatch).
+- **Selected values now survive static rendering.** The input previously rendered its value through `defaultValue`, which hono/jsx serialises as a dead `defaultValue="…"` attribute — a statically rendered picker with a `value`/`defaultValue` showed an empty input. It now renders a real `value` attribute; typing stays uncontrolled because the DOM runtime only assigns the value property when the prop actually changes.
+- **Month/year dropdowns preselect correctly in SSR.** `MonthSelect`/`YearSelect` used `value` on `<select>`, which is not an HTML attribute, so the focused month/year was never preselected in server output. The matching `<option>` now carries `selected`.
+- **Localised calendar text.** Weekday headers, month grids, and the month dropdown are generated from `Intl.DateTimeFormat` for the configured `locale` (cached per locale, with an English fallback when the locale is unknown). Previously only the heading respected `locale`.
+- **Range endpoints connect to the band.** The start/end days of a range now carry `data-range-start` / `data-range-end`, and the recipe squares their inner corners so the endpoints join the in-range highlight seamlessly.
+- **Keyboard focus survives view switches.** Zooming between day/month/year views (via the heading or by drilling into a month/year) used to drop DOM focus onto `<body>` because the previously focused control gets hidden. Focus now moves onto the active cell of the new view.
+- **Grid semantics tightened.** The stray `role="row"` on `<thead>` (which overrode its implicit `rowgroup` role) is gone, and the grid announces `aria-multiselectable` in `multiple`/`range` modes.
+- **Popup stays on-screen.** The calendar popup caps its width to the viewport on narrow screens instead of overflowing horizontally.
+
+Carried over from the previous revision: keyboard-first grid navigation clamped to `[min, max]`, bounded month/year views, range hover preview, free-text entry with commit-on-Enter/blur, native form submission via hidden inputs, ISO week numbers, conditional clear trigger, ARIA grid semantics with a roving tab stop, and open/close animations keyed to `data-state`.
 
 # Props
 
@@ -27,14 +29,16 @@ The component is **headless by design**: `app/components/ui/date-picker-primitiv
 | `defaultValue` | `CalendarDate[] \| string[] \| string \| Date[]` | Initial selected date(s) (uncontrolled). |
 | `focusedValue` | `CalendarDate \| string \| Date` | The date the calendar panel is focused on (controlled). |
 | `defaultFocusedValue` | `CalendarDate \| string \| Date` | Initial panel date (uncontrolled). |
-| `min` | `CalendarDate \| string \| Date` | Earliest selectable date. Earlier cells are disabled; typed dates outside the range are rejected. |
+| `min` | `CalendarDate \| string \| Date` | Earliest selectable date. Earlier days, months, and years are disabled; typed dates outside the range are rejected; keyboard focus is clamped to the range. |
 | `max` | `CalendarDate \| string \| Date` | Latest selectable date. |
 | `isDateUnavailable` | `(date, locale) => boolean` | Marks individual dates as unselectable (static/composed usage). |
 | `view` | `"day" \| "month" \| "year"` | The active panel view (controlled). |
 | `open` | `boolean` | Whether the popup calendar is open (controlled). |
 | `closeOnSelect` | `boolean` | Close the popup after a completed selection. Defaults to `true`. |
 | `showWeekNumbers` | `boolean` | Renders an ISO-8601 week-number column. Defaults to `false`. |
-| `locale` | `string` | BCP 47 locale used for month/date formatting. Defaults to `en-US`. |
+| `numOfMonths` | `number` | Reserved for multi-month rendering. Currently a single month panel is always shown; values greater than `1` are accepted but not yet rendered. |
+| `name` | `string` | When set, renders a hidden input per selected date under this name, enabling native `<form>` submission. In range/multiple mode each selected date becomes a separate entry (ordered). |
+| `locale` | `string` | BCP 47 locale used for the heading, weekday headers, month names, and cell labels (via `Intl.DateTimeFormat`, with an English fallback). Defaults to `en-US`. |
 | `disabled` | `boolean` | Disables the whole picker. |
 | `readOnly` | `boolean` | Makes the input read-only. |
 | `invalid` | `boolean` | Marks the input invalid (`aria-invalid` + error styling). |
@@ -54,15 +58,19 @@ Dates are represented by the `CalendarDate` class (`{ year, month, day }`, month
 | `daysInMonth(year, month)` | Number of days in the given month. |
 | `fromJSDate(date)` | Converts a JavaScript `Date` to a `CalendarDate`. |
 | `getWeekNumber(date)` | ISO-8601 week number for a `CalendarDate` (used by `showWeekNumbers`). |
+| `getWeekDays(locale)` | Localised weekday names (`{ short, narrow, long }`, Sunday-first), cached per locale. |
+| `getMonthNames(locale, format?)` | Localised month names (`"short"` or `"long"`), January-first, cached per locale. |
 
 # Functionality
 
 - **Popup calendar** — opens from the calendar trigger or by focusing/clicking the input; closes on outside click, <kbd>Escape</kbd> (focus returns to the trigger), or after a completed selection when `closeOnSelect` is set.
 - **Panel views** — click the month/year heading to zoom out from days → months → years; selecting a year or month drills back down. The prev/next arrows page by month, year, or decade depending on the view.
+- **Bounded selection** — `min`/`max` are enforced in every view: out-of-range days are disabled, months and years that fall entirely outside the range are disabled too, and keyboard focus is clamped so it can never rest on a disabled cell.
 - **Manual entry** — type a date in the input and press <kbd>Enter</kbd> (or blur). Valid `YYYY-MM-DD` values are committed and normalised; invalid or out-of-range values revert to the last committed value. Clearing the input clears the selection.
 - **Range selection** — the first click sets the start, the second sets the end (automatically ordered); the days in between are highlighted, and hovering previews the span before you commit.
 - **Multiple selection** — clicking toggles individual days on and off.
 - **Week numbers** — with `showWeekNumbers`, an ISO week-number column is shown alongside the day grid.
+- **Form submission** — pass a `name` prop and a hidden input is rendered for each selected date, so the picker works inside a plain `<form>` with no extra glue code.
 - **Presets** — `DatePicker.PresetTrigger` supports the values `today`, `last3Days`, `last7Days`, `last14Days`, `last30Days`, and `last90Days`. In range mode a preset selects the whole span; otherwise it selects the single anchor date.
 
 # Keyboard support
@@ -83,9 +91,9 @@ The trigger and input are reachable by <kbd>Tab</kbd>; opening from the keyboard
 
 # Accessibility
 
-- The grid uses ARIA grid semantics (`role="grid"`, `row`, `gridcell`, `columnheader`, `rowheader`) with `aria-selected` and `aria-current="date"` on the today cell.
+- The grid uses ARIA grid semantics (`role="grid"`, `row`, `gridcell`, `columnheader`, `rowheader`) with `aria-selected`, `aria-current="date"` on the today cell, and `aria-multiselectable` in `multiple`/`range` modes.
 - A **roving tabindex** keeps a single tab stop on the focused date; arrow keys move focus without tabbing through every cell.
-- Focus is managed: opening from the keyboard focuses the active day; closing returns focus to the trigger.
+- Focus is managed: opening from the keyboard focuses the active day; closing returns focus to the trigger; switching between day/month/year views moves focus onto the active cell of the new view instead of dropping it.
 - All interactive controls carry `aria-label`s (`Open date picker`, `Clear selected dates`, `Previous`, `Next`, `Switch calendar view`, `Select month`, `Select year`).
 - Colour is never the only signal — selected, today, in-range, and disabled states combine fill, weight, and (for today) a dot marker.
 - Respects `disabled` / `readOnly` / `invalid` via `aria-disabled`, `readonly`, and `aria-invalid`.
@@ -94,9 +102,9 @@ The trigger and input are reachable by <kbd>Tab</kbd>; opening from the keyboard
 
 The Panda CSS slot recipe (`app/theme/recipes/date-picker.ts`) exposes the following `data-part` slots for theming. Override via the `class`/`className` props or a semantic `classNames` map:
 
-`root`, `label`, `control`, `input`, `trigger`, `clearTrigger`, `positioner`, `content`, `view`, `viewControl`, `prevTrigger`, `nextTrigger`, `viewTrigger`, `rangeText`, `table`, `tableHead`, `tableHeader`, `tableRow`, `tableBody`, `tableCell`, `tableCellTrigger`, `weekNumber`, `monthSelect`, `yearSelect`, `presetTrigger`, `valueText`.
+`root`, `label`, `control`, `input`, `trigger`, `clearTrigger`, `positioner`, `content`, `view`, `viewControl`, `prevTrigger`, `nextTrigger`, `viewTrigger`, `rangeText`, `table`, `tableHead`, `tableHeader`, `tableRow`, `tableBody`, `tableCell`, `tableCellTrigger`, `weekNumber`, `monthSelect`, `yearSelect`, `presetTrigger`, `valueText`. The `hidden-input` part is rendered only when `name` is set and carries no visible styling.
 
-The selected / today / in-range / range-preview states are driven by `data-selected`, `data-today`, `data-in-range`, `data-outside-range`, and `data-range-preview` attributes, so they can be re-skinned independently of the recipe.
+The selected / today / in-range / range-preview / disabled states are driven by `data-selected`, `data-today`, `data-in-range`, `data-outside-range`, `data-range-preview`, and `data-disabled` attributes (applied in all three panel views), so they can be re-skinned independently of the recipe. Range endpoints additionally carry `data-range-start` / `data-range-end` (only when the range spans more than one day), which the recipe uses to square their inner corners against the in-range band. The open/close animation keys off `data-state="open"` / `data-state="closed"`.
 
 # Hydration
 
@@ -139,6 +147,22 @@ export default function MyPage() {
 
       {/* Preselected value */}
       <DatePicker label="Due Date" defaultValue="2026-07-15" />
+
+      {/* Inside a native form — the selected date submits as `due` */}
+      <form method="post" action="/submit">
+        <DatePicker label="Due Date" name="due" selectionMode="single" />
+        <button type="submit">Save</button>
+      </form>
+
+      {/* Range submission — start/end submit as two `range` entries */}
+      <form method="post" action="/report">
+        <DatePicker
+          label="Reporting Window"
+          name="range"
+          selectionMode="range"
+        />
+        <button type="submit">Run</button>
+      </form>
     </>
   );
 }
@@ -150,3 +174,6 @@ export default function MyPage() {
 - **SSR-safe.** Markup is rendered on the server; only the island branch pulls in client behaviour, and only when signalled.
 - **Token-driven.** Colours, spacing, radii, and shadows come from the shared theme tokens, so the picker inherits dark mode and the configured `colorPalette` automatically.
 - **Type-safe values.** `CalendarDate` avoids the timezone pitfalls of raw `Date`/`string` handling.
+- **Bounded by design.** `min`/`max` are enforced consistently across day, month, and year views — both for mouse selection and keyboard focus — so an out-of-range value can never be committed or focused.
+- **Form-ready.** The optional `name` prop renders hidden inputs, so the picker drops into native forms without custom submit handlers.
+- **Single-month panel.** `numOfMonths` is accepted for forward compatibility but currently renders a single month. Multi-month rendering is on the roadmap.

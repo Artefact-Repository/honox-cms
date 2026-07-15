@@ -27,7 +27,7 @@ A foundational component for form fields, managing labels, helper text, error me
 
 # Usage
 
-## Smart Switcher
+## Smart Auto-Hydration
 
 The `Field` component automatically determines if it should be interactive. It becomes an island if any of the following props are provided: `interactive`, `onValueChange`, `value`, `defaultValue`, `validator`, or `minLength`.
 
@@ -60,8 +60,6 @@ The `validator` prop accepts a function that returns `true` for valid, `false` f
   }}
 />
 ```
-
-## Flattened API
 
 The simplest way to use Field is with the flattened props. It will automatically render an input.
 

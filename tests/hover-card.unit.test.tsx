@@ -2,7 +2,7 @@ import { expect, test, describe } from "bun:test";
 import { HoverCard } from "../app/components/ui/hover-card";
 
 describe("HoverCard Unit Tests", () => {
-	test("should render flattened API correctly", () => {
+	test("should render correctly", () => {
 		const html = (
 			<HoverCard
 				interactive={false}

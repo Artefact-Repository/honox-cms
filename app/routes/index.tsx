@@ -29,7 +29,7 @@ import {
 	IconButton,
 	Link,
 	Loader,
-	Menu,
+	Dropdown,
 	PaginatedTable,
 	Pagination,
 	Popover,
@@ -343,28 +343,7 @@ export default createRoute((c) => {
 				</Heading>
 
 				<Stack direction="column" gap="8" class={css({ width: "full" })}>
-					{/* Inline ColorPicker */}
-					<Stack direction="column" gap="2">
-						<Text size="sm" class={css({ color: "fg.muted" })}>
-							Inline ColorPicker (Static SSR & Default Preset Group)
-						</Text>
-						<ColorPicker
-							value="#7c3aed"
-							interactive={false}
-							label="Favorite Color"
-							presets={[
-								"#ef4444",
-								"#f97316",
-								"#eab308",
-								"#22c55e",
-								"#3b82f6",
-								"#7c3aed",
-								"#000000",
-							]}
-						/>
-					</Stack>
-
-					{/* Interactive ColorPicker as Trigger / Popover */}
+					{/* ColorPicker as Trigger / Popover */}
 					<Stack direction="column" gap="2" align="center">
 						<Text size="sm" class={css({ color: "fg.muted" })}>
 							Interactive ColorPicker (Swatch Trigger + Popover)
@@ -372,7 +351,7 @@ export default createRoute((c) => {
 						<ColorPicker
 							interactive
 							trigger
-							value="#eab308"
+							defaultValue="#eab308"
 							label="Popover Trigger Picker"
 						/>
 					</Stack>
@@ -764,10 +743,9 @@ export default createRoute((c) => {
 					Dialog Component Examples
 				</Heading>
 				<Dialog
-					interactive
 					trigger={<Button variant="outline">Open Dialog</Button>}
 					title="Dialog Title"
-					description="This dialog uses the simplified flattened API."
+					description="This dialog uses the Dialog component API."
 					body="This is the dialog body content."
 					cancel={<Button variant="outline">Cancel</Button>}
 					confirm={<Button>Confirm</Button>}
@@ -786,17 +764,16 @@ export default createRoute((c) => {
 				</Heading>
 
 				<Drawer
-					interactive
 					trigger={<Button variant="outline">Open Drawer</Button>}
 					title="Drawer Title"
-					description="This drawer uses the simplified flattened API."
+					description="This drawer uses the Drawer component API."
 					body="This is the main content of the drawer, passed via the body prop."
 					cancel={<Button variant="outline">Close</Button>}
 					confirm={<Button>Action</Button>}
 				/>
 			</Stack>
 
-			{/* Menu Examples (Flattened API) */}
+			{/* Dropdown Examples */}
 			<Stack
 				direction="column"
 				gap="4"
@@ -804,14 +781,14 @@ export default createRoute((c) => {
 				class={css({ mt: "8", maxWidth: "xl", mx: "auto" })}
 			>
 				<Heading as="h2" class={css({ fontSize: "xl", mb: "4" })}>
-					Menu Component Examples (Flattened API)
+					Dropdown Component Examples
 				</Heading>
 
 				<Text size="sm" class={css({ color: "fg.muted", mb: "2" })}>
-					Basic Menu with Items (Interactive)
+					Basic Dropdown with Items
 				</Text>
-				<Menu
-					trigger={<Button variant="outline">Open Menu</Button>}
+				<Dropdown
+					trigger={<Button variant="outline">Open Dropdown</Button>}
 					items={[
 						{ type: "item", label: "New Tab", value: "new-tab" },
 						{ type: "item", label: "New Window", value: "new-window" },
@@ -827,9 +804,9 @@ export default createRoute((c) => {
 				/>
 
 				<Text size="sm" class={css({ color: "fg.muted", mt: "4", mb: "2" })}>
-					Menu with Disabled Items (Interactive)
+					Dropdown with Disabled Items (Interactive)
 				</Text>
-				<Menu
+				<Dropdown
 					trigger={
 						<Button variant="outline" colorPalette="blue">
 							Options
@@ -844,9 +821,9 @@ export default createRoute((c) => {
 				/>
 
 				<Text size="sm" class={css({ color: "fg.muted", mt: "4", mb: "2" })}>
-					Menu with Radio Group (Interactive)
+					Dropdown with Radio Group (Interactive)
 				</Text>
-				<Menu
+				<Dropdown
 					trigger={<Button variant="outline">Sort By</Button>}
 					items={[
 						{
@@ -1576,7 +1553,7 @@ export default createRoute((c) => {
 						class={css({ width: "full" })}
 					>
 						<Text size="sm" class={css({ color: "fg.muted" })}>
-							Basic Breadcrumb (Flattened API)
+							Basic Breadcrumb
 						</Text>
 						<Breadcrumb
 							items={[
@@ -1698,7 +1675,7 @@ export default createRoute((c) => {
 						width: "full",
 					})}
 				>
-					{/* Basic Flattened Card */}
+					{/* Card */}
 					<Card
 						title="Team Members"
 						description="Add new members to your organization."
@@ -1909,7 +1886,7 @@ export default createRoute((c) => {
 				class={css({ mt: "8", maxWidth: "3xl", mx: "auto" })}
 			>
 				<Heading as="h2" class={css({ fontSize: "xl", mb: "4" })}>
-					Table Component Examples (Flattened API)
+					Table Component Examples
 				</Heading>
 
 				<Text size="sm" class={css({ mb: "2", color: "fg.muted" })}>

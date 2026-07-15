@@ -1,4 +1,3 @@
-import { css } from "design-system/css";
 import type { JSX } from "hono/jsx";
 import PopoverIsland from "../../islands/popover";
 import { IconButton } from "./button";
@@ -90,12 +89,7 @@ function Popover(props: PopoverProps) {
 					)}
 					{closable && (
 						<CloseTrigger asChild>
-							<IconButton
-								variant="plain"
-								size="sm"
-								aria-label="Close"
-								class={css({ position: "absolute", top: "2", right: "2" })}
-							>
+							<IconButton variant="plain" size="sm" aria-label="Close">
 								{closeIcon ?? <DefaultCloseIcon />}
 							</IconButton>
 						</CloseTrigger>

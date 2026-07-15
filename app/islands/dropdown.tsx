@@ -1,21 +1,26 @@
 import { useEffect, useId, useRef, useState } from "hono/jsx";
-import { MenuRoot, type MenuRootProps } from "../components/ui/menu-primitive";
+import {
+	DropdownRoot,
+	type DropdownRootProps,
+} from "../components/ui/dropdown-primitive";
 
-const ROOT_SELECTOR = '[data-scope="menu"][data-part="root"]';
+const ROOT_SELECTOR = '[data-scope="dropdown"][data-part="root"]';
 
-export interface InteractiveMenuRootProps extends MenuRootProps {
+export interface InteractiveDropdownRootProps extends DropdownRootProps {
 	placement?: string;
 	trigger?:
-		| ("click" | "hover" | "contextMenu")[]
+		| ("click" | "hover" | "contextDropdown")[]
 		| "click"
 		| "hover"
-		| "contextMenu";
+		| "contextDropdown";
 	mouseEnterDelay?: number;
 	mouseLeaveDelay?: number;
 	arrow?: boolean;
 }
 
-export default function InteractiveMenuRoot(props: InteractiveMenuRootProps) {
+export default function InteractiveDropdownRoot(
+	props: InteractiveDropdownRootProps,
+) {
 	const {
 		open: openProp,
 		children,
@@ -35,7 +40,7 @@ export default function InteractiveMenuRoot(props: InteractiveMenuRootProps) {
 	const fallbackId = useId();
 	const rootIdRef = useRef<string | null>(null);
 	if (!rootIdRef.current) {
-		rootIdRef.current = idProp || `menu-${fallbackId}`;
+		rootIdRef.current = idProp || `dropdown-${fallbackId}`;
 	}
 	const rootId = rootIdRef.current;
 
@@ -423,13 +428,13 @@ export default function InteractiveMenuRoot(props: InteractiveMenuRootProps) {
 			}
 		};
 
-		const handleContextMenu = (e: MouseEvent) => {
+		const handleContextDropdown = (e: MouseEvent) => {
 			const target = (e.target as HTMLElement).closest<HTMLElement>(
 				'[data-part="context-trigger"]',
 			);
 			if (target && ownsTarget(target)) {
 				if (
-					triggerActions.includes("contextMenu") ||
+					triggerActions.includes("contextDropdown") ||
 					target.getAttribute("data-part") === "context-trigger"
 				) {
 					e.preventDefault();
@@ -544,7 +549,7 @@ export default function InteractiveMenuRoot(props: InteractiveMenuRootProps) {
 		};
 
 		root.addEventListener("click", handleClick);
-		root.addEventListener("contextmenu", handleContextMenu);
+		root.addEventListener("contextmenu", handleContextDropdown);
 		root.addEventListener("mouseover", handleMouseOver);
 		root.addEventListener("keydown", handleKeyDown);
 		window.addEventListener("mousedown", handleClickOutside);
@@ -562,7 +567,7 @@ export default function InteractiveMenuRoot(props: InteractiveMenuRootProps) {
 
 		return () => {
 			root.removeEventListener("click", handleClick as any);
-			root.removeEventListener("contextmenu", handleContextMenu as any);
+			root.removeEventListener("contextmenu", handleContextDropdown as any);
 			root.removeEventListener("mouseover", handleMouseOver as any);
 			root.removeEventListener("keydown", handleKeyDown);
 			window.removeEventListener("mousedown", handleClickOutside);
@@ -584,13 +589,13 @@ export default function InteractiveMenuRoot(props: InteractiveMenuRootProps) {
 		<div
 			id={rootId}
 			ref={rootRef}
-			data-scope="menu"
+			data-scope="dropdown"
 			data-part="root"
 			style={{ display: "contents" }}
 		>
-			<MenuRoot {...rest} open={isOpen} id={rootId} onClose={onClose}>
+			<DropdownRoot {...rest} open={isOpen} id={rootId} onClose={onClose}>
 				{children}
-			</MenuRoot>
+			</DropdownRoot>
 		</div>
 	);
 }

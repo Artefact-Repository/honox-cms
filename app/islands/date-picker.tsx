@@ -4,6 +4,7 @@ import {
 	DatePickerRoot,
 	type DatePickerRootProps,
 	DatePickerStructure,
+	daysInMonth,
 	fromJSDate,
 	isValidDateString,
 	parseDate,
@@ -126,6 +127,18 @@ export default function DatePickerIsland(props: DatePickerRootProps) {
 		return false;
 	};
 
+	// Clamp a date into the selectable [min, max] range so keyboard focus can
+	// never land on a disabled cell. Used for all keyboard-driven moves.
+	const clampToRange = (date: CalendarDate): CalendarDate => {
+		if (minDate && date.toDate().getTime() < minDate.toDate().getTime()) {
+			return new CalendarDate(minDate.year, minDate.month, minDate.day);
+		}
+		if (maxDate && date.toDate().getTime() > maxDate.toDate().getTime()) {
+			return new CalendarDate(maxDate.year, maxDate.month, maxDate.day);
+		}
+		return date;
+	};
+
 	const handleGoToNext = () => {
 		const { view: activeView, focusedValue: fv } = stateRef.current;
 		if (activeView === "day") {
@@ -161,6 +174,9 @@ export default function DatePickerIsland(props: DatePickerRootProps) {
 		} else {
 			setView("day");
 		}
+		// The previous view (and the control that had focus) is now hidden, so
+		// move focus onto the active cell of the new view.
+		focusGrid.current = true;
 	};
 
 	const handleCellClick = (cellVal: CalendarDate | number) => {
@@ -207,10 +223,12 @@ export default function DatePickerIsland(props: DatePickerRootProps) {
 			const { focusedValue: fv } = stateRef.current;
 			setFocusedValue(new CalendarDate(fv.year, cellVal, 1));
 			setView("day");
+			focusGrid.current = true;
 		} else if (activeView === "year" && typeof cellVal === "number") {
 			const { focusedValue: fv } = stateRef.current;
 			setFocusedValue(new CalendarDate(cellVal, fv.month, 1));
 			setView("month");
+			focusGrid.current = true;
 		}
 	};
 
@@ -325,7 +343,7 @@ export default function DatePickerIsland(props: DatePickerRootProps) {
 		if (!root) return;
 
 		const moveFocused = (next: CalendarDate) => {
-			setFocusedValue(next);
+			setFocusedValue(clampToRange(next));
 			focusGrid.current = true;
 		};
 
@@ -455,10 +473,16 @@ export default function DatePickerIsland(props: DatePickerRootProps) {
 					m -= 12;
 					y++;
 				}
-				moveFocused(new CalendarDate(y, m, fv.day));
+				// Clamp the day so month rollover never drifts past month end
+				// (e.g. Jan 31 -> Feb 28, not Feb 31 -> Mar 3).
+				const day = Math.min(fv.day, daysInMonth(y, m));
+				moveFocused(new CalendarDate(y, m, day));
 			};
 			const stepYears = (years: number) => {
-				moveFocused(new CalendarDate(fv.year + years, fv.month, fv.day));
+				const y = fv.year + years;
+				// Clamp the day for Feb 29 -> non-leap-year rollover.
+				const day = Math.min(fv.day, daysInMonth(y, fv.month));
+				moveFocused(new CalendarDate(y, fv.month, day));
 			};
 
 			switch (e.key) {

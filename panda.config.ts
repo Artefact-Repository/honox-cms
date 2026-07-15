@@ -55,7 +55,7 @@ export default defineConfig({
 			hoverCard: ["*"],
 			input: ["*"],
 			link: ["*"],
-			menu: ["*"],
+			dropdown: ["*"],
 			popover: ["*"],
 			progress: ["*"],
 			segmentGroup: ["*"],

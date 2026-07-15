@@ -36,7 +36,7 @@ The Page Builder supports a rich palette of over 25+ layout, typography, decorat
 * **Popover**: Floating descriptive content anchored to standard text triggers.
 * **Dialog**: Fully focus-trapped modal boxes with custom Confirm/Cancel buttons and custom children list.
 * **Drawer**: Responsive side panels sliding in from the page edge with custom children list.
-* **Menu**: Action menus with custom checkable, selectable, and separator options.
+* **Dropdown**: Action menus with custom checkable, selectable, and separator options.
 
 ### 5. Advanced & Data
 * **RadioGroup**: Custom radio lists with accessible single-select logic.

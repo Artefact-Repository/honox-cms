@@ -6,7 +6,7 @@ describe("Table Unit Tests", () => {
 		expect(Table).toBeDefined();
 	});
 
-	test("Table renders with flattened API structure", () => {
+	test("Table renders", () => {
 		const columns = [
 			{ header: "Name", key: "name" },
 			{ header: "Age", key: "age" },

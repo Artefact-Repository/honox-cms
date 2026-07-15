@@ -111,10 +111,10 @@ test("PageRenderer renders hover-card correctly with trigger, title, and descrip
 	expect(html).toContain("Active");
 });
 
-test("PageRenderer renders menu correctly with items", () => {
+test("PageRenderer renders dropdown correctly with items", () => {
 	const content = [
 		{
-			type: "menu",
+			type: "dropdown",
 			triggerText: "Options Menu",
 			items: [
 				{

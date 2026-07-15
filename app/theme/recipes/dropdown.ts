@@ -1,7 +1,7 @@
 import { defineSlotRecipe } from "@pandacss/dev";
 
-export const menu = defineSlotRecipe({
-	className: "menu",
+export const dropdown = defineSlotRecipe({
+	className: "dropdown",
 	slots: [
 		"arrow",
 		"arrowTip",
@@ -20,7 +20,7 @@ export const menu = defineSlotRecipe({
 	],
 	base: {
 		content: {
-			"--menu-z-index": "zIndex.dropdown",
+			"--dropdown-z-index": "zIndex.dropdown",
 
 			bg: "gray.surface.bg",
 			borderRadius: "l3",
@@ -33,7 +33,7 @@ export const menu = defineSlotRecipe({
 			overflow: "hidden",
 			overflowY: "auto",
 			position: "relative",
-			zIndex: "calc(var(--menu-z-index) + var(--layer-index, 0))",
+			zIndex: "calc(var(--dropdown-z-index) + var(--layer-index, 0))",
 			_open: {
 				animationStyle: "slide-fade-in",
 				animationDuration: "fast",

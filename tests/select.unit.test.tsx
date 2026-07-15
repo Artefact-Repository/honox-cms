@@ -2,7 +2,7 @@ import { expect, test, describe } from "bun:test";
 import { Select } from "../app/components/ui/select";
 
 describe("Select Unit Tests", () => {
-	test("should render correctly with flattened API (static)", () => {
+	test("should render correctly", () => {
 		const html = (
 			<Select
 				interactive={false}

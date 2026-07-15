@@ -1,29 +1,29 @@
 import { cx } from "design-system/css";
-import { type MenuVariantProps, menu } from "design-system/recipes";
+import { type DropdownVariantProps, dropdown } from "design-system/recipes";
 import type { JSX } from "hono/jsx";
-import InteractiveMenuRoot from "../../islands/menu";
+import InteractiveDropdownRoot from "../../islands/dropdown";
 import { shouldHydrate } from "./island-utils";
-// Import primitive components from menu-primitive
+// Import primitive components from dropdown-primitive
 import {
-	MenuCheckboxItem as CheckboxItem,
-	MenuContent as Content,
-	MenuItem as Item,
-	MenuItemGroupLabel as ItemGroupLabel,
-	MenuItemIndicator as ItemIndicator,
-	MenuItemText as ItemText,
-	MenuArrow,
-	MenuArrowTip,
-	MenuPositioner as Positioner,
-	MenuRadioItem as RadioItem,
-	MenuRadioItemGroup as RadioItemGroup,
-	MenuRoot as RootPrimitive,
-	MenuSeparator as Separator,
-	MenuTrigger as Trigger,
-} from "./menu-primitive";
+	DropdownCheckboxItem as CheckboxItem,
+	DropdownContent as Content,
+	DropdownItem as Item,
+	DropdownItemGroupLabel as ItemGroupLabel,
+	DropdownItemIndicator as ItemIndicator,
+	DropdownItemText as ItemText,
+	DropdownArrow,
+	DropdownArrowTip,
+	DropdownPositioner as Positioner,
+	DropdownRadioItem as RadioItem,
+	DropdownRadioItemGroup as RadioItemGroup,
+	DropdownRoot as RootPrimitive,
+	DropdownSeparator as Separator,
+	DropdownTrigger as Trigger,
+} from "./dropdown-primitive";
 
-// ============= Flattened API Types =============
+// ============= API Types =============
 
-type MenuItemType =
+type DropdownItemType =
 	| "item"
 	| "separator"
 	| "checkbox"
@@ -32,13 +32,13 @@ type MenuItemType =
 	| "submenu"
 	| "group";
 
-interface BaseMenuItem {
-	type?: MenuItemType;
+interface BaseDropdownItem {
+	type?: DropdownItemType;
 	disabled?: boolean;
 	class?: string;
 }
 
-interface MenuItemItem extends BaseMenuItem {
+interface DropdownItemItem extends BaseDropdownItem {
 	type?: "item";
 	label: string;
 	value: string;
@@ -46,11 +46,11 @@ interface MenuItemItem extends BaseMenuItem {
 	indicator?: JSX.Element;
 }
 
-interface MenuSeparatorItem extends BaseMenuItem {
+interface DropdownSeparatorItem extends BaseDropdownItem {
 	type: "separator";
 }
 
-interface MenuCheckboxItem extends BaseMenuItem {
+interface DropdownCheckboxItem extends BaseDropdownItem {
 	type: "checkbox";
 	label: string;
 	value: string;
@@ -58,7 +58,7 @@ interface MenuCheckboxItem extends BaseMenuItem {
 	icon?: JSX.Element;
 }
 
-interface MenuRadioItem extends BaseMenuItem {
+interface DropdownRadioItem extends BaseDropdownItem {
 	type: "radio";
 	label: string;
 	value: string;
@@ -66,31 +66,31 @@ interface MenuRadioItem extends BaseMenuItem {
 	icon?: JSX.Element;
 }
 
-interface MenuRadioGroupItem extends BaseMenuItem {
+interface DropdownRadioGroupItem extends BaseDropdownItem {
 	type: "radio-group";
 	value: string;
 	label?: string;
-	items: MenuRadioItem[];
+	items: DropdownRadioItem[];
 }
 
-interface MenuSubmenuItem extends BaseMenuItem {
+interface DropdownSubmenuItem extends BaseDropdownItem {
 	type: "submenu";
 	label: string;
 	icon?: JSX.Element;
-	items: (MenuItemItem | MenuSeparatorItem | MenuCheckboxItem)[];
+	items: (DropdownItemItem | DropdownSeparatorItem | DropdownCheckboxItem)[];
 }
 
-type MenuItem =
-	| MenuItemItem
-	| MenuSeparatorItem
-	| MenuCheckboxItem
-	| MenuRadioItem
-	| MenuRadioGroupItem
-	| MenuSubmenuItem;
+type DropdownItem =
+	| DropdownItemItem
+	| DropdownSeparatorItem
+	| DropdownCheckboxItem
+	| DropdownRadioItem
+	| DropdownRadioGroupItem
+	| DropdownSubmenuItem;
 
-interface MenuProps extends MenuVariantProps {
+interface DropdownProps extends DropdownVariantProps {
 	trigger?: JSX.Element;
-	items?: MenuItem[];
+	items?: DropdownItem[];
 	defaultOpen?: boolean;
 	interactive?: boolean;
 	class?: string;
@@ -100,23 +100,23 @@ interface MenuProps extends MenuVariantProps {
 	arrow?: boolean;
 	placement?: string;
 	triggerMode?:
-		| ("click" | "hover" | "contextMenu")[]
+		| ("click" | "hover" | "contextDropdown")[]
 		| "click"
 		| "hover"
-		| "contextMenu";
+		| "contextDropdown";
 	mouseEnterDelay?: number;
 	mouseLeaveDelay?: number;
 }
 
 // ============= Rendering Functions =============
 
-function renderMenuItem(item: MenuItem, index: number): JSX.Element {
+function renderDropdownItem(item: DropdownItem, index: number): JSX.Element {
 	switch (item.type) {
 		case "separator":
 			return <Separator key={index} />;
 
 		case "checkbox": {
-			const checkboxItem = item as MenuCheckboxItem;
+			const checkboxItem = item as DropdownCheckboxItem;
 			return (
 				<CheckboxItem
 					key={checkboxItem.value}
@@ -133,7 +133,7 @@ function renderMenuItem(item: MenuItem, index: number): JSX.Element {
 		}
 
 		case "radio": {
-			const radioItem = item as MenuRadioItem;
+			const radioItem = item as DropdownRadioItem;
 			return (
 				<RadioItem
 					key={radioItem.value}
@@ -148,21 +148,21 @@ function renderMenuItem(item: MenuItem, index: number): JSX.Element {
 		}
 
 		case "radio-group": {
-			const radioGroup = item as MenuRadioGroupItem;
+			const radioGroup = item as DropdownRadioGroupItem;
 			return (
 				<RadioItemGroup key={radioGroup.value} value={radioGroup.value}>
 					{radioGroup.label && (
 						<ItemGroupLabel>{radioGroup.label}</ItemGroupLabel>
 					)}
 					{radioGroup.items.map((radioItem, idx) =>
-						renderMenuItem(radioItem, idx),
+						renderDropdownItem(radioItem, idx),
 					)}
 				</RadioItemGroup>
 			);
 		}
 
 		case "submenu": {
-			const submenuItem = item as MenuSubmenuItem;
+			const submenuItem = item as DropdownSubmenuItem;
 			return (
 				<Item key={index} value={`submenu:${submenuItem.label}`} disabled>
 					<ItemText>{submenuItem.label}</ItemText>
@@ -171,7 +171,7 @@ function renderMenuItem(item: MenuItem, index: number): JSX.Element {
 		}
 
 		default: {
-			const menuItem = item as MenuItemItem;
+			const menuItem = item as DropdownItemItem;
 			return (
 				<Item
 					key={menuItem.value}
@@ -187,9 +187,9 @@ function renderMenuItem(item: MenuItem, index: number): JSX.Element {
 	}
 }
 
-// ============= Flattened Menu Component =============
+// ============= Dropdown Component =============
 
-function MenuRoot(props: MenuProps) {
+function DropdownRoot(props: DropdownProps) {
 	const {
 		trigger,
 		items,
@@ -207,11 +207,11 @@ function MenuRoot(props: MenuProps) {
 		...variantProps
 	} = props;
 
-	const styles = menu(variantProps);
+	const styles = dropdown(variantProps);
 
 	if (shouldHydrate(interactive, true)) {
 		return (
-			<InteractiveMenuRoot
+			<InteractiveDropdownRoot
 				open={defaultOpen}
 				placement={placement}
 				trigger={triggerMode}
@@ -224,16 +224,16 @@ function MenuRoot(props: MenuProps) {
 				{items && (
 					<Positioner class={cx(styles.positioner, positionerClass)}>
 						{arrow && (
-							<MenuArrow>
-								<MenuArrowTip />
-							</MenuArrow>
+							<DropdownArrow>
+								<DropdownArrowTip />
+							</DropdownArrow>
 						)}
 						<Content class={cx(styles.content, contentClass)}>
-							{items.map((item, index) => renderMenuItem(item, index))}
+							{items.map((item, index) => renderDropdownItem(item, index))}
 						</Content>
 					</Positioner>
 				)}
-			</InteractiveMenuRoot>
+			</InteractiveDropdownRoot>
 		);
 	}
 
@@ -244,12 +244,12 @@ function MenuRoot(props: MenuProps) {
 			{items && (
 				<Positioner class={cx(styles.positioner, positionerClass)}>
 					{arrow && (
-						<MenuArrow>
-							<MenuArrowTip />
-						</MenuArrow>
+						<DropdownArrow>
+							<DropdownArrowTip />
+						</DropdownArrow>
 					)}
 					<Content class={cx(styles.content, contentClass)}>
-						{items.map((item, index) => renderMenuItem(item, index))}
+						{items.map((item, index) => renderDropdownItem(item, index))}
 					</Content>
 				</Positioner>
 			)}
@@ -259,8 +259,8 @@ function MenuRoot(props: MenuProps) {
 
 // ============= Exports =============
 
-export const Menu = Object.assign(MenuRoot, {
-	Root: MenuRoot,
+export const Dropdown = Object.assign(DropdownRoot, {
+	Root: DropdownRoot,
 	Trigger: Trigger,
 	Positioner: Positioner,
 	Content: Content,
@@ -271,20 +271,20 @@ export const Menu = Object.assign(MenuRoot, {
 	ItemIndicator: ItemIndicator,
 	ItemGroupLabel: ItemGroupLabel,
 	RadioItemGroup: RadioItemGroup,
-	Arrow: MenuArrow,
-	ArrowTip: MenuArrowTip,
+	Arrow: DropdownArrow,
+	ArrowTip: DropdownArrowTip,
 });
 
 export {
-	type BaseMenuItem,
-	Menu as default,
-	type MenuCheckboxItem,
-	type MenuItem,
-	type MenuItemItem,
-	type MenuItemType,
-	type MenuProps,
-	type MenuRadioGroupItem,
-	type MenuRadioItem,
-	type MenuSeparatorItem,
-	type MenuSubmenuItem,
+	type BaseDropdownItem,
+	Dropdown as default,
+	type DropdownCheckboxItem,
+	type DropdownItem,
+	type DropdownItemItem,
+	type DropdownItemType,
+	type DropdownProps,
+	type DropdownRadioGroupItem,
+	type DropdownRadioItem,
+	type DropdownSeparatorItem,
+	type DropdownSubmenuItem,
 };

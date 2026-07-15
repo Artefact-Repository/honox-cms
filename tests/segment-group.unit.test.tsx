@@ -2,7 +2,7 @@ import { expect, test, describe } from "bun:test";
 import { SegmentGroup } from "../app/components/ui/segment-group";
 
 describe("SegmentGroup Unit Tests", () => {
-	test("should render correctly with flattened API", () => {
+	test("should render correctly", () => {
 		const html = (
 			<SegmentGroup
 				defaultValue="react"

@@ -1,5 +1,11 @@
 import { describe, expect, it } from "bun:test";
 import { ColorPicker } from "../app/components/ui/color-picker";
+import {
+	hslToHsv,
+	hsvToHsl,
+	hsvaToHslaString,
+	parseColor,
+} from "../app/components/ui/color-picker-primitive";
 
 describe("ColorPicker component", () => {
 	it("should render a static color picker under SSR correctly with expected parts", async () => {
@@ -37,6 +43,42 @@ describe("ColorPicker component", () => {
 		expect(htmlString).toContain('data-part="channel-input"');
 		expect(htmlString).toContain('data-channel="hex"');
 		expect(htmlString).toContain('value="#00ff00"');
+	});
+
+	it("should emit real HSL values in hsla strings", () => {
+		// Pure red: HSV (0, 100, 100) ↔ HSL (0, 100%, 50%)
+		expect(hsvaToHslaString({ h: 0, s: 100, v: 100, a: 1 })).toBe(
+			"hsla(0, 100%, 50%, 1)",
+		);
+		// White: HSV (0, 0, 100) ↔ HSL (0, 0%, 100%)
+		expect(hsvaToHslaString({ h: 0, s: 0, v: 100, a: 0.5 })).toBe(
+			"hsla(0, 0%, 100%, 0.5)",
+		);
+	});
+
+	it("should round-trip HSV ↔ HSL", () => {
+		for (const [h, s, v] of [
+			[210, 80, 60],
+			[0, 100, 100],
+			[120, 0, 50],
+			[300, 45, 90],
+		]) {
+			const hsl = hsvToHsl(h, s, v);
+			const back = hslToHsv(hsl.h, hsl.s, hsl.l);
+			expect(Math.abs(back.s - s)).toBeLessThanOrEqual(1);
+			expect(Math.abs(back.v - v)).toBeLessThanOrEqual(1);
+		}
+	});
+
+	it("should parse css colour strings into HSVA", () => {
+		expect(parseColor("#ff0000")).toEqual({ h: 0, s: 100, v: 100, a: 1 });
+		expect(parseColor("rgb(0, 255, 0)")).toEqual({
+			h: 120,
+			s: 100,
+			v: 100,
+			a: 1,
+		});
+		expect(parseColor("hsl(240, 100%, 50%)").h).toBe(240);
 	});
 
 	it("should render label when provided", async () => {

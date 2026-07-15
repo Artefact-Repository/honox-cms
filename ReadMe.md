@@ -66,7 +66,7 @@ We support a full collection of over **25+ rich presentational and interactive c
 * **UI Elements:** `Button` (Variant/Palette/Size), `Badge` (Variant/Palette/Size), `Alert` (Status/Variant), `Card` (Variant/Size/Clickable)
 * **Form & Controls:** `Checkbox`, `Combobox` (Items list/Clear trigger), `Field`, `RadioGroup`, `SegmentGroup`, `Slider`, `Switch`
 * **Feedback & Loaders:** `Progress` (Linear/Circular), `Skeleton` (NoOfLines/Circle), `Spinner`
-* **Overlays & Dialogs:** `Collapsible` (Trigger/Open), `Popover` (ShowArrow/Closable), `Dialog` (Cancel/Confirm/Closable), `Drawer` (Cancel/Confirm/Closable), `Menu` (Nestable item action list)
+* **Overlays & Dialogs:** `Collapsible` (Trigger/Open), `Popover` (ShowArrow/Closable), `Dialog` (Cancel/Confirm/Closable), `Drawer` (Cancel/Confirm/Closable), `Dropdown` (Nestable item action list)
 * **Tables & Data:** `PaginatedTable`, `Pagination`
 
 ### Multi-Level Nested Recursion

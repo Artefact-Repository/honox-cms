@@ -20,8 +20,6 @@ Groups related form controls and provides a legend.
 
 # Usage
 
-## Flattened API
-
 ```tsx
 import { Fieldset, Field } from "../components/ui";
 

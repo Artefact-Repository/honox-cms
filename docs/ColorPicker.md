@@ -1,0 +1,131 @@
+# ColorPicker
+
+# Introduction
+
+A colour picker with a saturation/brightness area, hue and alpha sliders, editable channel inputs (HEX / RGBA / HSLA), preset swatches, and an optional swatch trigger that opens the panel in a popover. It follows the Ark UI / Park UI colour-picker anatomy — every part carries `data-scope="colorPicker"` and a matching `data-part` — but is implemented entirely on Hono JSX and Panda CSS, with **no React and no `@ark-ui/react` dependency**.
+
+The component is split the same way as the rest of the library:
+
+- `app/components/ui/color-picker-primitive.tsx` — colour math, context, and every anatomical part, all server-renderable.
+- `app/islands/color-picker.tsx` — thin island wrapper around `InteractiveColorPicker`, which owns state and attaches pointer/keyboard handlers.
+- `app/theme/recipes/color-picker.ts` — the Panda CSS slot recipe.
+
+Colours are held internally as **HSVA** (`{ h: 0–360, s: 0–100, v: 0–100, a: 0–1 }`), the natural model for a saturation/brightness area, and converted at the edges.
+
+# What's new in this revision
+
+- **HSLA output is real HSL.** `hsvaToHslaString` previously stamped raw HSV saturation/value numbers into an `hsla()` string, producing a different colour than the one selected (e.g. pure red rendered as `hsla(0, 100%, 100%, 1)` — white). It now converts HSV → HSL properly (`hsla(0, 100%, 50%, 1)`).
+- **The HSLA input row edits true HSL channels.** The saturation/lightness inputs used to display HSV values under HSL labels; edits and displayed values now agree, and a dedicated `l` channel maps lightness edits back into the HSV model.
+- **Invalid hex input is rejected instead of committed.** Typing garbage into the hex field previously fell back to white and emitted it as a value change. The field now validates `#RGB`, `#RGBA`, `#RRGGBB`, and `#RRGGBBAA` (with or without the leading `#`) and ignores anything else.
+- **Format select is labelled** for assistive technology.
+
+# Props
+
+`<ColorPicker />` (the styled wrapper) accepts:
+
+| Prop | Type | Description |
+| :--- | :--- | :--- |
+| `value` | `string \| HSVA` | Current colour (controlled). Strings accept hex (`#rgb`, `#rgba`, `#rrggbb`, `#rrggbbaa`), `rgb()`/`rgba()`, and `hsl()`/`hsla()`. |
+| `defaultValue` | `string \| HSVA` | Initial colour (uncontrolled). Defaults to `#7c3aed`. |
+| `format` | `"hex" \| "rgba" \| "hsla"` | Active input format (controlled). |
+| `defaultFormat` | `"hex" \| "rgba" \| "hsla"` | Initial input format (uncontrolled). Defaults to `"hex"`. |
+| `onValueChange` | `(details: { value: string; hsva: HSVA }) => void` | Called on every colour change; `value` is the hex string (with alpha suffix when translucent). |
+| `onFormatChange` | `(details: { format: ColorFormat }) => void` | Called when the format select changes. |
+| `trigger` | `boolean` | Render a swatch trigger that opens the panel in a popover instead of inline. |
+| `open` / `defaultOpen` | `boolean` | Popover state (controlled / uncontrolled); only meaningful with `trigger`. |
+| `onOpenChange` | `(details: { open: boolean }) => void` | Called when the popover opens or closes. |
+| `closeOnSelect` | `boolean` | Close the popover after picking a preset swatch. Defaults to `false`. |
+| `presets` | `string[]` | Preset swatch colours. Defaults to a curated 14-colour palette; pass `[]` to hide. |
+| `name` | `string` | Renders a hidden input carrying the hex value for native `<form>` submission. |
+| `label` | `string \| JSX.Element` | Optional label rendered above the picker. |
+| `showArea` / `showSliders` / `showInputs` / `showSwatches` | `boolean` | Toggle individual panel sections. All default to `true`. |
+| `disabled` | `boolean` | Disables all interaction. |
+| `readOnly` | `boolean` | Value is visible but cannot be changed. |
+| `size` | `"sm" \| "md" \| "lg"` | Recipe size variant (area height, swatch size, spacing). Defaults to `"md"`. |
+| `interactive` | `boolean` | Forces (or suppresses) hydration as an island. |
+
+## Hydration
+
+The wrapper auto-hydrates when a behavioural signal is present — any callback, a `value`/`defaultValue`, `open`/`defaultOpen`, or `trigger` — and renders static HTML otherwise. `interactive={false}` always opts out; `interactive` (or `interactive={true}`) always opts in. The decision routes through the shared `shouldHydrate()` helper, like every island in the library.
+
+## Colour utilities
+
+Exported from the primitive for reuse and testing:
+
+| Helper | Description |
+| :--- | :--- |
+| `parseColor(input)` | Parses hex/rgb(a)/hsl(a) strings, HSVA-ish or RGB-ish objects into a clamped `HSVA`. Falls back to white. |
+| `hsvToRgb(h, s, v)` / `rgbToHsv(r, g, b)` | HSV ↔ RGB conversion. |
+| `hsvToHsl(h, s, v)` / `hslToHsv(h, s, l)` | HSV ↔ HSL conversion (s/v/l as 0–100). |
+| `hexToRgb(hex)` | Parses 3/4/6/8-digit hex into `{ r, g, b, a }`, or `null` when malformed. |
+| `hsvaToHex(c, includeAlpha?)` | Hex string; appends the alpha byte only when requested and translucent. |
+| `hsvaToRgbaString(c)` / `hsvaToHslaString(c)` | CSS `rgba()` / `hsla()` strings. |
+
+# Keyboard support
+
+The area and both sliders are focusable (`Tab`) and keyboard-operable:
+
+| Key | Area | Hue slider | Alpha slider |
+| :--- | :--- | :--- | :--- |
+| <kbd>←</kbd> / <kbd>→</kbd> | Saturation ±1 | Hue ±1° | Alpha ±1% |
+| <kbd>↑</kbd> / <kbd>↓</kbd> | Brightness ±1 | — | — |
+| <kbd>Shift</kbd> + arrows | ±10 steps | ±10° | ±10% |
+| <kbd>Home</kbd> / <kbd>End</kbd> | Min / max corner | 0° / 360° | 0% / 100% |
+
+With `trigger`, <kbd>Esc</kbd> and outside clicks close the popover.
+
+# Accessibility
+
+- The area and channel sliders expose `role="slider"` with `aria-valuemin`/`aria-valuemax`/`aria-valuenow` (the area additionally reports both channels through `aria-valuetext`).
+- Channel inputs, the format select, preset swatches, and the eye-dropper trigger all carry `aria-label`s; the active preset swatch is announced via `aria-pressed`.
+- `disabled` and `readOnly` remove the interactive tab stops and disable the swatch buttons; state is mirrored to `data-disabled` / `data-readonly` on every part.
+- The eye-dropper button renders disabled where the `EyeDropper` API is unavailable, so it is never a dead control.
+
+# Styling slots
+
+The Panda CSS slot recipe (`app/theme/recipes/color-picker.ts`) styles the parts listed under Anatomy. States are driven by data attributes (`data-disabled`, `data-readonly`, `data-state="checked"` on the active swatch, `data-channel` on slider parts), so custom skins can target them without touching the recipe. The `size` variant scales the area, swatches, and spacing.
+
+# Usage
+
+```tsx
+import { ColorPicker } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <>
+      {/* Inline picker, static SSR (no signal, no island) */}
+      <ColorPicker interactive={false} />
+
+      {/* Interactive inline picker */}
+      <ColorPicker
+        label="Brand colour"
+        defaultValue="#3b82f6"
+        onValueChange={({ value }) => console.log(value)}
+      />
+
+      {/* Swatch trigger + popover, custom presets */}
+      <ColorPicker
+        trigger
+        label="Accent"
+        defaultValue="#22c55e"
+        presets={["#ef4444", "#f97316", "#22c55e", "#3b82f6"]}
+        closeOnSelect
+      />
+
+      {/* Inside a native form — submits as `theme` (hex) */}
+      <form method="post" action="/settings">
+        <ColorPicker name="theme" defaultValue="#7c3aed" />
+        <button type="submit">Save</button>
+      </form>
+    </>
+  );
+}
+```
+
+# Production notes
+
+- **No new dependencies.** All colour math (HSV/HSL/RGB/hex conversions, parsing) is implemented locally and unit-tested; nothing is pulled from `@rc-component`, `@ark-ui`, or React.
+- **SSR-safe.** Every part renders meaningful markup on the server — the static variant is a faithful, non-interactive preview of the exact same DOM the island hydrates.
+- **Controlled or uncontrolled.** `value`/`format`/`open` each support both modes with the usual `default*` counterparts.
+- **Precision.** Assign `HSVA` objects (from `onValueChange`'s `details.hsva`) rather than re-parsed strings in controlled scenarios to avoid round-trip rounding drift between formats.
+- **Form-ready.** The `name` prop renders a hidden input with the current hex value, kept in sync on every change.

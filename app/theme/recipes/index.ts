@@ -23,7 +23,7 @@ import { heading } from "./heading";
 import { hoverCard } from "./hover-card";
 import { input } from "./input";
 import { link } from "./link";
-import { menu } from "./menu";
+import { dropdown } from "./dropdown";
 import { pagination } from "./pagination";
 import { popover } from "./popover";
 import { progress } from "./progress";
@@ -81,7 +81,7 @@ export const slotRecipes = {
 	field,
 	fieldset,
 	hoverCard,
-	menu,
+	dropdown,
 	popover,
 	progress,
 	slider,

@@ -1,17 +1,17 @@
 import { expect, test, describe } from "bun:test";
-import { Menu } from "../app/components/ui/menu";
+import { Dropdown } from "../app/components/ui/dropdown";
 
-describe("Menu Unit Tests", () => {
+describe("Dropdown Unit Tests", () => {
 	test("should render correctly", () => {
 		const html = (
-			<Menu.Root interactive={false}>
-				<Menu.Trigger>Open</Menu.Trigger>
-				<Menu.Positioner>
-					<Menu.Content>
-						<Menu.Item value="item-1">Item 1</Menu.Item>
-					</Menu.Content>
-				</Menu.Positioner>
-			</Menu.Root>
+			<Dropdown.Root interactive={false}>
+				<Dropdown.Trigger>Open</Dropdown.Trigger>
+				<Dropdown.Positioner>
+					<Dropdown.Content>
+						<Dropdown.Item value="item-1">Item 1</Dropdown.Item>
+					</Dropdown.Content>
+				</Dropdown.Positioner>
+			</Dropdown.Root>
 		).toString();
 
 		expect(html).toContain('data-part="trigger"');
@@ -21,16 +21,16 @@ describe("Menu Unit Tests", () => {
 
 	test("should render items correctly", () => {
 		const html = (
-			<Menu.Root interactive={false}>
-				<Menu.Positioner>
-					<Menu.Content>
-						<Menu.Item value="item-1">Item 1</Menu.Item>
-						<Menu.CheckboxItem value="item-2" checked>
+			<Dropdown.Root interactive={false}>
+				<Dropdown.Positioner>
+					<Dropdown.Content>
+						<Dropdown.Item value="item-1">Item 1</Dropdown.Item>
+						<Dropdown.CheckboxItem value="item-2" checked>
 							Item 2
-						</Menu.CheckboxItem>
-					</Menu.Content>
-				</Menu.Positioner>
-			</Menu.Root>
+						</Dropdown.CheckboxItem>
+					</Dropdown.Content>
+				</Dropdown.Positioner>
+			</Dropdown.Root>
 		).toString();
 
 		expect(html).toContain('role="menuitem"');
@@ -41,7 +41,7 @@ describe("Menu Unit Tests", () => {
 
 	test("should degrade submenu to a disabled item (no debug leak)", () => {
 		const html = (
-			<Menu.Root
+			<Dropdown.Root
 				interactive={false}
 				items={[{ type: "submenu", label: "More", items: [] }]}
 			/>
@@ -55,7 +55,7 @@ describe("Menu Unit Tests", () => {
 
 	test("should render arrow and arrow tip when arrow is true", () => {
 		const html = (
-			<Menu.Root
+			<Dropdown.Root
 				interactive={false}
 				arrow={true}
 				items={[{ type: "item", label: "Item 1", value: "item-1" }]}
@@ -68,7 +68,7 @@ describe("Menu Unit Tests", () => {
 
 	test("should support placement and triggerMode attributes", () => {
 		const html = (
-			<Menu.Root
+			<Dropdown.Root
 				interactive={true}
 				trigger={<button>Open</button>}
 				placement="bottomRight"

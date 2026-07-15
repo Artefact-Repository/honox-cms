@@ -113,6 +113,24 @@ export function hexToRgb(hex: string) {
 	return { r, g, b, a };
 }
 
+/** HSV → HSL. Input s/v are 0-100; output s/l are 0-100. */
+export function hsvToHsl(h: number, s: number, v: number) {
+	const sv = s / 100;
+	const vv = v / 100;
+	const l = vv * (1 - sv / 2);
+	const sl = l === 0 || l === 1 ? 0 : (vv - l) / Math.min(l, 1 - l);
+	return { h, s: Math.round(sl * 100), l: Math.round(l * 100) };
+}
+
+/** HSL → HSV. Input s/l are 0-100; output s/v are 0-100. */
+export function hslToHsv(h: number, s: number, l: number) {
+	const sl = s / 100;
+	const ll = l / 100;
+	const v = ll + sl * Math.min(ll, 1 - ll);
+	const sv = v === 0 ? 0 : 2 * (1 - ll / v);
+	return { h, s: Math.round(sv * 100), v: Math.round(v * 100) };
+}
+
 function hslToRgb(h: number, s: number, l: number) {
 	const sat = s / 100;
 	const lig = l / 100;
@@ -221,9 +239,9 @@ export function hsvaToRgbaString(c: HSVA) {
 }
 
 export function hsvaToHslaString(c: HSVA) {
-	return `hsla(${Math.round(c.h)}, ${Math.round(c.s)}%, ${Math.round(
-		c.v,
-	)}%, ${Number(c.a.toFixed(3))})`;
+	// The internal model is HSV; convert so the emitted string is real HSL.
+	const { h, s, l } = hsvToHsl(c.h, c.s, c.v);
+	return `hsla(${Math.round(h)}, ${s}%, ${l}%, ${Number(c.a.toFixed(3))})`;
 }
 
 export const hueGradient =
@@ -764,7 +782,7 @@ export function View(
 }
 
 export function ChannelInput(props: {
-	channel: "hex" | "r" | "g" | "b" | "a" | "h" | "s" | "v";
+	channel: "hex" | "r" | "g" | "b" | "a" | "h" | "s" | "l" | "v";
 	value: string;
 	class?: string;
 	readOnly?: boolean;
@@ -799,6 +817,7 @@ export function FormatSelect(props: {
 	return (
 		<select
 			data-part="format-select"
+			aria-label="Colour format"
 			class={cx(ctx?.styles.formatSelect, classProp)}
 			style={style as Record<string, string>}
 			{...rest}
@@ -959,6 +978,7 @@ export function ColorPickerContent(props: ColorPickerContentProps) {
 	const inputsReadOnly = !interactive || disabled || readOnly;
 
 	const rgb = hsvToRgb(value.h, value.s, value.v);
+	const hsl = hsvToHsl(value.h, value.s, value.v);
 	const hex = hsvaToHex(value, value.a < 1);
 	const rowStyle: Record<string, string> = {
 		display: "flex",
@@ -1047,13 +1067,13 @@ export function ColorPickerContent(props: ColorPickerContentProps) {
 							/>
 							<ChannelInput
 								channel="s"
-								value={String(Math.round(value.s))}
+								value={String(hsl.s)}
 								readOnly={inputsReadOnly}
 								aria-label="Saturation"
 							/>
 							<ChannelInput
-								channel="v"
-								value={String(Math.round(value.v))}
+								channel="l"
+								value={String(hsl.l)}
 								readOnly={inputsReadOnly}
 								aria-label="Lightness"
 							/>
@@ -1385,8 +1405,12 @@ export function InteractiveColorPicker(props: InteractiveColorPickerProps) {
 			const raw = target.value.trim();
 			const cur = colorRef.current;
 			if (channel === "hex") {
-				const parsed = parseColor(raw);
-				if (hsvaToHex(parsed) !== "#000000" || raw === "#000000") emit(parsed);
+				// Validate before parsing — parseColor falls back to white for
+				// garbage input, which must not be committed as a colour change.
+				const normalized = raw.startsWith("#") ? raw : `#${raw}`;
+				if (/^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(normalized)) {
+					emit(parseColor(normalized));
+				}
 				return;
 			}
 			const num = Number(raw);
@@ -1411,7 +1435,19 @@ export function InteractiveColorPicker(props: InteractiveColorPickerProps) {
 			} else if (channel === "h") {
 				emit({ ...cur, h: clamp(num, 0, 360) });
 			} else if (channel === "s") {
-				emit({ ...cur, s: clamp(num, 0, 100) });
+				// In the hsla view "s" is HSL saturation; route through HSL so the
+				// displayed and edited values agree.
+				if (formatRef.current === "hsla") {
+					const hsl = hsvToHsl(cur.h, cur.s, cur.v);
+					const next = hslToHsv(cur.h, clamp(num, 0, 100), hsl.l);
+					emit({ ...cur, s: next.s, v: next.v });
+				} else {
+					emit({ ...cur, s: clamp(num, 0, 100) });
+				}
+			} else if (channel === "l") {
+				const hsl = hsvToHsl(cur.h, cur.s, cur.v);
+				const next = hslToHsv(cur.h, hsl.s, clamp(num, 0, 100));
+				emit({ ...cur, s: next.s, v: next.v });
 			} else if (channel === "v") {
 				emit({ ...cur, v: clamp(num, 0, 100) });
 			}

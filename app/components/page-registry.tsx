@@ -20,7 +20,7 @@ import {
 	Heading,
 	HoverCard,
 	Link,
-	Menu,
+	Dropdown,
 	PaginatedTable,
 	Pagination,
 	Popover,
@@ -49,6 +49,7 @@ const TYPE_ALIASES: Record<string, string> = {
 	"grid-col": "gridCol",
 	"grid-row": "grid",
 	"color-picker": "colorPicker",
+	menu: "dropdown",
 };
 
 function resolveType(type: string): string {
@@ -444,12 +445,14 @@ const registry: Record<string, BlockRenderer> = {
 		);
 	},
 
-	menu: (b) => {
+	dropdown: (b) => {
 		const { triggerText, items, ...rest } = propsOf(b);
 		const trigger = triggerText ? (
 			<Button variant="outline">{triggerText}</Button>
 		) : undefined;
-		return <Menu interactive trigger={trigger} items={items || []} {...rest} />;
+		return (
+			<Dropdown interactive trigger={trigger} items={items || []} {...rest} />
+		);
 	},
 
 	popover: (b) => {

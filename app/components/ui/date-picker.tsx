@@ -6,6 +6,7 @@ import {
 	DatePickerContext as Context,
 	DatePickerControl as Control,
 	type DatePickerRootProps,
+	DatePickerStructure,
 	daysInMonth,
 	fromJSDate,
 	DatePickerInput as Input,
@@ -39,6 +40,8 @@ import { shouldHydrate } from "./island-utils";
 
 export interface DatePickerProps extends DatePickerRootProps {
 	interactive?: boolean;
+	label?: string;
+	placeholder?: string;
 }
 
 export function DatePickerRoot(props: DatePickerProps) {
@@ -86,7 +89,38 @@ export function DatePickerRoot(props: DatePickerProps) {
 		);
 	}
 
-	return <RootPrimitive {...props} />;
+	// Static render. Mirror the island's default structure so a picker without
+	// explicit children still shows its anatomy (label, input, trigger, panel),
+	// and keep wrapper-only props off the DOM.
+	const {
+		children,
+		label,
+		placeholder,
+		selectionMode = "single",
+		...primitiveProps
+	} = rest;
+
+	return (
+		<RootPrimitive
+			{...primitiveProps}
+			selectionMode={selectionMode}
+			value={value}
+			defaultValue={defaultValue}
+			min={min}
+			max={max}
+			focusedValue={focusedValue}
+			defaultFocusedValue={defaultFocusedValue}
+			isDateUnavailable={isDateUnavailable}
+		>
+			{children ?? (
+				<DatePickerStructure
+					selectionMode={selectionMode}
+					label={label}
+					placeholder={placeholder}
+				/>
+			)}
+		</RootPrimitive>
+	);
 }
 
 export const DatePicker = Object.assign(DatePickerRoot, {

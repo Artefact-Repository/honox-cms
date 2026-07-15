@@ -8,6 +8,7 @@ export const globalCss = {
 		},
 		html: {
 			colorPalette: "gray",
+			colorScheme: { _light: "light", _dark: "dark" },
 		},
 		body: {
 			background: "canvas",

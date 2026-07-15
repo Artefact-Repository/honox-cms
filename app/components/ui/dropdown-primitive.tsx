@@ -1,5 +1,5 @@
 import { css, cx } from "design-system/css";
-import { type MenuVariantProps, menu } from "design-system/recipes";
+import { type DropdownVariantProps, dropdown } from "design-system/recipes";
 import {
 	cloneElement,
 	createContext,
@@ -8,36 +8,38 @@ import {
 	useId,
 } from "hono/jsx";
 
-type MenuStyles = ReturnType<typeof menu>;
+type DropdownStyles = ReturnType<typeof dropdown>;
 
-interface MenuContextValue {
+interface DropdownContextValue {
 	id: string;
 	open: boolean;
-	styles: MenuStyles;
+	styles: DropdownStyles;
 	onClose?: () => void;
-	parentMenuId?: string;
+	parentDropdownId?: string;
 }
 
-const MenuContext = createContext<MenuContextValue | null>(null);
+const DropdownContext = createContext<DropdownContextValue | null>(null);
 
-export const useMenuContext = () => {
-	const context = useContext(MenuContext);
+export const useDropdownContext = () => {
+	const context = useContext(DropdownContext);
 	if (!context) {
 		// During SSR, return a default context to avoid errors
 		if (typeof window === "undefined") {
 			return {
-				id: "ssr-menu",
+				id: "ssr-dropdown",
 				open: false,
-				styles: menu({}),
-				parentMenuId: undefined,
-			} as MenuContextValue;
+				styles: dropdown({}),
+				parentDropdownId: undefined,
+			} as DropdownContextValue;
 		}
-		throw new Error("useMenuContext must be used within a Menu.Root");
+		throw new Error("useDropdownContext must be used within a Dropdown.Root");
 	}
 	return context;
 };
 
-export interface MenuRootProps extends MenuVariantProps, PropsWithChildren {
+export interface DropdownRootProps
+	extends DropdownVariantProps,
+		PropsWithChildren {
 	id?: string;
 	open?: boolean;
 	onClose?: () => void;
@@ -47,52 +49,52 @@ export interface MenuRootProps extends MenuVariantProps, PropsWithChildren {
 	onSelect?: (value: string) => void;
 }
 
-interface MenuRadioGroupContextValue {
+interface DropdownRadioGroupContextValue {
 	value?: string;
 	onValueChange?: (details: { value: string }) => void;
 }
 
-const MenuRadioGroupContext = createContext<MenuRadioGroupContextValue | null>(
-	null,
-);
+const DropdownRadioGroupContext =
+	createContext<DropdownRadioGroupContextValue | null>(null);
 
-export const useMenuRadioGroupContext = () => useContext(MenuRadioGroupContext);
+export const useDropdownRadioGroupContext = () =>
+	useContext(DropdownRadioGroupContext);
 
-export function MenuRoot(props: MenuRootProps) {
-	const [variantProps, localProps] = menu.splitVariantProps(props);
+export function DropdownRoot(props: DropdownRootProps) {
+	const [variantProps, localProps] = dropdown.splitVariantProps(props);
 	const { id: idProp, open = false, children, onClose } = localProps;
 	const autoId = useId();
 	const id = idProp || autoId;
-	const styles = menu(variantProps);
+	const styles = dropdown(variantProps);
 
-	const parentContext = useContext(MenuContext);
+	const parentContext = useContext(DropdownContext);
 
 	return (
-		<MenuContext.Provider
-			value={{ id, open, styles, onClose, parentMenuId: parentContext?.id }}
+		<DropdownContext.Provider
+			value={{ id, open, styles, onClose, parentDropdownId: parentContext?.id }}
 		>
 			{children}
-		</MenuContext.Provider>
+		</DropdownContext.Provider>
 	);
 }
 
-export interface MenuTriggerProps extends PropsWithChildren {
+export interface DropdownTriggerProps extends PropsWithChildren {
 	class?: string;
 	asChild?: boolean;
 	[key: string]: unknown;
 }
 
-export function MenuTrigger(props: MenuTriggerProps) {
+export function DropdownTrigger(props: DropdownTriggerProps) {
 	const { children, class: classProp, asChild, ...restProps } = props;
-	const context = useMenuContext();
+	const context = useDropdownContext();
 
 	const triggerProps = {
-		id: `menu-trigger-${context.id}`,
+		id: `dropdown-trigger-${context.id}`,
 		"aria-haspopup": "menu",
 		"aria-expanded": context.open ? "true" : "false",
-		"aria-controls": `menu-content-${context.id}`,
+		"aria-controls": `dropdown-content-${context.id}`,
 		"data-state": context.open ? "open" : "closed",
-		"data-scope": "menu",
+		"data-scope": "dropdown",
 		"data-part": "trigger",
 		...restProps,
 	};
@@ -116,17 +118,17 @@ export function MenuTrigger(props: MenuTriggerProps) {
 	);
 }
 
-export function MenuContextTrigger(props: MenuTriggerProps) {
+export function DropdownContextTrigger(props: DropdownTriggerProps) {
 	const { children, class: classProp, asChild, ...restProps } = props;
-	const context = useMenuContext();
+	const context = useDropdownContext();
 
 	const triggerProps = {
-		id: `menu-trigger-${context.id}`,
+		id: `dropdown-trigger-${context.id}`,
 		"aria-haspopup": "menu",
 		"aria-expanded": context.open ? "true" : "false",
-		"aria-controls": `menu-content-${context.id}`,
+		"aria-controls": `dropdown-content-${context.id}`,
 		"data-state": context.open ? "open" : "closed",
-		"data-scope": "menu",
+		"data-scope": "dropdown",
 		"data-part": "context-trigger",
 		...restProps,
 	};
@@ -146,14 +148,14 @@ export function MenuContextTrigger(props: MenuTriggerProps) {
 	);
 }
 
-export interface MenuPositionerProps extends PropsWithChildren {
+export interface DropdownPositionerProps extends PropsWithChildren {
 	class?: string;
 	[key: string]: unknown;
 }
 
-export function MenuPositioner(props: MenuPositionerProps) {
+export function DropdownPositioner(props: DropdownPositionerProps) {
 	const { children, class: classProp, ...restProps } = props;
-	const context = useMenuContext();
+	const context = useDropdownContext();
 
 	return (
 		<div
@@ -163,7 +165,7 @@ export function MenuPositioner(props: MenuPositionerProps) {
 				!context.open && css({ display: "none" }),
 			)}
 			data-state={context.open ? "open" : "closed"}
-			data-scope="menu"
+			data-scope="dropdown"
 			data-part="positioner"
 			{...restProps}
 		>
@@ -172,24 +174,24 @@ export function MenuPositioner(props: MenuPositionerProps) {
 	);
 }
 
-export interface MenuContentProps extends PropsWithChildren {
+export interface DropdownContentProps extends PropsWithChildren {
 	class?: string;
 	[key: string]: unknown;
 }
 
-export function MenuContent(props: MenuContentProps) {
+export function DropdownContent(props: DropdownContentProps) {
 	const { children, class: classProp, ...restProps } = props;
-	const context = useMenuContext();
+	const context = useDropdownContext();
 
 	return (
 		<div
-			id={`menu-content-${context.id}`}
+			id={`dropdown-content-${context.id}`}
 			role="menu"
-			aria-labelledby={`menu-trigger-${context.id}`}
+			aria-labelledby={`dropdown-trigger-${context.id}`}
 			class={cx(context.styles.content, classProp)}
 			data-state={context.open ? "open" : "closed"}
 			tabIndex={-1}
-			data-scope="menu"
+			data-scope="dropdown"
 			data-part="content"
 			{...restProps}
 		>
@@ -198,7 +200,7 @@ export function MenuContent(props: MenuContentProps) {
 	);
 }
 
-export interface MenuItemProps extends PropsWithChildren {
+export interface DropdownItemProps extends PropsWithChildren {
 	id?: string;
 	disabled?: boolean;
 	class?: string;
@@ -207,7 +209,7 @@ export interface MenuItemProps extends PropsWithChildren {
 	[key: string]: unknown;
 }
 
-export function MenuItem(props: MenuItemProps) {
+export function DropdownItem(props: DropdownItemProps) {
 	const {
 		children,
 		id,
@@ -217,12 +219,12 @@ export function MenuItem(props: MenuItemProps) {
 		asChild,
 		...restProps
 	} = props;
-	const context = useMenuContext();
+	const context = useDropdownContext();
 
 	const itemProps = {
 		id,
 		role: "menuitem",
-		"data-scope": "menu",
+		"data-scope": "dropdown",
 		"data-part": "item",
 		"data-disabled": disabled ? "" : undefined,
 		"data-value": value,
@@ -246,19 +248,19 @@ export function MenuItem(props: MenuItemProps) {
 	);
 }
 
-export function MenuTriggerItem(props: MenuItemProps) {
+export function DropdownTriggerItem(props: DropdownItemProps) {
 	const { children, disabled, class: classProp, asChild, ...restProps } = props;
-	const context = useMenuContext();
+	const context = useDropdownContext();
 
 	const itemProps = {
-		id: `menu-trigger-${context.id}`,
+		id: `dropdown-trigger-${context.id}`,
 		role: "menuitem",
 		"aria-haspopup": "menu",
 		"aria-expanded": context.open ? "true" : "false",
-		"aria-controls": `menu-content-${context.id}`,
+		"aria-controls": `dropdown-content-${context.id}`,
 		"aria-disabled": disabled ? "true" : undefined,
 		"data-state": context.open ? "open" : "closed",
-		"data-scope": "menu",
+		"data-scope": "dropdown",
 		"data-part": "trigger-item",
 		"data-disabled": disabled ? "" : undefined,
 		tabIndex: -1,
@@ -302,15 +304,15 @@ export function MenuTriggerItem(props: MenuItemProps) {
 	);
 }
 
-export interface MenuItemGroupProps extends PropsWithChildren {
+export interface DropdownItemGroupProps extends PropsWithChildren {
 	id?: string;
 	class?: string;
 	[key: string]: unknown;
 }
 
-export function MenuItemGroup(props: MenuItemGroupProps) {
+export function DropdownItemGroup(props: DropdownItemGroupProps) {
 	const { children, id, class: classProp, ...restProps } = props;
-	const context = useMenuContext();
+	const context = useDropdownContext();
 
 	return (
 		<fieldset
@@ -324,15 +326,15 @@ export function MenuItemGroup(props: MenuItemGroupProps) {
 	);
 }
 
-export interface MenuItemGroupLabelProps extends PropsWithChildren {
+export interface DropdownItemGroupLabelProps extends PropsWithChildren {
 	htmlFor?: string;
 	class?: string;
 	[key: string]: unknown;
 }
 
-export function MenuItemGroupLabel(props: MenuItemGroupLabelProps) {
+export function DropdownItemGroupLabel(props: DropdownItemGroupLabelProps) {
 	const { children, htmlFor, class: classProp, ...restProps } = props;
-	const context = useMenuContext();
+	const context = useDropdownContext();
 
 	return (
 		<div
@@ -345,14 +347,14 @@ export function MenuItemGroupLabel(props: MenuItemGroupLabelProps) {
 	);
 }
 
-export interface MenuItemTextProps extends PropsWithChildren {
+export interface DropdownItemTextProps extends PropsWithChildren {
 	class?: string;
 	[key: string]: unknown;
 }
 
-export function MenuItemText(props: MenuItemTextProps) {
+export function DropdownItemText(props: DropdownItemTextProps) {
 	const { children, class: classProp, ...restProps } = props;
-	const context = useMenuContext();
+	const context = useDropdownContext();
 
 	return (
 		<div
@@ -365,14 +367,14 @@ export function MenuItemText(props: MenuItemTextProps) {
 	);
 }
 
-export interface MenuSeparatorProps {
+export interface DropdownSeparatorProps {
 	class?: string;
 	[key: string]: unknown;
 }
 
-export function MenuSeparator(props: MenuSeparatorProps) {
+export function DropdownSeparator(props: DropdownSeparatorProps) {
 	const { class: classProp, ...restProps } = props;
-	const context = useMenuContext();
+	const context = useDropdownContext();
 
 	return (
 		<hr
@@ -383,14 +385,14 @@ export function MenuSeparator(props: MenuSeparatorProps) {
 	);
 }
 
-export interface MenuIndicatorProps extends PropsWithChildren {
+export interface DropdownIndicatorProps extends PropsWithChildren {
 	class?: string;
 	[key: string]: unknown;
 }
 
-export function MenuIndicator(props: MenuIndicatorProps) {
+export function DropdownIndicator(props: DropdownIndicatorProps) {
 	const { children, class: classProp, ...restProps } = props;
-	const context = useMenuContext();
+	const context = useDropdownContext();
 
 	return (
 		<div
@@ -403,11 +405,11 @@ export function MenuIndicator(props: MenuIndicatorProps) {
 	);
 }
 
-export interface MenuCheckboxItemProps extends MenuItemProps {
+export interface DropdownCheckboxItemProps extends DropdownItemProps {
 	checked?: boolean;
 }
 
-export function MenuCheckboxItem(props: MenuCheckboxItemProps) {
+export function DropdownCheckboxItem(props: DropdownCheckboxItemProps) {
 	const {
 		children,
 		checked,
@@ -416,7 +418,7 @@ export function MenuCheckboxItem(props: MenuCheckboxItemProps) {
 		class: classProp,
 		...restProps
 	} = props;
-	const context = useMenuContext();
+	const context = useDropdownContext();
 
 	return (
 		<div
@@ -424,7 +426,7 @@ export function MenuCheckboxItem(props: MenuCheckboxItemProps) {
 			aria-checked={checked ? "true" : "false"}
 			aria-disabled={disabled ? "true" : undefined}
 			data-state={checked ? "checked" : "unchecked"}
-			data-scope="menu"
+			data-scope="dropdown"
 			data-part="item"
 			data-value={value}
 			data-disabled={disabled ? "" : undefined}
@@ -437,26 +439,26 @@ export function MenuCheckboxItem(props: MenuCheckboxItemProps) {
 	);
 }
 
-export interface MenuRadioItemGroupProps extends MenuItemGroupProps {
+export interface DropdownRadioItemGroupProps extends DropdownItemGroupProps {
 	value?: string;
 	onValueChange?: (details: { value: string }) => void;
 }
 
-export function MenuRadioItemGroup(props: MenuRadioItemGroupProps) {
+export function DropdownRadioItemGroup(props: DropdownRadioItemGroupProps) {
 	const { children, value, onValueChange, ...restProps } = props;
 	return (
-		<MenuRadioGroupContext.Provider value={{ value, onValueChange }}>
-			<MenuItemGroup {...restProps}>{children}</MenuItemGroup>
-		</MenuRadioGroupContext.Provider>
+		<DropdownRadioGroupContext.Provider value={{ value, onValueChange }}>
+			<DropdownItemGroup {...restProps}>{children}</DropdownItemGroup>
+		</DropdownRadioGroupContext.Provider>
 	);
 }
 
-export interface MenuRadioItemProps extends MenuItemProps {
+export interface DropdownRadioItemProps extends DropdownItemProps {
 	value: string;
 	checked?: boolean;
 }
 
-export function MenuRadioItem(props: MenuRadioItemProps) {
+export function DropdownRadioItem(props: DropdownRadioItemProps) {
 	const {
 		children,
 		value,
@@ -465,8 +467,8 @@ export function MenuRadioItem(props: MenuRadioItemProps) {
 		class: classProp,
 		...restProps
 	} = props;
-	const context = useMenuContext();
-	const radioGroup = useMenuRadioGroupContext();
+	const context = useDropdownContext();
+	const radioGroup = useDropdownRadioGroupContext();
 	const isChecked = checked ?? radioGroup?.value === value;
 
 	return (
@@ -475,7 +477,7 @@ export function MenuRadioItem(props: MenuRadioItemProps) {
 			aria-checked={isChecked ? "true" : "false"}
 			aria-disabled={disabled ? "true" : undefined}
 			data-state={isChecked ? "checked" : "unchecked"}
-			data-scope="menu"
+			data-scope="dropdown"
 			data-part="item"
 			data-value={value}
 			data-disabled={disabled ? "" : undefined}
@@ -488,19 +490,19 @@ export function MenuRadioItem(props: MenuRadioItemProps) {
 	);
 }
 
-export interface MenuItemIndicatorProps extends PropsWithChildren {
+export interface DropdownItemIndicatorProps extends PropsWithChildren {
 	class?: string;
 	checked?: boolean;
 	[key: string]: unknown;
 }
 
-export function MenuItemIndicator(props: MenuItemIndicatorProps) {
+export function DropdownItemIndicator(props: DropdownItemIndicatorProps) {
 	const { children, checked, class: classProp, ...restProps } = props;
-	const context = useMenuContext();
+	const context = useDropdownContext();
 
 	return (
 		<div
-			data-scope="menu"
+			data-scope="dropdown"
 			data-part="item-indicator"
 			data-state={
 				checked === undefined ? undefined : checked ? "checked" : "unchecked"
@@ -513,13 +515,13 @@ export function MenuItemIndicator(props: MenuItemIndicatorProps) {
 	);
 }
 
-export function MenuArrow(props: PropsWithChildren<{ class?: string }>) {
+export function DropdownArrow(props: PropsWithChildren<{ class?: string }>) {
 	const { children, class: classProp, ...restProps } = props;
-	const context = useMenuContext();
+	const context = useDropdownContext();
 	return (
 		<div
 			class={cx(context.styles.arrow, classProp)}
-			data-scope="menu"
+			data-scope="dropdown"
 			data-part="arrow"
 			{...restProps}
 		>
@@ -528,17 +530,17 @@ export function MenuArrow(props: PropsWithChildren<{ class?: string }>) {
 	);
 }
 
-export function MenuArrowTip(props: { class?: string }) {
+export function DropdownArrowTip(props: { class?: string }) {
 	const { class: classProp, ...restProps } = props;
-	const context = useMenuContext();
+	const context = useDropdownContext();
 	return (
 		<div
 			class={cx(context.styles.arrowTip, classProp)}
-			data-scope="menu"
+			data-scope="dropdown"
 			data-part="arrow-tip"
 			{...restProps}
 		/>
 	);
 }
 
-export { MenuContext as Context };
+export { DropdownContext as Context };

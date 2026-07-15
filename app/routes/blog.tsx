@@ -5,8 +5,8 @@ import {
 	Badge,
 	Button,
 	Card,
-	Drawer,
 	Heading,
+	Popover,
 	Search,
 	Stack,
 	Text,
@@ -39,141 +39,6 @@ export default createRoute(async (c) => {
 		>
 			<title>Blog - Artefact</title>
 
-			{/* Decorative background element */}
-			<div
-				class={css({
-					position: "fixed",
-					top: "0",
-					left: "0",
-					right: "0",
-					height: "500px",
-					bgGradient: "to-b",
-					gradientFrom: "blue.3",
-					gradientTo: "transparent",
-					opacity: "0.5",
-					pointerEvents: "none",
-					zIndex: "-1",
-				})}
-			/>
-
-			{/* Header Section */}
-			<header
-				class={css({ textAlign: "center", mb: "12", position: "relative" })}
-			>
-				{/* Decorative dots pattern */}
-				<div
-					class={css({
-						position: "absolute",
-						top: "-40px",
-						left: "50%",
-						transform: "translateX(-50%)",
-						width: "200px",
-						height: "200px",
-						opacity: "0.1",
-						backgroundImage:
-							"radial-gradient(circle, blue.9 1px, transparent 1px)",
-						backgroundSize: "20px 20px",
-						pointerEvents: "none",
-					})}
-				/>
-
-				<Badge
-					variant="subtle"
-					colorPalette="blue"
-					class={css({
-						mb: "4",
-						px: "4",
-						py: "1.5",
-						borderRadius: "full",
-						fontSize: "sm",
-						fontWeight: "medium",
-					})}
-				>
-					✍️ Latest Articles
-				</Badge>
-
-				<Heading
-					as="h1"
-					size={{ base: "3xl", md: "4xl", lg: "5xl" }}
-					class={css({
-						fontWeight: "extrabold",
-						mb: "4",
-						letterSpacing: "tight",
-						lineHeight: "tight",
-						bgGradient: "to-r",
-						gradientFrom: "blue.10",
-						gradientTo: "purple.10",
-						bgClip: "text",
-					})}
-				>
-					Blog
-				</Heading>
-
-				<Text
-					size={{ base: "md", md: "lg" }}
-					class={css({
-						color: "fg.muted",
-						maxWidth: "2xl",
-						mx: "auto",
-						lineHeight: "relaxed",
-						fontSize: { base: "md", md: "lg" },
-					})}
-				>
-					Thoughts on web development, design systems, and building better
-					developer experiences. Stay updated with the latest trends and best
-					practices.
-				</Text>
-
-				{/* Stats row */}
-				<Stack
-					gap={{ base: "6", md: "10" }}
-					justify="center"
-					wrap="wrap"
-					class={css({ mt: "8" })}
-				>
-					<div class={css({ textAlign: "center" })}>
-						<Text
-							size="2xl"
-							class={css({
-								fontWeight: "bold",
-								color: "blue.10",
-								display: "block",
-								lineHeight: "tight",
-							})}
-						>
-							{blogPosts.length}
-						</Text>
-						<Text size="sm" class={css({ color: "fg.muted" })}>
-							Articles
-						</Text>
-					</div>
-					<div
-						class={css({
-							w: "1px",
-							h: "auto",
-							bg: "border",
-							display: { base: "none", sm: "block" },
-						})}
-					/>
-					<div class={css({ textAlign: "center" })}>
-						<Text
-							size="2xl"
-							class={css({
-								fontWeight: "bold",
-								color: "purple.10",
-								display: "block",
-								lineHeight: "tight",
-							})}
-						>
-							{tags.length}
-						</Text>
-						<Text size="sm" class={css({ color: "fg.muted" })}>
-							Categories
-						</Text>
-					</div>
-				</Stack>
-			</header>
-
 			{/* Search + Tag Browse */}
 			<section class={css({ mb: "8" })}>
 				<Stack gap="4" align="flex-start" justify="space-between" wrap="wrap">
@@ -192,7 +57,7 @@ export default createRoute(async (c) => {
 					</div>
 
 					{/* Tag Browse Button */}
-					<Drawer
+					<Popover
 						interactive
 						trigger={
 							<Button

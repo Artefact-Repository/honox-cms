@@ -1,4 +1,4 @@
-import { css, cx } from "design-system/css";
+import { cx } from "design-system/css";
 import type { DatePickerVariantProps } from "design-system/recipes";
 import { datePicker } from "design-system/recipes";
 import {
@@ -178,6 +178,12 @@ export interface DatePickerRootProps
 	min?: CalendarDate | string | Date;
 	max?: CalendarDate | string | Date;
 	isDateUnavailable?: (date: CalendarDate, locale: string) => boolean;
+	/**
+	 * When set, a hidden input is rendered so the selected value(s) submit
+	 * with a native <form>. Each selected date becomes a separate entry under
+	 * the same name (single → one value, range/multiple → ordered values).
+	 */
+	name?: string;
 	onValueChange?: (details: { value: CalendarDate[] }) => void;
 	onOpenChange?: (details: { open: boolean }) => void;
 	class?: string;
@@ -218,6 +224,86 @@ const DEFAULT_WEEKDAYS = [
 	{ short: "Sa", narrow: "S", long: "Saturday" },
 ];
 
+const FALLBACK_MONTHS_SHORT = [
+	"Jan",
+	"Feb",
+	"Mar",
+	"Apr",
+	"May",
+	"Jun",
+	"Jul",
+	"Aug",
+	"Sep",
+	"Oct",
+	"Nov",
+	"Dec",
+];
+
+const FALLBACK_MONTHS_LONG = [
+	"January",
+	"February",
+	"March",
+	"April",
+	"May",
+	"June",
+	"July",
+	"August",
+	"September",
+	"October",
+	"November",
+	"December",
+];
+
+const weekDaysCache = new Map<string, typeof DEFAULT_WEEKDAYS>();
+
+/** Localised weekday names (Sunday-first, matching the grid). */
+export function getWeekDays(
+	locale: string,
+): { short: string; narrow: string; long: string }[] {
+	const cached = weekDaysCache.get(locale);
+	if (cached) return cached;
+	try {
+		const short = new Intl.DateTimeFormat(locale, { weekday: "short" });
+		const narrow = new Intl.DateTimeFormat(locale, { weekday: "narrow" });
+		const long = new Intl.DateTimeFormat(locale, { weekday: "long" });
+		// 2023-01-01 is a Sunday, so day i of that week is weekday i.
+		const days = Array.from({ length: 7 }, (_, i) => {
+			const d = new Date(2023, 0, 1 + i);
+			return {
+				short: short.format(d),
+				narrow: narrow.format(d),
+				long: long.format(d),
+			};
+		});
+		weekDaysCache.set(locale, days);
+		return days;
+	} catch {
+		return DEFAULT_WEEKDAYS;
+	}
+}
+
+const monthNamesCache = new Map<string, string[]>();
+
+/** Localised month names, January-first. */
+export function getMonthNames(
+	locale: string,
+	format: "short" | "long" = "short",
+): string[] {
+	const cacheKey = `${locale}:${format}`;
+	const cached = monthNamesCache.get(cacheKey);
+	if (cached) return cached;
+	try {
+		const fmt = new Intl.DateTimeFormat(locale, { month: format });
+		const months = Array.from({ length: 12 }, (_, i) =>
+			fmt.format(new Date(2023, i, 1)),
+		);
+		monthNamesCache.set(cacheKey, months);
+		return months;
+	} catch {
+		return format === "short" ? FALLBACK_MONTHS_SHORT : FALLBACK_MONTHS_LONG;
+	}
+}
+
 export function DatePickerRoot(props: DatePickerRootProps) {
 	const [variantProps, localProps] = datePicker.splitVariantProps(props);
 	const {
@@ -242,6 +328,7 @@ export function DatePickerRoot(props: DatePickerRootProps) {
 		min: minProp,
 		max: maxProp,
 		isDateUnavailable,
+		name,
 		onValueChange,
 		onOpenChange,
 		class: classProp,
@@ -339,21 +426,7 @@ export function DatePickerRoot(props: DatePickerRootProps) {
 				year: "numeric",
 			});
 		} catch {
-			const months = [
-				"January",
-				"February",
-				"March",
-				"April",
-				"May",
-				"June",
-				"July",
-				"August",
-				"September",
-				"October",
-				"November",
-				"December",
-			];
-			return `${months[date.month - 1]} ${date.year}`;
+			return `${FALLBACK_MONTHS_LONG[date.month - 1]} ${date.year}`;
 		}
 	};
 
@@ -369,20 +442,10 @@ export function DatePickerRoot(props: DatePickerRootProps) {
 	}) => {
 		const columns = opts?.columns ?? 4;
 		const format = opts?.format ?? "short";
-		const months = [
-			{ value: 1, label: format === "short" ? "Jan" : "January" },
-			{ value: 2, label: format === "short" ? "Feb" : "February" },
-			{ value: 3, label: format === "short" ? "Mar" : "March" },
-			{ value: 4, label: format === "short" ? "Apr" : "April" },
-			{ value: 5, label: format === "short" ? "May" : "May" },
-			{ value: 6, label: format === "short" ? "Jun" : "June" },
-			{ value: 7, label: format === "short" ? "Jul" : "July" },
-			{ value: 8, label: format === "short" ? "Aug" : "August" },
-			{ value: 9, label: format === "short" ? "Sep" : "September" },
-			{ value: 10, label: format === "short" ? "Oct" : "October" },
-			{ value: 11, label: format === "short" ? "Nov" : "November" },
-			{ value: 12, label: format === "short" ? "Dec" : "December" },
-		];
+		const months = getMonthNames(locale, format).map((label, i) => ({
+			value: i + 1,
+			label,
+		}));
 		const grid: (typeof months)[] = [];
 		for (let i = 0; i < months.length; i += columns) {
 			grid.push(months.slice(i, i + columns));
@@ -426,7 +489,7 @@ export function DatePickerRoot(props: DatePickerRootProps) {
 				view: currentView,
 				value,
 				focusedValue,
-				weekDays: DEFAULT_WEEKDAYS,
+				weekDays: getWeekDays(locale),
 				weeks,
 				visibleRangeText,
 				locale,
@@ -458,6 +521,18 @@ export function DatePickerRoot(props: DatePickerRootProps) {
 				{...rest}
 			>
 				{children}
+				{/** Hidden inputs enable native form submission when `name` is set. */}
+				{name &&
+					value.map((v) => (
+						<input
+							key={v.toString()}
+							type="hidden"
+							name={name}
+							value={v.toString()}
+							data-scope="date-picker"
+							data-part="hidden-input"
+						/>
+					))}
 			</div>
 		</DatePickerCtx.Provider>
 	);
@@ -520,7 +595,10 @@ export function DatePickerInput(props: {
 			type="text"
 			id={context ? `${context.rootId}-input-${index}` : undefined}
 			placeholder={placeholder}
-			defaultValue={val}
+			// `value` (not `defaultValue`) so the selected date is present in the
+			// server-rendered HTML. hono/jsx's DOM runtime only assigns the value
+			// property when the prop changes, so typing stays uncontrolled.
+			value={val}
 			disabled={context?.disabled}
 			readOnly={context?.readOnly}
 			autocomplete="off"
@@ -624,16 +702,14 @@ export function DatePickerPositioner(
 		<div
 			data-scope="date-picker"
 			data-part="positioner"
-			class={cx(
-				context?.styles.positioner,
-				classProp,
-				!context?.open && css({ display: "none" }),
-			)}
+			data-state={context?.open ? "open" : "closed"}
+			class={cx(context?.styles.positioner, classProp)}
 			style={{
 				position: "absolute",
 				top: "100%",
 				left: "0",
-				zIndex: 1000,
+				// Inline display keeps the popup reliably hidden when closed,
+				// without depending on a timed unmount for the close animation.
 				display: context?.open ? "block" : "none",
 			}}
 			{...rest}
@@ -680,11 +756,7 @@ export function DatePickerView(
 			data-scope="date-picker"
 			data-part="view"
 			data-view={view}
-			class={cx(
-				context?.styles.view,
-				classProp,
-				!active && css({ display: "none" }),
-			)}
+			class={cx(context?.styles.view, classProp)}
 			style={{ display: active ? "flex" : "none", flexDirection: "column" }}
 			{...rest}
 		>
@@ -827,6 +899,9 @@ export function DatePickerTable(
 		<table
 			role="grid"
 			aria-label="Calendar"
+			aria-multiselectable={
+				context && context.selectionMode !== "single" ? "true" : undefined
+			}
 			data-scope="date-picker"
 			data-part="table"
 			data-view={context?.view}
@@ -845,7 +920,6 @@ export function DatePickerTableHead(
 	const context = useDatePickerContext();
 	return (
 		<thead
-			role="row"
 			data-scope="date-picker"
 			data-part="table-head"
 			data-view={context?.view}
@@ -977,6 +1051,8 @@ export function DatePickerTableCellTrigger(
 	let isSelected = false;
 	let isToday = false;
 	let inRange = false;
+	let isRangeStart = false;
+	let isRangeEnd = false;
 	let isOutsideRange = false;
 	let isDisabled = false;
 
@@ -998,6 +1074,13 @@ export function DatePickerTableCellTrigger(
 				const startTime = start.toDate().getTime();
 				const endTime = end.toDate().getTime();
 				inRange = cellTime >= startTime && cellTime <= endTime;
+				// Endpoint markers let the recipe square off the inner edge so the
+				// endpoints visually connect with the in-range band. Only set when
+				// the range spans more than one day.
+				if (start.toString() !== end.toString()) {
+					isRangeStart = valStr === start.toString();
+					isRangeEnd = valStr === end.toString();
+				}
 			}
 		}
 
@@ -1021,9 +1104,45 @@ export function DatePickerTableCellTrigger(
 			isSelected =
 				context.value[0]?.month === value &&
 				context.value[0]?.year === context.focusedValue.year;
+
+			// A month is selectable when any day of that month falls inside
+			// [min, max]; otherwise the whole month is disabled.
+			const monthEnd = new CalendarDate(
+				context.focusedValue.year,
+				value,
+				daysInMonth(context.focusedValue.year, value),
+			);
+			const monthStart = new CalendarDate(context.focusedValue.year, value, 1);
+			if (
+				context.min &&
+				monthEnd.toDate().getTime() < context.min.toDate().getTime()
+			) {
+				isDisabled = true;
+			}
+			if (
+				context.max &&
+				monthStart.toDate().getTime() > context.max.toDate().getTime()
+			) {
+				isDisabled = true;
+			}
 		} else if (context.view === "year") {
 			isToday = value === new Date().getFullYear();
 			isSelected = context.value[0]?.year === value;
+
+			const yearStart = new CalendarDate(value, 1, 1);
+			const yearEnd = new CalendarDate(value, 12, 31);
+			if (
+				context.min &&
+				yearEnd.toDate().getTime() < context.min.toDate().getTime()
+			) {
+				isDisabled = true;
+			}
+			if (
+				context.max &&
+				yearStart.toDate().getTime() > context.max.toDate().getTime()
+			) {
+				isDisabled = true;
+			}
 		}
 	}
 
@@ -1069,6 +1188,8 @@ export function DatePickerTableCellTrigger(
 			data-selected={isSelected ? "" : undefined}
 			data-today={isToday ? "" : undefined}
 			data-in-range={inRange ? "" : undefined}
+			data-range-start={isRangeStart ? "" : undefined}
+			data-range-end={isRangeEnd ? "" : undefined}
 			data-outside-range={isOutsideRange ? "" : undefined}
 			data-disabled={isDisabled ? "" : undefined}
 			class={cx(context.styles.tableCellTrigger, classProp)}
@@ -1084,33 +1205,28 @@ export function DatePickerMonthSelect(
 ) {
 	const { children, class: classProp, ...rest } = props;
 	const context = useDatePickerContext();
-	const months = [
-		{ value: 1, label: "January" },
-		{ value: 2, label: "February" },
-		{ value: 3, label: "March" },
-		{ value: 4, label: "April" },
-		{ value: 5, label: "May" },
-		{ value: 6, label: "June" },
-		{ value: 7, label: "July" },
-		{ value: 8, label: "August" },
-		{ value: 9, label: "September" },
-		{ value: 10, label: "October" },
-		{ value: 11, label: "November" },
-		{ value: 12, label: "December" },
-	];
+	const focusedMonth = context?.focusedValue.month ?? 1;
+	const months = getMonthNames(context?.locale ?? "en-US", "long").map(
+		(label, i) => ({ value: i + 1, label }),
+	);
 
 	return (
 		<select
 			aria-label="Select month"
 			data-scope="date-picker"
 			data-part="month-select"
-			value={String(context?.focusedValue.month ?? 1)}
 			class={cx(context?.styles.monthSelect, classProp)}
 			disabled={context?.disabled}
 			{...rest}
 		>
 			{months.map((m) => (
-				<option key={m.value} value={String(m.value)}>
+				// `selected` on the option (not `value` on the select) so the
+				// focused month is correct in server-rendered HTML too.
+				<option
+					key={m.value}
+					value={String(m.value)}
+					selected={m.value === focusedMonth}
+				>
 					{m.label}
 				</option>
 			))}
@@ -1136,13 +1252,12 @@ export function DatePickerYearSelect(
 			aria-label="Select year"
 			data-scope="date-picker"
 			data-part="year-select"
-			value={String(currentYear)}
 			class={cx(context?.styles.yearSelect, classProp)}
 			disabled={context?.disabled}
 			{...rest}
 		>
 			{years.map((y) => (
-				<option key={y} value={String(y)}>
+				<option key={y} value={String(y)} selected={y === currentYear}>
 					{y}
 				</option>
 			))}
