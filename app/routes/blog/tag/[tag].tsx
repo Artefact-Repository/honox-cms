@@ -2,6 +2,7 @@ import { css } from "design-system/css";
 import { ssgParams } from "hono/ssg";
 import { createRoute } from "honox/factory";
 import {
+	Anchor,
 	Avatar,
 	Badge,
 	Button,
@@ -560,25 +561,33 @@ export default createRoute(
 								{post.tags.length > 0 && (
 									<Stack gap="2" wrap="wrap" class={css({ mb: "4" })}>
 										{post.tags.slice(0, 3).map((tag) => (
-											<Badge
+											<Anchor
 												key={tag}
-												variant="subtle"
-												colorPalette="blue"
-												size="sm"
+												href={`/blog/tag/${tag}`}
+												variant="plain"
 												class={css({
-													borderRadius: "full",
-													px: "3",
-													py: "1",
-													fontSize: "xs",
-													fontWeight: "medium",
-													transition: "all 0.2s",
-													_hover: {
-														bg: "blue.4",
-													},
+													textDecoration: "none",
 												})}
 											>
-												{tag}
-											</Badge>
+												<Badge
+													variant="subtle"
+													colorPalette="blue"
+													size="sm"
+													class={css({
+														borderRadius: "full",
+														px: "3",
+														py: "1",
+														fontSize: "xs",
+														fontWeight: "medium",
+														transition: "all 0.2s",
+														_hover: {
+															bg: "blue.4",
+														},
+													})}
+												>
+													{tag}
+												</Badge>
+											</Anchor>
 										))}
 										{post.tags.length > 3 && (
 											<Badge

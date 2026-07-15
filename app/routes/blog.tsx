@@ -1,6 +1,7 @@
 import { css } from "design-system/css";
 import { createRoute } from "honox/factory";
 import {
+	Anchor,
 	Avatar,
 	Badge,
 	Button,
@@ -392,20 +393,32 @@ export default createRoute(async (c) => {
 								{post.tags.length > 0 && (
 									<Stack gap="2" wrap="wrap" class={css({ mb: "3" })}>
 										{post.tags.slice(0, 3).map((tag) => (
-											<Badge
+											<Anchor
 												key={tag}
-												variant="subtle"
-												colorPalette="blue"
-												size="sm"
+												href={`/blog/tag/${tag}`}
+												variant="plain"
 												class={css({
-													borderRadius: "full",
-													px: "2.5",
-													py: "0.5",
-													fontSize: "xs",
+													textDecoration: "none",
 												})}
 											>
-												{tag}
-											</Badge>
+												<Badge
+													variant="subtle"
+													colorPalette="blue"
+													size="sm"
+													class={css({
+														borderRadius: "full",
+														px: "2.5",
+														py: "0.5",
+														fontSize: "xs",
+														transition: "all 0.2s",
+														_hover: {
+															bg: "blue.4",
+														},
+													})}
+												>
+													{tag}
+												</Badge>
+											</Anchor>
 										))}
 										{post.tags.length > 3 && (
 											<Badge
