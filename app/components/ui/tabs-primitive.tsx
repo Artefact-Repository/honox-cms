@@ -1,4 +1,4 @@
-import { cx } from "design-system/css";
+import { css, cx } from "design-system/css";
 import { type TabsVariantProps, tabs } from "design-system/recipes";
 import type { JSX } from "hono/jsx";
 import {
@@ -108,21 +108,78 @@ export function List(props: ListProps) {
 	);
 }
 
+function CloseIcon() {
+	return (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="14"
+			height="14"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+			aria-hidden="true"
+		>
+			<title>Close</title>
+			<path d="M18 6 6 18" />
+			<path d="m6 6 12 12" />
+		</svg>
+	);
+}
+
+function PlusIcon() {
+	return (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="14"
+			height="14"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+			aria-hidden="true"
+		>
+			<title>Add tab</title>
+			<path d="M5 12h14" />
+			<path d="M12 5v14" />
+		</svg>
+	);
+}
+
 export interface TriggerProps extends PropsWithChildren {
 	value: string;
 	disabled?: boolean;
 	class?: string;
 	asChild?: boolean;
+	/** Icon rendered before the label. */
+	icon?: JSX.Element;
+	/** Render a close button inside the tab (used by closable/editable tabs). */
+	closable?: boolean;
+	onClose?: () => void;
+	closeAriaLabel?: string;
 }
 
 export function Trigger(props: TriggerProps) {
-	const { value, disabled, children, class: classProp, asChild } = props;
+	const {
+		value,
+		disabled,
+		children,
+		class: classProp,
+		asChild,
+		icon,
+		closable,
+		onClose,
+		closeAriaLabel = "Close tab",
+	} = props;
 	const context = useTabsContext();
 	const isSelected = context.value === value;
 
 	const triggerProps = {
 		role: "tab",
-		type: "button",
 		disabled,
 		"aria-selected": isSelected ? "true" : "false",
 		"aria-controls": `tabs-content-${context.id}-${value}`,
@@ -139,8 +196,37 @@ export function Trigger(props: TriggerProps) {
 		const child = children as any;
 		return cloneElement(child, {
 			...triggerProps,
+			type: "button",
 			class: cx(context.styles.trigger, classProp, child.props?.class),
 		});
+	}
+
+	const label = (
+		<>
+			{icon}
+			{children}
+		</>
+	);
+
+	if (closable) {
+		return (
+			<div {...triggerProps} class={cx(context.styles.trigger, classProp)}>
+				{label}
+				<button
+					type="button"
+					data-scope="tabs"
+					data-part="close"
+					aria-label={closeAriaLabel}
+					class={context.styles.close}
+					onClick={(e) => {
+						e.stopPropagation();
+						onClose?.();
+					}}
+				>
+					<CloseIcon />
+				</button>
+			</div>
+		);
 	}
 
 	return (
@@ -149,7 +235,7 @@ export function Trigger(props: TriggerProps) {
 			{...triggerProps}
 			class={cx(context.styles.trigger, classProp)}
 		>
-			{children}
+			{label}
 		</button>
 	);
 }
@@ -206,25 +292,114 @@ export interface TabsItem {
 	label: string | JSX.Element;
 	content: string | JSX.Element;
 	disabled?: boolean;
+	/** Icon rendered before the label. */
+	icon?: JSX.Element;
+	/** Overrides the structure-level `closable`/`editable` default for this tab. */
+	closable?: boolean;
+}
+
+export interface AddTriggerProps {
+	class?: string;
+	onAdd?: () => void;
+	disabled?: boolean;
+	ariaLabel?: string;
+}
+
+/** The trailing "+" trigger rendered by editable tab lists to append a new tab. */
+export function AddTrigger(props: AddTriggerProps) {
+	const { class: classProp, onAdd, disabled, ariaLabel = "Add tab" } = props;
+	const context = useTabsContext();
+	return (
+		<button
+			type="button"
+			data-scope="tabs"
+			data-part="add"
+			aria-label={ariaLabel}
+			disabled={disabled}
+			data-disabled={disabled ? "" : undefined}
+			class={cx(context.styles.add, classProp)}
+			onClick={() => onAdd?.()}
+		>
+			<PlusIcon />
+		</button>
+	);
 }
 
 export interface TabsStructureProps {
 	items: TabsItem[];
 	indicator?: boolean;
+	/** Every tab gets a close button (no "add" trigger). Per-item `closable` still wins. */
+	closable?: boolean;
+	/** Shorthand for `closable` plus a trailing "add tab" trigger. */
+	editable?: boolean;
+	onTabClose?: (value: string) => void;
+	onTabAdd?: () => void;
+	addAriaLabel?: string;
+	/** Content rendered alongside the tab list — a single node, or split start/end. */
+	extra?: JSX.Element | { start?: JSX.Element; end?: JSX.Element };
 }
 
 export const TabsStructure = (props: TabsStructureProps) => {
-	const { items, indicator = true } = props;
+	const {
+		items,
+		indicator = true,
+		closable,
+		editable,
+		onTabClose,
+		onTabAdd,
+		addAriaLabel,
+		extra,
+	} = props;
+	const showClose = closable || editable;
+	const isSplitExtra =
+		extra != null &&
+		typeof extra === "object" &&
+		("start" in extra || "end" in extra);
+	const extraStart = isSplitExtra
+		? (extra as { start?: JSX.Element }).start
+		: undefined;
+	const extraEnd = isSplitExtra
+		? (extra as { end?: JSX.Element }).end
+		: extra;
+
+	const list = (
+		<List>
+			{items.map((item) => (
+				<Trigger
+					key={item.value}
+					value={item.value}
+					disabled={item.disabled}
+					icon={item.icon}
+					closable={item.closable ?? showClose}
+					onClose={() => onTabClose?.(item.value)}
+				>
+					{item.label}
+				</Trigger>
+			))}
+			{editable && <AddTrigger onAdd={onTabAdd} ariaLabel={addAriaLabel} />}
+			{indicator && <Indicator />}
+		</List>
+	);
+
 	return (
 		<>
-			<List>
-				{items.map((item) => (
-					<Trigger key={item.value} value={item.value} disabled={item.disabled}>
-						{item.label}
-					</Trigger>
-				))}
-				{indicator && <Indicator />}
-			</List>
+			{extra ? (
+				<div
+					class={css({
+						display: "flex",
+						alignItems: "center",
+						justifyContent: "space-between",
+						gap: "4",
+						width: "full",
+					})}
+				>
+					{extraStart}
+					{list}
+					{extraEnd}
+				</div>
+			) : (
+				list
+			)}
 			{items.map((item) => (
 				<Content key={item.value} value={item.value}>
 					{item.content}

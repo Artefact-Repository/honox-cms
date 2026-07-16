@@ -67,6 +67,7 @@ export {
 	type TableRow,
 } from "./table";
 export {
+	TabsAddTrigger,
 	Tabs,
 	TabsContent,
 	TabsIndicator,

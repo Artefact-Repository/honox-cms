@@ -3,10 +3,15 @@ import {
 	InteractiveRoot,
 	type RootProps,
 	TabsStructure,
+	type TabsItem,
 	type TabsStructureProps,
 } from "../components/ui/tabs-primitive";
 
-export interface TabsIslandProps extends RootProps, TabsStructureProps {}
+export interface TabsIslandProps extends RootProps, TabsStructureProps {
+	/** Notified after a tab is added; return a `TabsItem` to override the
+	 * auto-generated default, or leave void to accept it. */
+	onTabAdd?: () => TabsItem | void;
+}
 
 export default function TabsIsland(props: TabsIslandProps) {
 	const {
@@ -16,9 +21,16 @@ export default function TabsIsland(props: TabsIslandProps) {
 		children,
 		items,
 		indicator,
+		closable,
+		editable,
+		onTabClose,
+		onTabAdd,
+		addAriaLabel,
+		extra,
 		...rest
 	} = props;
 	const [value, setValue] = useState(valueProp ?? defaultValue);
+	const [tabItems, setTabItems] = useState<TabsItem[]>(items ?? []);
 	const rootRef = useRef<HTMLDivElement>(null);
 
 	const updateIndicator = (activeTrigger: HTMLElement) => {
@@ -67,6 +79,37 @@ export default function TabsIsland(props: TabsIslandProps) {
 		}
 
 		if (activeTrigger) updateIndicator(activeTrigger);
+	};
+
+	// Closing/adding tabs mutates the list itself, not just which value is
+	// selected — that only works through the `items` API, where `TabsStructure`
+	// is constructed fresh from this state on every render (unlike a static
+	// `children` subtree, a freshly built element genuinely re-renders).
+	const handleTabClose = (closedValue: string) => {
+		setTabItems((prev) => {
+			const closedIndex = prev.findIndex((item) => item.value === closedValue);
+			const next = prev.filter((item) => item.value !== closedValue);
+			if (value === closedValue && next.length > 0) {
+				const neighbor = next[Math.min(closedIndex, next.length - 1)];
+				setValue(neighbor.value);
+				requestAnimationFrame(() => syncSelection(neighbor.value));
+			}
+			return next;
+		});
+		onTabClose?.(closedValue);
+	};
+
+	const handleTabAdd = () => {
+		const created = onTabAdd?.();
+		const newItem: TabsItem = created ?? {
+			value: `tab-${Date.now()}`,
+			label: `New Tab ${tabItems.length + 1}`,
+			content: "",
+			closable: true,
+		};
+		setTabItems((prev) => [...prev, newItem]);
+		setValue(newItem.value);
+		requestAnimationFrame(() => syncSelection(newItem.value));
 	};
 
 	useEffect(() => {
@@ -154,7 +197,18 @@ export default function TabsIsland(props: TabsIslandProps) {
 			rootRef={rootRef}
 			data-hydrated="true"
 		>
-			{children || <TabsStructure items={items} indicator={indicator} />}
+			{children || (
+				<TabsStructure
+					items={tabItems}
+					indicator={indicator}
+					closable={closable}
+					editable={editable}
+					onTabClose={handleTabClose}
+					onTabAdd={handleTabAdd}
+					addAriaLabel={addAriaLabel}
+					extra={extra}
+				/>
+			)}
 		</InteractiveRoot>
 	);
 }
