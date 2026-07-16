@@ -688,6 +688,7 @@ export default createRoute((c) => {
 									<Card
 										title="Action Dropdowns"
 										description="Nestable action list triggers"
+										class={css({ overflow: "visible" })}
 									>
 										<div class={css({ mt: "2" })}>
 											<Dropdown
