@@ -2660,9 +2660,7 @@ export default createRoute((c) => {
 							maxFiles={3}
 							maxFileSize={5 * 1024 * 1024}
 							dropzoneText="Drag your image(s) here"
-							onFileChange={(details) =>
-								console.log("Files changed:", details)
-							}
+							onFileChange={(details) => console.log("Files changed:", details)}
 						/>
 					</Stack>
 

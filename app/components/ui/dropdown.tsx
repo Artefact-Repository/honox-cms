@@ -130,10 +130,7 @@ interface DropdownProps extends DropdownVariantProps {
 	/** Close when Escape is pressed. Default `true`. */
 	closeOnEscape?: boolean;
 	/** Called when the menu opens or closes. */
-	onOpenChange?: (
-		open: boolean,
-		info?: { source: "trigger" | "menu" },
-	) => void;
+	onOpenChange?: (open: boolean, info?: { source: "trigger" | "menu" }) => void;
 	/** Called with an item's `value` when it is activated. */
 	onSelect?: (value: string) => void;
 	destroyOnHidden?: boolean;
@@ -388,8 +385,8 @@ function DropdownRoot(props: DropdownProps) {
 			? popupRender
 				? popupRender(menuContent)
 				: dropdownRender
-				? dropdownRender(menuContent)
-				: menuContent
+					? dropdownRender(menuContent)
+					: menuContent
 			: null;
 
 		return (
@@ -440,8 +437,8 @@ function DropdownRoot(props: DropdownProps) {
 		? popupRender
 			? popupRender(menuContent)
 			: dropdownRender
-			? dropdownRender(menuContent)
-			: menuContent
+				? dropdownRender(menuContent)
+				: menuContent
 		: null;
 
 	return (

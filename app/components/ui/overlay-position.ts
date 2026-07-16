@@ -307,7 +307,10 @@ export function positionOverlay(
 			let arrowStyleConfig = config;
 			if (config.pointAtCenter && triggerRect) {
 				const arrowSize = 12; // Standard arrow-size is 12px
-				const dim = (placement === "top" || placement === "bottom") ? triggerRect.width : triggerRect.height;
+				const dim =
+					placement === "top" || placement === "bottom"
+						? triggerRect.width
+						: triggerRect.height;
 				const calculatedOffset = `${dim / 2 - arrowSize / 2}px`;
 				arrowStyleConfig = {
 					...config,
