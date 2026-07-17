@@ -458,25 +458,43 @@ export default createRoute(
 								>
 									<Stack gap="3" align="center">
 										{/* Author Avatar */}
-										<Avatar
-											size="md"
-											variant="solid"
-											colorPalette="blue"
-											name={post.author}
-											class={css({ shadow: "sm" })}
-										/>
+										<Anchor
+											href={`/blog/by-author/${post.author}`}
+											class={css({
+												display: "inline-flex",
+												alignItems: "center",
+												textDecoration: "none",
+											})}
+										>
+											<Avatar
+												size="md"
+												variant="solid"
+												colorPalette="blue"
+												name={post.author}
+												class={css({ shadow: "sm" })}
+											/>
+										</Anchor>
 										<div>
-											<Text
-												size="sm"
+											<Anchor
+												href={`/blog/by-author/${post.author}`}
 												class={css({
-													fontWeight: "semibold",
-													lineHeight: "tight",
-													display: "block",
+													textDecoration: "none",
 													color: "fg",
+													_hover: { color: "blue.10" },
 												})}
 											>
-												{post.author}
-											</Text>
+												<Text
+													size="sm"
+													class={css({
+														fontWeight: "semibold",
+														lineHeight: "tight",
+														display: "block",
+														color: "inherit",
+													})}
+												>
+													{post.author}
+												</Text>
+											</Anchor>
 											<Stack gap="2" align="center" class={css({ mt: "0.5" })}>
 												<Text size="xs" class={css({ color: "fg.muted" })}>
 													{new Date(post.date).toLocaleDateString("en-US", {

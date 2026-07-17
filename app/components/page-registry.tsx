@@ -492,8 +492,15 @@ const registry: Record<string, BlockRenderer> = {
 
 	fieldset: (b) => {
 		const { children } = b;
-		const { legend, helperText, errorText, disabled, invalid, required, ...rest } =
-			propsOf(b);
+		const {
+			legend,
+			helperText,
+			errorText,
+			disabled,
+			invalid,
+			required,
+			...rest
+		} = propsOf(b);
 		return (
 			<Fieldset
 				legend={legend}

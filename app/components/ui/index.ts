@@ -43,8 +43,8 @@ export {
 	FieldsetErrorText,
 	FieldsetHelperText,
 	FieldsetLegend,
-	FieldsetRequiredIndicator,
 	type FieldsetProps,
+	FieldsetRequiredIndicator,
 } from "./fieldset";
 export { FileUpload, type FileUploadProps } from "./file-upload";
 export * as FileUploadPrimitive from "./file-upload-primitive";

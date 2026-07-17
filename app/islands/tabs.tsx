@@ -352,8 +352,7 @@ export default function TabsIsland(props: TabsIslandProps) {
 			// too — honor an explicit `dir` prop, else fall back to whatever
 			// direction actually got computed (an ancestor `<html dir="rtl">`).
 			const rtl =
-				!vertical &&
-				(props.dir ?? getComputedStyle(root).direction) === "rtl";
+				!vertical && (props.dir ?? getComputedStyle(root).direction) === "rtl";
 			const nextKey = vertical ? "ArrowDown" : rtl ? "ArrowLeft" : "ArrowRight";
 			const prevKey = vertical ? "ArrowUp" : rtl ? "ArrowRight" : "ArrowLeft";
 			const loopFocus = props.loopFocus ?? true;

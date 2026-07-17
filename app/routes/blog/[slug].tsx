@@ -2,6 +2,7 @@ import { css } from "design-system/css";
 import { ssgParams } from "hono/ssg";
 import { createRoute } from "honox/factory";
 import {
+	Anchor,
 	Avatar,
 	Badge,
 	Button,
@@ -253,23 +254,41 @@ export default createRoute(
 								>
 									{/* Author */}
 									<Stack gap="3" align="center">
-										<Avatar
-											size="md"
-											variant="solid"
-											colorPalette="blue"
-											name={data.author || "Artefact Team"}
-										/>
+										<Anchor
+											href={`/blog/by-author/${data.author || "Artefact Team"}`}
+											class={css({
+												display: "inline-flex",
+												alignItems: "center",
+												textDecoration: "none",
+											})}
+										>
+											<Avatar
+												size="md"
+												variant="solid"
+												colorPalette="blue"
+												name={data.author || "Artefact Team"}
+											/>
+										</Anchor>
 										<div>
-											<Text
-												size="sm"
+											<Anchor
+												href={`/blog/by-author/${data.author || "Artefact Team"}`}
 												class={css({
+													textDecoration: "none",
 													color: "fg",
-													fontWeight: "semibold",
-													display: "block",
+													_hover: { color: "blue.10" },
 												})}
 											>
-												{data.author || "Artefact Team"}
-											</Text>
+												<Text
+													size="sm"
+													class={css({
+														color: "inherit",
+														fontWeight: "semibold",
+														display: "block",
+													})}
+												>
+													{data.author || "Artefact Team"}
+												</Text>
+											</Anchor>
 										</div>
 									</Stack>
 

@@ -2,6 +2,7 @@ import { css } from "design-system/css";
 import { ssgParams } from "hono/ssg";
 import { createRoute } from "honox/factory";
 import {
+	Anchor,
 	Avatar,
 	Badge,
 	Button,
@@ -11,20 +12,31 @@ import {
 	Stack,
 	Text,
 } from "../../../components/ui";
-import { loadPosts, loadPostsByAuthor } from "../../../lib/posts";
+import { loadPosts } from "../../../lib/posts";
 
 export default createRoute(
+	// Use ssgParams middleware to tell SSG which params to generate
 	ssgParams(async () => {
 		const { posts } = await loadPosts();
-		const authors = new Set(
-			posts.map((post) => post.author || "Artefact Team"),
-		);
+		const authors = new Set<string>();
+		for (const post of posts) {
+			authors.add(post.author || "Artefact Team");
+		}
 		return Array.from(authors).map((author) => ({ author }));
 	}),
 
+	// Actual route handler
 	async (c) => {
-		const authorFilter = c.req.param("author") ?? "";
-		const blogPosts = await loadPostsByAuthor(authorFilter);
+		const authorParam = decodeURIComponent(c.req.param("author") ?? "");
+
+		const { posts } = await loadPosts();
+		const blogPosts = posts.filter(
+			(post) =>
+				(post.author || "Artefact Team").toLowerCase() ===
+				authorParam.toLowerCase(),
+		);
+
+		const authorName = blogPosts[0]?.author || authorParam;
 
 		return c.render(
 			<div
@@ -35,7 +47,7 @@ export default createRoute(
 					mx: "auto",
 				})}
 			>
-				<title>Posts by {authorFilter} - Artefact Blog</title>
+				<title>Posts by {authorName} - Artefact Blog</title>
 
 				{/* Decorative background element */}
 				<div
@@ -46,7 +58,7 @@ export default createRoute(
 						right: "0",
 						height: "500px",
 						bgGradient: "to-b",
-						gradientFrom: "purple.3",
+						gradientFrom: "blue.3",
 						gradientTo: "transparent",
 						opacity: "0.5",
 						pointerEvents: "none",
@@ -86,7 +98,7 @@ export default createRoute(
 						</a>
 					</div>
 
-					{/* Author Avatar */}
+					{/* Author Icon */}
 					<Stack
 						gap="0"
 						align="center"
@@ -96,19 +108,48 @@ export default createRoute(
 							h: "20",
 							mx: "auto",
 							mb: "6",
+							bgGradient: "to-r",
+							gradientFrom: "blue.9",
+							gradientTo: "purple.9",
+							borderRadius: "2xl",
+							shadow: "lg",
+							position: "relative",
+							"&::before": {
+								content: '""',
+								position: "absolute",
+								inset: "0",
+								borderRadius: "2xl",
+								bgGradient: "to-r",
+								gradientFrom: "blue.8",
+								gradientTo: "purple.8",
+								opacity: "0",
+								transition: "opacity 0.3s",
+							},
+							_hover: {
+								"&::before": {
+									opacity: "1",
+								},
+							},
 						})}
 					>
-						<Avatar
-							size="2xl"
-							variant="solid"
-							colorPalette="purple"
-							name={authorFilter}
-						/>
+						<svg
+							width="36"
+							height="36"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="white"
+							stroke-width="2"
+							style={{ position: "relative", zIndex: "1" }}
+						>
+							<title>Author</title>
+							<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+							<circle cx="12" cy="7" r="4" />
+						</svg>
 					</Stack>
 
 					<Badge
 						variant="subtle"
-						colorPalette="purple"
+						colorPalette="blue"
 						class={css({
 							mb: "4",
 							px: "4",
@@ -118,7 +159,7 @@ export default createRoute(
 							fontWeight: "medium",
 						})}
 					>
-						✍️ By Author
+						✍️ Author Archive
 					</Badge>
 
 					<Heading
@@ -129,9 +170,14 @@ export default createRoute(
 							mb: "4",
 							letterSpacing: "tight",
 							lineHeight: "tight",
+							bgGradient: "to-r",
+							gradientFrom: "blue.10",
+							gradientTo: "purple.10",
+							bgClip: "text",
+							color: "transparent",
 						})}
 					>
-						{authorFilter}
+						{authorName}
 					</Heading>
 
 					<Text
@@ -143,13 +189,13 @@ export default createRoute(
 							lineHeight: "relaxed",
 						})}
 					>
-						{blogPosts.length} article{blogPosts.length !== 1 ? "s" : ""} by{" "}
-						{authorFilter}
+						Showing {blogPosts.length} article
+						{blogPosts.length !== 1 ? "s" : ""} written by {authorName}
 					</Text>
 				</header>
 
 				{/* Search (island) — global autocomplete over /api/posts/search.json */}
-				<section class={css({ mb: "8", maxWidth: "xl", mx: "auto" })}>
+				<section class={css({ mb: "10", maxWidth: "xl", mx: "auto" })}>
 					<Search
 						placeholder="Search all articles..."
 						itemLabel="articles"
@@ -177,8 +223,8 @@ export default createRoute(
 								mx: "auto",
 								mb: "8",
 								bgGradient: "to-r",
-								gradientFrom: "purple.3",
-								gradientTo: "pink.3",
+								gradientFrom: "blue.3",
+								gradientTo: "purple.3",
 								borderRadius: "full",
 								animation: "pulse",
 								shadow: "lg",
@@ -193,9 +239,9 @@ export default createRoute(
 								stroke-width="1.5"
 								class={css({ color: "fg.muted" })}
 							>
-								<title>Search</title>
-								<circle cx="11" cy="11" r="8" />
-								<path d="m21 21-4.3-4.3" />
+								<title>Author</title>
+								<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+								<circle cx="12" cy="7" r="4" />
 							</svg>
 						</Stack>
 						<Heading
@@ -218,8 +264,8 @@ export default createRoute(
 								fontSize: "lg",
 							})}
 						>
-							No posts found by "<strong>{authorFilter}</strong>". Check back
-							later for new content.
+							No posts found by "<strong>{authorName}</strong>". Try browsing
+							all articles.
 						</Text>
 						<div class={css({ mt: "8" })}>
 							<a href="/blog" style={{ textDecoration: "none" }}>
@@ -252,7 +298,7 @@ export default createRoute(
 								_hover: {
 									transform: "translateY(-8px)",
 									shadow: "2xl",
-									borderColor: "purple.7",
+									borderColor: "blue.7",
 								},
 								overflow: "hidden",
 								position: "relative",
@@ -335,25 +381,43 @@ export default createRoute(
 								>
 									<Stack gap="3" align="center">
 										{/* Author Avatar */}
-										<Avatar
-											size="md"
-											variant="solid"
-											colorPalette="purple"
-											name={post.author}
-											class={css({ shadow: "sm" })}
-										/>
+										<Anchor
+											href={`/blog/by-author/${post.author}`}
+											class={css({
+												display: "inline-flex",
+												alignItems: "center",
+												textDecoration: "none",
+											})}
+										>
+											<Avatar
+												size="md"
+												variant="solid"
+												colorPalette="blue"
+												name={post.author}
+												class={css({ shadow: "sm" })}
+											/>
+										</Anchor>
 										<div>
-											<Text
-												size="sm"
+											<Anchor
+												href={`/blog/by-author/${post.author}`}
 												class={css({
-													fontWeight: "semibold",
-													lineHeight: "tight",
-													display: "block",
+													textDecoration: "none",
 													color: "fg",
+													_hover: { color: "blue.10" },
 												})}
 											>
-												{post.author}
-											</Text>
+												<Text
+													size="sm"
+													class={css({
+														fontWeight: "semibold",
+														lineHeight: "tight",
+														display: "block",
+														color: "fg",
+													})}
+												>
+													{post.author}
+												</Text>
+											</Anchor>
 											<Stack gap="2" align="center" class={css({ mt: "0.5" })}>
 												<Text size="xs" class={css({ color: "fg.muted" })}>
 													{new Date(post.date).toLocaleDateString("en-US", {
@@ -438,25 +502,33 @@ export default createRoute(
 								{post.tags.length > 0 && (
 									<Stack gap="2" wrap="wrap" class={css({ mb: "4" })}>
 										{post.tags.slice(0, 3).map((tag) => (
-											<Badge
+											<Anchor
 												key={tag}
-												variant="subtle"
-												colorPalette="blue"
-												size="sm"
+												href={`/blog/tag/${tag}`}
+												variant="plain"
 												class={css({
-													borderRadius: "full",
-													px: "3",
-													py: "1",
-													fontSize: "xs",
-													fontWeight: "medium",
-													transition: "all 0.2s",
-													_hover: {
-														bg: "blue.4",
-													},
+													textDecoration: "none",
 												})}
 											>
-												{tag}
-											</Badge>
+												<Badge
+													variant="subtle"
+													colorPalette="blue"
+													size="sm"
+													class={css({
+														borderRadius: "full",
+														px: "3",
+														py: "1",
+														fontSize: "xs",
+														fontWeight: "medium",
+														transition: "all 0.2s",
+														_hover: {
+															bg: "blue.4",
+														},
+													})}
+												>
+													{tag}
+												</Badge>
+											</Anchor>
 										))}
 										{post.tags.length > 3 && (
 											<Badge

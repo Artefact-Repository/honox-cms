@@ -65,37 +65,46 @@ export default createRoute(async (c) => {
 							>
 								{featuredPosts.map((post, index) => (
 									<Carousel.Item index={index}>
-										<a
-											href={`/blog/${post.slug}`}
+										<div
 											class={css({
 												display: "block",
 												position: "relative",
 												width: "full",
 												height: { base: "80", md: "96" },
-												textDecoration: "none",
 											})}
 										>
-											<img
-												src={post.cover}
-												alt={post.title}
+											<a
+												href={`/blog/${post.slug}`}
 												class={css({
 													position: "absolute",
 													inset: "0",
 													width: "full",
 													height: "full",
-													objectFit: "cover",
+													zIndex: "1",
 												})}
-											/>
-											<div
-												class={css({
-													position: "absolute",
-													inset: "0",
-													bgGradient: "to-t",
-													gradientFrom: "black.a10",
-													gradientVia: "black.a5",
-													gradientTo: "transparent",
-												})}
-											/>
+											>
+												<img
+													src={post.cover}
+													alt={post.title}
+													class={css({
+														position: "absolute",
+														inset: "0",
+														width: "full",
+														height: "full",
+														objectFit: "cover",
+													})}
+												/>
+												<div
+													class={css({
+														position: "absolute",
+														inset: "0",
+														bgGradient: "to-t",
+														gradientFrom: "black.a10",
+														gradientVia: "black.a5",
+														gradientTo: "transparent",
+													})}
+												/>
+											</a>
 											<div
 												class={css({
 													position: "absolute",
@@ -103,6 +112,8 @@ export default createRoute(async (c) => {
 													bottom: "0",
 													p: { base: "6", md: "10" },
 													maxWidth: "3xl",
+													zIndex: "2",
+													pointerEvents: "none",
 												})}
 											>
 												{index === 0 && (
@@ -110,7 +121,7 @@ export default createRoute(async (c) => {
 														variant="solid"
 														colorPalette="blue"
 														size="sm"
-														class={css({ mb: "3" })}
+														class={css({ mb: "3", pointerEvents: "auto" })}
 													>
 														Latest
 													</Badge>
@@ -119,12 +130,21 @@ export default createRoute(async (c) => {
 													as="h2"
 													size="xl"
 													class={css({
-														color: "white",
 														mb: "2",
 														lineHeight: "tight",
+														pointerEvents: "auto",
 													})}
 												>
-													{post.title}
+													<a
+														href={`/blog/${post.slug}`}
+														class={css({
+															color: "white",
+															textDecoration: "none",
+															_hover: { textDecoration: "underline" },
+														})}
+													>
+														{post.title}
+													</a>
 												</Heading>
 												<Text
 													class={css({
@@ -132,28 +152,53 @@ export default createRoute(async (c) => {
 														mb: "4",
 														display: { base: "none", md: "block" },
 														maxWidth: "2xl",
+														pointerEvents: "auto",
 													})}
 												>
-													{post.description}
-												</Text>
-												<Stack gap="2.5" align="center">
-													{post.author && (
-														<Avatar
-															size="sm"
-															variant="solid"
-															colorPalette="blue"
-															name={post.author}
-														/>
-													)}
-													<Text
-														size="sm"
+													<a
+														href={`/blog/${post.slug}`}
 														class={css({
-															color: "white.a12",
-															fontWeight: "medium",
+															color: "inherit",
+															textDecoration: "none",
 														})}
 													>
-														{post.author}
-													</Text>
+														{post.description}
+													</a>
+												</Text>
+												<Stack
+													gap="2.5"
+													align="center"
+													class={css({ pointerEvents: "auto" })}
+												>
+													{post.author && (
+														<Anchor
+															href={`/blog/by-author/${post.author}`}
+															class={css({
+																display: "inline-flex",
+																alignItems: "center",
+																gap: "2.5",
+																textDecoration: "none",
+																color: "white.a12",
+																_hover: { color: "blue.4" },
+															})}
+														>
+															<Avatar
+																size="sm"
+																variant="solid"
+																colorPalette="blue"
+																name={post.author}
+															/>
+															<Text
+																size="sm"
+																class={css({
+																	color: "inherit",
+																	fontWeight: "medium",
+																})}
+															>
+																{post.author}
+															</Text>
+														</Anchor>
+													)}
 													<Text size="sm" class={css({ color: "white.a10" })}>
 														{post.author ? "· " : ""}
 														{new Date(post.date).toLocaleDateString("en-US", {
@@ -165,7 +210,7 @@ export default createRoute(async (c) => {
 													</Text>
 												</Stack>
 											</div>
-										</a>
+										</div>
 									</Carousel.Item>
 								))}
 							</Carousel.ItemGroup>
@@ -481,23 +526,42 @@ export default createRoute(async (c) => {
 								>
 									<Stack gap="2.5" align="center">
 										{/* Author Avatar */}
-										<Avatar
-											size="sm"
-											variant="solid"
-											colorPalette="blue"
-											name={post.author}
-										/>
-										<div>
-											<Text
+										<Anchor
+											href={`/blog/by-author/${post.author}`}
+											class={css({
+												display: "inline-flex",
+												alignItems: "center",
+												textDecoration: "none",
+											})}
+										>
+											<Avatar
 												size="sm"
+												variant="solid"
+												colorPalette="blue"
+												name={post.author}
+											/>
+										</Anchor>
+										<div>
+											<Anchor
+												href={`/blog/by-author/${post.author}`}
 												class={css({
-													fontWeight: "medium",
-													lineHeight: "tight",
-													display: "block",
+													textDecoration: "none",
+													color: "fg",
+													_hover: { color: "blue.10" },
 												})}
 											>
-												{post.author}
-											</Text>
+												<Text
+													size="sm"
+													class={css({
+														fontWeight: "medium",
+														lineHeight: "tight",
+														display: "block",
+														color: "inherit",
+													})}
+												>
+													{post.author}
+												</Text>
+											</Anchor>
 											<Stack gap="2" align="center" class={css({ mt: "0.5" })}>
 												<Text size="xs" class={css({ color: "fg.muted" })}>
 													{new Date(post.date).toLocaleDateString("en-US", {
