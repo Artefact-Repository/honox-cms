@@ -26,6 +26,7 @@ import { gridRow } from "./grid-row";
 import { group } from "./group";
 import { heading } from "./heading";
 import { hoverCard } from "./hover-card";
+import { icon } from "./icon";
 import { input } from "./input";
 import { pagination } from "./pagination";
 import { popover } from "./popover";
@@ -64,6 +65,7 @@ export const recipes = {
 	gridCol,
 	gridRow,
 	anchor,
+	icon,
 };
 
 export const slotRecipes = {

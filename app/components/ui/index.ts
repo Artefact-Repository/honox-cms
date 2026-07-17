@@ -43,6 +43,7 @@ export { Grid, type GridProps } from "./grid";
 export { Group, type GroupProps } from "./group";
 export { Heading, type HeadingProps } from "./heading";
 export { HoverCard, type HoverCardProps } from "./hover-card";
+export { Icon, type IconProps } from "./icon";
 export { Loader, type LoaderProps } from "./loader";
 export { PaginatedTable } from "./paginated-table";
 export { Pagination, type PaginationProps } from "./pagination";

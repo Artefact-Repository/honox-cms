@@ -22,6 +22,7 @@ import {
 	Group,
 	Heading,
 	HoverCard,
+	Icon,
 	PaginatedTable,
 	Pagination,
 	Popover,
@@ -581,6 +582,17 @@ const registry: Record<string, BlockRenderer> = {
 			>
 				{children ? renderChildren(children as ComponentBlock[]) : undefined}
 			</Skeleton>
+		);
+	},
+
+	icon: (b) => {
+		const { svg, ariaLabel, ...rest } = propsOf(b);
+		return (
+			<Icon
+				aria-label={ariaLabel}
+				dangerouslySetInnerHTML={svg ? { __html: svg } : undefined}
+				{...rest}
+			/>
 		);
 	},
 

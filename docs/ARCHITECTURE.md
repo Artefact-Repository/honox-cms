@@ -98,6 +98,7 @@ Applies to:
 - Typography (text, heading, badge)
 - Layout (group, absolute-center, fieldset)
 - Status indicators (alert, breadcrumb, loader, skeleton, spinner, progress)
+- Graphics (icon)
 
 ---
 
@@ -161,6 +162,7 @@ Applies to:
 | `skeleton` | Skeleton screen | ✅ |
 | `spinner` | Spinner indicator | ✅ |
 | `progress` | Progress bar (value-driven, static by default) | ✅ |
+| `icon` | SVG icon wrapper (size/color only, no client state) | ✅ `icon.tsx` |
 
 ---
 

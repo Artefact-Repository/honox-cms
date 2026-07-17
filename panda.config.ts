@@ -56,6 +56,7 @@ export default defineConfig({
 			group: ["*"],
 			heading: ["*"],
 			hoverCard: ["*"],
+			icon: ["*"],
 			input: ["*"],
 			anchor: ["*"],
 			dropdown: ["*"],

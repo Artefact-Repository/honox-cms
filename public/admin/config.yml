@@ -212,6 +212,23 @@ collections:
                                 options: ["_blank", "_self", "_parent", "_top"]
                                 required: false
                               - { label: Rel, name: rel, widget: string, required: false }
+                          - label: Icon
+                            name: icon
+                            widget: object
+                            fields: &icon_fields
+                              - label: SVG Markup
+                                name: svg
+                                widget: text
+                                hint: "Raw inner SVG markup, e.g. <path d=\"M12 2 2 7l10 5 10-5-10-5z\" />"
+                              - { label: View Box, name: viewBox, widget: string, default: "0 0 24 24" }
+                              - { label: Fill, name: fill, widget: string, default: "none", required: false }
+                              - { label: Stroke, name: stroke, widget: string, default: "currentColor", required: false }
+                              - label: Size
+                                name: size
+                                widget: select
+                                options: [2xs, xs, sm, md, lg, xl]
+                                default: md
+                              - { label: Accessible Label, name: ariaLabel, widget: string, required: false, hint: "Leave blank for a decorative icon" }
                           - label: Checkbox
                             name: checkbox
                             widget: object
@@ -685,6 +702,10 @@ collections:
                     name: link
                     widget: object
                     fields: *link_fields
+                  - label: Icon
+                    name: icon
+                    widget: object
+                    fields: *icon_fields
                   - label: Checkbox
                     name: checkbox
                     widget: object
@@ -997,6 +1018,10 @@ collections:
             name: text
             widget: object
             fields: *text_fields
+          - label: Icon
+            name: icon
+            widget: object
+            fields: *icon_fields
           - label: Checkbox
             name: checkbox
             widget: object
