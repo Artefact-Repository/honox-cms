@@ -1,4 +1,8 @@
-import { parseFrontmatter, stripMarkdown } from "../utils/markdown";
+import {
+	markdownToHtml,
+	parseFrontmatter,
+	stripMarkdown,
+} from "../utils/markdown";
 import { buildHaystack, type SearchIndexEntry } from "../utils/search";
 
 // Use Vite's import.meta.glob to import all markdown files at build time
@@ -26,6 +30,13 @@ export interface LoadedPosts {
 	searchEntries: SearchIndexEntry[];
 	/** Unique tags across all posts, sorted */
 	tags: string[];
+}
+
+export interface PostDetail extends BlogPost {
+	/** Post body rendered to HTML */
+	html: string;
+	/** Up to 3 published posts sharing a tag with this one */
+	relatedPosts: BlogPost[];
 }
 
 export async function loadPosts(): Promise<LoadedPosts> {
@@ -94,4 +105,48 @@ export async function loadPosts(): Promise<LoadedPosts> {
 	);
 
 	return { posts, searchEntries, tags: Array.from(allTags).sort() };
+}
+
+/**
+ * Loads a single post by slug, rendered to HTML, with related posts attached.
+ * Returns undefined if the slug doesn't exist, or (in production) if it's a draft.
+ */
+export async function loadPostBySlug(
+	slug: string,
+): Promise<PostDetail | undefined> {
+	const loader = postFiles[`/content/posts/${slug}.md`];
+	if (!loader) {
+		return undefined;
+	}
+
+	const markdown = await (loader as () => Promise<string>)();
+	const { data, content } = parseFrontmatter(markdown);
+	const isDraft = data.draft === true;
+
+	if (isDraft && process.env["NODE_ENV"] === "production") {
+		return undefined;
+	}
+
+	const tags = Array.isArray(data.tags) ? data.tags : [];
+	const post: BlogPost = {
+		slug,
+		title: data.title || "Untitled",
+		date: data.date || "",
+		description: data.description || "",
+		tags,
+		draft: isDraft,
+		author: data.author || "Artefact Team",
+		readTime: data.readTime || "5 min read",
+		cover: data.cover,
+	};
+
+	const { posts: allPosts } = await loadPosts();
+	const relatedPosts = allPosts
+		.filter(
+			(other) =>
+				other.slug !== slug && other.tags.some((tag) => tags.includes(tag)),
+		)
+		.slice(0, 3);
+
+	return { ...post, html: markdownToHtml(content), relatedPosts };
 }

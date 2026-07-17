@@ -1,6 +1,6 @@
 // Shared search primitives used by the blog route (SSR filtering for the
-// no-JS ?q= fallback), the /search-index.json route (SSG static index), and
-// the Search island (instant client-side filtering + autocomplete), so
+// no-JS ?q= fallback), the /api/posts/search.json route (SSG static index),
+// and the Search island (instant client-side filtering + autocomplete), so
 // server, build output, and client always agree on what matches.
 
 export interface SearchIndexEntry {
@@ -15,7 +15,7 @@ export interface SearchIndexEntry {
 	haystack: string;
 }
 
-/** Shape of the SSG-generated /search-index.json document */
+/** Shape of the SSG-generated /api/posts/search.json document */
 export interface SearchIndexDocument {
 	generated: string;
 	entries: SearchIndexEntry[];

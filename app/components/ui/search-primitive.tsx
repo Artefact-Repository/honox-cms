@@ -187,7 +187,7 @@ export function SearchBase(props: SearchBaseProps) {
  */
 export function InteractiveSearch(props: SearchBaseProps) {
 	const {
-		src = "/search-index.json",
+		src = "/api/posts/search.json",
 		placeholder = "Search...",
 		initialQuery = "",
 		debounceMs = 150,

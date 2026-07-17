@@ -184,7 +184,7 @@ export default createRoute(
 					</Text>
 				</header>
 
-				{/* Search (island) — global autocomplete over /search-index.json */}
+				{/* Search (island) — global autocomplete over /api/posts/search.json */}
 				<section class={css({ mb: "8", maxWidth: "xl", mx: "auto" })}>
 					<Search
 						placeholder="Search all articles..."

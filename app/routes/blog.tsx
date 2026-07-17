@@ -222,10 +222,10 @@ export default createRoute(async (c) => {
 			{/* Search + Tag Browse */}
 			<section class={css({ mb: "8" })}>
 				<Stack gap="4" align="flex-start" justify="space-between" wrap="wrap">
-					{/* Instant Search (island) — lazily fetches /search-index.json */}
+					{/* Instant Search (island) — lazily fetches /api/posts/search.json */}
 					<div class={css({ flex: "1", minWidth: "260px" })}>
 						<Search
-							src="/search-index.json"
+							src="/api/posts/search.json"
 							action="/blog"
 							initialQuery={searchQuery}
 							placeholder="Search articles..."
