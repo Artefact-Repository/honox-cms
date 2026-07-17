@@ -389,6 +389,12 @@ describe("Tabs Unit Tests", () => {
 		expect(scrollHtml).not.toContain("onTabScroll");
 	});
 
+	test("should pass an explicit dir through to the root element", () => {
+		const html = (<Tabs items={items} dir="rtl" />).toString();
+
+		expect(html).toMatch(/dir="rtl"/);
+	});
+
 	test("should support tabBarGutter and tabBarStyle", () => {
 		const html = (
 			<Tabs

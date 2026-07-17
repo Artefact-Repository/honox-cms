@@ -71,8 +71,11 @@ export const tabs = defineSlotRecipe({
 			transitionDuration: "normal",
 			transitionTimingFunction: "default",
 			_hover: {
-				bg: "bg.emphasized",
+				bg: "gray.surface.bg.hover",
 				color: "fg.default",
+			},
+			_active: {
+				bg: "gray.surface.bg.active",
 			},
 			_focusVisible: {
 				focusVisibleRing: "outside",
@@ -88,8 +91,11 @@ export const tabs = defineSlotRecipe({
 			justifyContent: "center",
 			outline: "0",
 			_hover: {
-				bg: "bg.subtle",
+				bg: "gray.surface.bg.hover",
 				color: "fg.default",
+			},
+			_active: {
+				bg: "gray.surface.bg.active",
 			},
 			_focusVisible: {
 				focusVisibleRing: "outside",
@@ -294,7 +300,7 @@ export const tabs = defineSlotRecipe({
 					display: "none",
 				},
 				trigger: {
-					bg: "bg.subtle",
+					bg: "gray.surface.bg",
 					borderWidth: "1px",
 					borderColor: "border",
 					color: "fg.muted",
@@ -310,15 +316,17 @@ export const tabs = defineSlotRecipe({
 						me: "-1px",
 					},
 					_selected: {
-						bg: "bg.default",
+						// Matches the page background so the selected trigger's
+						// shared edge visually merges into the content below it.
+						bg: "canvas",
 						borderColor: "border",
 						color: "colorPalette.plain.fg",
 						zIndex: 1,
 						_horizontal: {
-							borderBottomColor: "bg.default",
+							borderBottomColor: "canvas",
 						},
 						_vertical: {
-							borderInlineEndColor: "bg.default",
+							borderInlineEndColor: "canvas",
 						},
 					},
 				},

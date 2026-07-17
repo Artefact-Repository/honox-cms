@@ -112,6 +112,9 @@ export interface RootProps extends TabsVariantProps, PropsWithChildren {
 	onValueChange?: (value: string | undefined) => void;
 	id?: string;
 	orientation?: "horizontal" | "vertical";
+	/** Overrides the ambient text direction for arrow-key navigation. Defaults to
+	 * the computed direction (e.g. an ancestor `<html dir="rtl">`). */
+	dir?: "ltr" | "rtl";
 	activationMode?: "automatic" | "manual";
 	/** Whether re-activating the selected trigger clears the selection. Default `false`. */
 	deselectable?: boolean;
@@ -179,6 +182,7 @@ export function Root(props: RootProps) {
 		onValueChange,
 		id: idProp,
 		orientation,
+		dir,
 		rootRef,
 		deselectable,
 		loopFocus,
@@ -288,6 +292,7 @@ export function Root(props: RootProps) {
 				}}
 				class={cx(stylesObj.root, semanticRoot.className, localProps.class)}
 				style={rootStyle}
+				dir={dir}
 				data-orientation={resolvedOrientation}
 				data-placement={placement}
 				data-scope="tabs"

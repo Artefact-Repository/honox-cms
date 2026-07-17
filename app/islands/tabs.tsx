@@ -183,14 +183,37 @@ export default function TabsIsland(props: TabsIslandProps) {
 	// selected — that only works through the `items` API, where `TabsStructure`
 	// is constructed fresh from this state on every render (unlike a static
 	// `children` subtree, a freshly built element genuinely re-renders).
+	// Find the trigger element whose `data-value` matches, without ever
+	// interpolating the (arbitrary, user-supplied) value into a selector
+	// string — mirrors the lookup style used by `syncSelection` below.
+	const findTrigger = (targetValue: string | undefined) =>
+		Array.from(
+			rootRef.current?.querySelectorAll<HTMLElement>(
+				'[data-scope="tabs"][data-part="trigger"]',
+			) ?? [],
+		).find((trigger) => trigger.getAttribute("data-value") === targetValue);
+
 	const handleTabClose = (closedValue: string) => {
+		// Closing a tab removes its DOM node; if focus was inside it (the close
+		// button, almost always), that focus would otherwise fall back to
+		// `<body>` and strand keyboard/screen-reader users. Capture the intent
+		// before the state update tears the node down, then restore it to the
+		// neighbor that takes over as active.
+		const closedTrigger = findTrigger(closedValue);
+		const shouldRefocus = !!(
+			closedTrigger && closedTrigger.contains(document.activeElement)
+		);
+
 		setTabItems((prev) => {
 			const closedIndex = prev.findIndex((item) => item.value === closedValue);
 			const next = prev.filter((item) => item.value !== closedValue);
 			const neighbor = next[Math.min(closedIndex, next.length - 1)];
 			if (value === closedValue && neighbor) {
 				setValue(neighbor.value);
-				requestAnimationFrame(() => syncSelection(neighbor.value));
+				requestAnimationFrame(() => {
+					syncSelection(neighbor.value);
+					if (shouldRefocus) findTrigger(neighbor.value)?.focus();
+				});
 				onChange?.(neighbor.value);
 				onValueChange?.(neighbor.value);
 			}
@@ -210,7 +233,12 @@ export default function TabsIsland(props: TabsIslandProps) {
 		};
 		setTabItems((prev) => [...prev, newItem]);
 		setValue(newItem.value);
-		requestAnimationFrame(() => syncSelection(newItem.value));
+		// Mirrors "open a new tab" convention elsewhere (browsers, editors):
+		// move focus onto the tab that just became active.
+		requestAnimationFrame(() => {
+			syncSelection(newItem.value);
+			findTrigger(newItem.value)?.focus();
+		});
 		onChange?.(newItem.value);
 		onValueChange?.(newItem.value);
 		onEdit?.("add" as any, "add");
@@ -230,6 +258,32 @@ export default function TabsIsland(props: TabsIslandProps) {
 			setTabItems(normalizedItems);
 		}
 	}, [items]);
+
+	// A trigger's own size can change without the tab list's box changing at
+	// all — a narrower viewport wrapping a label, a webfont swap, a locale
+	// string of different length — so the sliding indicator (measured in
+	// absolute px) would otherwise drift out of place until the next click.
+	// Re-observing on every `tabItems` change also keeps freshly added/closed
+	// editable tabs covered.
+	useEffect(() => {
+		const root = rootRef.current;
+		if (!root) return;
+
+		const triggers = Array.from(
+			root.querySelectorAll<HTMLElement>(
+				'[data-scope="tabs"][data-part="trigger"]',
+			),
+		);
+		const observer = new ResizeObserver(() => {
+			const active = triggers.find(
+				(trigger) => trigger.getAttribute("data-selected") !== null,
+			);
+			updateIndicator(active ?? null);
+		});
+		for (const trigger of triggers) observer.observe(trigger);
+
+		return () => observer.disconnect();
+	}, [tabItems]);
 
 	useEffect(() => {
 		const root = rootRef.current;
@@ -294,8 +348,14 @@ export default function TabsIsland(props: TabsIslandProps) {
 			);
 			const index = triggers.indexOf(trigger);
 			const vertical = root.getAttribute("data-orientation") === "vertical";
-			const nextKey = vertical ? "ArrowDown" : "ArrowRight";
-			const prevKey = vertical ? "ArrowUp" : "ArrowLeft";
+			// Horizontal layouts mirror in RTL, so Left/Right must swap meaning
+			// too — honor an explicit `dir` prop, else fall back to whatever
+			// direction actually got computed (an ancestor `<html dir="rtl">`).
+			const rtl =
+				!vertical &&
+				(props.dir ?? getComputedStyle(root).direction) === "rtl";
+			const nextKey = vertical ? "ArrowDown" : rtl ? "ArrowLeft" : "ArrowRight";
+			const prevKey = vertical ? "ArrowUp" : rtl ? "ArrowRight" : "ArrowLeft";
 			const loopFocus = props.loopFocus ?? true;
 
 			let nextIndex = -1;

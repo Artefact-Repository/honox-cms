@@ -18,6 +18,7 @@ The first enabled tab is selected automatically when no `value`/`defaultValue` (
 | `colorPalette` | `"gray" \| "blue" \| "green" \| "red" \| "orange" \| "cyan" \| "amber" \| "purple"` | Accent color theme for selection / indicators. | `"gray"` |
 | `type` | `"line" \| "card" \| "editable-card"` | Basic style mapping. `"editable-card"` automatically configures the card style and editable triggers. | `"line"` |
 | `tabPlacement` / `tabPosition` | `"top" \| "bottom" \| "left" \| "right" \| "start" \| "end"` | Visual layout placement of the tab headers relative to the content pane. | `"top"` |
+| `dir` | `"ltr" \| "rtl"` | Overrides the ambient text direction for arrow-key navigation (an inherited `<html dir="rtl">` is honored automatically otherwise). | - |
 | `activeKey` / `value` | `string` | The currently active tab key (Controlled). | - |
 | `defaultActiveKey` / `defaultValue` | `string` | The initially active tab key (Uncontrolled). | First enabled tab |
 | `onChange` / `onValueChange` | `(key: string) => void` | Callback executed when the active tab is changed. | - |
@@ -184,7 +185,18 @@ full model.
 - **Keyboard support (hydrated):** orientation-aware arrow keys move and (in automatic
   activation mode) select tabs, `Home`/`End` jump to the extremes, and `Enter`/`Space`
   activate the focused tab — including closable tabs, which render as `div[role="tab"]`
-  wrappers so their close button stays a real `<button>`.
+  wrappers so their close button stays a real `<button>`. In a horizontal, right-to-left
+  layout (an explicit `dir="rtl"`, or an inherited `<html dir="rtl">`), Left/Right are
+  swapped to match the visually mirrored layout.
+- **Focus follows editable mutations:** closing the active tab moves focus to the
+  neighbor that takes over as active — but only if focus was actually inside the tab
+  being closed, so a programmatic close elsewhere on the page never steals focus.
+  Adding a tab focuses the newly active trigger, mirroring the "open a new tab"
+  convention of browsers and editors.
+- **The sliding indicator tracks layout changes, not just selection:** a `ResizeObserver`
+  on every trigger repositions it whenever a trigger's own size changes — a viewport
+  resize wrapping a label, a webfont swap, an editable tab being added or removed —
+  not only when the active tab itself changes.
 - Pass `interactive={true}` / `interactive={false}` to force or forbid hydration outright;
   this is implemented via the shared `shouldHydrate(interactive, hasSignal)` predicate in
   `app/components/ui/island-utils.ts`.
