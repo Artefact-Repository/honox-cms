@@ -14,6 +14,7 @@ Live demo: [https://honox.chen.so](https://honox.chen.so), [https://honox-ts.ver
 | **Styling** | [PandaCSS](https://panda-css.com) — type-safe, zero-runtime CSS-in-JS |
 | **CMS** | [Sveltia CMS](https://sveltiacms.app) — Git-backed, runs at `/admin/` |
 | **Blog** | Markdown posts in `content/posts/`, rendered at `/blog` |
+| **API** | Read-only JSON REST API for posts at `/api/posts/*` |
 | **SSG** | Static site generation via `@hono/vite-ssg` |
 | **Deploy** | Cloudflare Pages (`wrangler.jsonc`) |
 
@@ -31,6 +32,9 @@ Live demo: [https://honox.chen.so](https://honox.chen.so), [https://honox-ts.ver
 | `/blog/:slug` | `app/routes/blog/[slug].tsx` | Individual post |
 | `/admin/` | `public/admin/index.html` | Sveltia CMS UI |
 | `/pages/:slug` | `app/routes/pages/[slug].tsx` | Dynamic CMS-built pages |
+| `/api/posts/index.json` | `app/routes/api/posts/index.json.ts` | Post collection (JSON) |
+| `/api/posts/:slug.json` | `app/routes/api/posts/[slug].json.ts` | Single post detail (JSON) |
+| `/api/posts/search.json` | `app/routes/api/posts/search.json.ts` | Search index (JSON) |
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for UI components architecture details.
 
@@ -50,6 +54,20 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for UI components architecture 
 2. **Components** — Choose from 25+ UI components (Stack, Card, Dialog, etc.).
 3. **Nesting** — Build complex layouts with recursive nesting (e.g., a Card inside a Stack inside another Stack).
 4. **Render** — The `PageRenderer` component (`app/components/page-renderer.tsx`) maps JSON data to themed UI components.
+
+---
+
+## Posts API
+
+A read-only JSON REST API over the same `content/posts/*.md` files that back `/blog`, prerendered by SSG like every other route. Because the site deploys as static files with no live server at request time, every endpoint's URL includes a literal `.json` suffix — that's the exact filename the build writes to `dist/`, so the same path works identically in dev (`bun run dev`) and once deployed.
+
+| Endpoint | Description |
+|---|---|
+| `GET /api/posts/index.json` | All published posts (drafts excluded in production), newest first. Shape: `{ generated, total, tags, posts: BlogPost[] }`. |
+| `GET /api/posts/:slug.json` | One post's full detail: frontmatter fields + rendered `html` + up to 3 `relatedPosts` sharing a tag. `404` with `{ "error": "Not found" }` for a missing or (in production) draft slug. |
+| `GET /api/posts/search.json` | The same search index the `Search` island fetches client-side. Shape: `{ generated, entries: SearchIndexEntry[] }`. |
+
+Implementation: `app/lib/posts.ts` (`loadPosts`, `loadPostBySlug`) backs all three routes. `app/routes/api/posts/_404.tsx` scopes a JSON not-found handler to this namespace so API errors don't fall back to the site's HTML 404 page.
 
 ---
 
@@ -116,6 +134,12 @@ app/
     blog/[slug].tsx  # Individual post
     blog/tag/[tag].tsx  # Tag-filtered post list
     pages/[slug].tsx # Page builder SSG route
+    api/posts/       # Read-only posts REST API
+      index.json.ts    # GET /api/posts/index.json — post collection
+      [slug].json.ts   # GET /api/posts/:slug.json — single post detail
+      search.json.ts   # GET /api/posts/search.json — search index
+      _404.tsx          # JSON 404s scoped to /api/posts/*
+  lib/posts.ts      # Post loading/parsing shared by blog pages + API
 utils/
   markdown.ts        # Frontmatter parser + MD→HTML
 content/posts/       # Blog post markdown files
