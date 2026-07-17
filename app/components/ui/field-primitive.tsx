@@ -9,6 +9,7 @@ import {
 	useId,
 	useState,
 } from "hono/jsx";
+import { useFieldsetContext } from "./fieldset";
 
 export interface FieldContextValue {
 	id: string;
@@ -101,10 +102,10 @@ export function FieldRoot(props: FieldProps) {
 		children,
 		class: classProp,
 		id: idProp,
-		disabled = props.disabled,
-		invalid: invalidProp = props.invalid,
-		readOnly = props.readOnly,
-		required = props.required,
+		disabled: disabledProp,
+		invalid: invalidProp,
+		readOnly,
+		required: requiredProp,
 		label,
 		helperText,
 		errorText: errorTextProp,
@@ -118,6 +119,14 @@ export function FieldRoot(props: FieldProps) {
 		...restProps
 	} = localProps;
 	const effectiveValidator = validator ?? validatorSource;
+
+	// A Field with no invalid/disabled/required signal of its own inherits
+	// the enclosing Fieldset's — mirrors Ark UI's Fieldset, which "provides
+	// contexts such as invalid and disabled for form elements." An explicit
+	// prop on the Field always wins.
+	const fieldsetContext = useFieldsetContext();
+	const disabled = disabledProp ?? fieldsetContext?.disabled;
+	const required = requiredProp ?? fieldsetContext?.required;
 
 	const [internalValue, setInternalValue] = useState(valueProp ?? defaultValue);
 
@@ -143,6 +152,14 @@ export function FieldRoot(props: FieldProps) {
 
 	if (invalidProp !== undefined) {
 		isInvalid = invalidProp;
+	} else if (
+		effectiveValidator === undefined &&
+		minLength === undefined &&
+		fieldsetContext?.invalid !== undefined
+	) {
+		// No validator of its own — inherit the group's invalid state instead
+		// of always reading as valid.
+		isInvalid = fieldsetContext.invalid;
 	}
 
 	const handleValueChange = (newValue: string) => {

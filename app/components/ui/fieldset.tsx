@@ -4,7 +4,7 @@ import { fieldset } from "design-system/recipes";
 import type { Child, PropsWithChildren } from "hono/jsx";
 import { createContext, useContext, useId } from "hono/jsx";
 
-interface FieldsetContextValue {
+export interface FieldsetContextValue {
 	id: string;
 	disabled?: boolean;
 	invalid?: boolean;
@@ -15,7 +15,11 @@ interface FieldsetContextValue {
 
 const FieldsetContext = createContext<FieldsetContextValue | null>(null);
 
-const useFieldsetContext = () => useContext(FieldsetContext);
+// Exported so nested form-control primitives (Field, Switch, ...) can pick up
+// the group's disabled/invalid/required state as a fallback — matching Ark
+// UI's Fieldset, which "provides contexts such as invalid and disabled for
+// form elements."
+export const useFieldsetContext = () => useContext(FieldsetContext);
 
 interface FieldsetProps extends FieldsetVariantProps, PropsWithChildren {
 	class?: string;
@@ -35,9 +39,9 @@ function Fieldset(props: FieldsetProps) {
 		children,
 		class: classProp,
 		id: idProp,
-		disabled = props.disabled,
-		invalid: invalidProp = props.invalid,
-		required = props.required,
+		disabled,
+		invalid: invalidProp,
+		required,
 		legend,
 		helperText,
 		errorText,
@@ -79,7 +83,6 @@ function Fieldset(props: FieldsetProps) {
 				disabled={disabled}
 				aria-describedby={describedBy || undefined}
 				aria-invalid={invalid ? "true" : undefined}
-				aria-required={required ? "true" : undefined}
 				data-invalid={invalid ? "" : undefined}
 				data-disabled={disabled ? "" : undefined}
 				data-required={required ? "" : undefined}
@@ -89,9 +92,7 @@ function Fieldset(props: FieldsetProps) {
 				the only place browsers use it to compute the group's
 				accessible name, so it can't live inside FieldsetContent. */}
 				{legend && <FieldsetLegend>{legend}</FieldsetLegend>}
-				{hasHelperText && (
-					<FieldsetHelperText>{helperText}</FieldsetHelperText>
-				)}
+				{hasHelperText && <FieldsetHelperText>{helperText}</FieldsetHelperText>}
 				{children && <FieldsetControl>{children}</FieldsetControl>}
 				{invalid && hasErrorText && (
 					<FieldsetErrorText>{errorText}</FieldsetErrorText>
@@ -204,7 +205,7 @@ export {
 	FieldsetErrorText,
 	FieldsetHelperText,
 	FieldsetLegend,
-	FieldsetRequiredIndicator,
 	type FieldsetProps,
+	FieldsetRequiredIndicator,
 };
 export default Fieldset;

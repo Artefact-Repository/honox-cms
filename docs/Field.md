@@ -78,6 +78,25 @@ export default function MyPage() {
 }
 ```
 
+## Fieldset inheritance
+
+A `Field` nested inside a `Fieldset` inherits the group's `disabled`/`required`
+state, and its `invalid` state too — but only when the `Field` has no
+validation of its own (no `validator`/`minLength` and no explicit `invalid`
+prop). An explicit prop on `Field` always wins over the inherited value.
+
+```tsx
+<Fieldset legend="Shipping address" disabled>
+  {/* inherits disabled — no need to repeat it */}
+  <Field label="Street" />
+</Fieldset>
+```
+
+Note that native `<fieldset disabled>` also disables every descendant form
+control at the browser level regardless of this inheritance — the inherited
+`disabled` prop only keeps the `Field`'s own styling/ARIA in sync with that,
+it can't be overridden back to enabled from inside a disabled fieldset.
+
 ## Composition
 
 For more control, you can wrap other components like `Textarea` or custom inputs. The `Field` provides context to its children.

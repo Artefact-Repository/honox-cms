@@ -5,7 +5,9 @@
 Groups related form controls under a native `<fieldset>`, with an accessible
 legend, helper text, and error text. Unlike `Field`, it has no validator of
 its own — it's a static, server-rendered grouping primitive, so it never
-hydrates as a client island.
+hydrates as a client island. It provides its `disabled`/`invalid`/`required`
+state as context to nested `Field`s, matching Ark UI's Fieldset — see
+[Context propagation](#context-propagation-to-nested-fields).
 
 # Props
 
@@ -14,7 +16,7 @@ hydrates as a client island.
 | `children`   | `any`     | Form controls to render inside the fieldset.                                                    |
 | `class`      | `string`  | Custom CSS classes.                                                                              |
 | `id`         | `string`  | Unique identifier. Auto-generated if omitted.                                                   |
-| `disabled`   | `boolean` | Disables the fieldset. Native `<fieldset disabled>` automatically disables every descendant control — no extra wiring needed. |
+| `disabled`   | `boolean` | Disables the fieldset. Native `<fieldset disabled>` automatically disables every descendant control, and nested `Field`s pick it up as context too — see [Context propagation](#context-propagation-to-nested-fields). |
 | `invalid`    | `boolean` | Whether the fieldset is in an invalid state. Defaults to `true` whenever `errorText` is set, so you usually don't need to pass this explicitly. |
 | `required`   | `boolean` | Marks the group as required and appends a required indicator to the legend. |
 | `legend`     | `Child`   | The legend text for the fieldset. Always rendered as a direct child of `<fieldset>` — see [Composition](#composition). |
@@ -43,6 +45,30 @@ export default function MyPage() {
 Passing `errorText` is enough to put the fieldset into its invalid state —
 you don't need to also pass `invalid`. Pass `invalid={false}` explicitly if
 you want to suppress the error styling while still keeping the text around.
+
+## Context propagation to nested Fields
+
+`Fieldset` exposes its `disabled`/`invalid`/`required` state as context.
+Every nested `Field` reads it as a fallback for its own — so a group-level
+`disabled` or `required` doesn't need to be repeated on each field:
+
+```tsx
+<Fieldset legend="Shipping address" disabled required>
+  <Field label="Street" />   {/* renders disabled + required */}
+  <Field label="Apt #" required={false} />  {/* opts back out of required */}
+</Fieldset>
+```
+
+A `Field`'s own prop always wins over the inherited one. For `invalid`
+specifically, inheritance only applies when the `Field` has no validation of
+its own (no `validator`, `minLength`, or explicit `invalid` prop) — a `Field`
+that validates its own value is never silently overridden by the group.
+
+This propagation is one level: only `Field` (and anything built on top of it,
+like `Textarea`) consults `Fieldset`'s context. A bare `Switch` or `Checkbox`
+placed directly inside a `Fieldset` — with no wrapping `Field` — won't pick
+up the group's styling, though native `<fieldset disabled>` still blocks
+interaction with it regardless.
 
 ## Composition
 
