@@ -23,6 +23,7 @@ import {
 	Dialog,
 	Drawer,
 	Dropdown,
+	Editable,
 	Field,
 	Fieldset,
 	FileUpload,
@@ -916,6 +917,27 @@ export default createRoute((c) => {
 											>
 												Dispatch Toast
 											</Button>
+										</Stack>
+									</Card>
+
+									{/* Editable */}
+									<Card
+										title="Editable"
+										description="Click to edit inline, in place"
+									>
+										<Stack
+											direction="vertical"
+											gap="4"
+											class={css({ mt: "2" })}
+										>
+											<Editable
+												label="Project name"
+												defaultValue="Artefact UI Suite"
+											/>
+											<Editable
+												label="Description"
+												placeholder="Add a description…"
+											/>
 										</Stack>
 									</Card>
 								</Grid>

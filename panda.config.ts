@@ -49,6 +49,7 @@ export default defineConfig({
 			combobox: ["*"],
 			dialog: ["*"],
 			drawer: ["*"],
+			editable: ["*"],
 			field: ["*"],
 			fieldset: ["*"],
 			fileUpload: ["*"],

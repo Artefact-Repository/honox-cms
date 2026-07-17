@@ -9,6 +9,16 @@ import {
 	useId,
 } from "hono/jsx";
 
+// `TabsContext` below is a module-scope singleton. Hot-reloading this file
+// re-runs `createContext`, producing a *new* context object — any island
+// left mounted from before the edit keeps consuming the old one, so
+// `useTabsContext` desyncs across the reload and hono/jsx/dom's client
+// reconciler recurses without terminating (`RangeError: Maximum call stack
+// size exceeded` in its `build()`), collapsing the rendered tree. Declining
+// HMR forces Vite to fall back to a full page reload for this module
+// instead, which always leaves a single consistent context.
+import.meta.hot?.decline();
+
 type TabsStyles = ReturnType<typeof tabs>;
 
 const CloseIcon = () => (

@@ -17,6 +17,7 @@ import { datePicker } from "./date-picker";
 import { dialog } from "./dialog";
 import { drawer } from "./drawer";
 import { dropdown } from "./dropdown";
+import { editable } from "./editable";
 import { field } from "./field";
 import { fieldset } from "./fieldset";
 import { fileUpload } from "./file-upload";
@@ -85,6 +86,7 @@ export const slotRecipes = {
 	combobox,
 	dialog,
 	drawer,
+	editable,
 	field,
 	fieldset,
 	hoverCard,
