@@ -1,5 +1,5 @@
 {
-  "title": "Contact Us — Artefact",
+  "title": "Contact Us",
   "content": [
     {
       "type": "stack",
@@ -31,7 +31,6 @@
     {
       "type": "grid",
       "gap": "8",
-      "columns": "{\"base\": 1, \"md\": 2}",
       "children": [
         {
           "type": "stack",
@@ -66,12 +65,11 @@
         },
         {
           "type": "card",
-          "title": "Send us a message",
           "children": [
             {
               "type": "fieldset",
-              "id": "contact-form",
               "helperText": "We typically respond within 1 business day.",
+              "id": "contact-form",
               "children": [
                 {
                   "type": "field",
@@ -114,9 +112,11 @@
                 }
               ]
             }
-          ]
+          ],
+          "title": "Send us a message"
         }
-      ]
+      ],
+      "columns": "{\"base\": 1, \"md\": 2}"
     },
     {
       "type": "stack",
@@ -137,7 +137,6 @@
           "align": "center",
           "justify": "center",
           "gap": "6",
-          "wrap": "wrap",
           "children": [
             {
               "type": "link",
@@ -160,7 +159,8 @@
               "colorPalette": "slate",
               "href": "/status"
             }
-          ]
+          ],
+          "wrap": "wrap"
         }
       ]
     }
