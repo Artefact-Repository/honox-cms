@@ -233,7 +233,7 @@ Walk the list in order; stop at the first match:
 - `interactive` is only a "knob": `true` forces, `false` forbids, `undefined` defers to `hasSignal`.
 - Every Tier-1 / Tier-2 component should add a `# Hydration` section to its
   `content/components/<Component>.mdx` and cross-reference this file, and set
-  its frontmatter `hydration-tier` to match.
+  its frontmatter `hydration` field (`1` / `2` / `3`) to match.
 
 ***
 
@@ -262,4 +262,4 @@ The following divergences were resolved during convention rollout; kept here for
 
 - [UI Components Architecture](/docs/Architecture) — the project-level overview
 - `app/components/ui/island-utils.ts` — the single decision entry point
-- `content/components/<Component>.mdx` (each Tier-1 / Tier-2 component) — its own `# Hydration` section, plus `hydration-tier`/`category` frontmatter
+- `content/components/<Component>.mdx` (each Tier-1 / Tier-2 component) — its own `# Hydration` section, plus `hydration`/`category` frontmatter

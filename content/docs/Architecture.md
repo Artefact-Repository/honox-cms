@@ -22,4 +22,4 @@ This project is built on [**HonoX**](https://github.com/honojs/honox) **+** [**@
 
 - [Hydration](/docs/Hydration) — the 3-tier hydration model, decision checklist, and full per-component classification
 - `app/components/ui/island-utils.ts` — the single decision entry point
-- `content/components/<Component>.mdx` (each Tier-1 / Tier-2 component) — its own `# Hydration` section, plus `hydration-tier`/`category` frontmatter
+- `content/components/<Component>.mdx` (each Tier-1 / Tier-2 component) — its own `# Hydration` section, plus `hydration`/`category` frontmatter

@@ -6,10 +6,16 @@ import { Badge, Stack } from "../../components/ui";
 import { loadDocBySlug, loadDocs } from "../../lib/docs";
 import { markdownContentClass } from "../../utils/markdown-content-style";
 
-const TIER_COLOR: Record<string, string> = {
-	"Tier 1": "purple",
-	"Tier 2": "blue",
-	"Tier 3": "gray",
+const TIER_COLOR: Record<number, string> = {
+	1: "purple",
+	2: "blue",
+	3: "gray",
+};
+
+const TIER_LABEL: Record<number, string> = {
+	1: "Auto-interactive",
+	2: "Smart auto-detect",
+	3: "Presentational",
 };
 
 export default createRoute(
@@ -32,7 +38,7 @@ export default createRoute(
 			<DocsLayout docs={docs} activeSlug={slug}>
 				<title>{doc.title} - Docs - Artefact</title>
 
-				{(doc.category || doc.hydrationTier) && (
+				{(doc.category || doc.hydration) && (
 					<Stack
 						direction="horizontal"
 						gap="2"
@@ -44,13 +50,13 @@ export default createRoute(
 								{doc.category}
 							</Badge>
 						)}
-						{doc.hydrationTier && (
+						{doc.hydration && (
 							<Badge
 								variant="subtle"
-								colorPalette={TIER_COLOR[doc.hydrationTier] ?? "gray"}
+								colorPalette={TIER_COLOR[doc.hydration] ?? "gray"}
 								size="sm"
 							>
-								{doc.hydrationTier}
+								{TIER_LABEL[doc.hydration] ?? `Tier ${doc.hydration}`}
 							</Badge>
 						)}
 					</Stack>

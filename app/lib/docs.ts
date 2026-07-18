@@ -14,7 +14,7 @@ const guideModules = import.meta.glob("/content/docs/*.md", {
 
 interface ComponentFrontmatter {
 	title?: string;
-	"hydration-tier"?: string;
+	hydration?: number;
 	category?: string;
 }
 type ComponentModule = () => Promise<{
@@ -31,8 +31,8 @@ export interface DocSummary {
 	section: "Guides" | "Components";
 	/** Fine-grained grouping, components only (e.g. "Layout", "Forms", "Overlays"). */
 	category?: string;
-	/** Hydration tier per app/components/ui/island-utils.ts, components only. */
-	hydrationTier?: string;
+	/** Hydration tier (1/2/3) per app/components/ui/island-utils.ts, components only. */
+	hydration?: number;
 }
 
 export interface DocDetail extends DocSummary {
@@ -75,7 +75,7 @@ async function summarizeComponent(
 		title: mod.frontmatter?.title || slug,
 		section: "Components",
 		category: mod.frontmatter?.category,
-		hydrationTier: mod.frontmatter?.["hydration-tier"],
+		hydration: mod.frontmatter?.hydration,
 	};
 }
 
@@ -128,7 +128,7 @@ export async function loadDocBySlug(
 			title: mod.frontmatter?.title || slug,
 			section: "Components",
 			category: mod.frontmatter?.category,
-			hydrationTier: mod.frontmatter?.["hydration-tier"],
+			hydration: mod.frontmatter?.hydration,
 			Component: mod.default,
 		};
 	}
