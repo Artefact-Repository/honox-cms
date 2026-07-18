@@ -3,7 +3,6 @@ import { button } from "design-system/recipes";
 import type { DocsConfig, DocsNavLinkConfig, DocSummary } from "../lib/docs";
 import {
 	Anchor,
-	Avatar,
 	Drawer,
 	Heading,
 	IconButton,
@@ -314,12 +313,6 @@ function DocsHeader({ editUrl, groups, activeSlug, links }: DocsHeaderProps) {
 					class={css({ textDecoration: "none", flexShrink: "0" })}
 				>
 					<Stack direction="horizontal" gap="3" align="center">
-						<Avatar
-							name="Artefact UI"
-							size="sm"
-							variant="solid"
-							colorPalette="blue"
-						/>
 						<Heading
 							as="h1"
 							class={css({
