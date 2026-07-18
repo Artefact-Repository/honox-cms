@@ -268,8 +268,13 @@ function DocsHeader({
 		<header
 			class={css({
 				borderBottomWidth: "1px",
-				borderColor: "border",
-				bg: "bg.default",
+				borderColor: { _light: "white.a4", _dark: "black.a4" },
+				bg: { _light: "white.a7", _dark: "black.a7" },
+				backdropFilter: "blur(20px) saturate(180%)",
+				boxShadow: {
+					_light: "inset 0 1px 0 0 rgba(255, 255, 255, 0.5), 0 4px 30px rgba(0, 0, 0, 0.03)",
+					_dark: "inset 0 1px 0 0 rgba(255, 255, 255, 0.15), 0 4px 30px rgba(0, 0, 0, 0.2)",
+				},
 				position: "sticky",
 				top: "0",
 				zIndex: "20",
