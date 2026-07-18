@@ -18,14 +18,15 @@ export default createRoute(
 			return c.notFound();
 		}
 
+		const DocContent = doc.Component;
+
 		return c.render(
 			<DocsLayout docs={docs} activeSlug={slug}>
 				<title>{doc.title} - Docs - Artefact</title>
 
-				<div
-					class={markdownContentClass}
-					dangerouslySetInnerHTML={{ __html: doc.html }}
-				/>
+				<div class={markdownContentClass}>
+					<DocContent />
+				</div>
 			</DocsLayout>,
 		);
 	},

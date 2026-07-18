@@ -9,7 +9,11 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import adapter from "@hono/vite-dev-server/node";
 import ssg from "@hono/vite-ssg";
+import mdx from "@mdx-js/rollup";
 import honox, { devServerDefaultOptions } from "honox/vite";
+import remarkFrontmatter from "remark-frontmatter";
+import remarkGfm from "remark-gfm";
+import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 import { defineConfig } from "vite";
 import pandaConfig from "./panda.config";
 
@@ -70,6 +74,10 @@ const mainConfig = (_mode: string) => ({
 		jsxImportSource: "hono/jsx",
 	},
 	plugins: [
+		mdx({
+			jsxImportSource: "hono/jsx",
+			remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter, remarkGfm],
+		}),
 		honox({
 			devServer: {
 				adapter,
