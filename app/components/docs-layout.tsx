@@ -414,8 +414,10 @@ export function DocsLayout({
 		: undefined;
 	let editUrl: string | undefined;
 	if (activeDoc) {
-		const collection = activeDoc.section === "Guides" ? "docs" : "components";
-		editUrl = `/admin/#/collections/${collection}/entries/${activeDoc.slug}`;
+		const cmsCollection =
+			config.collections?.find((c) => c.folder === activeDoc.collection)
+				?.cmsCollection ?? activeDoc.collection;
+		editUrl = `/admin/#/collections/${cmsCollection}/entries/${activeDoc.slug}`;
 	}
 
 	return (

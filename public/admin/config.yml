@@ -1471,6 +1471,26 @@ singletons:
     label: Docs Configuration
     file: content/config/docs.json
     fields:
+      - label: Collections
+        name: collections
+        widget: list
+        required: false
+        hint: "Maps each content/<folder> collection (e.g. docs, components) to a sidenav label and, if it differs from the folder name, a CMS collection slug for the doc's Edit link. A folder with no entry here falls back to its capitalized name for both."
+        fields:
+          - label: Folder
+            name: folder
+            widget: string
+            hint: "Folder name under content/, e.g. docs or components."
+          - label: Label
+            name: label
+            widget: string
+            required: false
+            hint: "Sidenav/section label. Defaults to the capitalized folder name."
+          - label: CMS Collection
+            name: cmsCollection
+            widget: string
+            required: false
+            hint: "Overrides the Edit link's CMS collection slug if it differs from the folder name."
       - label: Groups
         name: groups
         widget: list
@@ -1479,10 +1499,9 @@ singletons:
           - { label: Label, name: label, widget: string }
           - label: Section
             name: section
-            widget: select
-            options: [Guides, Components]
+            widget: string
             required: false
-            hint: "Claim every doc from a whole collection, e.g. all Guides."
+            hint: "Claim every doc from a whole collection by its section label (see Collections above), e.g. Guides."
           - label: Category
             name: category
             widget: select

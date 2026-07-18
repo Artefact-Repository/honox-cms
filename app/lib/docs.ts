@@ -2,43 +2,50 @@ import type { FC } from "hono/jsx";
 import { markdownToHtml, parseFrontmatter } from "../utils/markdown";
 import { buildHaystack, type SearchIndexEntry } from "../utils/search";
 
-// Guides (architecture notes, CMS internals) are plain markdown — prose
-// only, no need for live JSX demos — parsed with the same hand-rolled
-// pipeline as blog posts. Component reference docs are MDX, compiled to a
-// real component (via @mdx-js/rollup, configured in vite.config.ts) so they
-// can embed live, actually-rendered examples.
-const guideModules = import.meta.glob("/content/docs/*.md", {
-	query: "?raw",
-	import: "default",
-}) as Record<string, () => Promise<string>>;
+// Docs content lives under content/<collection>/*.{md,mdx} — any folder
+// becomes a collection automatically (see DocsConfig below for labeling).
+// Plain .md is parsed with the same hand-rolled pipeline as blog posts; .mdx
+// is compiled to a real component (via @mdx-js/rollup, configured in
+// vite.config.ts) so pages can embed live, actually-rendered examples.
+// content/posts is excluded: blog posts have their own loader/route
+// (app/lib/posts.ts).
+const markdownModules = import.meta.glob(
+	["/content/*/*.md", "!/content/posts/**"],
+	{ query: "?raw", import: "default" },
+) as Record<string, () => Promise<string>>;
 
-interface ComponentFrontmatter {
+interface MdxFrontmatter {
 	title?: string;
 	hydration?: number;
 	category?: string;
 }
-type ComponentModule = () => Promise<{
+type MdxModule = () => Promise<{
 	default: FC;
-	frontmatter?: ComponentFrontmatter;
+	frontmatter?: MdxFrontmatter;
 }>;
-const componentModules = import.meta.glob(
-	"/content/components/*.mdx",
-) as Record<string, ComponentModule>;
+const mdxModules = import.meta.glob("/content/*/*.mdx") as Record<
+	string,
+	MdxModule
+>;
 
 export interface DocSummary {
 	slug: string;
 	title: string;
-	section: "Guides" | "Components";
-	/** Fine-grained grouping, components only (e.g. "Layout", "Forms", "Overlays"). */
+	/** Folder name under content/ this doc came from, e.g. "docs", "components". */
+	collection: string;
+	/** Display label for `collection` — DocsConfig.collections[].label, or the
+	 * capitalized folder name if no config entry exists for it. */
+	section: string;
+	/** Fine-grained grouping, set only if present in frontmatter (e.g. "Layout", "Forms"). */
 	category?: string;
-	/** Hydration tier (1/2/3) per app/components/ui/island-utils.ts, components only. */
+	/** Hydration tier (1/2/3) per app/components/ui/island-utils.ts, set only if present in frontmatter. */
 	hydration?: number;
 }
 
 export interface DocDetail extends DocSummary {
-	/** Set for guides (content/docs/*.md), rendered via dangerouslySetInnerHTML. */
+	/** Set for markdown docs, rendered via dangerouslySetInnerHTML. */
 	html?: string;
-	/** Set for components (content/components/*.mdx), rendered as JSX. */
+	/** Set for MDX docs, rendered as JSX. */
 	Component?: FC;
 }
 
@@ -55,9 +62,21 @@ export interface DocsNavLinkConfig {
 	href: string;
 }
 
-/** Shape of the `DocsConfig` singleton (content/config/docs.json) — drives the
- * docs sidenav's grouping/ordering so it isn't hardcoded to any one collection. */
+/** Metadata for one content/<folder> collection: how it's labeled in the
+ * sidenav/nav filters, and which CMS collection its "Edit" link should point
+ * at. Both fall back to the raw folder name when omitted, so a new
+ * content/<folder> collection works with zero config changes. */
+export interface DocsCollectionConfig {
+	folder: string;
+	label?: string;
+	cmsCollection?: string;
+}
+
+/** Shape of the `DocsConfig` singleton (content/config/docs.json) — drives
+ * collection labeling plus the docs sidenav's grouping/ordering, so none of
+ * it is hardcoded to any one collection. */
 export interface DocsConfig {
+	collections?: DocsCollectionConfig[];
 	groups: DocsNavGroupConfig[];
 	/** Label for docs that don't match any group above. Defaults to "Other". */
 	fallbackLabel?: string;
@@ -74,57 +93,6 @@ const docsConfigModule = import.meta.glob("/content/config/docs.json", {
 	import: "default",
 }) as Record<string, () => Promise<DocsConfig>>;
 
-function guideSlugFromPath(path: string): string {
-	return path.replace("/content/docs/", "").replace(/\.md$/, "");
-}
-
-function componentSlugFromPath(path: string): string {
-	return path.replace("/content/components/", "").replace(/\.mdx$/, "");
-}
-
-async function summarizeGuide(
-	path: string,
-	loader: () => Promise<string>,
-): Promise<DocSummary> {
-	const slug = guideSlugFromPath(path);
-	const raw = await loader();
-	const { data } = parseFrontmatter(raw);
-	return {
-		slug,
-		title: (data.title as string) || slug,
-		section: "Guides",
-	};
-}
-
-async function summarizeComponent(
-	path: string,
-	loader: ComponentModule,
-): Promise<DocSummary> {
-	const slug = componentSlugFromPath(path);
-	const mod = await loader();
-	return {
-		slug,
-		title: mod.frontmatter?.title || slug,
-		section: "Components",
-		category: mod.frontmatter?.category,
-		hydration: mod.frontmatter?.hydration,
-	};
-}
-
-export async function loadDocs(): Promise<DocSummary[]> {
-	const docs = await Promise.all([
-		...Object.entries(guideModules).map(([path, loader]) =>
-			summarizeGuide(path, loader),
-		),
-		...Object.entries(componentModules).map(([path, loader]) =>
-			summarizeComponent(path, loader),
-		),
-	]);
-
-	docs.sort((a, b) => a.slug.localeCompare(b.slug));
-	return docs;
-}
-
 /** Loads the DocsConfig singleton that drives the docs sidenav's grouping. */
 export async function loadDocsConfig(): Promise<DocsConfig> {
 	const loader = docsConfigModule["/content/config/docs.json"];
@@ -132,10 +100,76 @@ export async function loadDocsConfig(): Promise<DocsConfig> {
 	return loader();
 }
 
+function capitalize(value: string): string {
+	return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+function sectionLabel(folder: string, config: DocsConfig): string {
+	const entry = config.collections?.find((c) => c.folder === folder);
+	return entry?.label ?? capitalize(folder);
+}
+
+/** Splits a `/content/<folder>/<slug>.<ext>` module path into its parts. */
+function parseContentPath(path: string): { folder: string; slug: string } {
+	const match = path.match(/^\/content\/([^/]+)\/(.+)\.(?:md|mdx)$/);
+	if (!match) {
+		throw new Error(`Unexpected docs content path: ${path}`);
+	}
+	return { folder: match[1], slug: match[2] };
+}
+
+async function summarizeMarkdownDoc(
+	path: string,
+	loader: () => Promise<string>,
+	config: DocsConfig,
+): Promise<DocSummary> {
+	const { folder, slug } = parseContentPath(path);
+	const raw = await loader();
+	const { data } = parseFrontmatter(raw);
+	return {
+		slug,
+		title: (data.title as string) || slug,
+		collection: folder,
+		section: sectionLabel(folder, config),
+	};
+}
+
+async function summarizeMdxDoc(
+	path: string,
+	loader: MdxModule,
+	config: DocsConfig,
+): Promise<DocSummary> {
+	const { folder, slug } = parseContentPath(path);
+	const mod = await loader();
+	return {
+		slug,
+		title: mod.frontmatter?.title || slug,
+		collection: folder,
+		section: sectionLabel(folder, config),
+		category: mod.frontmatter?.category,
+		hydration: mod.frontmatter?.hydration,
+	};
+}
+
+export async function loadDocs(): Promise<DocSummary[]> {
+	const config = await loadDocsConfig();
+	const docs = await Promise.all([
+		...Object.entries(markdownModules).map(([path, loader]) =>
+			summarizeMarkdownDoc(path, loader, config),
+		),
+		...Object.entries(mdxModules).map(([path, loader]) =>
+			summarizeMdxDoc(path, loader, config),
+		),
+	]);
+
+	docs.sort((a, b) => a.slug.localeCompare(b.slug));
+	return docs;
+}
+
 /**
  * Search index entries for every doc, keyed on title/section/category.
- * Guide bodies are real text (stripped to a haystack like blog posts);
- * component bodies are compiled JSX, so those are scoped to name/category.
+ * Markdown bodies are real text (stripped to a haystack like blog posts);
+ * MDX bodies are compiled JSX, so those are scoped to name/category.
  */
 export async function loadDocsSearchIndex(): Promise<SearchIndexEntry[]> {
 	const docs = await loadDocs();
@@ -151,35 +185,42 @@ export async function loadDocsSearchIndex(): Promise<SearchIndexEntry[]> {
 }
 
 /**
- * Loads a single doc by slug — checks the component collection first (the
- * common case), then guides. Returns undefined if the slug exists in
- * neither. Exactly one of `.html` / `.Component` is set on the result,
- * depending on which collection it came from.
+ * Loads a single doc by slug — checks MDX collections first (the common
+ * case for component-style docs with live demos), then markdown collections.
+ * Returns undefined if the slug exists in neither. Exactly one of
+ * `.html` / `.Component` is set on the result, depending on which module
+ * matched.
  */
 export async function loadDocBySlug(
 	slug: string,
 ): Promise<DocDetail | undefined> {
-	const componentLoader = componentModules[`/content/components/${slug}.mdx`];
-	if (componentLoader) {
-		const mod = await componentLoader();
+	const config = await loadDocsConfig();
+
+	for (const [path, loader] of Object.entries(mdxModules)) {
+		const parsed = parseContentPath(path);
+		if (parsed.slug !== slug) continue;
+		const mod = await loader();
 		return {
 			slug,
 			title: mod.frontmatter?.title || slug,
-			section: "Components",
+			collection: parsed.folder,
+			section: sectionLabel(parsed.folder, config),
 			category: mod.frontmatter?.category,
 			hydration: mod.frontmatter?.hydration,
 			Component: mod.default,
 		};
 	}
 
-	const guideLoader = guideModules[`/content/docs/${slug}.md`];
-	if (guideLoader) {
-		const raw = await guideLoader();
+	for (const [path, loader] of Object.entries(markdownModules)) {
+		const parsed = parseContentPath(path);
+		if (parsed.slug !== slug) continue;
+		const raw = await loader();
 		const { data, content } = parseFrontmatter(raw);
 		return {
 			slug,
 			title: (data.title as string) || slug,
-			section: "Guides",
+			collection: parsed.folder,
+			section: sectionLabel(parsed.folder, config),
 			html: markdownToHtml(content),
 		};
 	}

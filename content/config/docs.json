@@ -1,4 +1,8 @@
 {
+	"collections": [
+		{ "folder": "docs", "label": "Guides" },
+		{ "folder": "components", "label": "Components" }
+	],
 	"groups": [
 		{ "label": "Guides", "section": "Guides" },
 		{ "label": "Layout", "category": "Layout" },
