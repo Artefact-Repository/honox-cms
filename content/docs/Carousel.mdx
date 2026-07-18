@@ -92,6 +92,22 @@ export default function Page() {
 <Carousel slides={slides} inline loop />
 ```
 
+## CMS Page Builder
+
+This component is available as a `carousel` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`). Slides are flat `{ image, caption, href }` records, not nested component blocks:
+
+```json
+{
+  "type": "carousel",
+  "slides": [
+    { "image": "/hero-1.jpg", "caption": "Slide 1" },
+    { "image": "/hero-2.jpg", "caption": "Slide 2" }
+  ],
+  "loop": true,
+  "autoplayDelay": 3000
+}
+```
+
 ---
 
 

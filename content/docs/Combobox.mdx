@@ -78,6 +78,22 @@ export default function MyPage() {
 }
 ```
 
+## CMS Page Builder
+
+This component is available as a `combobox` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "combobox",
+  "label": "Framework",
+  "placeholder": "Select a Framework",
+  "items": [
+    { "label": "React", "value": "react" },
+    { "label": "Hono", "value": "hono" }
+  ]
+}
+```
+
 # Props
 
 | Prop | Type | Description |

@@ -195,6 +195,22 @@ const [open, setOpen] = useState(false);
 />;
 ```
 
+## CMS Page Builder
+
+This component is available as a `menu` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`) — the CMS block is labelled "Menu" but renders through this `Dropdown` component:
+
+```json
+{
+  "type": "menu",
+  "triggerText": "Open Dropdown",
+  "items": [
+    { "type": "item", "label": "Edit", "value": "edit" },
+    { "type": "separator" },
+    { "type": "item", "label": "Delete", "value": "delete" }
+  ]
+}
+```
+
 
 # Props
 

@@ -108,6 +108,23 @@ export default function MyPage() {
 }
 ```
 
+## CMS Page Builder
+
+This component is available as a `grid` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "grid",
+  "columns": 3,
+  "gap": "4",
+  "children": [
+    { "type": "text", "content": "1" },
+    { "type": "text", "content": "2" },
+    { "type": "text", "content": "3" }
+  ]
+}
+```
+
 # Props
 
 | Prop            | Type                              | Description                                                                                          |

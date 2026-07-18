@@ -74,6 +74,21 @@ export default function MyPage() {
 }
 ```
 
+## CMS Page Builder
+
+This component is available as a `dialog` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`). `trigger` is a nested block list (the CMS always submits an array):
+
+```json
+{
+  "type": "dialog",
+  "title": "Confirm action",
+  "description": "Are you sure you want to continue?",
+  "confirmText": "Confirm",
+  "cancelText": "Cancel",
+  "trigger": [{ "type": "button", "text": "Open Dialog" }]
+}
+```
+
 # Props
 
 

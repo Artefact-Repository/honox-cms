@@ -126,6 +126,22 @@ The hidden native `<select>` carries the selection, so a plain form post works:
 <Select items={items} invalid placeholder="Invalid state" />
 ```
 
+## CMS Page Builder
+
+This component is available as a `select` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "select",
+  "label": "Framework",
+  "placeholder": "Select a framework",
+  "items": [
+    { "label": "React", "value": "react" },
+    { "label": "Hono", "value": "hono" }
+  ]
+}
+```
+
 
 # Props
 

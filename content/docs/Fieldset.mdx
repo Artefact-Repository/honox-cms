@@ -99,6 +99,22 @@ exported sub-components (`FieldsetLegend`, `FieldsetHelperText`,
 `FieldsetRequiredIndicator`) exist for reuse in fully hand-built markup, not
 as an alternate way to compose within `Fieldset` itself.
 
+## CMS Page Builder
+
+This component is available as a `fieldset` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "fieldset",
+  "legend": "User Profile",
+  "helperText": "Manage your info.",
+  "required": true,
+  "children": [
+    { "type": "field", "label": "Name" }
+  ]
+}
+```
+
 
 # Props
 

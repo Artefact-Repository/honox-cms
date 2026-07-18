@@ -59,6 +59,21 @@ export default function MyPage() {
 }
 ```
 
+## CMS Page Builder
+
+This component is available as a `collapsible` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`). `trigger` is a nested block list (the CMS always submits an array, even for a single trigger element):
+
+```json
+{
+  "type": "collapsible",
+  "trigger": [{ "type": "button", "text": "Show more" }],
+  "showIndicator": true,
+  "children": [
+    { "type": "text", "content": "Additional details go here." }
+  ]
+}
+```
+
 
 # Props
 

@@ -41,6 +41,18 @@ export default function MyPage() {
 }
 ```
 
+## CMS Page Builder
+
+This component is available as a `skeleton` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`). The CMS `shape` options are `box`/`circle`/`text`, mapped to the real `shape` prop (`box` falls through to the plain default):
+
+```json
+{
+  "type": "skeleton",
+  "shape": "text",
+  "noOfLines": 3
+}
+```
+
 # Props
 
 

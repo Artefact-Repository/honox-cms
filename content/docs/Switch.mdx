@@ -36,6 +36,18 @@ export default function MyPage() {
 }
 ```
 
+## CMS Page Builder
+
+This component is available as a `switch` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`). **Known gap:** the CMS exposes a "Label" field, but the `switch` block renderer (`app/components/page-registry.tsx`) never forwards it into `Switch`'s `children` slot, so it currently has no visible effect:
+
+```json
+{
+  "type": "switch",
+  "checked": true,
+  "colorPalette": "blue"
+}
+```
+
 # Props
 
 | Prop              | Type                                      | Description                                        |

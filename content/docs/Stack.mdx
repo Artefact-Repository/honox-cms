@@ -31,6 +31,22 @@ export const Example = () => (
 )
 ```
 
+### CMS Page Builder
+
+This component is available as a `stack` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "stack",
+  "direction": "horizontal",
+  "gap": "4",
+  "children": [
+    { "type": "text", "content": "Item 1" },
+    { "type": "text", "content": "Item 2" }
+  ]
+}
+```
+
 ## Props
 
 | Prop | Type | Default | Description |
