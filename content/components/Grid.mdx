@@ -127,13 +127,13 @@ This component is available as a `grid` block in the [Page Builder](/docs/PageBu
 | `children` | `any` | Content to be rendered inside the grid. |
 | `class` | `string` | Custom CSS classes. |
 
-| `columns` | \`Responsive<number \ | string>\` | Number of columns (`repeat(columns, minmax(0, 1fr))`). Takes precedence over `minChildWidth` if both are set. |
-| `rows` | \`Responsive<number \ | string>\` | Number of rows (`repeat(rows, minmax(0, 1fr))`). |
-| `minChildWidth` | \`Responsive<number \ | string>\` | Auto-fits as many columns as fit, each at least this wide (`repeat(auto-fit, minmax(width, 1fr))`). Ignored when `columns` is set. |
+| `columns` | \`Responsive\<number \ | string\>\` | Number of columns (`repeat(columns, minmax(0, 1fr))`). Takes precedence over `minChildWidth` if both are set. |
+| `rows` | \`Responsive\<number \ | string\>\` | Number of rows (`repeat(rows, minmax(0, 1fr))`). |
+| `minChildWidth` | \`Responsive\<number \ | string\>\` | Auto-fits as many columns as fit, each at least this wide (`repeat(auto-fit, minmax(width, 1fr))`). Ignored when `columns` is set. |
 
-| `gap` | \`string \ | number \ | Responsive<...>\` | Gap between cells. Defaults to `"8px"` unless `columnGap`/`rowGap` is set. |
-| `columnGap` | \`string \ | number \ | Responsive<...>\` | Gap between columns only. |
-| `rowGap` | \`string \ | number \ | Responsive<...>\` | Gap between rows only. |
+| `gap` | \`string \ | number \ | Responsive\<...\>\` | Gap between cells. Defaults to `"8px"` unless `columnGap`/`rowGap` is set. |
+| `columnGap` | \`string \ | number \ | Responsive\<...\>\` | Gap between columns only. |
+| `rowGap` | \`string \ | number \ | Responsive\<...\>\` | Gap between rows only. |
 
 `Responsive<T>` accepts either a plain value or a per-breakpoint object,
 e.g. `{ base: 1, md: 2, lg: 3 }`, using the same breakpoints as the rest of

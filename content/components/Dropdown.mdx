@@ -215,7 +215,7 @@ This component is available as a `menu` block in the [Page Builder](/docs/PageBu
 | `disabled` | `boolean` | Disables every trigger mode and renders the trigger inert. | `false` |
 | `interactive` | `boolean` | Forces hydration as an island. Defaults to `true`. | `true` |
 
-| `arrow` | \`boolean \ | { pointAtCenter?: boolean }\` | Show a pointer arrow pointing from the menu to the trigger. Can align exactly with the trigger's center. | `false` |
+| `arrow` | \`boolean \ | \{ pointAtCenter?: boolean \}\` | Show a pointer arrow pointing from the menu to the trigger. Can align exactly with the trigger's center. | `false` |
 
 | `placement` | `string` | Menu placement: `"top"` \ | `"topLeft"` \ | `"topRight"` \ | `"bottom"` \ | `"bottomLeft"` \ | `"bottomRight"` \ | `"left"` \ | `"leftTop"` \ | `"leftBottom"` \ | `"right"` \ | `"rightTop"` \ | `"rightBottom"`. Dash-case aliases are also accepted. | `"bottomLeft"` |
 
@@ -225,7 +225,7 @@ This component is available as a `menu` block in the [Page Builder](/docs/PageBu
 | `mouseLeaveDelay` | `number` | Delay in ms before closing when trigger includes `"hover"`. | `100` |
 | `closeOnEscape` | `boolean` | Close when Escape is pressed. | `true` |
 
-| `onOpenChange` | \`(open: boolean, info?: { source: 'trigger' \ | 'menu' }) => void\` | Called when the menu opens or closes. `source` specifies what triggered the action. | - |
+| `onOpenChange` | \`(open: boolean, info?: \{ source: 'trigger' \ | 'menu' \}) => void\` | Called when the menu opens or closes. `source` specifies what triggered the action. | - |
 
 | `onSelect` | `(value: string) => void` | Called with an item's `value` when it is activated. | - |
 
