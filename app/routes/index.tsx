@@ -250,6 +250,17 @@ export default createRoute((c) => {
 							Blog
 						</Anchor>
 						<Anchor
+							href="/docs"
+							variant="plain"
+							class={css({
+								display: { base: "none", md: "block" },
+								textStyle: "sm",
+								fontWeight: "medium",
+							})}
+						>
+							Docs
+						</Anchor>
+						<Anchor
 							href="/pages/product-landing"
 							variant="plain"
 							class={css({

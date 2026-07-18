@@ -1,0 +1,169 @@
+---
+title: "Carousel"
+---
+
+# Carousel
+
+# Introduction
+
+A slideshow that pages through a set of slides using real, native CSS
+scroll-snap — not transform math. Supports paging by group (`slidesPerPage`),
+looping, autoplay, mouse-drag scrolling, keyboard navigation, and vertical
+orientation.
+
+# Props
+
+## Carousel
+
+The data-driven convenience component: pass `slides` and it composes
+`ItemGroup`/`Item` plus a default `Control` (prev/next triggers and
+indicator dots) for you. For full manual composition, use `Carousel.Root`
+and the exported parts directly (see [Manual composition](#manual-composition)).
+
+| Prop | Type | Description | Default |
+| :--- | :--- | :--- | :--- |
+| `slides` | `JSX.Element[]` | The slide contents. `slideCount` is derived from its length. | - |
+| `interactive` | `boolean` | Forces hydration as an island. | `true` |
+| `page` | `number` | Whether the carousel is on a given page (controlled). | - |
+| `defaultPage` | `number` | Initial page (uncontrolled). | `0` |
+| `slidesPerPage` | `number` | Number of slides visible at once. | `1` |
+| `slidesPerMove` | `number \| "auto"` | Slides advanced per page step. `"auto"` uses `slidesPerPage`. | `"auto"` |
+| `orientation` | `"horizontal" \| "vertical"` | Scroll axis. | `"horizontal"` |
+| `loop` | `boolean` | Wraps around at the first/last page. | `false` |
+| `spacing` | `string` | Gap between slides (any CSS length). | `"0px"` |
+| `padding` | `string` | Extra scroll padding at each end (any CSS length). | - |
+| `autoSize` | `boolean` | Lets slides size themselves instead of splitting evenly by `slidesPerPage`. | `false` |
+| `allowMouseDrag` | `boolean` | Enables click-and-drag scrolling with the mouse (touch/trackpad scrolling always works natively). | `false` |
+| `autoplay` | `boolean \| { delay: number }` | Auto-advances pages. Always wraps at the end regardless of `loop`. | `false` |
+| `pauseOnHover` | `boolean` | Pauses autoplay while the pointer is over the carousel. | `false` |
+| `snapType` | `"proximity" \| "mandatory"` | CSS scroll-snap strictness. | `"mandatory"` |
+| `disabled` | `boolean` | Disables all triggers/indicators and dragging. | `false` |
+| `showControls` | `boolean` | Renders `PrevTrigger`/`NextTrigger` in the default `Control`. | `true` |
+| `showIndicators` | `boolean` | Renders an `IndicatorGroup` in the default `Control`. | `true` |
+| `showAutoplayTrigger` | `boolean` | Renders an `AutoplayTrigger` in the default `Control`. | `false` |
+| `itemClass` | `string` | Custom class applied to every generated `Item`. | - |
+| `size` | `"sm" \| "md" \| "lg"` | Size of the triggers/indicators. | `"md"` |
+| `colorPalette` | `"gray" \| "blue" \| "cyan" \| "green" \| "orange" \| "purple" \| "red" \| "teal" \| "indigo" \| "pink" \| "yellow" \| "success" \| "error" \| "warning"` | Accent color for the active indicator/pressed autoplay trigger. | `"green"` |
+| `inline` | `boolean` | Overlays `Control` on top of the item group instead of stacking below it. | `false` |
+| `translations` | `CarouselTranslations` | Localized strings (aria-labels, progress text). | - |
+| `onPageChange` | `(details: { page: number; pageSnapPoint: number }) => void` | Called when the active page settles. | - |
+| `onAutoplayStatusChange` | `(details: { type: string; isPlaying: boolean; page: number }) => void` | Called when autoplay starts/ticks/stops. | - |
+| `onDragStatusChange` | `(details: { type: string; isDragging: boolean; page: number }) => void` | Called on drag start/move/end. | - |
+| `class` | `string` | Custom CSS classes for the root element. | - |
+| `classNames` | `Record<string, string>` | Custom CSS classes per part (`root`, `itemGroup`, `item`, `control`, `prevTrigger`, `nextTrigger`, `indicatorGroup`, `indicator`, `autoplayTrigger`). | - |
+
+### Carousel.Item
+
+| Prop | Type | Description | Default |
+| :--- | :--- | :--- | :--- |
+| `index` | `number` | The slide's position. Required. | - |
+| `snapAlign` | `"start" \| "center" \| "end"` | Which edge of the slide snaps into view. | `"start"` |
+
+### Carousel.Indicator
+
+| Prop | Type | Description | Default |
+| :--- | :--- | :--- | :--- |
+| `index` | `number` | The page it jumps to. Required. | - |
+| `readOnly` | `boolean` | Renders the dot without a click handler. | `false` |
+
+---
+
+# Usage
+
+## Basic carousel
+
+```tsx
+import { Carousel } from "../components/ui";
+
+export default function Page() {
+  return (
+    <Carousel
+      slides={[
+        <div>Slide 1</div>,
+        <div>Slide 2</div>,
+        <div>Slide 3</div>,
+      ]}
+    />
+  );
+}
+```
+
+## Multiple slides per page, looping
+
+```tsx
+<Carousel
+  slides={slides}
+  slidesPerPage={3}
+  spacing="16px"
+  loop
+  colorPalette="purple"
+/>
+```
+
+## Autoplay with pause-on-hover
+
+```tsx
+<Carousel
+  slides={slides}
+  autoplay={{ delay: 2500 }}
+  pauseOnHover
+  loop
+  showAutoplayTrigger
+/>
+```
+
+## Vertical orientation
+
+```tsx
+<div class={css({ height: "72" })}>
+  <Carousel slides={slides} orientation="vertical" class={css({ height: "full" })} />
+</div>
+```
+
+## Overlaid (inline) controls
+
+```tsx
+<Carousel slides={slides} inline loop />
+```
+
+---
+
+# Architecture notes
+
+- **Native scrolling, not transforms.** `ItemGroup` is a real
+  `overflow: auto` grid/flex container with `scroll-snap-type`; paging calls
+  `scrollTo(...)` on it. This means touch swipe, trackpad scroll, and
+  focused-element arrow-key scrolling work even before hydration finishes —
+  only the trigger/indicator *clicks* and autoplay require JavaScript.
+- **`pageSnapPoints`** is the item index each page starts at, computed with
+  the same structural formula Ark UI's `@zag-js/carousel` machine uses
+  (`getPageSnapPoints`) — deterministic from `slideCount`/`slidesPerPage`/
+  `slidesPerMove` alone, so it's identical on the server and before
+  hydration (no layout measurement needed for SSR).
+- **Children don't re-render on hydration.** Like this project's other
+  islands, the interactive `Carousel` root patches `data-current`,
+  `disabled`, `data-inview`, and `aria-hidden` on the already-rendered DOM
+  directly (see `applyPageState` in `carousel-primitive.tsx`) rather than
+  regenerating `Item`/`Indicator` children — HonoX rehydrates an island's
+  children from a serialized HTML snapshot, not by re-invoking the
+  component that produced them.
+- **Never rely on a JSX `onClick` for a trigger/indicator button.** For the
+  same reason: `PrevTrigger`/`NextTrigger`/`Indicator`/`AutoplayTrigger` are
+  composed as children, so hono/jsx/dom never reconciles its own synthetic
+  event props onto those already-mounted nodes — an `onClick` on them
+  silently never fires. All click handling is delegated from the root in a
+  single `useEffect` (`target.closest('[data-part="..."]')`), mirroring
+  `dropdown-primitive.tsx`/`combobox-primitive.tsx`. That effect (and the
+  `pauseOnHover` one) mounts exactly once and reads `scrollNext`/`scrollPrev`/
+  `isPlaying`/etc. through refs rather than closing over them directly —
+  putting reactive state in its dependency array reattaches the listener on
+  every change, and `pauseOnHover`'s own `setIsPlaying` (fired by
+  `pointerenter`, which lands *just before* the paired click in a real
+  click gesture) would otherwise tear the click listener down in the gap
+  between the mouse arriving and the button being pressed.
+- **Simplifications vs. upstream Ark UI:** in-view tracking uses the same
+  index-range math as the SSR render (not a real `IntersectionObserver`),
+  and `ItemGroup`'s `tabindex` is always `0` (not toggled based on whether a
+  slide contains a focusable element). Both are pragmatic trade-offs that
+  cover the common fixed-`slidesPerPage` case; RTL (`dir`) is not supported,
+  matching the rest of this component library.

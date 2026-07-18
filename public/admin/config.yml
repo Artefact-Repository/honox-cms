@@ -66,6 +66,18 @@ collections:
         widget: boolean
         default: false
 
+  - name: docs
+    label: Docs
+    label_singular: Doc
+    folder: /content/docs
+    create: true
+    slug: "{{slug}}"
+    summary: "{{title}}"
+    sortable_fields: [title]
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Body, name: body, widget: markdown }
+
   - name: pages
     label: Pages
     label_singular: Page

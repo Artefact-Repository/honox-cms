@@ -1,0 +1,36 @@
+---
+title: "Group"
+---
+
+# Group
+
+# Introduction
+
+A layout component for grouping related elements visually.
+
+# Props
+
+| Prop          | Type                         | Description                                                   |
+| :------------ | :--------------------------- | :------------------------------------------------------------ |
+| `children`    | `any`                        | Content to be rendered inside the component.                  |
+| `class`       | `string`                     | Custom CSS classes.                                           |
+| `orientation` | `"horizontal" \| "vertical"` | The orientation of the group.                                 |
+| `attached`    | `boolean`                    | Whether to attach the children together.                      |
+| `grow`        | `boolean`                    | Whether the children should grow to fill the available space. |
+
+# Usage
+
+```tsx
+import { Group } from "../components/ui";
+import { Button } from "../components/ui/button";
+
+export default function MyPage() {
+  return (
+    <Group attached>
+      <Button>First</Button>
+      <Button>Second</Button>
+      <Button>Third</Button>
+    </Group>
+  );
+}
+```

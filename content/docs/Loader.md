@@ -1,0 +1,45 @@
+---
+title: "Loader"
+---
+
+# Loader
+
+# Introduction
+
+A utility component that manages the visual state of a `Spinner` and associated text.
+
+# Props
+
+| Prop               | Type               | Description                                                             |
+| :----------------- | :----------------- | :---------------------------------------------------------------------- |
+| `children`         | `any`              | Text content to be rendered alongside the spinner.                      |
+| `spinner`          | `Child`            | Custom spinner element. Defaults to `<Spinner size="inherit" />`.       |
+| `text`             | `Child`            | Alternative prop for text content.                                      |
+| `spinnerPlacement` | `"start" \| "end"` | Where to place the spinner relative to the text. Defaults to `"start"`. |
+
+# Usage
+
+```tsx
+import { Loader, Spinner } from "../components/ui";
+
+export default function MyPage() {
+  return <Loader text="Loading data..." />;
+}
+```
+
+## Custom Spinner and Placement
+
+```tsx
+import { Loader, Spinner } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Loader
+      spinner={<Spinner size="lg" colorPalette="blue" />}
+      spinnerPlacement="end"
+    >
+      Please wait
+    </Loader>
+  );
+}
+```

@@ -1,0 +1,88 @@
+---
+title: "Icon"
+---
+
+# Icon
+
+# Introduction
+
+A lightweight, size- and color-aware wrapper for SVG icons. It applies consistent sizing
+(`2xs`–`xl`) and inherits `currentcolor` so icons match surrounding text/icon-color by default,
+without requiring any icon library dependency.
+
+`Icon` composes in two ways, decided automatically from its `children`:
+
+- **Wrap** — if `children` is bare SVG content (`<path>`, `<circle>`, `<g>`, …), text, or more
+  than one element, `Icon` renders its own `<svg>` around it.
+- **Merge (`asChild`, default `true`)** — if `children` is a single element that isn't bare SVG
+  content (e.g. a hand-authored `<svg>…</svg>`), `Icon` merges its class (and any other passed
+  props) directly onto that element instead of wrapping it in a second `<svg>`. Pass
+  `asChild={false}` to force wrapping even in that case.
+
+# Props
+
+| Prop            | Type                                                 | Description                                                                                   |
+| :-------------- | :---------------------------------------------------- | :---------------------------------------------------------------------------------------------- |
+| `children`      | `Child`                                               | SVG content (`<path>`, etc.) or a single SVG-like element to render/merge.                       |
+| `class`         | `string`                                              | Custom CSS classes.                                                                              |
+| `size`          | `"2xs" \| "xs" \| "sm" \| "md" \| "lg" \| "xl"`        | The size of the icon. Defaults to `"md"`.                                                       |
+| `asChild`       | `boolean`                                             | Merge onto the single child element instead of wrapping it in a new `<svg>`. Defaults to `true`. |
+| `viewBox`       | `string`                                              | Passed through to the rendered/merged `<svg>`.                                                   |
+| `xmlns`         | `string`                                              | Passed through to the generated `<svg>` wrapper. Defaults to the SVG namespace.                  |
+| `fill`          | `string`                                              | Passed through to the rendered/merged `<svg>`.                                                   |
+| `stroke`        | `string`                                              | Passed through to the rendered/merged `<svg>`.                                                   |
+| `aria-label`    | `string`                                              | Accessible label. When provided, `aria-hidden` is omitted.                                       |
+| `aria-hidden`   | `boolean \| "true" \| "false"`                        | Defaults to `"true"` when no `aria-label` is given (icons are decorative by default).            |
+
+# Usage
+
+## Bare SVG paths (no icon library required)
+
+```tsx
+import { Icon } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Icon size="lg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path d="M12 2 2 7l10 5 10-5-10-5z" />
+    </Icon>
+  );
+}
+```
+
+## Composing with a hand-authored `<svg>` (`asChild`, default)
+
+```tsx
+import { Icon } from "../components/ui";
+
+function HeartSvg(props: { class?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <path d="M12 21s-6.7-4.35-9.3-8.1C.8 9.7 2 6 5.4 6c1.9 0 3.2 1 4.6 2.6C11.4 7 12.7 6 14.6 6 18 6 19.2 9.7 17.3 12.9 14.7 16.65 12 21 12 21z" />
+    </svg>
+  );
+}
+
+export default function MyPage() {
+  return (
+    <span style={{ color: "red" }}>
+      <Icon size="sm">
+        <HeartSvg />
+      </Icon>
+    </span>
+  );
+}
+```
+
+The `icon` class (and size) is merged onto the `<svg>` returned by `HeartSvg`, so there is no
+extra wrapping element in the rendered markup. Since the icon recipe sets `color: currentcolor`,
+the icon picks up the surrounding text color (here, `red`) as long as its paths use
+`fill="currentColor"` or `stroke="currentColor"`.
+
+## Labelled (non-decorative) icon
+
+```tsx
+<Icon aria-label="Search" viewBox="0 0 24 24">
+  <path d="M10 2a8 8 0 105.3 14.03l4.34 4.34 1.42-1.42-4.34-4.34A8 8 0 0010 2z" />
+</Icon>
+```
