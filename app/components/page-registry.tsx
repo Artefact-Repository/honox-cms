@@ -1,6 +1,7 @@
 import { css } from "design-system/css";
 import { type ComponentBlock, propsOf } from "./block-types";
 import {
+	AbsoluteCenter,
 	Alert,
 	AlertIcon,
 	Anchor,
@@ -13,6 +14,7 @@ import {
 	Collapsible,
 	ColorPicker,
 	Combobox,
+	DatePicker,
 	Dialog,
 	Drawer,
 	Dropdown,
@@ -25,6 +27,7 @@ import {
 	Heading,
 	HoverCard,
 	Icon,
+	Loader,
 	PaginatedTable,
 	Pagination,
 	Popover,
@@ -35,10 +38,15 @@ import {
 	Select,
 	Skeleton,
 	Slider,
+	Spinner,
+	Splitter,
 	Stack,
 	Switch,
+	Table,
+	TagsInput,
 	Text,
 	Textarea,
+	Tooltip,
 } from "./ui";
 
 type BlockRenderer = (block: ComponentBlock) => JSX.Element;
@@ -701,6 +709,76 @@ const registry: Record<string, BlockRenderer> = {
 	colorPicker: (b) => <ColorPicker interactive {...propsOf(b)} />,
 
 	breadcrumb: (b) => <Breadcrumb {...propsOf(b)} />,
+	datePicker: (b) => <DatePicker interactive {...propsOf(b)} />,
+	loader: (b) => <Loader {...propsOf(b)} />,
+	spinner: (b) => <Spinner {...propsOf(b)} />,
+	tagsInput: (b) => <TagsInput interactive {...propsOf(b)} />,
+
+	table: (b) => {
+		const { columns, rows, ...rest } = propsOf(b);
+		let parsedRows: unknown[] = [];
+		if (typeof rows === "string" && rows.trim()) {
+			try {
+				const parsed = JSON.parse(rows);
+				if (Array.isArray(parsed)) parsedRows = parsed;
+			} catch (_) {
+				parsedRows = [];
+			}
+		} else if (Array.isArray(rows)) {
+			parsedRows = rows;
+		}
+		return (
+			<Table
+				columns={Array.isArray(columns) ? columns : []}
+				rows={parsedRows}
+				{...rest}
+			/>
+		);
+	},
+
+	tooltip: (b) => {
+		const { triggerText, content, placement, showArrow, ...rest } = propsOf(b);
+		return (
+			<Tooltip
+				content={content}
+				placement={placement}
+				showArrow={showArrow}
+				asChild
+				{...rest}
+			>
+				<Button variant="outline">{triggerText || "Hover me"}</Button>
+			</Tooltip>
+		);
+	},
+
+	absoluteCenter: (b) => {
+		const { children } = b;
+		return (
+			<AbsoluteCenter {...propsOf(b)}>
+				{renderChildren(children as ComponentBlock[])}
+			</AbsoluteCenter>
+		);
+	},
+
+	splitter: (b) => {
+		const { panels, ...rest } = propsOf(b);
+		const resolvedPanels = Array.isArray(panels)
+			? panels.map((panel: { id?: string; content?: ComponentBlock[] }) => ({
+					id: panel.id,
+					content:
+						Array.isArray(panel.content) && panel.content.length > 0
+							? renderBlocks(panel.content)[0]
+							: undefined,
+				}))
+			: [];
+		// Forced static: panel content is arbitrary nested JSX, which can't cross
+		// the island's prop-serialization boundary (unlike `children`, which
+		// HonoX snapshots to HTML for hydration, `panels` is a plain prop and
+		// would otherwise get JSON-serialized as a raw JSX element).
+		return (
+			<Splitter interactive={false} panels={resolvedPanels} {...rest} />
+		);
+	},
 };
 
 // Safe fallback for an unrecognized block type. Previously this dumped the

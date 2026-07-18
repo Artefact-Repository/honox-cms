@@ -249,6 +249,93 @@
       "size": "md",
       "activationMode": "focus",
       "submitMode": "both"
+    },
+    {
+      "type": "heading",
+      "text": "5. New Component Bindings",
+      "size": "2xl",
+      "as": "h2"
+    },
+    {
+      "type": "breadcrumb",
+      "items": [
+        { "label": "Home", "href": "/" },
+        { "label": "Docs", "href": "/docs" },
+        { "label": "Test Page" }
+      ],
+      "variant": "underline",
+      "size": "md"
+    },
+    {
+      "type": "datePicker",
+      "label": "Check-in Date",
+      "selectionMode": "single",
+      "placeholder": "YYYY-MM-DD",
+      "colorPalette": "blue"
+    },
+    {
+      "type": "tagsInput",
+      "label": "Amenities",
+      "defaultValue": ["WiFi", "Fireplace", "Hot Tub"]
+    },
+    {
+      "type": "stack",
+      "direction": "horizontal",
+      "gap": "4",
+      "children": [
+        {
+          "type": "loader",
+          "text": "Checking availability..."
+        },
+        {
+          "type": "spinner",
+          "size": "lg",
+          "label": "Loading"
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "columns": [
+        { "header": "Room", "key": "room" },
+        { "header": "Price", "key": "price", "align": "end" }
+      ],
+      "rows": "[{\"room\": \"Cabin Loft\", \"price\": \"$180/night\"}, {\"room\": \"Cabin Suite\", \"price\": \"$240/night\"}]",
+      "variant": "plain",
+      "striped": true
+    },
+    {
+      "type": "tooltip",
+      "content": "Free cancellation up to 24 hours before check-in.",
+      "triggerText": "Cancellation Policy",
+      "placement": "top",
+      "showArrow": true
+    },
+    {
+      "type": "absoluteCenter",
+      "axis": "both",
+      "children": [
+        {
+          "type": "badge",
+          "text": "Centered Badge",
+          "colorPalette": "purple",
+          "variant": "solid"
+        }
+      ]
+    },
+    {
+      "type": "splitter",
+      "orientation": "horizontal",
+      "panels": [
+        {
+          "id": "left",
+          "content": [{ "type": "text", "content": "Left panel" }]
+        },
+        {
+          "id": "right",
+          "content": [{ "type": "text", "content": "Right panel" }]
+        }
+      ]
     }
   ]
 }
