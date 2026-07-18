@@ -705,7 +705,14 @@ const registry: Record<string, BlockRenderer> = {
 	},
 
 	slider: (b) => <Slider interactive {...propsOf(b)} />,
-	switch: (b) => <Switch interactive {...propsOf(b)} />,
+	switch: (b) => {
+		const { label, ...rest } = propsOf(b);
+		return (
+			<Switch interactive {...rest}>
+				{label}
+			</Switch>
+		);
+	},
 	colorPicker: (b) => <ColorPicker interactive {...propsOf(b)} />,
 
 	breadcrumb: (b) => <Breadcrumb {...propsOf(b)} />,

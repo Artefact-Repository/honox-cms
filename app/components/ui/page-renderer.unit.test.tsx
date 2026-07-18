@@ -259,8 +259,9 @@ test("PageRenderer renders slider and switch correctly", () => {
 
 	expect(html).toContain("Volume");
 	expect(html).toContain("40");
-	expect(html).toContain("Dark Mode");
 	expect(html).toContain("role=\"switch\"");
+	expect(html).toMatch(/<span[^>]*>Dark Mode<\/span>/);
+	expect(html).not.toContain('label="Dark Mode"');
 });
 
 test("PageRenderer renders custom triggers for collapsible, dialog, and drawer correctly", () => {
