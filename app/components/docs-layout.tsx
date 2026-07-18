@@ -1,7 +1,16 @@
 import { css, cx } from "design-system/css";
 import { button } from "design-system/recipes";
 import type { DocSummary } from "../lib/docs";
-import { Anchor, Avatar, Heading, Search, Stack, Text } from "./ui";
+import {
+	Anchor,
+	Avatar,
+	Drawer,
+	Heading,
+	IconButton,
+	Search,
+	Stack,
+	Text,
+} from "./ui";
 
 interface DocsLayoutProps {
 	docs: DocSummary[];
@@ -9,7 +18,7 @@ interface DocsLayoutProps {
 	children?: unknown;
 }
 
-// Sidebar order for component categories; anything uncategorized (or a
+// Sidenav order for component categories; anything uncategorized (or a
 // future category not listed here) falls into a trailing "Other" group.
 const CATEGORY_ORDER = [
 	"Layout",
@@ -38,11 +47,151 @@ function GitHubIcon() {
 	);
 }
 
-interface DocsHeaderProps {
-	editUrl?: string;
+function HamburgerIcon() {
+	return (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="20"
+			height="20"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+		>
+			<title>Open menu</title>
+			<path d="M4 6h16" />
+			<path d="M4 12h16" />
+			<path d="M4 18h16" />
+		</svg>
+	);
 }
 
-function DocsHeader({ editUrl }: DocsHeaderProps) {
+// Workaround: HonoX's client hydration snapshots a Drawer island's `children`
+// outside of the DrawerContext.Provider that supplies its variant styles, so
+// the `placement="start"` prop resets to the "end" default the moment
+// hydration runs (verified via SSR vs. post-hydration DOM diff). Force the
+// left-docked layout and matching slide direction directly so the sidenav
+// drawer keeps opening from the left regardless of that upstream bug.
+const sidenavDrawerOverride = css({
+	"& [data-part='positioner']": {
+		justifyContent: "flex-start",
+	},
+	"& [data-part='content']": {
+		_open: {
+			animationName: "slide-from-left-full, fade-in",
+		},
+		_closed: {
+			animationName: "slide-to-left-full, fade-out",
+		},
+	},
+});
+
+interface DocGroup {
+	label: string;
+	items: DocSummary[];
+}
+
+function buildGroups(docs: DocSummary[]): DocGroup[] {
+	const guides = docs.filter((doc) => doc.section === "Guides");
+	const components = docs.filter((doc) => doc.section === "Components");
+
+	const categoryGroups = CATEGORY_ORDER.map((category) => ({
+		label: category,
+		items: components.filter((doc) => doc.category === category),
+	})).filter((group) => group.items.length > 0);
+
+	const uncategorized = components.filter(
+		(doc) => !doc.category || !CATEGORY_ORDER.includes(doc.category),
+	);
+
+	return [
+		...(guides.length > 0 ? [{ label: "Guides", items: guides }] : []),
+		...categoryGroups,
+		...(uncategorized.length > 0
+			? [{ label: "Other", items: uncategorized }]
+			: []),
+	];
+}
+
+interface SidenavProps {
+	groups: DocGroup[];
+	activeSlug?: string;
+}
+
+function Sidenav({ groups, activeSlug }: SidenavProps) {
+	return (
+		<nav
+			class={css({
+				display: "flex",
+				flexDirection: "column",
+				gap: "6",
+			})}
+		>
+			{groups.map((group) => (
+				<div key={group.label}>
+					<Text
+						size="xs"
+						class={css({
+							fontWeight: "semibold",
+							textTransform: "uppercase",
+							letterSpacing: "wide",
+							color: "fg.muted",
+							mb: "2",
+							display: "block",
+						})}
+					>
+						{group.label}
+					</Text>
+					<div
+						class={css({
+							display: "flex",
+							flexDirection: "column",
+							gap: "0.5",
+						})}
+					>
+						{group.items.map((doc) => {
+							const isActive = doc.slug === activeSlug;
+							return (
+								<a
+									key={doc.slug}
+									href={`/docs/${doc.slug}`}
+									aria-current={isActive ? "page" : undefined}
+									class={css({
+										display: "block",
+										px: "3",
+										py: "1.5",
+										borderRadius: "md",
+										fontSize: "sm",
+										textDecoration: "none",
+										color: isActive ? "fg" : "fg.muted",
+										bg: isActive ? "blue.4" : "transparent",
+										fontWeight: isActive ? "semibold" : "normal",
+										_hover: {
+											bg: isActive ? "blue.4" : "bg.subtle",
+											color: "fg",
+										},
+									})}
+								>
+									{doc.title}
+								</a>
+							);
+						})}
+					</div>
+				</div>
+			))}
+		</nav>
+	);
+}
+
+interface DocsHeaderProps {
+	editUrl?: string;
+	groups: DocGroup[];
+	activeSlug?: string;
+}
+
+function DocsHeader({ editUrl, groups, activeSlug }: DocsHeaderProps) {
 	return (
 		<header
 			class={css({
@@ -65,6 +214,24 @@ function DocsHeader({ editUrl }: DocsHeaderProps) {
 					gap: { base: "4", md: "8" },
 				})}
 			>
+				<div class={sidenavDrawerOverride}>
+					<Drawer
+						placement="start"
+						aria-label="Docs navigation"
+						trigger={
+							<IconButton
+								variant="plain"
+								size="sm"
+								aria-label="Open menu"
+								class={css({ display: { base: "flex", md: "none" } })}
+							>
+								<HamburgerIcon />
+							</IconButton>
+						}
+						body={<Sidenav groups={groups} activeSlug={activeSlug} />}
+					/>
+				</div>
+
 				<Anchor
 					href="/"
 					variant="plain"
@@ -158,33 +325,6 @@ function DocsHeader({ editUrl }: DocsHeaderProps) {
 	);
 }
 
-interface DocGroup {
-	label: string;
-	items: DocSummary[];
-}
-
-function buildGroups(docs: DocSummary[]): DocGroup[] {
-	const guides = docs.filter((doc) => doc.section === "Guides");
-	const components = docs.filter((doc) => doc.section === "Components");
-
-	const categoryGroups = CATEGORY_ORDER.map((category) => ({
-		label: category,
-		items: components.filter((doc) => doc.category === category),
-	})).filter((group) => group.items.length > 0);
-
-	const uncategorized = components.filter(
-		(doc) => !doc.category || !CATEGORY_ORDER.includes(doc.category),
-	);
-
-	return [
-		...(guides.length > 0 ? [{ label: "Guides", items: guides }] : []),
-		...categoryGroups,
-		...(uncategorized.length > 0
-			? [{ label: "Other", items: uncategorized }]
-			: []),
-	];
-}
-
 export function DocsLayout({ docs, activeSlug, children }: DocsLayoutProps) {
 	const groups = buildGroups(docs);
 
@@ -199,7 +339,7 @@ export function DocsLayout({ docs, activeSlug, children }: DocsLayoutProps) {
 
 	return (
 		<div class={css({ bg: "bg.canvas", minH: "screen" })}>
-			<DocsHeader editUrl={editUrl} />
+			<DocsHeader editUrl={editUrl} groups={groups} activeSlug={activeSlug} />
 
 			<div
 				class={css({
@@ -223,66 +363,7 @@ export function DocsLayout({ docs, activeSlug, children }: DocsLayoutProps) {
 						overflowY: "auto",
 					})}
 				>
-					<nav
-						class={css({
-							display: "flex",
-							flexDirection: "column",
-							gap: "6",
-						})}
-					>
-						{groups.map((group) => (
-							<div key={group.label}>
-								<Text
-									size="xs"
-									class={css({
-										fontWeight: "semibold",
-										textTransform: "uppercase",
-										letterSpacing: "wide",
-										color: "fg.muted",
-										mb: "2",
-										display: "block",
-									})}
-								>
-									{group.label}
-								</Text>
-								<div
-									class={css({
-										display: "flex",
-										flexDirection: "column",
-										gap: "0.5",
-									})}
-								>
-									{group.items.map((doc) => {
-										const isActive = doc.slug === activeSlug;
-										return (
-											<a
-												key={doc.slug}
-												href={`/docs/${doc.slug}`}
-												aria-current={isActive ? "page" : undefined}
-												class={css({
-													display: "block",
-													px: "3",
-													py: "1.5",
-													borderRadius: "md",
-													fontSize: "sm",
-													textDecoration: "none",
-													color: isActive ? "fg" : "fg.muted",
-													bg: isActive ? "blue.4" : "transparent",
-													fontWeight: isActive ? "semibold" : "normal",
-													_hover: {
-														bg: isActive ? "blue.4" : "bg.subtle",
-														color: "fg",
-													},
-												})}
-											>
-												{doc.title}
-											</a>
-										);
-									})}
-								</div>
-							</div>
-						))}
-					</nav>
+					<Sidenav groups={groups} activeSlug={activeSlug} />
 				</aside>
 
 				<main class={css({ flex: "1", minWidth: "0" })}>{children}</main>

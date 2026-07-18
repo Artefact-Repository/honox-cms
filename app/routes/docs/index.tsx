@@ -16,7 +16,7 @@ export default createRoute(async (c) => {
 			</Heading>
 			<Text class={css({ color: "fg.muted", mb: "10", maxWidth: "2xl" })}>
 				Guides and component reference for the Artefact UI suite. Pick a page
-				from the sidebar, or jump in below.
+				from the sidenav, or jump in below.
 			</Text>
 
 			<div
