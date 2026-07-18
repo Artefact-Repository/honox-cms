@@ -2,9 +2,20 @@
 title: "PaginatedTable"
 ---
 
+import { PaginatedTable } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # PaginatedTable
 
 A high-level component that combines a Table with Pagination, managing state internally.
+
+## Usage
+
+<DemoPreview>
+  <div style={{ width: "100%" }}>
+    <PaginatedTable title="Users" pageSize={5} />
+  </div>
+</DemoPreview>
 
 ## Props
 

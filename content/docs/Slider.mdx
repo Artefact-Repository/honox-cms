@@ -2,6 +2,9 @@
 title: "Slider"
 ---
 
+import { Slider } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # Slider
 
 # Introduction
@@ -41,6 +44,19 @@ A control that allows the user to select a value (or range of values) from a con
 # Usage
 
 ## Basic Slider
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "280px" }}>
+    <Slider
+      label="Volume"
+      defaultValue={30}
+      min={0}
+      max={100}
+      showValueText
+      interactive
+    />
+  </div>
+</DemoPreview>
 
 ```tsx
 import { Slider } from "../components/ui";

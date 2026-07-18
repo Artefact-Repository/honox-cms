@@ -2,6 +2,9 @@
 title: "Tooltip"
 ---
 
+import { Tooltip, Button } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # Tooltip
 
 # Introduction
@@ -38,6 +41,12 @@ closes it immediately — the `openDelay`/`closeDelay` only apply to hover.
 # Usage
 
 ## High-level wrapper
+
+<DemoPreview>
+  <Tooltip content="This is the tooltip content" placement="bottom" showArrow asChild>
+    <Button>Hover me</Button>
+  </Tooltip>
+</DemoPreview>
 
 ```tsx
 import { Tooltip } from "../components/ui/tooltip";

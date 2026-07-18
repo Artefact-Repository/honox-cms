@@ -2,6 +2,9 @@
 title: "Spinner"
 ---
 
+import { Spinner } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # Spinner
 
 # Introduction
@@ -17,6 +20,10 @@ A component used to indicate a loading state.
 | `label` | `string`                                                     | An accessible label for screen readers.      |
 
 # Usage
+
+<DemoPreview>
+  <Spinner size="md" label="Loading..." />
+</DemoPreview>
 
 ```tsx
 import { Spinner } from "../components/ui";

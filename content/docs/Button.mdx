@@ -2,6 +2,9 @@
 title: "Button"
 ---
 
+import { Button, ButtonGroup } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # Button
 
 # Introduction
@@ -35,6 +38,14 @@ A clickable component for triggering actions and user interactions. Includes var
 
 ## Basic Button
 
+<DemoPreview>
+  <Button variant="solid" colorPalette="blue">Click me</Button>
+  <Button variant="outline" colorPalette="blue">Click me</Button>
+  <Button variant="subtle" colorPalette="blue">Click me</Button>
+  <Button variant="surface" colorPalette="blue">Click me</Button>
+  <Button variant="plain" colorPalette="blue">Click me</Button>
+</DemoPreview>
+
 ```tsx
 import { Button } from "../components/ui";
 
@@ -48,6 +59,10 @@ export default function MyPage() {
 ```
 
 ## Loading state
+
+<DemoPreview>
+  <Button loading loadingText="Saving...">Save</Button>
+</DemoPreview>
 
 ```tsx
 import { Button } from "../components/ui";
@@ -91,6 +106,13 @@ export default function MyPage() {
 ```
 
 ## ButtonGroup
+
+<DemoPreview>
+  <ButtonGroup attached>
+    <Button>First</Button>
+    <Button>Second</Button>
+  </ButtonGroup>
+</DemoPreview>
 
 ```tsx
 import { Button, ButtonGroup } from "../components/ui";

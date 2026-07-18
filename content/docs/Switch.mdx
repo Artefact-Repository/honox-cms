@@ -2,6 +2,9 @@
 title: "Switch"
 ---
 
+import { Switch } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # Switch
 
 # Introduction
@@ -22,6 +25,10 @@ A control that allows the user to toggle between checked and unchecked states.
 | `interactive`     | `boolean`                                 | Forces hydration as an island.                     |
 
 # Usage
+
+<DemoPreview>
+  <Switch defaultChecked interactive>Enable Notifications</Switch>
+</DemoPreview>
 
 ```tsx
 import { Switch } from "../components/ui";

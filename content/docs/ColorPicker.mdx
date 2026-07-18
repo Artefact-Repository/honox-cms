@@ -2,6 +2,9 @@
 title: "ColorPicker"
 ---
 
+import { ColorPicker } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # ColorPicker
 
 # Introduction
@@ -90,6 +93,10 @@ With `trigger`, <kbd>Esc</kbd> and outside clicks close the popover.
 The Panda CSS slot recipe (`app/theme/recipes/color-picker.ts`) styles the parts listed under Anatomy. States are driven by data attributes (`data-disabled`, `data-readonly`, `data-state="checked"` on the active swatch, `data-channel` on slider parts), so custom skins can target them without touching the recipe. The `size` variant scales the area, swatches, and spacing.
 
 # Usage
+
+<DemoPreview>
+  <ColorPicker label="Brand colour" defaultValue="#3b82f6" />
+</DemoPreview>
 
 ```tsx
 import { ColorPicker } from "../components/ui";

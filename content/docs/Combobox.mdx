@@ -2,6 +2,9 @@
 title: "Combobox"
 ---
 
+import { Combobox } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # Combobox
 
 # Introduction
@@ -53,6 +56,22 @@ It hydrates as an island when **any** of the following signals is present (or `i
 All interactivity decisions in the library route through the shared `shouldHydrate()` helper in `app/components/ui/island-utils.ts`.
 
 # Usage
+
+<DemoPreview>
+  <Combobox
+    interactive
+    items={[
+      { label: "React", value: "react" },
+      { label: "Solid", value: "solid" },
+      { label: "Svelte", value: "svelte" },
+      { label: "Vue", value: "vue" },
+      { label: "Hono", value: "hono" },
+    ]}
+    label="Framework"
+    placeholder="Select a Framework"
+    allowClear
+  />
+</DemoPreview>
 
 ```tsx
 import { Combobox } from "../components/ui";

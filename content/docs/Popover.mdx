@@ -2,6 +2,9 @@
 title: "Popover"
 ---
 
+import { Popover, Button } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # Popover
 
 # Introduction
@@ -33,6 +36,16 @@ An interactive element that displays additional content in a layer over its anch
 | `asChild` | `boolean` | Whether to merge props onto the immediate child element. |
 
 # Usage
+
+<DemoPreview>
+  <Popover
+    placement="right"
+    trigger={<Button>Open Popover</Button>}
+    title="Title"
+    description="Description"
+    body="Popover Body"
+  />
+</DemoPreview>
 
 ```tsx
 import { Popover } from "../components/ui/popover";

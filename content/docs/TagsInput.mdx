@@ -2,9 +2,20 @@
 title: "TagsInput"
 ---
 
+import { TagsInput } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # TagsInput
 
 A component that allows users to enter multiple tags as a list.
+
+## Usage
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <TagsInput label="Skills" defaultValue={["React", "Hono"]} />
+  </div>
+</DemoPreview>
 
 ## Props
 

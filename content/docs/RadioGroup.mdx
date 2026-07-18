@@ -2,9 +2,25 @@
 title: "RadioGroup"
 ---
 
+import { RadioGroup } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # RadioGroup
 
 A set of checkable buttons where only one can be checked at a time.
+
+## Usage
+
+<DemoPreview>
+  <RadioGroup
+    label="Choose an option"
+    items={[
+      { label: "Option A", value: "a" },
+      { label: "Option B", value: "b" },
+      { label: "Option C", value: "c" },
+    ]}
+  />
+</DemoPreview>
 
 ## Props
 

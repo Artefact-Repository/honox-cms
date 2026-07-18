@@ -75,6 +75,12 @@ const mainConfig = (_mode: string) => ({
 	},
 	plugins: [
 		mdx({
+			// Restrict to .mdx only — .md (blog posts under content/posts) stays
+			// on the hand-rolled markdown.ts pipeline. Without this, the plugin's
+			// transform hook also intercepts .md `?raw` imports (used by
+			// app/lib/posts.ts) and corrupts them, since it strips the query
+			// string before checking the extension.
+			include: /\.mdx$/,
 			jsxImportSource: "hono/jsx",
 			remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter, remarkGfm],
 		}),

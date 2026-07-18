@@ -2,6 +2,9 @@
 title: "Icon"
 ---
 
+import { Icon } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # Icon
 
 # Introduction
@@ -37,6 +40,12 @@ without requiring any icon library dependency.
 # Usage
 
 ## Bare SVG paths (no icon library required)
+
+<DemoPreview>
+  <Icon size="lg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    <path d="M12 2 2 7l10 5 10-5-10-5z" />
+  </Icon>
+</DemoPreview>
 
 ```tsx
 import { Icon } from "../components/ui";

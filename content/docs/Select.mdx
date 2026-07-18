@@ -2,6 +2,9 @@
 title: "Select"
 ---
 
+import { Select } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # Select
 
 # Introduction
@@ -79,6 +82,21 @@ Opening the list highlights the currently selected option (or the first enabled 
 All interactivity decisions in the library route through the shared `shouldHydrate()` helper in `app/components/ui/island-utils.ts`.
 
 # Usage
+
+<DemoPreview>
+  <Select
+    items={[
+      { label: "React", value: "react" },
+      { label: "Solid", value: "solid" },
+      { label: "Svelte", value: "svelte", disabled: true },
+      { label: "Vue", value: "vue" },
+      { label: "Hono", value: "hono" },
+    ]}
+    label="Framework"
+    placeholder="Select a framework"
+    allowClear
+  />
+</DemoPreview>
 
 ```tsx
 import { Select } from "../components/ui";

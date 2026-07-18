@@ -2,6 +2,9 @@
 title: "Drawer"
 ---
 
+import { Drawer, Button } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # Drawer
 
 # Introduction
@@ -30,6 +33,17 @@ Additional props (e.g. `open`, `defaultOpen`, `onOpenChange`, `id`) are forwarde
 # Usage
 
 ## Basic Drawer
+
+<DemoPreview>
+  <Drawer
+    trigger={<Button>Open Drawer</Button>}
+    title="Settings"
+    description="Adjust your preferences."
+    body="Drawer body content goes here."
+    cancel={<Button variant="outline">Close</Button>}
+    confirm={<Button>Save</Button>}
+  />
+</DemoPreview>
 
 ```tsx
 import { Drawer, Button } from "../components/ui";

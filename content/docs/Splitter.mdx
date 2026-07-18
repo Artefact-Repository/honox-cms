@@ -2,6 +2,9 @@
 title: "Splitter"
 ---
 
+import { Splitter } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # Splitter
 
 # Introduction
@@ -37,6 +40,18 @@ A layout component that divides content into resizable panels separated by drag 
 # Usage
 
 ## Basic Splitter
+
+<DemoPreview>
+  <div style={{ width: "100%", height: "180px" }}>
+    <Splitter
+      orientation="horizontal"
+      panels={[
+        { id: "left", content: <div style={{ padding: "1rem" }}>Sidebar</div> },
+        { id: "right", content: <div style={{ padding: "1rem" }}>Content</div> },
+      ]}
+    />
+  </div>
+</DemoPreview>
 
 ```tsx
 import { Splitter } from "../components/ui";

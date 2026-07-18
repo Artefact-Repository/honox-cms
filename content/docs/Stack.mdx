@@ -2,11 +2,22 @@
 title: "Stack"
 ---
 
+import { Stack } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # Stack
 
 A layout primitive that can be used to create a vertical or horizontal stack of elements.
 
 ## Usage
+
+<DemoPreview>
+  <Stack direction="row" gap="4">
+    <div style={{ padding: "0.75rem 1rem", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Item 1</div>
+    <div style={{ padding: "0.75rem 1rem", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Item 2</div>
+    <div style={{ padding: "0.75rem 1rem", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Item 3</div>
+  </Stack>
+</DemoPreview>
 
 ```tsx
 import { Stack } from '../components/ui/stack'

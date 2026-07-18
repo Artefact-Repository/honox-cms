@@ -2,6 +2,9 @@
 title: "Skeleton"
 ---
 
+import { Skeleton } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # Skeleton
 
 # Introduction
@@ -37,6 +40,14 @@ Plus all `Skeleton` props.
 # Usage
 
 ## Basic Skeleton
+
+<DemoPreview>
+  <div style={{ display: "flex", flexDirection: "column", gap: "1rem", width: "100%", maxWidth: "320px" }}>
+    <Skeleton shape="circle" size="12" />
+    <Skeleton height="6" width="40" />
+    <Skeleton shape="text" noOfLines={3} />
+  </div>
+</DemoPreview>
 
 ```tsx
 import { Skeleton, SkeletonCircle, SkeletonText } from "../components/ui";

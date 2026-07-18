@@ -2,6 +2,9 @@
 title: "Table"
 ---
 
+import { Table } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # Table
 
 # Introduction
@@ -33,6 +36,24 @@ A flexible component for displaying tabular data.
 | `align` | `"start" \| "center" \| "end"` | Text alignment for the column. |
 
 # Usage
+
+<DemoPreview>
+  <div style={{ width: "100%" }}>
+    <Table
+      variant="plain"
+      caption="Product Inventory"
+      columns={[
+        { header: "Name", key: "name" },
+        { header: "Category", key: "category" },
+        { header: "Price", key: "price", align: "end" },
+      ]}
+      rows={[
+        { name: "Laptop", category: "Electronics", price: "$999.00" },
+        { name: "Coffee Mug", category: "Home & Kitchen", price: "$15.00" },
+      ]}
+    />
+  </div>
+</DemoPreview>
 
 ```tsx
 import { Table } from "../components/ui";

@@ -2,6 +2,9 @@
 title: "Fieldset"
 ---
 
+import { Fieldset, Field } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # Fieldset
 
 # Introduction
@@ -28,6 +31,14 @@ state as context to nested `Field`s, matching Ark UI's Fieldset — see
 | `errorText`  | `Child`   | Error text shown when the fieldset is invalid.                                                  |
 
 # Usage
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <Fieldset legend="User Profile" helperText="Manage your info." required>
+      <Field label="Name" placeholder="Jane Doe" />
+    </Fieldset>
+  </div>
+</DemoPreview>
 
 ```tsx
 import { Fieldset, Field } from "../components/ui";

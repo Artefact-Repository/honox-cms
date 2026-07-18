@@ -1,5 +1,5 @@
-import type { FC } from "hono/jsx";
 import type {} from "hono";
+import type { FC } from "hono/jsx";
 
 declare module "hono" {
 	interface Env {

@@ -2,9 +2,24 @@
 title: "SegmentGroup"
 ---
 
+import { SegmentGroup } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # SegmentGroup
 
 A group of radio-like buttons that look like a single segmented control.
+
+## Usage
+
+<DemoPreview>
+  <SegmentGroup
+    label="View"
+    items={[
+      { label: "List", value: "list" },
+      { label: "Grid", value: "grid" },
+    ]}
+  />
+</DemoPreview>
 
 ## Props
 

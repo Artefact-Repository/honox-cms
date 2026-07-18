@@ -2,6 +2,9 @@
 title: "Carousel"
 ---
 
+import { Carousel } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # Carousel
 
 # Introduction
@@ -71,6 +74,18 @@ and the exported parts directly (see [Manual composition](#manual-composition)).
 # Usage
 
 ## Basic carousel
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "360px" }}>
+    <Carousel
+      slides={[
+        <div style={{ padding: "3rem 1rem", textAlign: "center", background: "var(--colors-blue-3)" }}>Slide 1</div>,
+        <div style={{ padding: "3rem 1rem", textAlign: "center", background: "var(--colors-purple-3)" }}>Slide 2</div>,
+        <div style={{ padding: "3rem 1rem", textAlign: "center", background: "var(--colors-green-3)" }}>Slide 3</div>,
+      ]}
+    />
+  </div>
+</DemoPreview>
 
 ```tsx
 import { Carousel } from "../components/ui";

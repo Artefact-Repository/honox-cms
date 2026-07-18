@@ -2,6 +2,9 @@
 title: "Text"
 ---
 
+import { Text } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # Text
 
 # Introduction
@@ -20,6 +23,10 @@ A polymorphic component for displaying body text, paragraphs, or spans with cons
 | `interactive` | `boolean` | Whether to enable client-side hydration.                         |
 
 # Usage
+
+<DemoPreview>
+  <Text size="lg">This is a paragraph.</Text>
+</DemoPreview>
 
 ```tsx
 import { Text } from "../components/ui";

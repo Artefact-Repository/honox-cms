@@ -2,6 +2,9 @@
 title: "Toast"
 ---
 
+import { Toast, Button } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # Toast
 
 # Introduction
@@ -20,6 +23,16 @@ Built-in behavior:
 > A live, runnable version of every example below is in `app/routes/index.tsx` — the **Toast Component Examples** section. The docs examples are kept in sync with that file.
 
 # Usage
+
+<DemoPreview>
+  <Toast.Toaster />
+  <Button
+    variant="outline"
+    onclick="window.dispatchEvent(new CustomEvent('park-ui:toast:create', { detail: { id: Math.random().toString(36).substring(2, 9), title: 'Success', description: 'Action completed successfully', closable: true, type: 'success' } }))"
+  >
+    Show Success Toast
+  </Button>
+</DemoPreview>
 
 ## Mount the Toaster
 

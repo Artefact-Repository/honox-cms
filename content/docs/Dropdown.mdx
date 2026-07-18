@@ -2,6 +2,9 @@
 title: "Dropdown"
 ---
 
+import { Dropdown, Button } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # Dropdown
 
 # Introduction
@@ -85,6 +88,26 @@ Supports all common `Dropdown` props such as `items`, `placement`, `arrow`, `cla
 # Usage
 
 ## Basic Dropdown
+
+<DemoPreview>
+  <Dropdown
+    trigger={<Button>Open Dropdown</Button>}
+    items={[
+      { type: "item", label: "Edit", value: "edit" },
+      { type: "separator" },
+      { type: "checkbox", label: "Bold", value: "bold", checked: true },
+      {
+        type: "radio-group",
+        value: "theme",
+        label: "Theme",
+        items: [
+          { type: "radio", label: "Light", value: "light" },
+          { type: "radio", label: "Dark", value: "dark" },
+        ],
+      },
+    ]}
+  />
+</DemoPreview>
 
 ```tsx
 import { Dropdown, Button } from "../components/ui";

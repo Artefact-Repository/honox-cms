@@ -2,7 +2,19 @@
 title: "Grid"
 ---
 
+import { Grid } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # Grid
+
+
+<DemoPreview>
+  <Grid columns={3} gap="4" style={{ width: "100%" }}>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-blue-3)", borderRadius: "8px" }}>1</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-blue-3)", borderRadius: "8px" }}>2</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-blue-3)", borderRadius: "8px" }}>3</div>
+  </Grid>
+</DemoPreview>
 
 The Grid component is a responsive 24-column grid layout built on a flex-based system. It consists of two subcomponents: `Row` and `Col`.
 

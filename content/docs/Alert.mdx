@@ -2,6 +2,9 @@
 title: "Alert"
 ---
 
+import { Alert, AlertIcon } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # Alert
 
 # Introduction
@@ -22,6 +25,15 @@ Displays a brief, important message in a way that attracts the user's attention 
 | `aria-live`   | `"polite" \| "assertive" \| "off"`            | The aria-live setting of the alert. Defaults to "polite". |
 
 # Usage
+
+<DemoPreview>
+  <Alert
+    status="success"
+    title="Success"
+    description="Your changes have been saved."
+    indicator={<AlertIcon />}
+  />
+</DemoPreview>
 
 ```tsx
 import { Alert, AlertIcon } from "../components/ui";

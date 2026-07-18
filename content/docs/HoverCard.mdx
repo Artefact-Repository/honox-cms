@@ -2,6 +2,9 @@
 title: "HoverCard"
 ---
 
+import { HoverCard } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # HoverCard
 
 # Introduction
@@ -23,6 +26,15 @@ A popover that appears when the user hovers over a trigger, useful for showing s
 # Usage
 
 ## Basic HoverCard
+
+<DemoPreview>
+  <HoverCard
+    trigger={<a href="#">Hover me</a>}
+    title="Supplementary information"
+    description="Shown on hover, positioned automatically."
+    showArrow
+  />
+</DemoPreview>
 
 ```tsx
 import { HoverCard } from "../components/ui";

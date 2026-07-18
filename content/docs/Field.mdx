@@ -2,6 +2,9 @@
 title: "Field"
 ---
 
+import { Field } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # Field
 
 # Introduction
@@ -66,6 +69,17 @@ The `validator` prop accepts a function that returns `true` for valid, `false` f
 ```
 
 The simplest way to use Field is with the flattened props. It will automatically render an input.
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <Field
+      label="Username"
+      helperText="Choose a unique username."
+      placeholder="Type here..."
+      minLength={3}
+    />
+  </div>
+</DemoPreview>
 
 ```tsx
 import { Field } from "../components/ui";

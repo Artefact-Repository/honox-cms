@@ -2,6 +2,9 @@
 title: "Group"
 ---
 
+import { Group, Button } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # Group
 
 # Introduction
@@ -19,6 +22,14 @@ A layout component for grouping related elements visually.
 | `grow`        | `boolean`                    | Whether the children should grow to fill the available space. |
 
 # Usage
+
+<DemoPreview>
+  <Group attached>
+    <Button>First</Button>
+    <Button>Second</Button>
+    <Button>Third</Button>
+  </Group>
+</DemoPreview>
 
 ```tsx
 import { Group } from "../components/ui";

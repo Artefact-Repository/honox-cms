@@ -2,6 +2,9 @@
 title: "Dialog"
 ---
 
+import { Dialog, Button } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # Dialog
 
 # Introduction
@@ -61,6 +64,17 @@ Complies with the [Dialog (Modal) WAI-ARIA design pattern](https://www.w3.org/WA
 # Usage
 
 ## Basic Dialog
+
+<DemoPreview>
+  <Dialog
+    trigger={<Button>Open Dialog</Button>}
+    title="Confirm action"
+    description="Are you sure you want to continue?"
+    body="This action cannot be undone."
+    cancel={<Button variant="outline">Cancel</Button>}
+    confirm={<Button>Confirm</Button>}
+  />
+</DemoPreview>
 
 ```tsx
 import { Dialog, Button } from "../components/ui";

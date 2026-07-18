@@ -2,6 +2,9 @@
 title: "Card"
 ---
 
+import { Card, Button } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # Card
 
 # Introduction
@@ -33,6 +36,16 @@ A flexible container for grouping related content, with optional header, body, f
 # Usage
 
 ## Basic Card
+
+<DemoPreview>
+  <Card
+    variant="elevated"
+    title="Project title"
+    description="A short description of the project."
+    body="Main content of the card goes here."
+    footer={<Button>View</Button>}
+  />
+</DemoPreview>
 
 ```tsx
 import { Card, Button } from "../components/ui";

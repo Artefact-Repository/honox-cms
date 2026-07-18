@@ -2,6 +2,9 @@
 title: "DatePicker"
 ---
 
+import { DatePicker } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
 # DatePicker
 
 # Introduction
@@ -123,6 +126,10 @@ The selected / today / in-range / range-preview / disabled states are driven by 
 All interactivity decisions in the library route through the shared `shouldHydrate()` helper in `app/components/ui/island-utils.ts`.
 
 # Usage
+
+<DemoPreview>
+  <DatePicker label="Choose Date" selectionMode="single" />
+</DemoPreview>
 
 ```tsx
 import { DatePicker } from "../components/ui";
