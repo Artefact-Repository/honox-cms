@@ -12,9 +12,9 @@ import {
 	Search,
 	Stack,
 	Text,
-} from "../components/ui";
-import { loadPosts } from "../lib/posts";
-import { filterEntries } from "../utils/search";
+} from "../../components/ui";
+import { loadPosts } from "../../lib/posts";
+import { filterEntries } from "../../utils/search";
 
 export default createRoute(async (c) => {
 	const { posts: blogPosts, searchEntries, tags } = await loadPosts();
