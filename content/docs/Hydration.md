@@ -1,13 +1,12 @@
 ---
-title: "Hydration"
+title: Hydration
 ---
 
 # Hydration
 
-This project is built on **HonoX + SSG**: pages emit **static HTML** by default, and only
+This project use **@hono/ssg** for Static Site Generation of pages, emitting **static HTML** by default, and only
 components that genuinely need client-side interactivity are "promoted" to islands (client JS
-snippets). This is the full reference for that system — see
-[UI Components Architecture](/docs/ARCHITECTURE) for the project-level overview.
+snippets). This is the full reference for that system — see [UI Components Architecture](/docs/ARCHITECTURE) for the project-level overview.
 
 ## The Core Predicate
 
@@ -34,14 +33,14 @@ export function shouldHydrate(interactive: unknown, hasSignal: boolean): boolean
 
 ### Truth table
 
-| `interactive` | `hasSignal` | Result  | Meaning |
-|---------------|------------|---------|---------|
-| `false`       | any        | `false` | Explicitly forbidden to hydrate (pure static) |
-| `true`        | any        | `true`  | Explicitly forced to hydrate |
-| `undefined`   | `true`     | `true`  | Smart-detect: signal present → hydrate |
-| `undefined`   | `false`    | `false` | Smart-detect: no signal → static |
+| `interactive` | `hasSignal` | Result | Meaning |
+| --- | --- | --- | --- |
+| `false` | any | `false` | Explicitly forbidden to hydrate (pure static) |
+| `true` | any | `true` | Explicitly forced to hydrate |
+| `undefined` | `true` | `true` | Smart-detect: signal present → hydrate |
+| `undefined` | `false` | `false` | Smart-detect: no signal → static |
 
----
+***
 
 ## The 3-Tier Model
 
@@ -49,7 +48,7 @@ export function shouldHydrate(interactive: unknown, hasSignal: boolean): boolean
 
 > **Core rule: `shouldHydrate(interactive, true)`**
 
-These components *are* interaction — their entire value depends on client JS
+These components _are_ interaction — their entire value depends on client JS
 (overlays, modals, drag handles, expand/collapse). They hydrate
 unless the caller explicitly passes `interactive={false}`.
 
@@ -64,7 +63,7 @@ Applies to:
 
 > **Core rule: `shouldHydrate(interactive, hasSignal)`**
 
-These components are *static by default, interactive only when a signal is present*.
+These components are _static by default, interactive only when a signal is present_.
 They are **controlled/uncontrolled form controls or selectable groups**: hydration only
 matters when state (`value` / `checked` / `defaultValue`) or a handler
 (`onChange` / `onClick` …) is supplied; otherwise static markup is enough.
@@ -82,8 +81,8 @@ Applies to:
 
 > **Never mounts an island**
 
-Pure typographic / decorative components with no client behaviour. They **must not declare
-an `interactive` prop** (historically `badge` / `heading` / `text` / `fieldset` mistakenly
+Pure typographic / decorative components with no client behaviour. They **must not declare**
+**an `interactive` prop** (historically `badge` / `heading` / `text` / `fieldset` mistakenly
 declared it and leaked the attribute onto the DOM — now removed).
 
 Applies to:
@@ -93,7 +92,7 @@ Applies to:
 - Status indicators (alert, breadcrumb, loader, skeleton, spinner, progress)
 - Graphics (icon)
 
----
+***
 
 ## Full Component Classification
 
@@ -103,7 +102,7 @@ Applies to:
 ### Tier-1 (auto-interactive)
 
 | Component | Rule | Trigger | Status |
-|-----------|------|---------|--------|
+| --- | --- | --- | --- |
 | `dialog` | `shouldHydrate(interactive, true)` | Always hydrates unless `interactive={false}` | ✅ `dialog.tsx` |
 | `drawer` | `shouldHydrate(interactive, true)` | Always hydrates unless `interactive={false}` | ✅ `drawer.tsx` |
 | `splitter` | `shouldHydrate(interactive, true)` | Always hydrates unless `interactive={false}` | ✅ `splitter.tsx` |
@@ -118,7 +117,7 @@ Applies to:
 ### Tier-2 (smart auto-detect)
 
 | Component | Behaviour signal (`hasSignal` is true when…) | Status |
-|-----------|-----------------------------------------------|--------|
+| --- | --- | --- |
 | `button` | `onClick` / `onPointerDown` / `onSubmit` | ✅ `button.tsx` |
 | `card` | `onClick` / `onPointerDown` | ✅ `card.tsx` |
 | `table` | any `row.onClick` | ✅ `table.tsx` |
@@ -141,7 +140,7 @@ Applies to:
 ### Tier-3 (presentational)
 
 | Component | Notes | Status |
-|-----------|-------|--------|
+| --- | --- | --- |
 | `text` | Typographic text | ✅ |
 | `heading` | Heading | ✅ |
 | `badge` | Badge | ✅ (dead `interactive` prop removed) |
@@ -156,7 +155,7 @@ Applies to:
 | `progress` | Progress bar (value-driven, static by default) | ✅ |
 | `icon` | SVG icon wrapper (size/color only, no client state) | ✅ `icon.tsx` |
 
----
+***
 
 ## Trigger Conditions per Tier
 
@@ -174,7 +173,7 @@ Applies to:
 
 Each component's `hasSignal` is a boolean OR over "is this prop defined?":
 
-```ts
+```typescript
 // Typical pattern (segment-group shown)
 const hasSignal =
 	rest.value !== undefined ||
@@ -214,7 +213,7 @@ Decision principles:
   `fieldset` wrongly declared it and leaked `interactive="true"` onto the DOM; that has
   been removed in cleanup.)
 
----
+***
 
 ## Decision Checklist for New Components
 
@@ -223,8 +222,8 @@ Walk the list in order; stop at the first match:
 1. **Does its existence depend entirely on client JS?**
    Overlay / modal / drag / expand-collapse → **Tier-1**, use
    `shouldHydrate(interactive, true)`.
-2. **Is it a form control or a visually-selectable component that may be controlled or
-   uncontrolled?**
+2. **Is it a form control or a visually-selectable component that may be controlled or**
+\*\*   uncontrolled?\*\*
    button / checkbox / switch / slider / combobox / row-click table … → **Tier-2**,
    define `hasSignal` (state + handlers) then call `shouldHydrate(interactive, hasSignal)`.
 3. **Is it purely typographic / layout / decorative?**
@@ -238,17 +237,19 @@ Walk the list in order; stop at the first match:
   `content/components/<Component>.mdx` and cross-reference this file, and set
   its frontmatter `hydration-tier` to match.
 
----
+***
 
 ## Historical Cleanup Log (already fixed)
 
 The following divergences were resolved during convention rollout; kept here for traceability:
 
 | # | Component | Original divergence | Fix |
-|---|-----------|---------------------|-----|
+| --- | --- | --- | --- |
 | 1 | `splitter` / `dialog` / `drawer` | Hardcoded `interactive = true` + `if (interactive)`, bypassing `shouldHydrate` | Switched to `shouldHydrate(interactive, true)`, restoring the `interactive={false}` opt-out |
 | 2 | `radio-group` | `interactive ? Island : Root`, forcing callers to pass `interactive` | Switched to `shouldHydrate(interactive, hasSignal)`, signals `value` / `defaultValue` / `onValueChange` |
-| 3 | `avatar` | Ad-hoc `if (rest.src || interactive)` | Switched to `shouldHydrate(interactive, Boolean(rest.src))`, unified entry point |
+
+| 3 | `avatar` | Ad-hoc \`if (rest.src |  | interactive)\` | Switched to `shouldHydrate(interactive, Boolean(rest.src))`, unified entry point |
+
 | 4 | `badge` / `heading` / `text` / `fieldset` | Dead `interactive` prop declared, leaked onto the DOM via `restProps` (`interactive="true"`) | Removed the `interactive` prop declaration |
 | 5 | `collapsible` | Tier not documented explicitly | Added a `# Hydration` section to `docs/Collapsible.md`, marking it Tier-1 |
 | 6 | `tags-input` | Bare `if (isInteractive)` branch, no `interactive` prop, no `shouldHydrate`, and `defaultValue` / `defaultInputValue` omitted from the signal set (an uncontrolled tags-input rendered static) | Switched to `shouldHydrate(interactive, hasSignal)`, added the `interactive` knob, extended the signal set to include `defaultValue` / `defaultInputValue` |
@@ -257,7 +258,7 @@ The following divergences were resolved during convention rollout; kept here for
 > Note: item 4 was a real bug — `badge` / `heading` / `text` / `fieldset` would render
 > `interactive` as an invalid HTML attribute on the DOM; it was prioritised for repair.
 
----
+***
 
 ## Related Documentation
 
