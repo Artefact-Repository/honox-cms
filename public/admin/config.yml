@@ -1495,3 +1495,11 @@ singletons:
         default: Other
         required: false
         hint: "Label for any doc that doesn't match a group above."
+      - label: Links
+        name: links
+        widget: list
+        required: false
+        hint: "Plain links shown at the bottom of the sidenav, e.g. the GitHub repo."
+        fields:
+          - { label: Label, name: label, widget: string }
+          - { label: URL, name: href, widget: string }

@@ -1,6 +1,6 @@
 import { css, cx } from "design-system/css";
 import { button } from "design-system/recipes";
-import type { DocsConfig, DocSummary } from "../lib/docs";
+import type { DocsConfig, DocsNavLinkConfig, DocSummary } from "../lib/docs";
 import {
 	Anchor,
 	Avatar,
@@ -21,7 +21,13 @@ interface DocsLayoutProps {
 	children?: unknown;
 }
 
-const GITHUB_URL = "https://github.com/Chen-Software/honox-cms";
+function isGithubLink(link: DocsNavLinkConfig): boolean {
+	try {
+		return new URL(link.href).hostname === "github.com";
+	} catch {
+		return false;
+	}
+}
 
 function GitHubIcon() {
 	return (
@@ -55,6 +61,27 @@ function HamburgerIcon() {
 			<path d="M4 6h16" />
 			<path d="M4 12h16" />
 			<path d="M4 18h16" />
+		</svg>
+	);
+}
+
+function ExternalLinkIcon() {
+	return (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="16"
+			height="16"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+		>
+			<title>External link</title>
+			<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+			<path d="M15 3h6v6" />
+			<path d="M10 14 21 3" />
 		</svg>
 	);
 }
@@ -122,9 +149,10 @@ function buildGroups(docs: DocSummary[], config: DocsConfig): DocGroup[] {
 interface SidenavProps {
 	groups: DocGroup[];
 	activeSlug?: string;
+	links?: DocsNavLinkConfig[];
 }
 
-function Sidenav({ groups, activeSlug }: SidenavProps) {
+function Sidenav({ groups, activeSlug, links }: SidenavProps) {
 	return (
 		<nav
 			class={css({
@@ -185,6 +213,46 @@ function Sidenav({ groups, activeSlug }: SidenavProps) {
 					</div>
 				</div>
 			))}
+			{links && links.length > 0 && (
+				<div
+					class={css({
+						borderTopWidth: "1px",
+						borderColor: "border",
+						pt: "4",
+						display: "flex",
+						flexDirection: "column",
+						gap: "0.5",
+					})}
+				>
+					{links.map((link) => (
+						<Anchor
+							key={link.href}
+							href={link.href}
+							target="_blank"
+							rel="noopener noreferrer"
+							variant="plain"
+							class={css({
+								display: "flex",
+								alignItems: "center",
+								gap: "2",
+								px: "3",
+								py: "1.5",
+								borderRadius: "md",
+								fontSize: "sm",
+								textDecoration: "none",
+								color: "fg.muted",
+								_hover: {
+									bg: "bg.subtle",
+									color: "fg",
+								},
+							})}
+						>
+							{isGithubLink(link) ? <GitHubIcon /> : <ExternalLinkIcon />}
+							{link.label}
+						</Anchor>
+					))}
+				</div>
+			)}
 		</nav>
 	);
 }
@@ -193,9 +261,11 @@ interface DocsHeaderProps {
 	editUrl?: string;
 	groups: DocGroup[];
 	activeSlug?: string;
+	links?: DocsNavLinkConfig[];
 }
 
-function DocsHeader({ editUrl, groups, activeSlug }: DocsHeaderProps) {
+function DocsHeader({ editUrl, groups, activeSlug, links }: DocsHeaderProps) {
+	const githubLink = links?.find(isGithubLink);
 	return (
 		<header
 			class={css({
@@ -232,7 +302,9 @@ function DocsHeader({ editUrl, groups, activeSlug }: DocsHeaderProps) {
 								<HamburgerIcon />
 							</IconButton>
 						}
-						body={<Sidenav groups={groups} activeSlug={activeSlug} />}
+						body={
+							<Sidenav groups={groups} activeSlug={activeSlug} links={links} />
+						}
 					/>
 				</div>
 
@@ -311,18 +383,20 @@ function DocsHeader({ editUrl, groups, activeSlug }: DocsHeaderProps) {
 					>
 						Home
 					</Anchor>
-					<Anchor
-						href={GITHUB_URL}
-						target="_blank"
-						rel="noopener noreferrer"
-						aria-label="View on GitHub"
-						class={cx(
-							button({ variant: "plain", size: "sm" }),
-							css({ px: "0" }),
-						)}
-					>
-						<GitHubIcon />
-					</Anchor>
+					{githubLink && (
+						<Anchor
+							href={githubLink.href}
+							target="_blank"
+							rel="noopener noreferrer"
+							aria-label="View on GitHub"
+							class={cx(
+								button({ variant: "plain", size: "sm" }),
+								css({ px: "0" }),
+							)}
+						>
+							<GitHubIcon />
+						</Anchor>
+					)}
 				</nav>
 			</div>
 		</header>
@@ -348,7 +422,12 @@ export function DocsLayout({
 
 	return (
 		<div class={css({ bg: "bg.canvas", minH: "screen" })}>
-			<DocsHeader editUrl={editUrl} groups={groups} activeSlug={activeSlug} />
+			<DocsHeader
+				editUrl={editUrl}
+				groups={groups}
+				activeSlug={activeSlug}
+				links={config.links}
+			/>
 
 			<div
 				class={css({
@@ -372,7 +451,7 @@ export function DocsLayout({
 						overflowY: "auto",
 					})}
 				>
-					<Sidenav groups={groups} activeSlug={activeSlug} />
+					<Sidenav groups={groups} activeSlug={activeSlug} links={config.links} />
 				</aside>
 
 				<main class={css({ flex: "1", minWidth: "0" })}>

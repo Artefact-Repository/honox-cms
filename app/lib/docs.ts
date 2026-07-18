@@ -49,12 +49,20 @@ export interface DocsNavGroupConfig {
 	category?: string;
 }
 
+/** A plain link rendered at the bottom of the docs sidenav (e.g. the GitHub repo). */
+export interface DocsNavLinkConfig {
+	label: string;
+	href: string;
+}
+
 /** Shape of the `DocsConfig` singleton (content/config/docs.json) — drives the
  * docs sidenav's grouping/ordering so it isn't hardcoded to any one collection. */
 export interface DocsConfig {
 	groups: DocsNavGroupConfig[];
 	/** Label for docs that don't match any group above. Defaults to "Other". */
 	fallbackLabel?: string;
+	/** External links shown at the bottom of the sidenav, e.g. the GitHub repo. */
+	links?: DocsNavLinkConfig[];
 }
 
 const EMPTY_DOCS_CONFIG: DocsConfig = { groups: [] };

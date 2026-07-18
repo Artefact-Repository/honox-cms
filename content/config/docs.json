@@ -9,5 +9,8 @@
 		{ "label": "Forms", "category": "Forms" },
 		{ "label": "Overlays", "category": "Overlays" }
 	],
-	"fallbackLabel": "Other"
+	"fallbackLabel": "Other",
+	"links": [
+		{ "label": "GitHub", "href": "https://github.com/Chen-Software/honox-cms" }
+	]
 }
