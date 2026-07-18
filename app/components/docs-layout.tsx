@@ -377,7 +377,16 @@ export function DocsLayout({
 
 				<main class={css({ flex: "1", minWidth: "0" })}>
 					{activeDoc && (
-						<Heading as="h1" size="2xl" class={css({ mb: "6" })}>
+						// Bigger than the content's own h1s (markdownContentClass fixes
+						// those at "2xl") so the page title reads as a distinct, higher
+						// level of hierarchy rather than just another section heading.
+						// Deliberately a flat literal size, not a responsive object: this
+						// repo's staticCss config can't statically generate responsive
+						// recipe-variant classes (no `jsx: [...]` mapping — see
+						// panda.config.ts's staticCss.recipes comment), so a `{ base, md }`
+						// value here renders the right classes in HTML but with no
+						// matching CSS ever emitted for the breakpoint-scoped one.
+						<Heading as="h1" size="3xl" class={css({ mb: "6" })}>
 							{activeDoc.title}
 						</Heading>
 					)}
