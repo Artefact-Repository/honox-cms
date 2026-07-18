@@ -107,41 +107,83 @@ export default createRoute(
 							py: { base: "8", md: "12" },
 						})}
 					>
-						{/* Back Button */}
-						<a
-							href="/blog"
-							class={css({
-								display: "inline-flex",
-								alignItems: "center",
-								gap: "2",
-								color: "fg.muted",
-								textDecoration: "none",
-								fontSize: "sm",
-								mb: "8",
-								px: "4",
-								py: "2",
-								borderRadius: "lg",
-								transition: "all 0.2s",
-								_hover: {
-									bg: "bg.subtle",
-									color: "fg",
-									transform: "translateX(-4px)",
-								},
-							})}
+						<Stack
+							direction="horizontal"
+							justify="space-between"
+							align="center"
+							class={css({ mb: "8" })}
 						>
-							<svg
-								width="20"
-								height="20"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
+							{/* Back Button */}
+							<a
+								href="/blog"
+								class={css({
+									display: "inline-flex",
+									alignItems: "center",
+									gap: "2",
+									color: "fg.muted",
+									textDecoration: "none",
+									fontSize: "sm",
+									px: "4",
+									py: "2",
+									borderRadius: "lg",
+									transition: "all 0.2s",
+									_hover: {
+										bg: "bg.subtle",
+										color: "fg",
+										transform: "translateX(-4px)",
+									},
+								})}
 							>
-								<title>Back</title>
-								<path d="M19 12H5M12 19l-7-7 7-7" />
-							</svg>
-							Back to Blog
-						</a>
+								<svg
+									width="20"
+									height="20"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+								>
+									<title>Back</title>
+									<path d="M19 12H5M12 19l-7-7 7-7" />
+								</svg>
+								Back to Blog
+							</a>
+
+							{/* Edit Button */}
+							<a
+								href={`/admin/#/collections/posts/entries/${slug}`}
+								class={css({
+									display: "inline-flex",
+									alignItems: "center",
+									gap: "2",
+									color: "fg.muted",
+									textDecoration: "none",
+									fontSize: "sm",
+									px: "4",
+									py: "2",
+									borderRadius: "lg",
+									transition: "all 0.2s",
+									_hover: {
+										bg: "bg.subtle",
+										color: "fg",
+										transform: "translateY(-1px)",
+									},
+								})}
+							>
+								<svg
+									width="18"
+									height="18"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+								>
+									<title>Edit</title>
+									<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+									<path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+								</svg>
+								Edit Post
+							</a>
+						</Stack>
 
 						<div
 							class={css({
