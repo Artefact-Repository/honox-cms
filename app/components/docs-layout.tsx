@@ -351,17 +351,6 @@ function DocsHeader({ editUrl, groups, activeSlug, links }: DocsHeaderProps) {
 						flexShrink: "0",
 					})}
 				>
-					{editUrl && (
-						<Anchor
-							href={editUrl}
-							class={cx(
-								button({ variant: "outline", size: "sm" }),
-								css({ textStyle: "sm", fontWeight: "medium" })
-							)}
-						>
-							Edit
-						</Anchor>
-					)}
 					<Anchor
 						href="/blog"
 						variant="plain"
@@ -376,6 +365,17 @@ function DocsHeader({ editUrl, groups, activeSlug, links }: DocsHeaderProps) {
 					>
 						Home
 					</Anchor>
+					{editUrl && (
+						<Anchor
+							href={editUrl}
+							class={cx(
+								button({ variant: "outline", size: "sm" }),
+								css({ textStyle: "sm", fontWeight: "medium" })
+							)}
+						>
+							Edit
+						</Anchor>
+					)}
 					{githubLink && (
 						<Anchor
 							href={githubLink.href}
