@@ -28,6 +28,7 @@ import { heading } from "./heading";
 import { hoverCard } from "./hover-card";
 import { icon } from "./icon";
 import { input } from "./input";
+import { layout } from "./layout";
 import { pagination } from "./pagination";
 import { popover } from "./popover";
 import { progress } from "./progress";
@@ -68,6 +69,7 @@ export const recipes = {
 };
 
 export const slotRecipes = {
+	layout,
 	fileUpload,
 	tagsInput,
 	pagination,

@@ -1,7 +1,7 @@
 import { css, cx } from "design-system/css";
 import { button } from "design-system/recipes";
 import type { DocSummary, DocsConfig, DocsNavLinkConfig } from "../lib/docs";
-import { Anchor, Heading, Search, Stack, Text } from "./ui";
+import { Anchor, Heading, Layout, Search, Stack, Text } from "./ui";
 
 interface DocsLayoutProps {
 	docs: DocSummary[];
@@ -301,21 +301,7 @@ function DocsHeader({
 }: DocsHeaderProps) {
 	const githubLink = links?.find(isGithubLink);
 	return (
-		<header
-			class={css({
-				borderBottomWidth: "1px",
-				borderColor: { _light: "white.a4", _dark: "black.a4" },
-				bg: { _light: "white.a7", _dark: "black.a7" },
-				backdropFilter: "blur(20px) saturate(180%)",
-				boxShadow: {
-					_light: "inset 0 1px 0 0 rgba(255, 255, 255, 0.5), 0 4px 30px rgba(0, 0, 0, 0.03)",
-					_dark: "inset 0 1px 0 0 rgba(255, 255, 255, 0.15), 0 4px 30px rgba(0, 0, 0, 0.2)",
-				},
-				position: "sticky",
-				top: "0",
-				zIndex: "20",
-			})}
-		>
+		<>
 			<div
 				class={css({
 					maxWidth: "7xl",
@@ -419,7 +405,7 @@ function DocsHeader({
 			</div>
 
 			<MobileNav groups={groups} activeSlug={activeSlug} links={links} />
-		</header>
+		</>
 	);
 }
 
@@ -443,47 +429,52 @@ export function DocsLayout({
 	}
 
 	return (
-		<div class={css({ bg: "bg.canvas", minH: "screen" })}>
-			<DocsHeader
-				editUrl={editUrl}
-				groups={groups}
-				activeSlug={activeSlug}
-				links={config.links}
-				headerLinks={config.headerLinks}
-			/>
-
-			<div
-				class={css({
-					maxWidth: "7xl",
-					mx: "auto",
-					px: { base: "4", md: "6", lg: "8" },
-					py: { base: "8", md: "12" },
-					display: "flex",
-					alignItems: "flex-start",
-					gap: "10",
-				})}
-			>
-				<aside
-					class={css({
-						display: { base: "none", md: "block" },
-						width: "64",
-						flexShrink: "0",
-						position: "sticky",
-						// Clears the sticky glass header (~4.5rem tall) plus a gap so the
-						// first nav group isn't blurred behind it while scrolling.
-						top: "24",
-						maxH: "calc(100vh - 7rem)",
-						overflowY: "auto",
-					})}
-				>
-					<Sidenav
-						groups={groups}
-						activeSlug={activeSlug}
-						links={config.links}
-					/>
-				</aside>
-
-				<main class={css({ flex: "1", minWidth: "0" })}>
+		<Layout
+			fullHeight
+			class={css({ bg: "bg.canvas" })}
+			stickyHeader
+			headerClass={css({
+				borderBottomWidth: "1px",
+				borderColor: { _light: "white.a4", _dark: "black.a4" },
+				bg: { _light: "white.a7", _dark: "black.a7" },
+				backdropFilter: "blur(20px) saturate(180%)",
+				boxShadow: {
+					_light:
+						"inset 0 1px 0 0 rgba(255, 255, 255, 0.5), 0 4px 30px rgba(0, 0, 0, 0.03)",
+					_dark:
+						"inset 0 1px 0 0 rgba(255, 255, 255, 0.15), 0 4px 30px rgba(0, 0, 0, 0.2)",
+				},
+			})}
+			header={
+				<DocsHeader
+					editUrl={editUrl}
+					groups={groups}
+					activeSlug={activeSlug}
+					links={config.links}
+					headerLinks={config.headerLinks}
+				/>
+			}
+			bodyClass={css({
+				maxWidth: "7xl",
+				width: "full",
+				mx: "auto",
+				px: { base: "4", md: "6", lg: "8" },
+				py: { base: "8", md: "12" },
+				gap: "10",
+			})}
+			stickySider
+			siderHideBelow="md"
+			siderClass={css({
+				// Clears the sticky glass header (~4.5rem tall) plus a gap so the
+				// first nav group isn't blurred behind it while scrolling.
+				top: "24",
+				maxH: "calc(100vh - 7rem)",
+			})}
+			sider={
+				<Sidenav groups={groups} activeSlug={activeSlug} links={config.links} />
+			}
+			content={
+				<>
 					{activeDoc && (
 						// Bigger than the content's own h1s (markdownContentClass fixes
 						// those at "2xl") so the page title reads as a distinct, higher
@@ -499,8 +490,8 @@ export function DocsLayout({
 						</Heading>
 					)}
 					{children}
-				</main>
-			</div>
-		</div>
+				</>
+			}
+		/>
 	);
 }

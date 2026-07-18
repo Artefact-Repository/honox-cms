@@ -1073,6 +1073,53 @@ collections:
                         widget: list
                         types: *leaf_components
                         required: false
+                  # Nested Layout: parts hold leaves only at this depth (YAML
+                  # anchors can't express recursion, so nesting bottoms out
+                  # one level down from the root Layout block).
+                  - label: Layout
+                    name: layout
+                    widget: object
+                    fields:
+                      - &layout_full_height
+                        label: Full Height
+                        name: fullHeight
+                        widget: boolean
+                        default: false
+                        required: false
+                        hint: "Fill the viewport height — turn on for a page-level shell."
+                      - &layout_sticky_header
+                        label: Sticky Header
+                        name: stickyHeader
+                        widget: boolean
+                        default: false
+                        required: false
+                        hint: "Pin the header to the top of the page while scrolling."
+                      - &layout_sider_width
+                        label: Sider Width
+                        name: siderWidth
+                        widget: select
+                        options: [sm, md, lg]
+                        default: md
+                        required: false
+                        hint: "Rail width: sm = 14rem, md = 16rem, lg = 18rem."
+                      - &layout_sticky_sider
+                        label: Sticky Sider
+                        name: stickySider
+                        widget: boolean
+                        default: false
+                        required: false
+                        hint: "Pin the sider below a sticky header; it scrolls internally."
+                      - &layout_sider_hide_below
+                        label: Sider Hide Below
+                        name: siderHideBelow
+                        widget: select
+                        options: [sm, md, lg]
+                        required: false
+                        hint: "Hide the sider under this breakpoint (small screens should get another nav)."
+                      - { label: Header, name: header, widget: list, types: *leaf_components, required: false }
+                      - { label: Sider, name: sider, widget: list, types: *leaf_components, required: false }
+                      - { label: Content, name: content, widget: list, types: *leaf_components, required: false }
+                      - { label: Footer, name: footer, widget: list, types: *leaf_components, required: false }
 
           # ==========================================
           # 1b. GRID
@@ -1463,6 +1510,39 @@ collections:
             name: carousel
             widget: object
             fields: *carousel_fields
+          - label: Layout
+            name: layout
+            widget: object
+            fields:
+              - *layout_full_height
+              - *layout_sticky_header
+              - *layout_sider_width
+              - *layout_sticky_sider
+              - *layout_sider_hide_below
+              - label: Header
+                name: header
+                widget: list
+                types: *nestable_components
+                required: false
+                hint: "Any components, rendered in a semantic <header> above the body."
+              - label: Sider
+                name: sider
+                widget: list
+                types: *nestable_components
+                required: false
+                hint: "Any components, rendered in an <aside> rail beside the content. Leave empty for no sider."
+              - label: Content
+                name: content
+                widget: list
+                types: *nestable_components
+                required: false
+                hint: "Any components, rendered in the <main> area — including a nested Layout."
+              - label: Footer
+                name: footer
+                widget: list
+                types: *nestable_components
+                required: false
+                hint: "Any components, rendered in a semantic <footer> below the body."
 
 # Singletons - Single-instance config files, edited as one entry (not a list)
 # Docs: https://sveltiacms.app/en/docs/collections/singletons

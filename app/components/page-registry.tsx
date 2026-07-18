@@ -27,6 +27,7 @@ import {
 	Heading,
 	HoverCard,
 	Icon,
+	Layout,
 	Loader,
 	PaginatedTable,
 	Pagination,
@@ -755,6 +756,36 @@ const registry: Record<string, BlockRenderer> = {
 			>
 				<Button variant="outline">{triggerText || "Hover me"}</Button>
 			</Tooltip>
+		);
+	},
+
+	layout: (b) => {
+		// The four part fields are block lists, not props — pull them out and
+		// render each into the matching slot prop (undefined when empty, so
+		// the component skips that part's wrapper element entirely).
+		const { header, sider, content, footer } = b;
+		const props = propsOf(b);
+		for (const key of ["header", "sider", "content", "footer"]) {
+			delete props[key];
+		}
+		// Same empty-string cleanup as radioCardGroup: untouched optional
+		// selects (siderWidth/siderHideBelow) arrive as "" and would override
+		// the recipe's defaults with a nonexistent variant value.
+		for (const key of Object.keys(props)) {
+			if (props[key] === "") delete props[key];
+		}
+		const part = (blocks: unknown): JSX.Element | undefined =>
+			Array.isArray(blocks) && blocks.length > 0 ? (
+				<>{renderChildren(blocks as ComponentBlock[])}</>
+			) : undefined;
+		return (
+			<Layout
+				header={part(header)}
+				sider={part(sider)}
+				content={part(content)}
+				footer={part(footer)}
+				{...props}
+			/>
 		);
 	},
 
