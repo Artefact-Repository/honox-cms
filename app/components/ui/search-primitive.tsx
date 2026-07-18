@@ -27,8 +27,8 @@ const inputClass = css({
 	py: "3",
 	borderWidth: "2px",
 	borderRadius: "lg",
-	bg: "bg",
-	color: "fg",
+	bg: "gray.surface.bg",
+	color: "fg.default",
 	borderColor: "border",
 	fontSize: "md",
 	transition: "all 0.2s",
@@ -353,7 +353,7 @@ export function InteractiveSearch(props: SearchBaseProps) {
 							top: "calc(100% + 6px)",
 							left: "0",
 							right: "0",
-							bg: "bg",
+							bg: "gray.surface.bg",
 							borderWidth: "1px",
 							borderColor: "border",
 							borderRadius: "lg",
@@ -397,7 +397,7 @@ export function InteractiveSearch(props: SearchBaseProps) {
 								onMouseOver={() => setHighlighted(index)}
 								onFocus={() => setHighlighted(index)}
 							>
-								<div class={css({ fontWeight: "medium", color: "fg" })}>
+								<div class={css({ fontWeight: "medium", color: "fg.default" })}>
 									<Highlighted text={entry.title} tokens={tokens} />
 								</div>
 								{entry.description && (
