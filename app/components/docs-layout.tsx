@@ -1,4 +1,5 @@
-import { css } from "design-system/css";
+import { css, cx } from "design-system/css";
+import { button } from "design-system/recipes";
 import type { DocSummary } from "../lib/docs";
 import { Anchor, Avatar, Heading, Search, Stack, Text } from "./ui";
 
@@ -20,7 +21,11 @@ const CATEGORY_ORDER = [
 	"Overlays",
 ];
 
-function DocsHeader() {
+interface DocsHeaderProps {
+	editUrl?: string;
+}
+
+function DocsHeader({ editUrl }: DocsHeaderProps) {
 	return (
 		<header
 			class={css({
@@ -93,6 +98,17 @@ function DocsHeader() {
 						flexShrink: "0",
 					})}
 				>
+					{editUrl && (
+						<Anchor
+							href={editUrl}
+							class={cx(
+								button({ variant: "outline", size: "sm" }),
+								css({ textStyle: "sm", fontWeight: "medium" })
+							)}
+						>
+							Edit
+						</Anchor>
+					)}
 					<Anchor
 						href="/blog"
 						variant="plain"
@@ -143,9 +159,18 @@ function buildGroups(docs: DocSummary[]): DocGroup[] {
 export function DocsLayout({ docs, activeSlug, children }: DocsLayoutProps) {
 	const groups = buildGroups(docs);
 
+	const activeDoc = activeSlug
+		? docs.find((doc) => doc.slug === activeSlug)
+		: undefined;
+	let editUrl: string | undefined;
+	if (activeDoc) {
+		const collection = activeDoc.section === "Guides" ? "docs" : "components";
+		editUrl = `/admin/#/collections/${collection}/entries/${activeDoc.slug}`;
+	}
+
 	return (
 		<div class={css({ bg: "bg.canvas", minH: "screen" })}>
-			<DocsHeader />
+			<DocsHeader editUrl={editUrl} />
 
 			<div
 				class={css({
