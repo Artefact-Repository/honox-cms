@@ -14,9 +14,7 @@ test("Card renders basic content", () => {
 });
 
 test("Card renders image", () => {
-	const html = (
-		<Card image="test-image.jpg" title="Image Card" />
-	).toString();
+	const html = (<Card image="test-image.jpg" title="Image Card" />).toString();
 
 	expect(html).toContain('<img src="test-image.jpg"');
 });

@@ -1,7 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import { Carousel } from "./carousel";
 
-const slides = [<div>One</div>, <div>Two</div>, <div>Three</div>, <div>Four</div>];
+const slides = [
+	<div>One</div>,
+	<div>Two</div>,
+	<div>Three</div>,
+	<div>Four</div>,
+];
 
 describe("Carousel Unit Tests", () => {
 	test("should render the region with carousel semantics", () => {
@@ -40,14 +45,18 @@ describe("Carousel Unit Tests", () => {
 		expect(html).toContain('data-part="prev-trigger"');
 		expect(html).toContain('data-part="next-trigger"');
 		expect(html).toMatch(/<button[^>]*data-part="prev-trigger"[^>]*>/);
-		const [prevTriggerTag] = html.match(/<button[^>]*data-part="prev-trigger"[^>]*>/) ?? [];
+		const [prevTriggerTag] =
+			html.match(/<button[^>]*data-part="prev-trigger"[^>]*>/) ?? [];
 		expect(prevTriggerTag).toContain("disabled");
 	});
 
 	test("should keep prev trigger enabled on the first page when looping", () => {
-		const html = (<Carousel interactive={false} slides={slides} loop />).toString();
+		const html = (
+			<Carousel interactive={false} slides={slides} loop />
+		).toString();
 
-		const [prevTriggerTag] = html.match(/<button[^>]*data-part="prev-trigger"[^>]*>/) ?? [];
+		const [prevTriggerTag] =
+			html.match(/<button[^>]*data-part="prev-trigger"[^>]*>/) ?? [];
 		expect(prevTriggerTag).not.toContain("disabled");
 	});
 

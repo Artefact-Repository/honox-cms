@@ -38,10 +38,7 @@ describe("HoverCard Unit Tests", () => {
 
 	test("should render custom content when provided", () => {
 		const html = (
-			<HoverCard
-				interactive={false}
-				content={<div>Custom Content</div>}
-			/>
+			<HoverCard interactive={false} content={<div>Custom Content</div>} />
 		).toString();
 
 		expect(html).toContain("Custom Content");

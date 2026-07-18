@@ -38,7 +38,9 @@ test("Field - JSX errorText is rendered and announced", () => {
 	expect(html).toContain("Username is taken");
 	expect(html).toContain('aria-live="polite"');
 	expect(html).toContain('id="field::jsx-error-field::error-text"');
-	expect(html).toContain('aria-describedby="field::jsx-error-field::error-text"');
+	expect(html).toContain(
+		'aria-describedby="field::jsx-error-field::error-text"',
+	);
 });
 
 test("Field - Flattened API validation (minLength)", () => {

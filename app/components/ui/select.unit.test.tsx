@@ -27,9 +27,7 @@ describe("Select Unit Tests", () => {
 
 	test("should force-hydrate by default as a Tier-1 component", () => {
 		const html = (
-			<Select
-				items={[{ label: "Hono", value: "hono" }]}
-			/>
+			<Select items={[{ label: "Hono", value: "hono" }]} />
 		).toString();
 
 		expect(html).toContain('data-hydrated="true"');
@@ -186,9 +184,7 @@ describe("Select Unit Tests", () => {
 
 	test("should support compound components for backward compatibility", () => {
 		const html = (
-			<Select.Root
-				items={[{ label: "Hono", value: "hono" }]}
-			>
+			<Select.Root items={[{ label: "Hono", value: "hono" }]}>
 				<Select.Label>Framework</Select.Label>
 				<Select.Control>
 					<Select.Trigger>
@@ -242,7 +238,7 @@ describe("Select Unit Tests", () => {
 
 		expect(html).toContain('data-disabled=""');
 		expect(html).toContain('data-invalid=""');
-		expect(html).toContain('multiple');
+		expect(html).toContain("multiple");
 		expect(html).toContain('data-part="clear-trigger"');
 	});
 

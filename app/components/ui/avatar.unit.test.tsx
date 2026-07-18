@@ -28,7 +28,11 @@ describe("Avatar component", () => {
 	});
 
 	it("should render image part and hide fallback when src and loaded status are provided", async () => {
-		const html = (await Avatar({ src: "https://example.com/avatar.png", status: "loaded", interactive: false })) as any;
+		const html = (await Avatar({
+			src: "https://example.com/avatar.png",
+			status: "loaded",
+			interactive: false,
+		})) as any;
 		const htmlString = html.toString();
 		expect(htmlString).toContain('data-part="image"');
 		expect(htmlString).toContain('data-state="loaded"');

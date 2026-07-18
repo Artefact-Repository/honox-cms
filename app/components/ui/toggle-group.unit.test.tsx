@@ -24,28 +24,25 @@ describe("ToggleGroup Unit Tests", () => {
 
 	test("should render as an island when interactive", () => {
 		const html = (
-			<ToggleGroup
-				interactive
-				items={[{ label: "B", value: "bold" }]}
-			/>
+			<ToggleGroup interactive items={[{ label: "B", value: "bold" }]} />
 		).toString();
 
 		expect(html).toContain('data-hydrated="true"');
 	});
 
-    test("should support multiple selection", () => {
-        const html = (
-            <ToggleGroup
-                multiple
-                defaultValue={["bold", "italic"]}
-                items={[
-                    { label: "B", value: "bold" },
-                    { label: "I", value: "italic" },
-                ]}
-            />
-        ).toString();
+	test("should support multiple selection", () => {
+		const html = (
+			<ToggleGroup
+				multiple
+				defaultValue={["bold", "italic"]}
+				items={[
+					{ label: "B", value: "bold" },
+					{ label: "I", value: "italic" },
+				]}
+			/>
+		).toString();
 
-        expect(html).toContain('role="checkbox"');
-        expect(html).toContain('aria-pressed="true"');
-    });
+		expect(html).toContain('role="checkbox"');
+		expect(html).toContain('aria-pressed="true"');
+	});
 });

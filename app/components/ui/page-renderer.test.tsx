@@ -17,9 +17,9 @@ test("PageRenderer renders flat grid component correctly", () => {
 				{
 					type: "button",
 					text: "Grid Button 2",
-				}
-			]
-		}
+				},
+			],
+		},
 	];
 
 	const html = (<PageRenderer content={content} />).toString();
@@ -41,7 +41,7 @@ test("PageRenderer parses responsive grid columns and gap props", () => {
 			type: "grid",
 			columns: '{"base": 1, "md": 3}',
 			gap: "6",
-		}
+		},
 	];
 
 	const html = (<PageRenderer content={content} />).toString();

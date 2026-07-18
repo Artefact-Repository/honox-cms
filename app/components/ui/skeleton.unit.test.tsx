@@ -21,7 +21,9 @@ test("Skeleton component renders with shape='circle' and direct size prop", asyn
 	const htmlString = html.toString();
 	expect(htmlString).toContain("skeleton");
 	expect(htmlString).toContain("skeleton--circle_true");
-	expect(htmlString).toContain('style="width:var(--sizes-12);height:var(--sizes-12)"');
+	expect(htmlString).toContain(
+		'style="width:var(--sizes-12);height:var(--sizes-12)"',
+	);
 });
 
 test("Skeleton component renders with width and height props", async () => {
@@ -31,7 +33,9 @@ test("Skeleton component renders with width and height props", async () => {
 	})) as unknown as { toString: () => string };
 	const htmlString = html.toString();
 	expect(htmlString).toContain("skeleton");
-	expect(htmlString).toContain('style="width:var(--sizes-40);height:var(--sizes-6)"');
+	expect(htmlString).toContain(
+		'style="width:var(--sizes-40);height:var(--sizes-6)"',
+	);
 });
 
 test("Skeleton component renders with shape='circle' and variant='shine' prop", async () => {
@@ -44,7 +48,9 @@ test("Skeleton component renders with shape='circle' and variant='shine' prop", 
 	expect(htmlString).toContain("skeleton");
 	expect(htmlString).toContain("skeleton--circle_true");
 	expect(htmlString).toContain("skeleton--variant_shine");
-	expect(htmlString).toContain('style="width:var(--sizes-10);height:var(--sizes-10)"');
+	expect(htmlString).toContain(
+		'style="width:var(--sizes-10);height:var(--sizes-10)"',
+	);
 });
 
 test("Skeleton component renders with shape='text' prop", async () => {
@@ -55,7 +61,8 @@ test("Skeleton component renders with shape='text' prop", async () => {
 	const htmlString = html.toString();
 	expect(htmlString).toContain("skeleton");
 	// Should render multiple lines (as Skeletons inside a stack)
-	const skeletonOccurrences = (htmlString.match(/class="[^"]*skeleton/g) || []).length;
+	const skeletonOccurrences = (htmlString.match(/class="[^"]*skeleton/g) || [])
+		.length;
 	// 2 inner lines = 2 skeletons total
 	expect(skeletonOccurrences).toBe(2);
 });

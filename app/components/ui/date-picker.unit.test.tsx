@@ -153,7 +153,9 @@ describe("DatePicker Unit Tests", () => {
 	test("should render preset triggers", () => {
 		const html = (
 			<DatePicker interactive={false}>
-				<DatePicker.PresetTrigger value="last7Days">Last 7 Days</DatePicker.PresetTrigger>
+				<DatePicker.PresetTrigger value="last7Days">
+					Last 7 Days
+				</DatePicker.PresetTrigger>
 			</DatePicker>
 		).toString();
 
@@ -233,7 +235,11 @@ describe("DatePicker Unit Tests", () => {
 
 	test("should render hidden inputs for native form submission", () => {
 		const html = (
-			<DatePicker interactive={false} name="due" value={[parseDate("2026-07-15")]}>
+			<DatePicker
+				interactive={false}
+				name="due"
+				value={[parseDate("2026-07-15")]}
+			>
 				<DatePicker.Control>
 					<DatePicker.Input />
 				</DatePicker.Control>
@@ -307,7 +313,9 @@ describe("DatePicker Unit Tests", () => {
 			</DatePicker>
 		).toString();
 
-		expect(html).toMatch(/<option[^>]*value="7"[^>]*selected[^>]*>July<\/option>/);
+		expect(html).toMatch(
+			/<option[^>]*value="7"[^>]*selected[^>]*>July<\/option>/,
+		);
 		expect(html).toMatch(/<option[^>]*value="2026"[^>]*selected/);
 		// The invalid `value` attribute on <select> must be gone
 		expect(html).not.toMatch(/<select[^>]*value=/);

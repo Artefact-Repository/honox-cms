@@ -1,15 +1,7 @@
 import { css, cx } from "design-system/css";
 import { button } from "design-system/recipes";
 import type { DocsConfig, DocsNavLinkConfig, DocSummary } from "../lib/docs";
-import {
-	Anchor,
-	Drawer,
-	Heading,
-	IconButton,
-	Search,
-	Stack,
-	Text,
-} from "./ui";
+import { Anchor, Drawer, Heading, IconButton, Search, Stack, Text } from "./ui";
 
 interface DocsLayoutProps {
 	docs: DocSummary[];
@@ -373,7 +365,7 @@ function DocsHeader({
 							href={editUrl}
 							class={cx(
 								button({ variant: "outline", size: "sm" }),
-								css({ textStyle: "sm", fontWeight: "medium" })
+								css({ textStyle: "sm", fontWeight: "medium" }),
 							)}
 						>
 							Edit
@@ -448,7 +440,11 @@ export function DocsLayout({
 						overflowY: "auto",
 					})}
 				>
-					<Sidenav groups={groups} activeSlug={activeSlug} links={config.links} />
+					<Sidenav
+						groups={groups}
+						activeSlug={activeSlug}
+						links={config.links}
+					/>
 				</aside>
 
 				<main class={css({ flex: "1", minWidth: "0" })}>

@@ -3,10 +3,7 @@ import { TagsInput } from "./tags-input";
 
 test("TagsInput renders with default value", () => {
 	const html = (
-		<TagsInput
-			label="Frameworks"
-			defaultValue={["React", "Solid"]}
-		/>
+		<TagsInput label="Frameworks" defaultValue={["React", "Solid"]} />
 	).toString();
 
 	expect(html).toContain('data-part="root"');
@@ -18,14 +15,14 @@ test("TagsInput renders with default value", () => {
 });
 
 test("TagsInput renders interactive island when onValueChange is provided", () => {
-    const html = (
-        <TagsInput
-            label="Frameworks"
-            defaultValue={["React"]}
-            onValueChange={() => {}}
-        />
-    ).toString();
+	const html = (
+		<TagsInput
+			label="Frameworks"
+			defaultValue={["React"]}
+			onValueChange={() => {}}
+		/>
+	).toString();
 
-    // In our implementation, islands add data-interactive="true"
-    expect(html).toContain('data-interactive="true"');
+	// In our implementation, islands add data-interactive="true"
+	expect(html).toContain('data-interactive="true"');
 });

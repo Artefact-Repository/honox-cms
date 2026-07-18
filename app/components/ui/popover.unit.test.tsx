@@ -22,17 +22,13 @@ describe("Popover Unit Tests", () => {
 	});
 
 	test("should render arrow when showArrow is true", () => {
-		const html = (
-			<Popover interactive={false} showArrow={true} />
-		).toString();
+		const html = (<Popover interactive={false} showArrow={true} />).toString();
 
 		expect(html).toContain('class="popover__arrow"');
 	});
 
 	test("should not render arrow when showArrow is false", () => {
-		const html = (
-			<Popover interactive={false} showArrow={false} />
-		).toString();
+		const html = (<Popover interactive={false} showArrow={false} />).toString();
 
 		expect(html).not.toContain('class="popover__arrow"');
 	});
@@ -51,7 +47,7 @@ describe("Popover Unit Tests", () => {
 		let focusCalledCount = 0;
 		if (typeof document !== "undefined") {
 			const originalFocus = HTMLElement.prototype.focus;
-			HTMLElement.prototype.focus = function() {
+			HTMLElement.prototype.focus = function () {
 				focusCalledCount++;
 			};
 
@@ -62,7 +58,11 @@ describe("Popover Unit Tests", () => {
 				<Popover
 					id="test-focus-popover"
 					interactive={true}
-					trigger={<button id="test-trigger" type="button">Open</button>}
+					trigger={
+						<button id="test-trigger" type="button">
+							Open
+						</button>
+					}
 					title="Popover Title"
 					body="This is the popover body content."
 				/>

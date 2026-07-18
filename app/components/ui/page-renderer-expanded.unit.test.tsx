@@ -17,9 +17,9 @@ test("PageRenderer renders field correctly with custom children and attributes",
 					type: "button",
 					text: "Check Availability",
 					variant: "outline",
-				}
-			]
-		}
+				},
+			],
+		},
 	];
 
 	const html = (<PageRenderer content={content} />).toString();
@@ -45,9 +45,9 @@ test("PageRenderer renders fieldset correctly with legend and nested content", (
 					type: "field",
 					label: "Email Address",
 					defaultValue: "user@example.com",
-				}
-			]
-		}
+				},
+			],
+		},
 	];
 
 	const html = (<PageRenderer content={content} />).toString();
@@ -74,9 +74,9 @@ test("PageRenderer renders group correctly", () => {
 				{
 					type: "button",
 					text: "Right Option",
-				}
-			]
-		}
+				},
+			],
+		},
 	];
 
 	const html = (<PageRenderer content={content} />).toString();
@@ -98,9 +98,9 @@ test("PageRenderer renders hover-card correctly with trigger, title, and descrip
 					type: "badge",
 					text: "Active",
 					colorPalette: "green",
-				}
-			]
-		}
+				},
+			],
+		},
 	];
 
 	const html = (<PageRenderer content={content} />).toString();
@@ -130,9 +130,9 @@ test("PageRenderer renders dropdown correctly with items", () => {
 					label: "Receive Notifications",
 					value: "notifications",
 					checked: true,
-				}
-			]
-		}
+				},
+			],
+		},
 	];
 
 	const html = (<PageRenderer content={content} />).toString();

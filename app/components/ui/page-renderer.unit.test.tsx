@@ -13,10 +13,10 @@ test("PageRenderer renders card and its children components correctly", () => {
 					type: "button",
 					text: "Book Cabin",
 					variant: "solid",
-					colorPalette: "green"
-				}
-			]
-		}
+					colorPalette: "green",
+				},
+			],
+		},
 	];
 
 	const html = (<PageRenderer content={content} />).toString();
@@ -33,8 +33,8 @@ test("PageRenderer renders checkbox correctly", () => {
 			type: "checkbox",
 			label: "Accept Terms",
 			checked: true,
-			colorPalette: "blue"
-		}
+			colorPalette: "blue",
+		},
 	];
 
 	const html = (<PageRenderer content={content} />).toString();
@@ -52,10 +52,10 @@ test("PageRenderer renders collapsible correctly", () => {
 			children: [
 				{
 					type: "text",
-					content: "Secret content"
-				}
-			]
-		}
+					content: "Secret content",
+				},
+			],
+		},
 	];
 
 	const html = (<PageRenderer content={content} />).toString();
@@ -71,10 +71,10 @@ test("PageRenderer renders combobox correctly", () => {
 			label: "Select Tech",
 			placeholder: "Choose...",
 			items: [
-				{ "label": "Hono", "value": "hono" },
-				{ "label": "React", "value": "react" }
-			]
-		}
+				{ label: "Hono", value: "hono" },
+				{ label: "React", value: "react" },
+			],
+		},
 	];
 
 	const html = (<PageRenderer content={content} />).toString();
@@ -95,12 +95,12 @@ test("PageRenderer renders dialog correctly", () => {
 				{
 					type: "button",
 					text: "Open Dialog",
-					variant: "outline"
-				}
+					variant: "outline",
+				},
 			],
 			confirmText: "Yes",
-			cancelText: "No"
-		}
+			cancelText: "No",
+		},
 	];
 
 	const html = (<PageRenderer content={content} />).toString();
@@ -122,12 +122,12 @@ test("PageRenderer renders drawer correctly", () => {
 				{
 					type: "button",
 					text: "Open Drawer",
-					variant: "outline"
-				}
+					variant: "outline",
+				},
 			],
 			confirmText: "Save",
-			cancelText: "Close"
-		}
+			cancelText: "Close",
+		},
 	];
 
 	const html = (<PageRenderer content={content} />).toString();
@@ -147,8 +147,8 @@ test("PageRenderer renders popover correctly", () => {
 			title: "Popover Title",
 			description: "Popover Desc",
 			body: "Popover Body",
-			footer: "Popover Footer"
-		}
+			footer: "Popover Footer",
+		},
 	];
 
 	const html = (<PageRenderer content={content} />).toString();
@@ -166,32 +166,32 @@ test("PageRenderer renders skeleton correctly", () => {
 			type: "skeleton",
 			variant: "text",
 			noOfLines: 2,
-			loaded: false
-		}
+			loaded: false,
+		},
 	];
 
 	const html = (<PageRenderer content={content} />).toString();
 
-	expect(html).toContain("class=\"skeleton");
+	expect(html).toContain('class="skeleton');
 });
 
 test("PageRenderer renders paginatedTable and pagination correctly", () => {
 	const content = [
 		{
-			type: "paginatedTable"
+			type: "paginatedTable",
 		},
 		{
 			type: "pagination",
 			count: 50,
 			pageSize: 10,
-			defaultPage: 2
-		}
+			defaultPage: 2,
+		},
 	];
 
 	const html = (<PageRenderer content={content} />).toString();
 
 	expect(html).toContain("Alice Johnson"); // from PaginatedTable default state
-	expect(html).toContain("aria-label=\"Next Page\""); // standard pagination attribute
+	expect(html).toContain('aria-label="Next Page"'); // standard pagination attribute
 });
 
 test("PageRenderer renders progress correctly", () => {
@@ -200,8 +200,8 @@ test("PageRenderer renders progress correctly", () => {
 			type: "progress",
 			label: "Loading Task",
 			value: 75,
-			showValueText: true
-		}
+			showValueText: true,
+		},
 	];
 
 	const html = (<PageRenderer content={content} />).toString();
@@ -217,17 +217,17 @@ test("PageRenderer renders radioGroup and segmentGroup correctly", () => {
 			label: "Select Option",
 			items: [
 				{ label: "Opt A", value: "a" },
-				{ label: "Opt B", value: "b" }
-			]
+				{ label: "Opt B", value: "b" },
+			],
 		},
 		{
 			type: "segmentGroup",
 			label: "View Mode",
 			items: [
 				{ label: "Grid", value: "grid" },
-				{ label: "List", value: "list" }
-			]
-		}
+				{ label: "List", value: "list" },
+			],
+		},
 	];
 
 	const html = (<PageRenderer content={content} />).toString();
@@ -246,20 +246,20 @@ test("PageRenderer renders slider and switch correctly", () => {
 			type: "slider",
 			label: "Volume",
 			defaultValue: 40,
-			showValueText: true
+			showValueText: true,
 		},
 		{
 			type: "switch",
 			label: "Dark Mode",
-			checked: true
-		}
+			checked: true,
+		},
 	];
 
 	const html = (<PageRenderer content={content} />).toString();
 
 	expect(html).toContain("Volume");
 	expect(html).toContain("40");
-	expect(html).toContain("role=\"switch\"");
+	expect(html).toContain('role="switch"');
 	expect(html).toMatch(/<span[^>]*>Dark Mode<\/span>/);
 	expect(html).not.toContain('label="Dark Mode"');
 });
@@ -273,15 +273,15 @@ test("PageRenderer renders custom triggers for collapsible, dialog, and drawer c
 					type: "button",
 					text: "Custom Collapsible Button Trigger",
 					variant: "outline",
-					colorPalette: "blue"
-				}
+					colorPalette: "blue",
+				},
 			],
 			children: [
 				{
 					type: "text",
-					content: "Secret details inside"
-				}
-			]
+					content: "Secret details inside",
+				},
+			],
 		},
 		{
 			type: "dialog",
@@ -291,9 +291,9 @@ test("PageRenderer renders custom triggers for collapsible, dialog, and drawer c
 					type: "badge",
 					text: "Custom Dialog Badge Trigger",
 					variant: "solid",
-					colorPalette: "green"
-				}
-			]
+					colorPalette: "green",
+				},
+			],
 		},
 		{
 			type: "drawer",
@@ -302,10 +302,10 @@ test("PageRenderer renders custom triggers for collapsible, dialog, and drawer c
 				{
 					type: "button",
 					text: "Custom Drawer Button Trigger",
-					variant: "solid"
-				}
-			]
-		}
+					variant: "solid",
+				},
+			],
+		},
 	];
 
 	const html = (<PageRenderer content={content} />).toString();

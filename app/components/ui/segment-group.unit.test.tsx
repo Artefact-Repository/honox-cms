@@ -23,10 +23,7 @@ describe("SegmentGroup Unit Tests", () => {
 
 	test("should render as an island when interactive", () => {
 		const html = (
-			<SegmentGroup
-				interactive
-				items={[{ label: "React", value: "react" }]}
-			/>
+			<SegmentGroup interactive items={[{ label: "React", value: "react" }]} />
 		).toString();
 
 		expect(html).toContain('data-hydrated="true"');
@@ -44,21 +41,21 @@ describe("SegmentGroup Unit Tests", () => {
 		expect(html).toContain('data-part="root"');
 	});
 
-    test("should support compound components for backward compatibility", () => {
-        const html = (
-            <SegmentGroup.Root defaultValue="react">
-                <SegmentGroup.Indicator />
-                <SegmentGroup.Item value="react">
-                    <SegmentGroup.ItemText>React</SegmentGroup.ItemText>
-                    <SegmentGroup.ItemHiddenInput />
-                </SegmentGroup.Item>
-            </SegmentGroup.Root>
-        ).toString();
+	test("should support compound components for backward compatibility", () => {
+		const html = (
+			<SegmentGroup.Root defaultValue="react">
+				<SegmentGroup.Indicator />
+				<SegmentGroup.Item value="react">
+					<SegmentGroup.ItemText>React</SegmentGroup.ItemText>
+					<SegmentGroup.ItemHiddenInput />
+				</SegmentGroup.Item>
+			</SegmentGroup.Root>
+		).toString();
 
-        expect(html).toContain('data-part="root"');
-        expect(html).toContain('data-part="indicator"');
-        expect(html).toContain('data-part="item"');
-        expect(html).toContain('data-part="item-text"');
-        expect(html).toContain('type="radio"');
-    });
+		expect(html).toContain('data-part="root"');
+		expect(html).toContain('data-part="indicator"');
+		expect(html).toContain('data-part="item"');
+		expect(html).toContain('data-part="item-text"');
+		expect(html).toContain('type="radio"');
+	});
 });
