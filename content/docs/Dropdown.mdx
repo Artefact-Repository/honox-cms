@@ -5,7 +5,9 @@ title: "Dropdown"
 import { Dropdown, Button } from "../../app/components/ui";
 import { DemoPreview } from "../../app/components/demo-preview";
 
+
 # Dropdown
+
 
 # Introduction
 
@@ -14,78 +16,9 @@ placements with automatic viewport-overflow flipping, an optional arrow with cen
 checkbox/radio/group items, cascading submenus, and click / hover / context
 menu trigger modes.
 
-# Props
-
-## Dropdown
-
-| Prop | Type | Description | Default |
-| :--- | :--- | :--- | :--- |
-| `trigger` | `JSX.Element` | Element that opens the menu when activated. | - |
-| `items` | `DropdownItem[]` | The menu items to render. | - |
-| `open` | `boolean` | Whether the menu is open (controlled). | - |
-| `defaultOpen` | `boolean` | Whether the menu is open by default (uncontrolled). | `false` |
-| `disabled` | `boolean` | Disables every trigger mode and renders the trigger inert. | `false` |
-| `interactive` | `boolean` | Forces hydration as an island. Defaults to `true`. | `true` |
-| `arrow` | `boolean \| { pointAtCenter?: boolean }` | Show a pointer arrow pointing from the menu to the trigger. Can align exactly with the trigger's center. | `false` |
-| `placement` | `string` | Menu placement: `"top"` \| `"topLeft"` \| `"topRight"` \| `"bottom"` \| `"bottomLeft"` \| `"bottomRight"` \| `"left"` \| `"leftTop"` \| `"leftBottom"` \| `"right"` \| `"rightTop"` \| `"rightBottom"`. Dash-case aliases are also accepted. | `"bottomLeft"` |
-| `trigger` | `("click" \| "hover" \| "contextMenu" \| "contextDropdown")[] \| string` | Trigger interaction modes to open/close the menu. (Aliased as `triggerMode`). | `["click"]` |
-| `mouseEnterDelay` | `number` | Delay in ms before opening when trigger includes `"hover"`. | `150` |
-| `mouseLeaveDelay` | `number` | Delay in ms before closing when trigger includes `"hover"`. | `100` |
-| `closeOnEscape` | `boolean` | Close when Escape is pressed. | `true` |
-| `onOpenChange` | `(open: boolean, info?: { source: 'trigger' \| 'menu' }) => void` | Called when the menu opens or closes. `source` specifies what triggered the action. | - |
-| `onSelect` | `(value: string) => void` | Called with an item's `value` when it is activated. | - |
-| `size` | `"xs" \| "sm" \| "md" \| "lg" \| "xl"` | The size of the menu. | `"md"` |
-| `class` | `string` | Custom CSS classes for the root element. | - |
-| `contentClass` | `string` | Custom CSS classes for the content element. | - |
-| `positionerClass` | `string` | Custom CSS classes for the positioner element. | - |
-| `destroyOnHidden` | `boolean` | Whether to destroy/unmount the popup content from DOM when hidden. (Aliased as `destroyPopupOnHide`). | `false` |
-| `popupRender` | `(menu: JSX.Element) => JSX.Element` | Customize/wrap the popup content. (Aliased as `dropdownRender`). | - |
-| `classNames` | `Record<string, string>` | Custom CSS classes for each semantic structure component inside the Dropdown. | - |
-| `styles` | `Record<string, any>` | Custom inline styles for each semantic structure component inside the Dropdown. | - |
-
-### classNames and styles slots:
-- `root` (or `positioner`): The overlay absolute positioning container.
-- `content`: The popup card containing list items.
-- `item`: Individual list item (including checkbox and radio items).
-- `trigger`: The main trigger button/wrapper.
-- `arrow`: The outer arrow wrapper.
-- `arrowTip`: The styled inner diamond.
-
-### DropdownItem
-
-| Property | Type | Description |
-| :--- | :--- | :--- |
-| `type` | `"item" \| "separator" \| "checkbox" \| "radio" \| "radio-group" \| "submenu" \| "group"` | The kind of menu entry. |
-| `label` | `string` | Display text (for `item`, `checkbox`, `radio`, `submenu`, and optionally `group`). |
-| `value` | `string` | Unique value (for `item`, `checkbox`, `radio`, `radio-group`). |
-| `checked` | `boolean` | Checked state (for `checkbox`, `radio`). |
-| `icon` | `JSX.Element` | Leading icon (for `item`, `checkbox`, `radio`, `submenu`). |
-| `indicator` | `JSX.Element` | Custom trailing indicator element (for `item`). |
-| `items` | `DropdownItem[]` | Nested items (for `radio-group`, `submenu`, `group`). Submenu/group items may themselves be any `DropdownItem`, including further submenus. |
-| `disabled` | `boolean` | Whether the item (or, for `submenu`, the whole nested menu) is disabled. |
-| `class` | `string` | Custom CSS classes for the item. |
-
----
-
-## Dropdown.Button (DropdownButton)
-
-A Button with a dropdown menu, rendered as a continuous attached button group.
-
-| Prop | Type | Description | Default |
-| :--- | :--- | :--- | :--- |
-| `type` | `"default" \| "primary" \| "dashed" \| "link" \| "text" \| "solid" \| "outline" \| "subtle" \| "plain" \| "surface"` | The type of buttons to render. | `"outline"` |
-| `danger` | `boolean` | Renders buttons with danger visual theme. | `false` |
-| `disabled` | `boolean` | Disables both the primary button and the dropdown trigger. | `false` |
-| `loading` | `boolean` | Renders the primary button in loading/busy state. | `false` |
-| `onClick` | `(e: MouseEvent) => void` | Click event handler for the left/primary button. | - |
-| `icon` | `JSX.Element` | Icon for the right/trigger button. | `<EllipsisIcon />` |
-| `buttonsRender` | `(buttons: JSX.Element[]) => JSX.Element[]` | Custom render function to customize both buttons. | - |
-
-Supports all common `Dropdown` props such as `items`, `placement`, `arrow`, `classNames`, `styles`, etc.
-
----
 
 # Usage
+
 
 ## Basic Dropdown
 
@@ -135,6 +68,7 @@ export default function MyPage() {
 }
 ```
 
+
 ## Button with Dropdown Menu
 
 ```tsx
@@ -153,6 +87,7 @@ export default function Page() {
 }
 ```
 
+
 ## Custom styling & semantic classNames
 
 ```tsx
@@ -169,6 +104,7 @@ export default function Page() {
 />
 ```
 
+
 ## Center-pointing Arrow
 
 ```tsx
@@ -179,6 +115,7 @@ export default function Page() {
   items={[{ type: "item", label: "Item 1", value: "1" }]}
 />
 ```
+
 
 ## Groups and cascading submenus
 
@@ -207,6 +144,7 @@ export default function Page() {
 />
 ```
 
+
 ## Custom placement, arrow, and hover trigger
 
 ```tsx
@@ -226,6 +164,7 @@ export default function Page() {
 />
 ```
 
+
 ## Context menu
 
 A trigger wired for `"contextMenu"` opens on right-click, anchored
@@ -242,6 +181,7 @@ at the pointer, instead of behaving like a button:
 />
 ```
 
+
 ## Controlled open state
 
 ```tsx
@@ -255,11 +195,89 @@ const [open, setOpen] = useState(false);
 />;
 ```
 
+
+# Props
+
+
+## Dropdown
+
+| Prop | Type | Description | Default |
+| :--- | :--- | :--- | :--- |
+| `trigger` | `JSX.Element` | Element that opens the menu when activated. | - |
+| `items` | `DropdownItem[]` | The menu items to render. | - |
+| `open` | `boolean` | Whether the menu is open (controlled). | - |
+| `defaultOpen` | `boolean` | Whether the menu is open by default (uncontrolled). | `false` |
+| `disabled` | `boolean` | Disables every trigger mode and renders the trigger inert. | `false` |
+| `interactive` | `boolean` | Forces hydration as an island. Defaults to `true`. | `true` |
+| `arrow` | `boolean \| { pointAtCenter?: boolean }` | Show a pointer arrow pointing from the menu to the trigger. Can align exactly with the trigger's center. | `false` |
+| `placement` | `string` | Menu placement: `"top"` \| `"topLeft"` \| `"topRight"` \| `"bottom"` \| `"bottomLeft"` \| `"bottomRight"` \| `"left"` \| `"leftTop"` \| `"leftBottom"` \| `"right"` \| `"rightTop"` \| `"rightBottom"`. Dash-case aliases are also accepted. | `"bottomLeft"` |
+| `trigger` | `("click" \| "hover" \| "contextMenu" \| "contextDropdown")[] \| string` | Trigger interaction modes to open/close the menu. (Aliased as `triggerMode`). | `["click"]` |
+| `mouseEnterDelay` | `number` | Delay in ms before opening when trigger includes `"hover"`. | `150` |
+| `mouseLeaveDelay` | `number` | Delay in ms before closing when trigger includes `"hover"`. | `100` |
+| `closeOnEscape` | `boolean` | Close when Escape is pressed. | `true` |
+| `onOpenChange` | `(open: boolean, info?: { source: 'trigger' \| 'menu' }) => void` | Called when the menu opens or closes. `source` specifies what triggered the action. | - |
+| `onSelect` | `(value: string) => void` | Called with an item's `value` when it is activated. | - |
+| `size` | `"xs" \| "sm" \| "md" \| "lg" \| "xl"` | The size of the menu. | `"md"` |
+| `class` | `string` | Custom CSS classes for the root element. | - |
+| `contentClass` | `string` | Custom CSS classes for the content element. | - |
+| `positionerClass` | `string` | Custom CSS classes for the positioner element. | - |
+| `destroyOnHidden` | `boolean` | Whether to destroy/unmount the popup content from DOM when hidden. (Aliased as `destroyPopupOnHide`). | `false` |
+| `popupRender` | `(menu: JSX.Element) => JSX.Element` | Customize/wrap the popup content. (Aliased as `dropdownRender`). | - |
+| `classNames` | `Record<string, string>` | Custom CSS classes for each semantic structure component inside the Dropdown. | - |
+| `styles` | `Record<string, any>` | Custom inline styles for each semantic structure component inside the Dropdown. | - |
+
+
+### classNames and styles slots:
+- `root` (or `positioner`): The overlay absolute positioning container.
+- `content`: The popup card containing list items.
+- `item`: Individual list item (including checkbox and radio items).
+- `trigger`: The main trigger button/wrapper.
+- `arrow`: The outer arrow wrapper.
+- `arrowTip`: The styled inner diamond.
+
+
+### DropdownItem
+
+| Property | Type | Description |
+| :--- | :--- | :--- |
+| `type` | `"item" \| "separator" \| "checkbox" \| "radio" \| "radio-group" \| "submenu" \| "group"` | The kind of menu entry. |
+| `label` | `string` | Display text (for `item`, `checkbox`, `radio`, `submenu`, and optionally `group`). |
+| `value` | `string` | Unique value (for `item`, `checkbox`, `radio`, `radio-group`). |
+| `checked` | `boolean` | Checked state (for `checkbox`, `radio`). |
+| `icon` | `JSX.Element` | Leading icon (for `item`, `checkbox`, `radio`, `submenu`). |
+| `indicator` | `JSX.Element` | Custom trailing indicator element (for `item`). |
+| `items` | `DropdownItem[]` | Nested items (for `radio-group`, `submenu`, `group`). Submenu/group items may themselves be any `DropdownItem`, including further submenus. |
+| `disabled` | `boolean` | Whether the item (or, for `submenu`, the whole nested menu) is disabled. |
+| `class` | `string` | Custom CSS classes for the item. |
+
+---
+
+
+## Dropdown.Button (DropdownButton)
+
+A Button with a dropdown menu, rendered as a continuous attached button group.
+
+| Prop | Type | Description | Default |
+| :--- | :--- | :--- | :--- |
+| `type` | `"default" \| "primary" \| "dashed" \| "link" \| "text" \| "solid" \| "outline" \| "subtle" \| "plain" \| "surface"` | The type of buttons to render. | `"outline"` |
+| `danger` | `boolean` | Renders buttons with danger visual theme. | `false` |
+| `disabled` | `boolean` | Disables both the primary button and the dropdown trigger. | `false` |
+| `loading` | `boolean` | Renders the primary button in loading/busy state. | `false` |
+| `onClick` | `(e: MouseEvent) => void` | Click event handler for the left/primary button. | - |
+| `icon` | `JSX.Element` | Icon for the right/trigger button. | `<EllipsisIcon />` |
+| `buttonsRender` | `(buttons: JSX.Element[]) => JSX.Element[]` | Custom render function to customize both buttons. | - |
+
+Supports all common `Dropdown` props such as `items`, `placement`, `arrow`, `classNames`, `styles`, etc.
+
+---
+
+
 # Note
 
 Please ensure that `trigger` accepts `onMouseEnter`, `onMouseLeave`, `onFocus`,
 and `onClick` — the trigger element is cloned in place with these (and the
 relevant ARIA/`data-*`) attributes attached, rather than wrapped.
+
 
 # Limitations
 

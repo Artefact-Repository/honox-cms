@@ -5,7 +5,9 @@ title: "Grid"
 import { Grid } from "../../app/components/ui";
 import { DemoPreview } from "../../app/components/demo-preview";
 
+
 # Grid
+
 
 # Introduction
 
@@ -13,24 +15,9 @@ A responsive CSS Grid layout primitive. Lay children out with an explicit
 column/row count, or let them auto-fit based on a minimum child width —
 both support responsive (per-breakpoint) values.
 
-# Props
-
-| Prop            | Type                              | Description                                                                                          |
-| :-------------- | :--------------------------------- | :----------------------------------------------------------------------------------------------------- |
-| `children`      | `any`                              | Content to be rendered inside the grid.                                                                |
-| `class`         | `string`                           | Custom CSS classes.                                                                                    |
-| `columns`       | `Responsive<number \| string>`     | Number of columns (`repeat(columns, minmax(0, 1fr))`). Takes precedence over `minChildWidth` if both are set. |
-| `rows`          | `Responsive<number \| string>`     | Number of rows (`repeat(rows, minmax(0, 1fr))`).                                                       |
-| `minChildWidth` | `Responsive<number \| string>`     | Auto-fits as many columns as fit, each at least this wide (`repeat(auto-fit, minmax(width, 1fr))`). Ignored when `columns` is set. |
-| `gap`           | `string \| number \| Responsive<...>` | Gap between cells. Defaults to `"8px"` unless `columnGap`/`rowGap` is set.                            |
-| `columnGap`     | `string \| number \| Responsive<...>` | Gap between columns only.                                                                              |
-| `rowGap`        | `string \| number \| Responsive<...>` | Gap between rows only.                                                                                 |
-
-`Responsive<T>` accepts either a plain value or a per-breakpoint object,
-e.g. `{ base: 1, md: 2, lg: 3 }`, using the same breakpoints as the rest of
-the design system (`base`, `sm`, `md`, `lg`, `xl`, `2xl`).
 
 # Usage
+
 
 ## Fixed columns
 
@@ -55,6 +42,7 @@ export default function MyPage() {
   );
 }
 ```
+
 
 ## Auto-fit by minimum child width
 
@@ -85,6 +73,7 @@ export default function MyPage() {
 }
 ```
 
+
 ## Responsive column count
 
 ```tsx
@@ -100,6 +89,7 @@ export default function MyPage() {
   );
 }
 ```
+
 
 ## Separate column and row gaps
 
@@ -117,3 +107,21 @@ export default function MyPage() {
   );
 }
 ```
+
+# Props
+
+| Prop            | Type                              | Description                                                                                          |
+| :-------------- | :--------------------------------- | :----------------------------------------------------------------------------------------------------- |
+| `children`      | `any`                              | Content to be rendered inside the grid.                                                                |
+| `class`         | `string`                           | Custom CSS classes.                                                                                    |
+| `columns`       | `Responsive<number \| string>`     | Number of columns (`repeat(columns, minmax(0, 1fr))`). Takes precedence over `minChildWidth` if both are set. |
+| `rows`          | `Responsive<number \| string>`     | Number of rows (`repeat(rows, minmax(0, 1fr))`).                                                       |
+| `minChildWidth` | `Responsive<number \| string>`     | Auto-fits as many columns as fit, each at least this wide (`repeat(auto-fit, minmax(width, 1fr))`). Ignored when `columns` is set. |
+| `gap`           | `string \| number \| Responsive<...>` | Gap between cells. Defaults to `"8px"` unless `columnGap`/`rowGap` is set.                            |
+| `columnGap`     | `string \| number \| Responsive<...>` | Gap between columns only.                                                                              |
+| `rowGap`        | `string \| number \| Responsive<...>` | Gap between rows only.                                                                                 |
+
+`Responsive<T>` accepts either a plain value or a per-breakpoint object,
+e.g. `{ base: 1, md: 2, lg: 3 }`, using the same breakpoints as the rest of
+the design system (`base`, `sm`, `md`, `lg`, `xl`, `2xl`).
+

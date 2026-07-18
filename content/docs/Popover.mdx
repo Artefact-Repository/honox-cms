@@ -5,35 +5,14 @@ title: "Popover"
 import { Popover, Button } from "../../app/components/ui";
 import { DemoPreview } from "../../app/components/demo-preview";
 
+
 # Popover
+
 
 # Introduction
 
 An interactive element that displays additional content in a layer over its anchor.
 
-# Props
-
-## Root
-
-| Prop                      | Type                                        | Description                                                    |
-| :------------------------ | :------------------------------------------ | :--------------------------------------------------------------- |
-| `children`                | `any`                                        | Popover sub-components.                                          |
-| `open`                    | `boolean`                                    | Whether the popover is open (controlled).                        |
-| `defaultOpen`             | `boolean`                                    | Initial open state (uncontrolled). Default `false`.               |
-| `onOpenChange`             | `(details: { open: boolean }) => void`       | Called when the popover opens or closes.                         |
-| `placement`               | `"top" \| "bottom" \| "left" \| "right"`     | Which side of the trigger the content opens on. Default `"bottom"`. Flips to the opposite side automatically if there isn't enough viewport room. |
-| `interactive`             | `boolean`                                    | Forces hydration as an island. Defaults to `true`.                |
-| `id`                      | `string`                                     | Unique identifier for the popover.                                |
-| `closeOnEscape`           | `boolean`                                    | Close when Escape is pressed. Default `true`.                     |
-| `closeOnInteractOutside`  | `boolean`                                    | Close on pointer interaction outside, or when focus tabs away from the popover. Default `true`. |
-| `onClose`                 | `() => void`                                 | Callback triggered when the popover closes.                      |
-| `onToggle`                | `() => void`                                 | Callback triggered when the popover toggles.                     |
-
-## Trigger
-
-| Prop      | Type      | Description                                              |
-| :-------- | :-------- | :------------------------------------------------------- |
-| `asChild` | `boolean` | Whether to merge props onto the immediate child element. |
 
 # Usage
 
@@ -59,6 +38,34 @@ import { Button } from "../components/ui/button";
   body="Popover Body"
 />;
 ```
+
+
+# Props
+
+
+## Root
+
+| Prop                      | Type                                        | Description                                                    |
+| :------------------------ | :------------------------------------------ | :--------------------------------------------------------------- |
+| `children`                | `any`                                        | Popover sub-components.                                          |
+| `open`                    | `boolean`                                    | Whether the popover is open (controlled).                        |
+| `defaultOpen`             | `boolean`                                    | Initial open state (uncontrolled). Default `false`.               |
+| `onOpenChange`             | `(details: { open: boolean }) => void`       | Called when the popover opens or closes.                         |
+| `placement`               | `"top" \| "bottom" \| "left" \| "right"`     | Which side of the trigger the content opens on. Default `"bottom"`. Flips to the opposite side automatically if there isn't enough viewport room. |
+| `interactive`             | `boolean`                                    | Forces hydration as an island. Defaults to `true`.                |
+| `id`                      | `string`                                     | Unique identifier for the popover.                                |
+| `closeOnEscape`           | `boolean`                                    | Close when Escape is pressed. Default `true`.                     |
+| `closeOnInteractOutside`  | `boolean`                                    | Close on pointer interaction outside, or when focus tabs away from the popover. Default `true`. |
+| `onClose`                 | `() => void`                                 | Callback triggered when the popover closes.                      |
+| `onToggle`                | `() => void`                                 | Callback triggered when the popover toggles.                     |
+
+
+## Trigger
+
+| Prop      | Type      | Description                                              |
+| :-------- | :-------- | :------------------------------------------------------- |
+| `asChild` | `boolean` | Whether to merge props onto the immediate child element. |
+
 
 # Limitations
 

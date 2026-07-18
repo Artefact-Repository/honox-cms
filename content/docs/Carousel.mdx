@@ -5,7 +5,9 @@ title: "Carousel"
 import { Carousel } from "../../app/components/ui";
 import { DemoPreview } from "../../app/components/demo-preview";
 
+
 # Carousel
+
 
 # Introduction
 
@@ -14,7 +16,87 @@ scroll-snap — not transform math. Supports paging by group (`slidesPerPage`),
 looping, autoplay, mouse-drag scrolling, keyboard navigation, and vertical
 orientation.
 
+
+# Usage
+
+
+## Basic carousel
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "360px" }}>
+    <Carousel
+      slides={[
+        <div style={{ padding: "3rem 1rem", textAlign: "center", background: "var(--colors-blue-3)" }}>Slide 1</div>,
+        <div style={{ padding: "3rem 1rem", textAlign: "center", background: "var(--colors-purple-3)" }}>Slide 2</div>,
+        <div style={{ padding: "3rem 1rem", textAlign: "center", background: "var(--colors-green-3)" }}>Slide 3</div>,
+      ]}
+    />
+  </div>
+</DemoPreview>
+
+```tsx
+import { Carousel } from "../components/ui";
+
+export default function Page() {
+  return (
+    <Carousel
+      slides={[
+        <div>Slide 1</div>,
+        <div>Slide 2</div>,
+        <div>Slide 3</div>,
+      ]}
+    />
+  );
+}
+```
+
+
+## Multiple slides per page, looping
+
+```tsx
+<Carousel
+  slides={slides}
+  slidesPerPage={3}
+  spacing="16px"
+  loop
+  colorPalette="purple"
+/>
+```
+
+
+## Autoplay with pause-on-hover
+
+```tsx
+<Carousel
+  slides={slides}
+  autoplay={{ delay: 2500 }}
+  pauseOnHover
+  loop
+  showAutoplayTrigger
+/>
+```
+
+
+## Vertical orientation
+
+```tsx
+<div class={css({ height: "72" })}>
+  <Carousel slides={slides} orientation="vertical" class={css({ height: "full" })} />
+</div>
+```
+
+
+## Overlaid (inline) controls
+
+```tsx
+<Carousel slides={slides} inline loop />
+```
+
+---
+
+
 # Props
+
 
 ## Carousel
 
@@ -55,12 +137,14 @@ and the exported parts directly (see [Manual composition](#manual-composition)).
 | `class` | `string` | Custom CSS classes for the root element. | - |
 | `classNames` | `Record<string, string>` | Custom CSS classes per part (`root`, `itemGroup`, `item`, `control`, `prevTrigger`, `nextTrigger`, `indicatorGroup`, `indicator`, `autoplayTrigger`). | - |
 
+
 ### Carousel.Item
 
 | Prop | Type | Description | Default |
 | :--- | :--- | :--- | :--- |
 | `index` | `number` | The slide's position. Required. | - |
 | `snapAlign` | `"start" \| "center" \| "end"` | Which edge of the slide snaps into view. | `"start"` |
+
 
 ### Carousel.Indicator
 
@@ -71,77 +155,6 @@ and the exported parts directly (see [Manual composition](#manual-composition)).
 
 ---
 
-# Usage
-
-## Basic carousel
-
-<DemoPreview>
-  <div style={{ width: "100%", maxWidth: "360px" }}>
-    <Carousel
-      slides={[
-        <div style={{ padding: "3rem 1rem", textAlign: "center", background: "var(--colors-blue-3)" }}>Slide 1</div>,
-        <div style={{ padding: "3rem 1rem", textAlign: "center", background: "var(--colors-purple-3)" }}>Slide 2</div>,
-        <div style={{ padding: "3rem 1rem", textAlign: "center", background: "var(--colors-green-3)" }}>Slide 3</div>,
-      ]}
-    />
-  </div>
-</DemoPreview>
-
-```tsx
-import { Carousel } from "../components/ui";
-
-export default function Page() {
-  return (
-    <Carousel
-      slides={[
-        <div>Slide 1</div>,
-        <div>Slide 2</div>,
-        <div>Slide 3</div>,
-      ]}
-    />
-  );
-}
-```
-
-## Multiple slides per page, looping
-
-```tsx
-<Carousel
-  slides={slides}
-  slidesPerPage={3}
-  spacing="16px"
-  loop
-  colorPalette="purple"
-/>
-```
-
-## Autoplay with pause-on-hover
-
-```tsx
-<Carousel
-  slides={slides}
-  autoplay={{ delay: 2500 }}
-  pauseOnHover
-  loop
-  showAutoplayTrigger
-/>
-```
-
-## Vertical orientation
-
-```tsx
-<div class={css({ height: "72" })}>
-  <Carousel slides={slides} orientation="vertical" class={css({ height: "full" })} />
-</div>
-```
-
-## Overlaid (inline) controls
-
-```tsx
-<Carousel slides={slides} inline loop />
-```
-
----
 
 # Architecture notes
 

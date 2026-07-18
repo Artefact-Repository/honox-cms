@@ -5,7 +5,9 @@ title: "Fieldset"
 import { Fieldset, Field } from "../../app/components/ui";
 import { DemoPreview } from "../../app/components/demo-preview";
 
+
 # Fieldset
+
 
 # Introduction
 
@@ -16,19 +18,6 @@ hydrates as a client island. It provides its `disabled`/`invalid`/`required`
 state as context to nested `Field`s, matching Ark UI's Fieldset — see
 [Context propagation](#context-propagation-to-nested-fields).
 
-# Props
-
-| Prop         | Type      | Description                                                                                     |
-| :----------- | :-------- | :------------------------------------------------------------------------------------------------ |
-| `children`   | `any`     | Form controls to render inside the fieldset.                                                    |
-| `class`      | `string`  | Custom CSS classes.                                                                              |
-| `id`         | `string`  | Unique identifier. Auto-generated if omitted.                                                   |
-| `disabled`   | `boolean` | Disables the fieldset. Native `<fieldset disabled>` automatically disables every descendant control, and nested `Field`s pick it up as context too — see [Context propagation](#context-propagation-to-nested-fields). |
-| `invalid`    | `boolean` | Whether the fieldset is in an invalid state. Defaults to `true` whenever `errorText` is set, so you usually don't need to pass this explicitly. |
-| `required`   | `boolean` | Marks the group as required and appends a required indicator to the legend. |
-| `legend`     | `Child`   | The legend text for the fieldset. Always rendered as a direct child of `<fieldset>` — see [Composition](#composition). |
-| `helperText` | `Child`   | Helper text shown below the legend.                                                             |
-| `errorText`  | `Child`   | Error text shown when the fieldset is invalid.                                                  |
 
 # Usage
 
@@ -61,6 +50,7 @@ Passing `errorText` is enough to put the fieldset into its invalid state —
 you don't need to also pass `invalid`. Pass `invalid={false}` explicitly if
 you want to suppress the error styling while still keeping the text around.
 
+
 ## Context propagation to nested Fields
 
 `Fieldset` exposes its `disabled`/`invalid`/`required` state as context.
@@ -85,6 +75,7 @@ placed directly inside a `Fieldset` — with no wrapping `Field` — won't pick
 up the group's styling, though native `<fieldset disabled>` still blocks
 interaction with it regardless.
 
+
 ## Composition
 
 `children` is always the group of actual form controls — `Fieldset` wraps it
@@ -107,6 +98,22 @@ exported sub-components (`FieldsetLegend`, `FieldsetHelperText`,
 `FieldsetErrorText`, `FieldsetContent`, `FieldsetControl`,
 `FieldsetRequiredIndicator`) exist for reuse in fully hand-built markup, not
 as an alternate way to compose within `Fieldset` itself.
+
+
+# Props
+
+| Prop         | Type      | Description                                                                                     |
+| :----------- | :-------- | :------------------------------------------------------------------------------------------------ |
+| `children`   | `any`     | Form controls to render inside the fieldset.                                                    |
+| `class`      | `string`  | Custom CSS classes.                                                                              |
+| `id`         | `string`  | Unique identifier. Auto-generated if omitted.                                                   |
+| `disabled`   | `boolean` | Disables the fieldset. Native `<fieldset disabled>` automatically disables every descendant control, and nested `Field`s pick it up as context too — see [Context propagation](#context-propagation-to-nested-fields). |
+| `invalid`    | `boolean` | Whether the fieldset is in an invalid state. Defaults to `true` whenever `errorText` is set, so you usually don't need to pass this explicitly. |
+| `required`   | `boolean` | Marks the group as required and appends a required indicator to the legend. |
+| `legend`     | `Child`   | The legend text for the fieldset. Always rendered as a direct child of `<fieldset>` — see [Composition](#composition). |
+| `helperText` | `Child`   | Helper text shown below the legend.                                                             |
+| `errorText`  | `Child`   | Error text shown when the fieldset is invalid.                                                  |
+
 
 # CMS bindings
 

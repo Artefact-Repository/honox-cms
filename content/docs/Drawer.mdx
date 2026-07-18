@@ -5,32 +5,17 @@ title: "Drawer"
 import { Drawer, Button } from "../../app/components/ui";
 import { DemoPreview } from "../../app/components/demo-preview";
 
+
 # Drawer
+
 
 # Introduction
 
 A panel that slides in from the edge of the screen to present content or actions without leaving the current page.
 
-# Props
-
-## Drawer
-
-| Prop | Type | Description |
-| :--- | :--- | :--- |
-| `trigger` | `JSX.Element` | Element that opens the drawer when activated. |
-| `title` | `string \| JSX.Element` | The drawer title. |
-| `description` | `string \| JSX.Element` | The drawer description. |
-| `body` | `string \| JSX.Element` | The main body content. |
-| `footer` | `string \| JSX.Element` | Custom footer content. |
-| `cancel` | `JSX.Element` | Element rendered as a close (cancel) trigger. |
-| `confirm` | `JSX.Element` | Element rendered as an action trigger. |
-| `closable` | `boolean` | Whether to show the close button. Default: `true`. |
-| `interactive` | `boolean` | Enable client-side hydration for interactive behavior. |
-| `class` | `string` | Custom CSS classes for the root element. |
-
-Additional props (e.g. `open`, `defaultOpen`, `onOpenChange`, `id`) are forwarded to the underlying drawer primitive.
 
 # Usage
+
 
 ## Basic Drawer
 
@@ -61,3 +46,24 @@ export default function MyPage() {
   );
 }
 ```
+
+# Props
+
+
+## Drawer
+
+| Prop | Type | Description |
+| :--- | :--- | :--- |
+| `trigger` | `JSX.Element` | Element that opens the drawer when activated. |
+| `title` | `string \| JSX.Element` | The drawer title. |
+| `description` | `string \| JSX.Element` | The drawer description. |
+| `body` | `string \| JSX.Element` | The main body content. |
+| `footer` | `string \| JSX.Element` | Custom footer content. |
+| `cancel` | `JSX.Element` | Element rendered as a close (cancel) trigger. |
+| `confirm` | `JSX.Element` | Element rendered as an action trigger. |
+| `closable` | `boolean` | Whether to show the close button. Default: `true`. |
+| `interactive` | `boolean` | Enable client-side hydration for interactive behavior. |
+| `class` | `string` | Custom CSS classes for the root element. |
+
+Additional props (e.g. `open`, `defaultOpen`, `onOpenChange`, `id`) are forwarded to the underlying drawer primitive.
+

@@ -5,33 +5,17 @@ title: "Breadcrumb"
 import { Breadcrumb } from "../../app/components/ui";
 import { DemoPreview } from "../../app/components/demo-preview";
 
+
 # Breadcrumb
+
 
 # Introduction
 
 A navigation aid that shows the current page's location within a hierarchy using a list of links.
 
-# Props
-
-## Breadcrumb
-
-| Prop | Type | Description |
-| :--- | :--- | :--- |
-| `items` | `BreadcrumbItem[]` | The breadcrumb items to render. |
-| `separator` | `Child` | Custom separator between items. Default: a chevron-right icon. |
-| `variant` | `"underline" \| "plain"` | The visual style of the breadcrumb. |
-| `size` | `"xs" \| "sm" \| "md" \| "lg"` | The size of the breadcrumb. |
-| `class` | `string` | Custom CSS classes for the root element. |
-
-### BreadcrumbItem
-
-| Property | Type | Description |
-| :--- | :--- | :--- |
-| `label` | `Child` | Display text or JSX node. |
-| `href` | `string` | If present, renders as a link; otherwise renders as plain text (current page). |
-| `current` | `boolean` | Marks the current page. Defaults to `true` for the last item. |
 
 # Usage
+
 
 ## Basic Breadcrumb
 
@@ -61,6 +45,7 @@ export default function MyPage() {
 }
 ```
 
+
 ## Custom Separator
 
 ```tsx
@@ -78,3 +63,26 @@ export default function MyPage() {
   );
 }
 ```
+
+# Props
+
+
+## Breadcrumb
+
+| Prop | Type | Description |
+| :--- | :--- | :--- |
+| `items` | `BreadcrumbItem[]` | The breadcrumb items to render. |
+| `separator` | `Child` | Custom separator between items. Default: a chevron-right icon. |
+| `variant` | `"underline" \| "plain"` | The visual style of the breadcrumb. |
+| `size` | `"xs" \| "sm" \| "md" \| "lg"` | The size of the breadcrumb. |
+| `class` | `string` | Custom CSS classes for the root element. |
+
+
+### BreadcrumbItem
+
+| Property | Type | Description |
+| :--- | :--- | :--- |
+| `label` | `Child` | Display text or JSX node. |
+| `href` | `string` | If present, renders as a link; otherwise renders as plain text (current page). |
+| `current` | `boolean` | Marks the current page. Defaults to `true` for the last item. |
+

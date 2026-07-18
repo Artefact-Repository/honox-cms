@@ -5,25 +5,17 @@ title: "HoverCard"
 import { HoverCard } from "../../app/components/ui";
 import { DemoPreview } from "../../app/components/demo-preview";
 
+
 # HoverCard
+
 
 # Introduction
 
 A popover that appears when the user hovers over a trigger, useful for showing supplementary information.
 
-# Props
-
-## HoverCard
-
-| Prop | Type | Description |
-| :--- | :--- | :--- |
-| `interactive` | `boolean` | Enable client-side hydration. Default: `true`. |
-| `open` | `boolean` | Controlled open state. |
-| `openDelay` | `number` | Delay in ms before opening on hover. |
-| `closeDelay` | `number` | Delay in ms before closing on leave. |
-| `class` | `string` | Custom CSS classes for the root element. |
 
 # Usage
+
 
 ## Basic HoverCard
 
@@ -54,6 +46,21 @@ export default function MyPage() {
   );
 }
 ```
+
+
+# Props
+
+
+## HoverCard
+
+| Prop | Type | Description |
+| :--- | :--- | :--- |
+| `interactive` | `boolean` | Enable client-side hydration. Default: `true`. |
+| `open` | `boolean` | Controlled open state. |
+| `openDelay` | `number` | Delay in ms before opening on hover. |
+| `closeDelay` | `number` | Delay in ms before closing on leave. |
+| `class` | `string` | Custom CSS classes for the root element. |
+
 
 # Sub-components
 

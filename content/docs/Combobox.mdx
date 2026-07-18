@@ -5,34 +5,14 @@ title: "Combobox"
 import { Combobox } from "../../app/components/ui";
 import { DemoPreview } from "../../app/components/demo-preview";
 
+
 # Combobox
+
 
 # Introduction
 
 A widget that combines a text input with a listbox, allowing users to filter and select from a list of options.
 
-# Props
-
-| Prop | Type | Description |
-| :--- | :--- | :--- |
-| `items` | `ComboboxItem[]` | An array of items to display in the list. |
-| `label` | `Child` | The label for the combobox. |
-| `placeholder` | `string` | The placeholder text for the input. |
-| `allowClear` | `boolean` | Whether to show a clear button in the input. |
-| `interactive` | `boolean` | Forces hydration as an island. |
-| `open` | `boolean` | Whether the combobox list is open (controlled). |
-| `inputValue` | `string` | The current value of the input (controlled). |
-| `onToggle` | `() => void` | Callback triggered when the list is toggled. |
-| `onInputChange` | `(value: string) => void` | Callback triggered when the input value changes. |
-| `onItemSelect` | `(value: string) => void` | Callback triggered when an item is selected. |
-
-## ComboboxItem
-
-| Prop | Type | Description |
-| :--- | :--- | :--- |
-| `label` | `string` | The display text for the item. |
-| `value` | `string` | The unique value for the item. |
-| `disabled` | `boolean` | Whether the item is disabled. |
 
 # Hydration
 
@@ -54,6 +34,7 @@ It hydrates as an island when **any** of the following signals is present (or `i
 | `false` | Static — no client JS |
 
 All interactivity decisions in the library route through the shared `shouldHydrate()` helper in `app/components/ui/island-utils.ts`.
+
 
 # Usage
 
@@ -96,3 +77,28 @@ export default function MyPage() {
   );
 }
 ```
+
+# Props
+
+| Prop | Type | Description |
+| :--- | :--- | :--- |
+| `items` | `ComboboxItem[]` | An array of items to display in the list. |
+| `label` | `Child` | The label for the combobox. |
+| `placeholder` | `string` | The placeholder text for the input. |
+| `allowClear` | `boolean` | Whether to show a clear button in the input. |
+| `interactive` | `boolean` | Forces hydration as an island. |
+| `open` | `boolean` | Whether the combobox list is open (controlled). |
+| `inputValue` | `string` | The current value of the input (controlled). |
+| `onToggle` | `() => void` | Callback triggered when the list is toggled. |
+| `onInputChange` | `(value: string) => void` | Callback triggered when the input value changes. |
+| `onItemSelect` | `(value: string) => void` | Callback triggered when an item is selected. |
+
+
+## ComboboxItem
+
+| Prop | Type | Description |
+| :--- | :--- | :--- |
+| `label` | `string` | The display text for the item. |
+| `value` | `string` | The unique value for the item. |
+| `disabled` | `boolean` | Whether the item is disabled. |
+

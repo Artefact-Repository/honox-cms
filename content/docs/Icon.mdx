@@ -5,7 +5,9 @@ title: "Icon"
 import { Icon } from "../../app/components/ui";
 import { DemoPreview } from "../../app/components/demo-preview";
 
+
 # Icon
+
 
 # Introduction
 
@@ -22,22 +24,9 @@ without requiring any icon library dependency.
   props) directly onto that element instead of wrapping it in a second `<svg>`. Pass
   `asChild={false}` to force wrapping even in that case.
 
-# Props
-
-| Prop            | Type                                                 | Description                                                                                   |
-| :-------------- | :---------------------------------------------------- | :---------------------------------------------------------------------------------------------- |
-| `children`      | `Child`                                               | SVG content (`<path>`, etc.) or a single SVG-like element to render/merge.                       |
-| `class`         | `string`                                              | Custom CSS classes.                                                                              |
-| `size`          | `"2xs" \| "xs" \| "sm" \| "md" \| "lg" \| "xl"`        | The size of the icon. Defaults to `"md"`.                                                       |
-| `asChild`       | `boolean`                                             | Merge onto the single child element instead of wrapping it in a new `<svg>`. Defaults to `true`. |
-| `viewBox`       | `string`                                              | Passed through to the rendered/merged `<svg>`.                                                   |
-| `xmlns`         | `string`                                              | Passed through to the generated `<svg>` wrapper. Defaults to the SVG namespace.                  |
-| `fill`          | `string`                                              | Passed through to the rendered/merged `<svg>`.                                                   |
-| `stroke`        | `string`                                              | Passed through to the rendered/merged `<svg>`.                                                   |
-| `aria-label`    | `string`                                              | Accessible label. When provided, `aria-hidden` is omitted.                                       |
-| `aria-hidden`   | `boolean \| "true" \| "false"`                        | Defaults to `"true"` when no `aria-label` is given (icons are decorative by default).            |
 
 # Usage
+
 
 ## Bare SVG paths (no icon library required)
 
@@ -58,6 +47,7 @@ export default function MyPage() {
   );
 }
 ```
+
 
 ## Composing with a hand-authored `<svg>` (`asChild`, default)
 
@@ -88,6 +78,7 @@ extra wrapping element in the rendered markup. Since the icon recipe sets `color
 the icon picks up the surrounding text color (here, `red`) as long as its paths use
 `fill="currentColor"` or `stroke="currentColor"`.
 
+
 ## Labelled (non-decorative) icon
 
 ```tsx
@@ -95,3 +86,19 @@ the icon picks up the surrounding text color (here, `red`) as long as its paths 
   <path d="M10 2a8 8 0 105.3 14.03l4.34 4.34 1.42-1.42-4.34-4.34A8 8 0 0010 2z" />
 </Icon>
 ```
+
+# Props
+
+| Prop            | Type                                                 | Description                                                                                   |
+| :-------------- | :---------------------------------------------------- | :---------------------------------------------------------------------------------------------- |
+| `children`      | `Child`                                               | SVG content (`<path>`, etc.) or a single SVG-like element to render/merge.                       |
+| `class`         | `string`                                              | Custom CSS classes.                                                                              |
+| `size`          | `"2xs" \| "xs" \| "sm" \| "md" \| "lg" \| "xl"`        | The size of the icon. Defaults to `"md"`.                                                       |
+| `asChild`       | `boolean`                                             | Merge onto the single child element instead of wrapping it in a new `<svg>`. Defaults to `true`. |
+| `viewBox`       | `string`                                              | Passed through to the rendered/merged `<svg>`.                                                   |
+| `xmlns`         | `string`                                              | Passed through to the generated `<svg>` wrapper. Defaults to the SVG namespace.                  |
+| `fill`          | `string`                                              | Passed through to the rendered/merged `<svg>`.                                                   |
+| `stroke`        | `string`                                              | Passed through to the rendered/merged `<svg>`.                                                   |
+| `aria-label`    | `string`                                              | Accessible label. When provided, `aria-hidden` is omitted.                                       |
+| `aria-hidden`   | `boolean \| "true" \| "false"`                        | Defaults to `"true"` when no `aria-label` is given (icons are decorative by default).            |
+

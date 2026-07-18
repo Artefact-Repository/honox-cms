@@ -5,13 +5,16 @@ title: "DatePicker"
 import { DatePicker } from "../../app/components/ui";
 import { DemoPreview } from "../../app/components/demo-preview";
 
+
 # DatePicker
+
 
 # Introduction
 
 A date picker that combines a text input with a popup calendar. It supports single, multiple, and range selection, month/year panel views, quick-select presets, week numbers, and manual date entry — rendered server-side with HonoX and hydrated as an island only when interactivity is needed.
 
 The component is **headless by design**: `app/components/ui/date-picker-primitive.tsx` produces semantic, accessible markup and state, while `app/islands/date-picker.tsx` adds the client-side behaviour (keyboard navigation, hover preview, outside-click, typing). No new runtime dependencies are introduced — it builds on Hono JSX and Panda CSS, the same stack as the rest of the design system.
+
 
 # What's new in this revision
 
@@ -25,48 +28,6 @@ The component is **headless by design**: `app/components/ui/date-picker-primitiv
 
 Carried over from the previous revision: keyboard-first grid navigation clamped to `[min, max]`, bounded month/year views, range hover preview, free-text entry with commit-on-Enter/blur, native form submission via hidden inputs, ISO week numbers, conditional clear trigger, ARIA grid semantics with a roving tab stop, and open/close animations keyed to `data-state`.
 
-# Props
-
-| Prop | Type | Description |
-| :--- | :--- | :--- |
-| `label` | `string` | Renders a label associated with the first input (default structure only). |
-| `placeholder` | `string` | Placeholder for the input. Defaults to `YYYY-MM-DD`. |
-| `selectionMode` | `"single" \| "multiple" \| "range"` | How dates are selected. Defaults to `"single"`. Range mode renders start and end inputs. |
-| `value` | `CalendarDate[] \| string[] \| string \| Date[]` | Selected date(s) (controlled). Strings use the `YYYY-MM-DD` format. |
-| `defaultValue` | `CalendarDate[] \| string[] \| string \| Date[]` | Initial selected date(s) (uncontrolled). |
-| `focusedValue` | `CalendarDate \| string \| Date` | The date the calendar panel is focused on (controlled). |
-| `defaultFocusedValue` | `CalendarDate \| string \| Date` | Initial panel date (uncontrolled). |
-| `min` | `CalendarDate \| string \| Date` | Earliest selectable date. Earlier days, months, and years are disabled; typed dates outside the range are rejected; keyboard focus is clamped to the range. |
-| `max` | `CalendarDate \| string \| Date` | Latest selectable date. |
-| `isDateUnavailable` | `(date, locale) => boolean` | Marks individual dates as unselectable (static/composed usage). |
-| `view` | `"day" \| "month" \| "year"` | The active panel view (controlled). |
-| `open` | `boolean` | Whether the popup calendar is open (controlled). |
-| `closeOnSelect` | `boolean` | Close the popup after a completed selection. Defaults to `true`. |
-| `showWeekNumbers` | `boolean` | Renders an ISO-8601 week-number column. Defaults to `false`. |
-| `numOfMonths` | `number` | Reserved for multi-month rendering. Currently a single month panel is always shown; values greater than `1` are accepted but not yet rendered. |
-| `name` | `string` | When set, renders a hidden input per selected date under this name, enabling native `<form>` submission. In range/multiple mode each selected date becomes a separate entry (ordered). |
-| `locale` | `string` | BCP 47 locale used for the heading, weekday headers, month names, and cell labels (via `Intl.DateTimeFormat`, with an English fallback). Defaults to `en-US`. |
-| `disabled` | `boolean` | Disables the whole picker. |
-| `readOnly` | `boolean` | Makes the input read-only. |
-| `invalid` | `boolean` | Marks the input invalid (`aria-invalid` + error styling). |
-| `colorPalette` | `"blue" \| "green" \| "red" \| "orange" \| "gray" \| "cyan" \| "amber" \| "purple"` | Accent color for the selected date, today indicator, and range highlight. Defaults to `"blue"`. |
-| `interactive` | `boolean` | Forces (or suppresses) hydration as an island. |
-| `onValueChange` | `(details: { value: CalendarDate[] }) => void` | Called when the selection changes. |
-| `onOpenChange` | `(details: { open: boolean }) => void` | Called when the popup opens or closes. |
-
-## CalendarDate
-
-Dates are represented by the `CalendarDate` class (`{ year, month, day }`, month is 1-based) to avoid timezone drift. Helpers are exported alongside the component:
-
-| Helper | Description |
-| :--- | :--- |
-| `parseDate(str)` | Parses a `YYYY-MM-DD` string, clamping out-of-range parts. |
-| `isValidDateString(str)` | Strictly validates a `YYYY-MM-DD` string (including month lengths and leap years). |
-| `daysInMonth(year, month)` | Number of days in the given month. |
-| `fromJSDate(date)` | Converts a JavaScript `Date` to a `CalendarDate`. |
-| `getWeekNumber(date)` | ISO-8601 week number for a `CalendarDate` (used by `showWeekNumbers`). |
-| `getWeekDays(locale)` | Localised weekday names (`{ short, narrow, long }`, Sunday-first), cached per locale. |
-| `getMonthNames(locale, format?)` | Localised month names (`"short"` or `"long"`), January-first, cached per locale. |
 
 # Functionality
 
@@ -79,6 +40,7 @@ Dates are represented by the `CalendarDate` class (`{ year, month, day }`, month
 - **Week numbers** — with `showWeekNumbers`, an ISO week-number column is shown alongside the day grid.
 - **Form submission** — pass a `name` prop and a hidden input is rendered for each selected date, so the picker works inside a plain `<form>` with no extra glue code.
 - **Presets** — `DatePicker.PresetTrigger` supports the values `today`, `last3Days`, `last7Days`, `last14Days`, `last30Days`, and `last90Days`. In range mode a preset selects the whole span; otherwise it selects the single anchor date.
+
 
 # Keyboard support
 
@@ -96,6 +58,7 @@ When the popup is open and focus is inside the calendar, the following keys are 
 
 The trigger and input are reachable by <kbd>Tab</kbd>; opening from the keyboard moves focus straight into the grid so the calendar is operable without a mouse.
 
+
 # Accessibility
 
 - The grid uses ARIA grid semantics (`role="grid"`, `row`, `gridcell`, `columnheader`, `rowheader`) with `aria-selected`, `aria-current="date"` on the today cell, and `aria-multiselectable` in `multiple`/`range` modes.
@@ -105,6 +68,7 @@ The trigger and input are reachable by <kbd>Tab</kbd>; opening from the keyboard
 - Colour is never the only signal — selected, today, in-range, and disabled states combine fill, weight, and (for today) a dot marker.
 - Respects `disabled` / `readOnly` / `invalid` via `aria-disabled`, `readonly`, and `aria-invalid`.
 
+
 # Styling slots
 
 The Panda CSS slot recipe (`app/theme/recipes/date-picker.ts`) exposes the following `data-part` slots for theming. Override via the `class`/`className` props or a semantic `classNames` map:
@@ -112,6 +76,7 @@ The Panda CSS slot recipe (`app/theme/recipes/date-picker.ts`) exposes the follo
 `root`, `label`, `control`, `input`, `trigger`, `clearTrigger`, `positioner`, `content`, `view`, `viewControl`, `prevTrigger`, `nextTrigger`, `viewTrigger`, `rangeText`, `table`, `tableHead`, `tableHeader`, `tableRow`, `tableBody`, `tableCell`, `tableCellTrigger`, `weekNumber`, `monthSelect`, `yearSelect`, `presetTrigger`, `valueText`. The `hidden-input` part is rendered only when `name` is set and carries no visible styling.
 
 The selected / today / in-range / range-preview / disabled states are driven by `data-selected`, `data-today`, `data-in-range`, `data-outside-range`, `data-range-preview`, and `data-disabled` attributes (applied in all three panel views), so they can be re-skinned independently of the recipe. Range endpoints additionally carry `data-range-start` / `data-range-end` (only when the range spans more than one day), which the recipe uses to square their inner corners against the in-range band. The open/close animation keys off `data-state="open"` / `data-state="closed"`.
+
 
 # Hydration
 
@@ -124,6 +89,7 @@ The selected / today / in-range / range-preview / disabled states are driven by 
 | `false` | Static — no client JS |
 
 All interactivity decisions in the library route through the shared `shouldHydrate()` helper in `app/components/ui/island-utils.ts`.
+
 
 # Usage
 
@@ -178,6 +144,52 @@ export default function MyPage() {
   );
 }
 ```
+
+
+# Props
+
+| Prop | Type | Description |
+| :--- | :--- | :--- |
+| `label` | `string` | Renders a label associated with the first input (default structure only). |
+| `placeholder` | `string` | Placeholder for the input. Defaults to `YYYY-MM-DD`. |
+| `selectionMode` | `"single" \| "multiple" \| "range"` | How dates are selected. Defaults to `"single"`. Range mode renders start and end inputs. |
+| `value` | `CalendarDate[] \| string[] \| string \| Date[]` | Selected date(s) (controlled). Strings use the `YYYY-MM-DD` format. |
+| `defaultValue` | `CalendarDate[] \| string[] \| string \| Date[]` | Initial selected date(s) (uncontrolled). |
+| `focusedValue` | `CalendarDate \| string \| Date` | The date the calendar panel is focused on (controlled). |
+| `defaultFocusedValue` | `CalendarDate \| string \| Date` | Initial panel date (uncontrolled). |
+| `min` | `CalendarDate \| string \| Date` | Earliest selectable date. Earlier days, months, and years are disabled; typed dates outside the range are rejected; keyboard focus is clamped to the range. |
+| `max` | `CalendarDate \| string \| Date` | Latest selectable date. |
+| `isDateUnavailable` | `(date, locale) => boolean` | Marks individual dates as unselectable (static/composed usage). |
+| `view` | `"day" \| "month" \| "year"` | The active panel view (controlled). |
+| `open` | `boolean` | Whether the popup calendar is open (controlled). |
+| `closeOnSelect` | `boolean` | Close the popup after a completed selection. Defaults to `true`. |
+| `showWeekNumbers` | `boolean` | Renders an ISO-8601 week-number column. Defaults to `false`. |
+| `numOfMonths` | `number` | Reserved for multi-month rendering. Currently a single month panel is always shown; values greater than `1` are accepted but not yet rendered. |
+| `name` | `string` | When set, renders a hidden input per selected date under this name, enabling native `<form>` submission. In range/multiple mode each selected date becomes a separate entry (ordered). |
+| `locale` | `string` | BCP 47 locale used for the heading, weekday headers, month names, and cell labels (via `Intl.DateTimeFormat`, with an English fallback). Defaults to `en-US`. |
+| `disabled` | `boolean` | Disables the whole picker. |
+| `readOnly` | `boolean` | Makes the input read-only. |
+| `invalid` | `boolean` | Marks the input invalid (`aria-invalid` + error styling). |
+| `colorPalette` | `"blue" \| "green" \| "red" \| "orange" \| "gray" \| "cyan" \| "amber" \| "purple"` | Accent color for the selected date, today indicator, and range highlight. Defaults to `"blue"`. |
+| `interactive` | `boolean` | Forces (or suppresses) hydration as an island. |
+| `onValueChange` | `(details: { value: CalendarDate[] }) => void` | Called when the selection changes. |
+| `onOpenChange` | `(details: { open: boolean }) => void` | Called when the popup opens or closes. |
+
+
+## CalendarDate
+
+Dates are represented by the `CalendarDate` class (`{ year, month, day }`, month is 1-based) to avoid timezone drift. Helpers are exported alongside the component:
+
+| Helper | Description |
+| :--- | :--- |
+| `parseDate(str)` | Parses a `YYYY-MM-DD` string, clamping out-of-range parts. |
+| `isValidDateString(str)` | Strictly validates a `YYYY-MM-DD` string (including month lengths and leap years). |
+| `daysInMonth(year, month)` | Number of days in the given month. |
+| `fromJSDate(date)` | Converts a JavaScript `Date` to a `CalendarDate`. |
+| `getWeekNumber(date)` | ISO-8601 week number for a `CalendarDate` (used by `showWeekNumbers`). |
+| `getWeekDays(locale)` | Localised weekday names (`{ short, narrow, long }`, Sunday-first), cached per locale. |
+| `getMonthNames(locale, format?)` | Localised month names (`"short"` or `"long"`), January-first, cached per locale. |
+
 
 # Production notes
 

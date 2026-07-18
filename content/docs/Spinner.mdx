@@ -5,19 +5,14 @@ title: "Spinner"
 import { Spinner } from "../../app/components/ui";
 import { DemoPreview } from "../../app/components/demo-preview";
 
+
 # Spinner
+
 
 # Introduction
 
 A component used to indicate a loading state.
 
-# Props
-
-| Prop    | Type                                                         | Description                                  |
-| :------ | :----------------------------------------------------------- | :------------------------------------------- |
-| `class` | `string`                                                     | Custom CSS classes.                          |
-| `size`  | `"xs" \| "sm" \| "md" \| "lg" \| "xl" \| "2xl" \| "inherit"` | The size of the spinner.                     |
-| `label` | `string`                                                     | An accessible label for screen readers.      |
 
 # Usage
 
@@ -32,3 +27,12 @@ export default function MyPage() {
   return <Spinner size="md" label="Loading..." />;
 }
 ```
+
+# Props
+
+| Prop    | Type                                                         | Description                                  |
+| :------ | :----------------------------------------------------------- | :------------------------------------------- |
+| `class` | `string`                                                     | Custom CSS classes.                          |
+| `size`  | `"xs" \| "sm" \| "md" \| "lg" \| "xl" \| "2xl" \| "inherit"` | The size of the spinner.                     |
+| `label` | `string`                                                     | An accessible label for screen readers.      |
+

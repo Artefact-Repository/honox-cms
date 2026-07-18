@@ -5,13 +5,52 @@ title: "Progress"
 import { Progress } from "../../app/components/ui";
 import { DemoPreview } from "../../app/components/demo-preview";
 
+
 # Progress
+
 
 # Introduction
 
 A component that shows the completion progress of an operation as a linear bar or circular indicator.
 
+
+# Usage
+
+
+## Linear Progress
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <Progress value={72} showValueText />
+  </div>
+</DemoPreview>
+
+```tsx
+import { Progress } from "../components/ui";
+
+export default function MyPage() {
+  return <Progress value={72} showValueText />;
+}
+```
+
+
+## Circular Progress
+
+<DemoPreview>
+  <Progress type="circular" value={40} showValueText />
+</DemoPreview>
+
+```tsx
+import { Progress } from "../components/ui";
+
+export default function MyPage() {
+  return <Progress type="circular" value={40} showValueText />;
+}
+```
+
+
 # Props
+
 
 ## Progress
 
@@ -31,37 +70,6 @@ A component that shows the completion progress of an operation as a linear bar o
 | `size` | `"xs" \| "sm" \| "md" \| "lg" \| "xl"` | The size of the indicator. |
 | `class` | `string` | Custom CSS classes for the root element. |
 
-# Usage
-
-## Linear Progress
-
-<DemoPreview>
-  <div style={{ width: "100%", maxWidth: "320px" }}>
-    <Progress value={72} showValueText />
-  </div>
-</DemoPreview>
-
-```tsx
-import { Progress } from "../components/ui";
-
-export default function MyPage() {
-  return <Progress value={72} showValueText />;
-}
-```
-
-## Circular Progress
-
-<DemoPreview>
-  <Progress type="circular" value={40} showValueText />
-</DemoPreview>
-
-```tsx
-import { Progress } from "../components/ui";
-
-export default function MyPage() {
-  return <Progress type="circular" value={40} showValueText />;
-}
-```
 
 # Sub-components
 

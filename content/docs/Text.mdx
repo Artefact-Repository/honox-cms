@@ -5,22 +5,14 @@ title: "Text"
 import { Text } from "../../app/components/ui";
 import { DemoPreview } from "../../app/components/demo-preview";
 
+
 # Text
+
 
 # Introduction
 
 A polymorphic component for displaying body text, paragraphs, or spans with consistent typography.
 
-# Props
-
-| Prop          | Type      | Description                                                      |
-| :------------ | :-------- | :--------------------------------------------------------------- |
-| `children`    | `any`     | The text or content.                                             |
-| `class`       | `string`  | Custom CSS classes.                                              |
-| `as`          | `string`  | The HTML element to render (e.g., "p", "span"). Defaults to "p". |
-| `size`        | `string`  | The font size variant.                                           |
-| `variant`     | `string`  | Typographic style variant (e.g., "heading", "label").            |
-| `interactive` | `boolean` | Whether to enable client-side hydration.                         |
 
 # Usage
 
@@ -39,3 +31,15 @@ export default function MyPage() {
   );
 }
 ```
+
+# Props
+
+| Prop          | Type      | Description                                                      |
+| :------------ | :-------- | :--------------------------------------------------------------- |
+| `children`    | `any`     | The text or content.                                             |
+| `class`       | `string`  | Custom CSS classes.                                              |
+| `as`          | `string`  | The HTML element to render (e.g., "p", "span"). Defaults to "p". |
+| `size`        | `string`  | The font size variant.                                           |
+| `variant`     | `string`  | Typographic style variant (e.g., "heading", "label").            |
+| `interactive` | `boolean` | Whether to enable client-side hydration.                         |
+

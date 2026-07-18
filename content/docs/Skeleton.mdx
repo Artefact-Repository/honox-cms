@@ -5,39 +5,17 @@ title: "Skeleton"
 import { Skeleton } from "../../app/components/ui";
 import { DemoPreview } from "../../app/components/demo-preview";
 
+
 # Skeleton
+
 
 # Introduction
 
 A placeholder used to indicate that content is loading, with a variety of animation and shape options.
 
-# Props
-
-## Skeleton
-
-| Prop | Type | Description |
-| :--- | :--- | :--- |
-| `loading` | `boolean` | Whether to show the skeleton. Default: `true`. |
-| `circle` | `boolean` | Render the skeleton as a circle. |
-| `variant` | `"pulse" \| "shine" \| "none"` | The animation style. |
-| `class` | `string` | Custom CSS classes for the root element. |
-
-All other native `<div>` attributes (e.g. `style`, `id`, `width`, `height`) are forwarded to the underlying element.
-
-## SkeletonCircle
-
-Same props as `Skeleton`, pre-configured with `circle`.
-
-## SkeletonText
-
-| Prop | Type | Description |
-| :--- | :--- | :--- |
-| `noOfLines` | `number` | Number of lines to display. Default: `3`. |
-| `gap` | `string \| number` | Gap between lines. Default: `"2"`. |
-
-Plus all `Skeleton` props.
 
 # Usage
+
 
 ## Basic Skeleton
 
@@ -62,3 +40,33 @@ export default function MyPage() {
   );
 }
 ```
+
+# Props
+
+
+## Skeleton
+
+| Prop | Type | Description |
+| :--- | :--- | :--- |
+| `loading` | `boolean` | Whether to show the skeleton. Default: `true`. |
+| `circle` | `boolean` | Render the skeleton as a circle. |
+| `variant` | `"pulse" \| "shine" \| "none"` | The animation style. |
+| `class` | `string` | Custom CSS classes for the root element. |
+
+All other native `<div>` attributes (e.g. `style`, `id`, `width`, `height`) are forwarded to the underlying element.
+
+
+## SkeletonCircle
+
+Same props as `Skeleton`, pre-configured with `circle`.
+
+
+## SkeletonText
+
+| Prop | Type | Description |
+| :--- | :--- | :--- |
+| `noOfLines` | `number` | Number of lines to display. Default: `3`. |
+| `gap` | `string \| number` | Gap between lines. Default: `"2"`. |
+
+Plus all `Skeleton` props.
+
