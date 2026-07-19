@@ -9,7 +9,7 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-Nest a `<Layout>` inside another `<Layout>`'s `content` to build composite
+Nest a `<Layout>` inside another `<Layout>`'s `content` or nested children to build composite
 shells, e.g. an outer Layout with a page header/footer and an inner Layout
 holding a sidenav rail.
 
@@ -55,8 +55,7 @@ export default function MyPage() {
 
 Passing `sider` wraps it and `content` in a row. `siderWidth` picks a rail
 width (`sm` 14rem, `md` 16rem default, `lg` 18rem); `siderHideBelow` hides
-the rail under a breakpoint for small screens (pair it with an in-flow
-disclosure nav there, e.g. a `<details>` menu).
+the rail under a breakpoint for small screens.
 
 <DemoPreview>
   <div style={{ width: "100%", border: "1px solid var(--colors-border)", borderRadius: "12px", overflow: "hidden" }}>
@@ -189,19 +188,20 @@ component default.
 
 | Prop | Type | Description |
 | --- | --- | --- |
-| `header` | \`string \| JSX.Element\` | Rendered inside a semantic `<header>` above the body. |
-| `sider` | \`string \| JSX.Element\` | Rendered inside a semantic `<aside>` rail. Its presence switches the body to a row of sider + content. |
-| `content` | \`string \| JSX.Element\` | Rendered inside a semantic `<main>`. `children` are appended after it, so either (or both) can carry the page content. |
-| `footer` | \`string \| JSX.Element\` | Rendered inside a semantic `<footer>` below the body. |
+| `header` | \`string \| JSX.Element\` | Rendered inside a semantic `<header>` above the body. (Shorthand API only) |
+| `sider` | \`string \| JSX.Element\` | Rendered inside a semantic `<aside>` rail. Its presence switches the body to a row of sider + content. (Shorthand API only) |
+| `content` | \`string \| JSX.Element\` | Rendered inside a semantic `<main>`. `children` are appended after it. (Shorthand API only) |
+| `footer` | \`string \| JSX.Element\` | Rendered inside a semantic `<footer>` below the body. (Shorthand API only) |
 | `fullHeight` | `boolean` | Fill the viewport height — for the outermost page shell. |
 | `stickyHeader` | `boolean` | Pin the header to the top of the page scroll. |
 | `stickySider` | `boolean` | Pin the sider below a sticky header; it scrolls internally. |
 | `siderWidth` | \`"sm" \| "md" \| "lg"\` | Sider rail width: sm (14rem), md (16rem, default), lg (18rem). |
-| `siderHideBelow` | \`"sm" \| "md" \| "lg"\` | Hide the sider under this breakpoint. Pair with an in-flow disclosure (e.g. a `<details>` menu) so small screens keep a nav. |
-| `headerClass` | `string` | Extra class for the `<header>` part. |
-| `siderClass` | `string` | Extra class for the `<aside>` part. |
-| `contentClass` | `string` | Extra class for the `<main>` part. |
-| `footerClass` | `string` | Extra class for the `<footer>` part. |
+| `siderHideBelow` | \`"sm" \| "md" \| "lg"\` | Hide the sider under this breakpoint. Pair with an in-flow disclosure. |
+| `hasSider` | `boolean` | Manually force layout direction to row. (Compound API) |
+| `headerClass` | `string` | Extra class for the `<header>` part. (Shorthand API only) |
+| `siderClass` | `string` | Extra class for the `<aside>` part. (Shorthand API only) |
+| `contentClass` | `string` | Extra class for the `<main>` part. (Shorthand API only) |
+| `footerClass` | `string` | Extra class for the `<footer>` part. (Shorthand API only) |
 | `bodyClass` | `string` | Extra class for the row wrapper around sider + content (only rendered when `sider` is set). |
-| `children` | `any` | Appended inside `<main>`, after `content`. |
+| `children` | `any` | Children to render inside the layout shell. |
 | `class` | `string` | Custom CSS classes for the root element. |

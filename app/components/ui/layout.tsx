@@ -1,6 +1,112 @@
 import { cx } from "design-system/css";
 import { layout } from "design-system/recipes";
 import type { JSX, PropsWithChildren } from "hono/jsx";
+import { createContext, Fragment, useContext } from "hono/jsx";
+
+type LayoutStyles = ReturnType<typeof layout>;
+
+export interface LayoutContextValue {
+	classes: LayoutStyles;
+}
+
+export const LayoutContext = createContext<LayoutContextValue | null>(null);
+
+export const useLayoutContext = () => useContext(LayoutContext);
+
+export interface HeaderProps
+	extends PropsWithChildren<{
+		class?: string;
+		sticky?: boolean;
+	}> {}
+
+export function Header(props: HeaderProps) {
+	const { children, class: classProp, sticky, ...rest } = props;
+	const context = useLayoutContext();
+
+	let headerClass: string;
+	if (sticky !== undefined) {
+		headerClass = layout({ stickyHeader: sticky }).header;
+	} else {
+		headerClass = context?.classes.header ?? layout({}).header;
+	}
+
+	return (
+		<header class={cx(headerClass, classProp)} {...rest}>
+			{children}
+		</header>
+	);
+}
+
+export interface SiderProps
+	extends PropsWithChildren<{
+		class?: string;
+		width?: "sm" | "md" | "lg";
+		hideBelow?: "sm" | "md" | "lg";
+		sticky?: boolean;
+	}> {}
+
+export function Sider(props: SiderProps) {
+	const {
+		children,
+		class: classProp,
+		width,
+		hideBelow,
+		sticky,
+		...rest
+	} = props;
+	const context = useLayoutContext();
+
+	let siderClass: string;
+	if (width !== undefined || hideBelow !== undefined || sticky !== undefined) {
+		siderClass = layout({
+			siderWidth: width,
+			siderHideBelow: hideBelow,
+			stickySider: sticky,
+		}).sider;
+	} else {
+		siderClass = context?.classes.sider ?? layout({}).sider;
+	}
+
+	return (
+		<aside class={cx(siderClass, classProp)} {...rest}>
+			{children}
+		</aside>
+	);
+}
+
+export interface ContentProps
+	extends PropsWithChildren<{
+		class?: string;
+	}> {}
+
+export function Content(props: ContentProps) {
+	const { children, class: classProp, ...rest } = props;
+	const context = useLayoutContext();
+	const contentClass = context?.classes.content ?? layout({}).content;
+
+	return (
+		<main class={cx(contentClass, classProp)} {...rest}>
+			{children}
+		</main>
+	);
+}
+
+export interface FooterProps
+	extends PropsWithChildren<{
+		class?: string;
+	}> {}
+
+export function Footer(props: FooterProps) {
+	const { children, class: classProp, ...rest } = props;
+	const context = useLayoutContext();
+	const footerClass = context?.classes.footer ?? layout({}).footer;
+
+	return (
+		<footer class={cx(footerClass, classProp)} {...rest}>
+			{children}
+		</footer>
+	);
+}
 
 export interface LayoutProps
 	extends PropsWithChildren<{
@@ -26,6 +132,8 @@ export interface LayoutProps
 		/** Hide the sider under this breakpoint. Pair with an in-flow
 		 * disclosure (e.g. a `<details>` menu) so small screens keep a nav. */
 		siderHideBelow?: "sm" | "md" | "lg";
+		/** Force layout direction to horizontal/hasSider */
+		hasSider?: boolean;
 		/** Extra class for the `<header>` part. */
 		headerClass?: string;
 		/** Extra class for the `<aside>` part. */
@@ -39,25 +147,26 @@ export interface LayoutProps
 		bodyClass?: string;
 	}> {}
 
-/**
- * Flat page-shell component: pass the parts as props and get semantic
- * `<header>` / `<aside>` / `<main>` / `<footer>` structure back, with the
- * sider + content row appearing automatically when `sider` is set. Purely
- * presentational — no island, no hydration. Nest a `<Layout>` inside
- * `content` for composite shells.
- *
- * ```tsx
- * <Layout
- *   fullHeight
- *   stickyHeader
- *   header={<Nav />}
- *   sider={<Sidenav />}
- *   siderHideBelow="md"
- *   content={<Article />}
- *   footer={<Copyright />}
- * />
- * ```
- */
+// Helper to check recursively if any nested child is a Sider component.
+function hasSiderChild(children: unknown): boolean {
+	if (!children) return false;
+	const arr = Array.isArray(children) ? children : [children];
+	for (const child of arr) {
+		if (child && typeof child === "object") {
+			const node = child as Record<string, unknown>;
+			if (node.tag === Sider) {
+				return true;
+			}
+			if (node.tag === Fragment && node.children) {
+				if (hasSiderChild(node.children)) {
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
 export function Layout(props: LayoutProps) {
 	const {
 		children,
@@ -71,6 +180,7 @@ export function Layout(props: LayoutProps) {
 		stickySider,
 		siderWidth,
 		siderHideBelow,
+		hasSider,
 		headerClass,
 		siderClass,
 		contentClass,
@@ -87,29 +197,64 @@ export function Layout(props: LayoutProps) {
 		siderHideBelow,
 	});
 
-	const main = (
-		<main class={cx(classes.content, contentClass)}>
-			{content}
-			{children}
-		</main>
-	);
+	const isShorthand =
+		header !== undefined ||
+		sider !== undefined ||
+		content !== undefined ||
+		footer !== undefined;
+
+	const mergedHasSider = hasSider || (!isShorthand && hasSiderChild(children));
+
+	const contextValue = { classes };
+
+	if (isShorthand) {
+		const main = (
+			<main class={cx(classes.content, contentClass)}>
+				{content}
+				{children}
+			</main>
+		);
+
+		return (
+			<LayoutContext.Provider value={contextValue}>
+				<div class={cx(classes.root, classProp)} {...rest}>
+					{header !== undefined && (
+						<header class={cx(classes.header, headerClass)}>{header}</header>
+					)}
+					{sider !== undefined ? (
+						<div class={cx(classes.body, bodyClass)}>
+							<aside class={cx(classes.sider, siderClass)}>{sider}</aside>
+							{main}
+						</div>
+					) : (
+						main
+					)}
+					{footer !== undefined && (
+						<footer class={cx(classes.footer, footerClass)}>{footer}</footer>
+					)}
+				</div>
+			</LayoutContext.Provider>
+		);
+	}
 
 	return (
-		<div class={cx(classes.root, classProp)} {...rest}>
-			{header !== undefined && (
-				<header class={cx(classes.header, headerClass)}>{header}</header>
-			)}
-			{sider !== undefined ? (
-				<div class={cx(classes.body, bodyClass)}>
-					<aside class={cx(classes.sider, siderClass)}>{sider}</aside>
-					{main}
-				</div>
-			) : (
-				main
-			)}
-			{footer !== undefined && (
-				<footer class={cx(classes.footer, footerClass)}>{footer}</footer>
-			)}
-		</div>
+		<LayoutContext.Provider value={contextValue}>
+			<div
+				class={cx(classes.root, classProp)}
+				data-has-sider={mergedHasSider || undefined}
+				{...rest}
+			>
+				{children}
+			</div>
+		</LayoutContext.Provider>
 	);
 }
+
+export const LayoutComponent = Object.assign(Layout, {
+	Header,
+	Footer,
+	Content,
+	Sider,
+});
+
+export default LayoutComponent;

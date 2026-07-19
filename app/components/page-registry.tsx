@@ -705,9 +705,7 @@ const registry: Record<string, BlockRenderer> = {
 						? Number(maxSuggestions)
 						: undefined
 				}
-				total={
-					total !== undefined && total !== "" ? Number(total) : undefined
-				}
+				total={total !== undefined && total !== "" ? Number(total) : undefined}
 				{...rest}
 			/>
 		);

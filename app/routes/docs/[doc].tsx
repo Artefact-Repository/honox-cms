@@ -7,18 +7,18 @@ import {
 	Badge,
 	Heading,
 	Layout,
+	type LayoutProps,
 	Search,
 	Stack,
 	Text,
-	type LayoutProps,
 } from "../../components/ui";
 import {
-	loadDocBySlug,
-	loadDocs,
-	loadDocsConfig,
 	type DocSummary,
 	type DocsConfig,
 	type DocsNavLinkConfig,
+	loadDocBySlug,
+	loadDocs,
+	loadDocsConfig,
 } from "../../lib/docs";
 import { markdownContentClass } from "../../utils/markdown-content-style";
 

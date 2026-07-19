@@ -9,6 +9,9 @@ export const layout = defineSlotRecipe({
 			flexDirection: "column",
 			flex: "auto",
 			minWidth: "0",
+			"&[data-has-sider]": {
+				flexDirection: "row",
+			},
 		},
 		// Row wrapper rendered around sider + content when a sider is present.
 		body: {

@@ -6,17 +6,17 @@ import {
 	Card,
 	Heading,
 	Layout,
+	type LayoutProps,
 	Search,
 	Stack,
 	Text,
-	type LayoutProps,
 } from "../../components/ui";
 import {
-	loadDocs,
-	loadDocsConfig,
 	type DocSummary,
 	type DocsConfig,
 	type DocsNavLinkConfig,
+	loadDocs,
+	loadDocsConfig,
 } from "../../lib/docs";
 
 // ---------------------------------------------------------------------------
