@@ -1,0 +1,111 @@
+---
+title: Tabs
+hydration: 2
+category: Navigation
+---
+
+import { Tabs, Stack, Badge } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
+# Introduction
+
+A navigation or layout element that organizes content into switchable, mutually exclusive panels.
+
+# Usage
+
+<DemoPreview>
+  <Tabs defaultValue="features" interactive variant="enclosed" size="md">
+    <Tabs.List>
+      <Tabs.Trigger value="features">⚡ Key Features</Tabs.Trigger>
+      <Tabs.Trigger value="pricing">💎 Pricing Plans</Tabs.Trigger>
+      <Tabs.Indicator />
+    </Tabs.List>
+
+    <Tabs.Content value="features">
+      Our Hono/JSX Tabs component supports zero runtime styled-system classes, smooth sliding indicator transitions, and native keyboard interaction.
+    </Tabs.Content>
+
+    <Tabs.Content value="pricing">
+      Flexible subscription pricing for individuals, start-ups, and scaling enterprise workspaces.
+    </Tabs.Content>
+  </Tabs>
+</DemoPreview>
+
+```tsx
+import { Tabs } from "../components/ui/tabs";
+
+<Tabs defaultValue="features" interactive variant="enclosed" size="md">
+  <Tabs.List>
+    <Tabs.Trigger value="features">⚡ Key Features</Tabs.Trigger>
+    <Tabs.Trigger value="pricing">💎 Pricing Plans</Tabs.Trigger>
+    <Tabs.Indicator />
+  </Tabs.List>
+
+  <Tabs.Content value="features">
+    Our Hono/JSX Tabs component supports zero-runtime classes, smooth sliding transitions, and native keyboard interaction.
+  </Tabs.Content>
+
+  <Tabs.Content value="pricing">
+    Flexible subscription pricing for individuals, start-ups, and scaling enterprise workspaces.
+  </Tabs.Content>
+</Tabs>;
+```
+
+## CMS Page Builder
+
+This component is available as a `tabs` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`), designed with a clean, flattened API:
+
+```json
+{
+  "type": "tabs",
+  "variant": "enclosed",
+  "size": "md",
+  "items": [
+    {
+      "value": "features",
+      "label": "⚡ Key Features",
+      "content": [
+        {
+          "type": "text",
+          "content": "Our high-end tabs component is lightning fast."
+        }
+      ]
+    },
+    {
+      "value": "pricing",
+      "label": "💎 Pricing Plans",
+      "content": [
+        {
+          "type": "text",
+          "content": "Starting from $0/mo."
+        }
+      ]
+    }
+  ]
+}
+```
+
+# Props
+
+## Root
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `defaultValue` | `string` | The initial selected tab value when rendered (uncontrolled). |
+| `value` | `string` | The controlled selected tab value. |
+| `variant` | \`"line" \ | "subtle" \ | "enclosed"\` | Visual appearance of the tabs list and indicator. Default `"line"`. |
+| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg"\` | The overall height, spacing and padding of tab items. Default `"md"`. |
+| `orientation` | \`"horizontal" \ | "vertical"\` | The layout flow of triggers. Default `"horizontal"`. |
+| `activationMode` | \`"automatic" \ | "manual"\` | In manual mode, triggers are activated on Enter/Space click; in automatic mode, they activate instantly on focus. Default `"automatic"`. |
+| `loopFocus` | `boolean` | Whether keyboard focus loops back to the start or end of the list. Default `true`. |
+| `lazyMount` | `boolean` | Delay rendering of tab content panels until they are first visited. Default `false`. |
+| `unmountOnExit` | `boolean` | Destroy tab panel elements from the DOM when they become inactive. Default `false`. |
+| `onValueChange` | `(details: { value: string }) => void` | Called when the active tab value changes. |
+| `onFocusChange` | `(details: { value: string }) => void` | Called when a different tab trigger receives keyboard or click focus. |
+
+# Accessibility
+
+This component fully complies with the **WAI-ARIA Tabs Design Pattern**:
+- Sets `role="tablist"` on the list container and `aria-orientation` mapped to layout.
+- Sets `role="tab"` on triggers, with `aria-selected` matching active state and `aria-controls` referencing panel IDs.
+- Keyboard support: ArrowRight/ArrowLeft (or ArrowDown/ArrowUp when vertical) navigates triggers with focus-roving tabIndex. Home/End moves focus immediately to endpoints. Enter/Space activates triggers when in manual mode.
