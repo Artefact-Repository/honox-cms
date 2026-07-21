@@ -1,0 +1,203 @@
+---
+title: FileUpload
+hydration: 2
+category: Forms
+---
+
+import { FileUpload } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
+# Introduction
+
+A dropzone and file picker for selecting one or more files, with drag-and-drop,
+client-side validation (type/size/count), and a live preview list — all
+composed from Ark UI-equivalent parts on top of a native `<input type="file">`
+so the form still works with JavaScript disabled.
+
+# Usage
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "360px" }}>
+    <FileUpload
+      label="Upload Images"
+      name="images"
+      accept="image/*"
+      maxFiles={2}
+      dropzoneText="Drag and drop or browse files"
+      interactive
+    />
+  </div>
+</DemoPreview>
+
+```tsx
+import { FileUpload } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <FileUpload
+      label="Upload Images"
+      name="images"
+      accept="image/*"
+      maxFiles={2}
+      dropzoneText="Drag and drop or browse files"
+    />
+  );
+}
+```
+
+## Custom Composition
+
+The default composition (`label` + `dropzoneText` + `triggerText` props) covers
+the common case. Pass explicit `children` for full control over layout — swap
+in any subset of the parts below:
+
+```tsx
+import { FileUpload } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <FileUpload name="attachments" maxFiles={5} accept="image/*,.pdf">
+      <FileUpload.Label>Attachments</FileUpload.Label>
+      <FileUpload.Dropzone>
+        <span>Drop files here, or</span>
+        <FileUpload.Trigger>browse</FileUpload.Trigger>
+      </FileUpload.Dropzone>
+      <FileUpload.List showSize clearable />
+      <FileUpload.ClearTrigger>Clear all</FileUpload.ClearTrigger>
+      <FileUpload.HiddenInput />
+    </FileUpload>
+  );
+}
+```
+
+## CMS Page Builder
+
+This component is available as a `file-upload` (alias `fileUpload`) block in
+the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "file-upload",
+  "label": "Resume",
+  "name": "resume",
+  "accept": ".pdf,.docx",
+  "maxFiles": 1,
+  "maxFileSize": 5242880,
+  "dropzoneText": "Drag your file(s) here",
+  "triggerText": "Open file picker",
+  "showSize": true,
+  "clearable": true
+}
+```
+
+`maxFiles` and `maxFileSize` are coerced from strings to numbers by the
+renderer; every other field passes straight through to `FileUpload`. It
+always renders `interactive` in the Page Builder.
+
+# Props
+
+## Root
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `accept` | `string \| string[] \| Record<string, string[]>` | Accepted file types — a MIME string, a list, or a MIME→extensions record. Normalized to the native `accept` attribute. |
+| `allowDrop` | `boolean` | Whether to allow drag-and-drop in the dropzone. Default `true`. |
+| `capture` | `"user" \| "environment"` | The default camera to use when capturing media. |
+| `directory` | `boolean` | Whether to accept directories (`webkitdirectory`). |
+| `disabled` | `boolean` | Disables the dropzone, trigger, and hidden input. |
+| `invalid` | `boolean` | Marks the field invalid (`data-invalid` on every part). |
+| `required` | `boolean` | Marks the underlying input required. |
+| `maxFiles` | `number` | Maximum number of files. Default `1`. Selecting `> 1` switches the island from replace to append mode. |
+| `maxFileSize` | `number` | Maximum file size in bytes. Default `Infinity`. |
+| `minFileSize` | `number` | Minimum file size in bytes. Default `0`. |
+| `name` | `string` | Name of the underlying file input, for native form submission. |
+| `locale` | `string` | BCP-47 locale used for file-size formatting. Default `"en-US"`. |
+| `translations` | `Partial<FileUploadTranslations>` | Overrides for the dropzone/preview/delete/clear ARIA strings. |
+| `size` | `"sm" \| "md" \| "lg"` | Visual size variant. Default `"md"`. |
+| `acceptedFiles` | `File[]` | Controlled list of accepted files (island only). |
+| `defaultAcceptedFiles` | `File[]` | Initial list of accepted files, uncontrolled (island only). |
+| `preventDocumentDrop` | `boolean` | Stops the browser from navigating to a file dropped outside the dropzone. Default `true` (island only). |
+| `validate` | `(file: File, details: FileValidateDetails) => FileError[] \| null` | Custom validation, run after the built-in type/size/count checks (island only). |
+| `transformFiles` | `(files: File[]) => Promise<File[]>` | Transforms newly accepted files (e.g. compress) before they're committed (island only). |
+| `onFileAccept` | `(details: FileAcceptDetails) => void` | Called with the files accepted from the most recent selection or drop. |
+| `onFileReject` | `(details: FileRejectDetails) => void` | Called with any rejected files and their error codes. |
+| `onFileChange` | `(details: FileChangeDetails) => void` | Called after every selection with the full accepted/rejected sets. |
+| `interactive` | `boolean` | Forces (or suppresses) hydration as an island. |
+
+## Default composition
+
+These props only apply when `children` is omitted — `FileUpload` then renders
+`Label` + `Dropzone` + `Trigger` + `List` + `HiddenInput` for you.
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `label` | `string` | Label rendered above the dropzone. |
+| `dropzoneText` | `string` | Dropzone helper text. Default `"Drag your file(s) here"`. |
+| `triggerText` | `string` | Trigger button text. Default `"Open file picker"`. |
+| `showSize` | `boolean` | Show each file's formatted size in the list. Default `true`. |
+| `clearable` | `boolean` | Show a per-file delete trigger in the list. Default `true`. |
+
+## Sub-components
+
+`FileUpload` is a compound component — every part below reads from the
+`FileUpload.Root` context, so they only work nested inside it (or inside a
+`FileUpload.Item` for the item-scoped parts).
+
+| Part | Description |
+| --- | --- |
+| `FileUpload.Label` | `<label>` bound to the hidden input via `for`. |
+| `FileUpload.Dropzone` | Drop target; renders `role="button"` with keyboard support (Enter/Space opens the picker). |
+| `FileUpload.Trigger` | Opens the file picker. Renders as a `<label for>` (not a `<button>`) so it keeps working without JavaScript. |
+| `FileUpload.HiddenInput` | The visually-hidden native `<input type="file">` that actually holds the selection for form submission. |
+| `FileUpload.ItemGroup` | `<ul>` wrapping the accepted-file `Item`s. |
+| `FileUpload.Item` | One accepted file. Requires a `file` prop; provides file context to its children. |
+| `FileUpload.ItemName` | The file's name, or `children` to override. |
+| `FileUpload.ItemSizeText` | The file's formatted size (via `formatBytes`), or `children` to override. |
+| `FileUpload.ItemPreview` | Wrapper shown only when the file's MIME type matches its `type` regex prop (default `".*"`). |
+| `FileUpload.ItemPreviewImage` | Client-only `<img>` preview via `URL.createObjectURL`; renders nothing during SSR or for non-image files. |
+| `FileUpload.ItemDeleteTrigger` | Removes this item from the accepted-files list. |
+| `FileUpload.ClearTrigger` | Clears every accepted file. Hidden automatically when the list is empty. |
+| `FileUpload.Items` | Composite: maps accepted files to `Item`s with an image/file-icon preview, name, optional size, and optional delete trigger. Takes `showSize` / `clearable` / `files`. |
+| `FileUpload.List` | Composite: `ItemGroup` wrapping `Items`. Same `showSize` / `clearable` / `files` props. |
+| `FileUpload.FileText` | Shows the first selected file's name, an `"N files"` count for multi-select, or a `fallback` string when nothing is selected. |
+
+```tsx
+import { FileUpload, formatBytes } from "../components/ui";
+```
+
+`formatBytes(bytes, locale?)` and the `FileAccept` / `FileError` /
+`FileRejection` / `FileChangeDetails` / `FileUploadTranslations` types are
+also exported for consumers building a fully custom composition.
+
+# Validation
+
+Each selected file is checked in order and rejected on the first failing
+rule; `validate` runs last, after every built-in check passes:
+
+| `FileError` code | Trigger |
+| --- | --- |
+| `FILE_INVALID_TYPE` | Doesn't match `accept`. |
+| `FILE_TOO_LARGE` | `file.size > maxFileSize`. |
+| `FILE_TOO_SMALL` | `file.size < minFileSize`. |
+| `FILE_EXISTS` | Same name/size/type already accepted (multi-file mode only). |
+| `TOO_MANY_FILES` | Accepting this file would exceed `maxFiles`. |
+| `FILE_INVALID` | Reserved for custom `validate` results. |
+
+With `maxFiles={1}` (the default), a new accepted file **replaces** the
+current selection. With `maxFiles > 1`, new files are **appended** to the
+existing selection up to the limit.
+
+# Accessibility
+
+- `Dropzone` renders `role="button"` with `aria-label` from
+  `translations.dropzone`, `aria-disabled` when disabled, and is keyboard
+  operable (`tabIndex={0}`, Enter/Space opens the file picker).
+- `Label` and `Trigger` are real `<label for>` elements bound to the hidden
+  input's id, so clicking either opens the native file picker even before
+  hydration.
+- `ItemDeleteTrigger` and `ClearTrigger` get `aria-label`s from
+  `translations.deleteFile(file)` / `translations.clearFiles`, overridable
+  via the `translations` prop.
+- `data-disabled` / `data-invalid` / `data-required` / `data-readonly` /
+  `data-dragging` are mirrored onto every part for styling and assistive-tech
+  state.
