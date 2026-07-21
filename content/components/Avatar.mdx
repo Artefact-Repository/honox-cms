@@ -1,7 +1,7 @@
 ---
 title: Avatar
-hydration: 2
 category: Data Display
+hydration: 2
 ---
 
 import { Avatar, Stack } from "../../app/components/ui";
@@ -15,10 +15,7 @@ generic user icon when no image is available or the image fails to load.
 # Hydration
 
 **Tier 2 — smart auto-detect.** `Avatar` renders as static HTML and ships
-no client JS unless a `src` is supplied — an image needs client-side
-`onload`/`onerror` handling to know when to fall back, so passing `src` is
-itself the hydration signal. `name`/`fallback`-only avatars (no `src`) stay
-fully static.
+no client JS unless a `src` is supplied.
 
 | `interactive` prop | Result |
 | --- | --- |
@@ -65,10 +62,15 @@ export default function MyPage() {
 | `alt` | `string` | Alt text for the image. |
 | `name` | `string` | Used to derive initials (first + last name) when there's no image. |
 | `fallback` | `JSX.Element` | Custom fallback content, overriding the derived initials/icon. |
-| `status` | `"idle" \| "loading" \| "loaded" \| "error"` | The image load state. Managed automatically by the island; only set this by hand on a static render. |
-| `size` | `"full" \| "2xs" \| "xs" \| "sm" \| "md" \| "lg" \| "xl" \| "2xl"` | Visual size. Default `"md"`. |
-| `variant` | `"solid" \| "surface" \| "subtle" \| "outline"` | Visual style. Default `"subtle"`. |
-| `shape` | `"square" \| "rounded" \| "full"` | Corner shape. Default `"full"`. |
+
+| `status` | \`"idle" \ | "loading" \ | "loaded" \ | "error"\` | The image load state. Managed automatically by the island; only set this by hand on a static render. |
+
+| `size` | \`"full" \ | "2xs" \ | "xs" \ | "sm" \ | "md" \ | "lg" \ | "xl" \ | "2xl"\` | Visual size. Default `"md"`. |
+
+| `variant` | \`"solid" \ | "surface" \ | "subtle" \ | "outline"\` | Visual style. Default `"subtle"`. |
+
+| `shape` | \`"square" \ | "rounded" \ | "full"\` | Corner shape. Default `"full"`. |
+
 | `interactive` | `boolean` | Overrides the hydration decision (see above). |
 | `class` | `string` | Custom CSS classes for the root element. |
 
