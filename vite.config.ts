@@ -73,6 +73,14 @@ const mainConfig = (_mode: string) => ({
 	oxc: {
 		jsxImportSource: "hono/jsx",
 	},
+	// The remark/rehype/yaml pipeline in app/utils/markdown.ts pulls in a few
+	// packages the SSG build's SSR module runner can't safely inline/transform
+	// as ESM (either old-style CJS with no `type: module`, like `extend`, or a
+	// dual CJS/ESM package where the runner resolves the `require()`-using CJS
+	// build, like `yaml`) — force Node's native module loader to handle them.
+	ssr: {
+		external: ["extend", "yaml"],
+	},
 	plugins: [
 		mdx({
 			// Restrict to .mdx only — .md (blog posts under content/posts) stays
