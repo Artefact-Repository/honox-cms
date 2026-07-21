@@ -260,9 +260,10 @@ function NoteGrid({ notes }: { notes: Note[] }) {
 }
 
 export default createRoute(async (c) => {
-	const [{ notes: allNotes, searchEntries, tags }, config] = await Promise.all(
-		[loadNotes(), loadDocsConfig()],
-	);
+	const [{ notes: allNotes, searchEntries, tags }, config] = await Promise.all([
+		loadNotes(),
+		loadDocsConfig(),
+	]);
 
 	const url = new URL(c.req.url);
 	const searchQuery = url.searchParams.get("q") || "";
