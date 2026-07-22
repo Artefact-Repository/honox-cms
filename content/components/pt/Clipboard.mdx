@@ -1,0 +1,106 @@
+---
+title: Clipboard Área de Transferência
+hydration: 2
+category: Forms
+---
+
+import { Clipboard } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introdução
+
+Um campo somente leitura emparelhado com um gatilho de copiar para a área de
+transferência, com estados de indicador copiado/não copiado incorporados.
+
+# Uso
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "360px" }}>
+    <Clipboard
+      label="Clone Command"
+      value="git clone https://github.com/honojs/honox"
+      interactive
+    />
+  </div>
+</DemoPreview>
+
+```tsx
+import { Clipboard } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Clipboard
+      label="Clone Command"
+      value="git clone https://github.com/honojs/honox"
+    />
+  );
+}
+```
+
+## Composição personalizada
+
+Passe `children` para `Clipboard.Trigger` para sobrescrever a troca padrão de
+ícone copiar/verificar, ou componha as partes diretamente para controle total:
+
+```tsx
+import { Clipboard } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Clipboard.Root value="npm install honox">
+      <Clipboard.Label>Install Command</Clipboard.Label>
+      <Clipboard.Control>
+        <Clipboard.Input />
+        <Clipboard.Trigger>
+          <Clipboard.CopyText />
+        </Clipboard.Trigger>
+      </Clipboard.Control>
+    </Clipboard.Root>
+  );
+}
+```
+
+# Propriedades
+
+## Root
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `value` | `string` | O texto a copiar (controlado). |
+| `defaultValue` | `string` | O texto inicial a copiar (não controlado). |
+| `disabled` | `boolean` | Desabilita o gatilho. |
+| `timeout` | `number` | Milissegundos que o estado copiado permanece ativo antes de reverter. Padrão `3000`. |
+| `translations` | `Partial<ClipboardTranslations>` | Sobrescritas para o `aria-label` do gatilho. |
+| `onValueChange` | `(details: { value: string }) => void` | Chamado quando o valor muda (por exemplo, via uma entrada personalizada). |
+| `onStatusChange` | `(details: { copied: boolean }) => void` | Chamado quando o estado copiado muda. |
+| `size` | `"sm" \| "md" \| "lg"` | Tamanho visual. Padrão `"md"`. |
+| `colorPalette` | `string` | O tema de cor. Padrão `"green"`. |
+| `interactive` | `boolean` | Força (ou suprime) a hidratação como uma ilha. |
+| `class` | `string` | Classes CSS personalizadas para o elemento raiz. |
+
+## Composição padrão
+
+Estas se aplicam apenas ao `<Clipboard>` de nível superior (não a `Clipboard.Root`), que renderiza `Label` + `Control` (`Input` + `Trigger`) para você.
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `label` | `JSX.Element \| string` | Rótulo renderizado acima do controle. |
+| `children` | `JSX.Element` | Conteúdo personalizado do `Trigger`, sobrescrevendo a troca padrão de ícone copiar/verificar. |
+
+## Subcomponentes
+
+| Part | Description |
+| --- | --- |
+| `Clipboard.Label` | `<label>` vinculado ao input somente leitura. |
+| `Clipboard.Control` | Envolve `Input` e `Trigger`. |
+| `Clipboard.Input` | `<input>` somente leitura mostrando o valor atual; seleciona seu texto ao focar. Copiar manualmente via Ctrl/Cmd+C também dispara o estado copiado. |
+| `Clipboard.Trigger` | Copia `value` para a área de transferência ao clicar. Aceita `asChild` para fundir-se a um filho personalizado em vez de renderizar um `<button>`. |
+| `Clipboard.Indicator` | Renderiza tanto `children` quanto uma variante `copied` como nós irmãos, alternados via `hidden` — use para trocas personalizadas de ícone ou texto copiado/não copiado. |
+| `Clipboard.CopyText` | `Indicator` de conveniência que alterna entre o texto `"Copy"` / `"Copied"` (sobrescrevível via as props `children`/`copied`). |
+| `Clipboard.Context` | Acesso via render-prop ao contexto do clipboard: `<Clipboard.Context>{(ctx) => ...}</Clipboard.Context>`. |
+
+# Acessibilidade
+
+- `Trigger` obtém um `aria-label` de `translations.triggerLabel(copied)` (padrão `"Copy to clipboard"` / `"Copied to clipboard"`), anunciando a mudança de estado para tecnologia assistiva.
+- `Input` é `readOnly`, não `disabled`, então permanece focável e seu texto é selecionável/copiável por meio de atalhos de teclado nativos mesmo sem clicar no gatilho.
+- `data-copied` é refletido em cada parte para estilização baseada em estado.

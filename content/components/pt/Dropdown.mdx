@@ -1,0 +1,319 @@
+---
+title: Dropdown Menu Suspenso
+hydration: 1
+category: Overlays
+---
+
+import { Dropdown, Button } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introdução
+
+Uma lista de ações ou opções que aparece quando acionada. Suporta posicionamentos
+personalizados com inversão automática ao transbordar o viewport, uma seta opcional com
+geometria que aponta para o centro, itens de checkbox/radio/grupo, submenus em cascata, e
+modos de disparo por clique / hover / menu de contexto.
+
+# Uso
+
+## Dropdown básico
+
+<DemoPreview>
+  <Dropdown
+    trigger={<Button>Open Dropdown</Button>}
+    items={[
+      { type: "item", label: "Edit", value: "edit" },
+      { type: "separator" },
+      { type: "checkbox", label: "Bold", value: "bold", checked: true },
+      {
+        type: "radio-group",
+        value: "theme",
+        label: "Theme",
+        items: [
+          { type: "radio", label: "Light", value: "light" },
+          { type: "radio", label: "Dark", value: "dark" },
+        ],
+      },
+    ]}
+  />
+</DemoPreview>
+
+```tsx
+import { Dropdown, Button } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Dropdown
+      trigger={<Button>Open Dropdown</Button>}
+      items={[
+        { type: "item", label: "Edit", value: "edit" },
+        { type: "separator" },
+        { type: "checkbox", label: "Bold", value: "bold", checked: true },
+        {
+          type: "radio-group",
+          value: "theme",
+          label: "Theme",
+          items: [
+            { type: "radio", label: "Light", value: "light" },
+            { type: "radio", label: "Dark", value: "dark" },
+          ],
+        },
+      ]}
+    />
+  );
+}
+```
+
+## Botão com menu suspenso
+
+```tsx
+import { Dropdown } from "../components/ui";
+
+export default function Page() {
+  return (
+    <Dropdown.Button
+      type="primary"
+      items={[{ type: "item", label: "Submit & Close", value: "close" }]}
+      onClick={() => console.log("Primary click!")}
+    >
+      Submit Action
+    </Dropdown.Button>
+  );
+}
+```
+
+## Estilo personalizado e classNames semânticos
+
+```tsx
+<Dropdown
+  trigger={<Button>Styled Dropdown</Button>}
+  classNames={{
+    content: "custom-menu-card",
+    item: "custom-menu-item"
+  }}
+  styles={{
+    content: { boxShadow: "0 4px 20px rgba(0,0,0,0.15)" }
+  }}
+  items={[{ type: "item", label: "Custom Styled Item", value: "styled" }]}
+/>
+```
+
+## Seta apontando para o centro
+
+```tsx
+<Dropdown
+  trigger={<Button>Center Arrow</Button>}
+  arrow={{ pointAtCenter: true }}
+  placement="bottomRight"
+  items={[{ type: "item", label: "Item 1", value: "1" }]}
+/>
+```
+
+## Grupos e submenus em cascata
+
+```tsx
+<Dropdown
+  trigger={<Button>Open Dropdown</Button>}
+  items={[
+    {
+      type: "group",
+      label: "File",
+      items: [
+        { type: "item", label: "New", value: "new" },
+        { type: "item", label: "Open", value: "open" },
+      ],
+    },
+    { type: "separator" },
+    {
+      type: "submenu",
+      label: "Share",
+      items: [
+        { type: "item", label: "Email", value: "email" },
+        { type: "item", label: "Link", value: "link" },
+      ],
+    },
+  ]}
+/>
+```
+
+## Posicionamento personalizado, seta e disparo por hover
+
+```tsx
+<Dropdown
+  trigger={<Button>Hover Me</Button>}
+  placement="bottomRight"
+  triggerMode="hover"
+  arrow={true}
+  mouseEnterDelay={100}
+  mouseLeaveDelay={150}
+  items={[
+    { type: "item", label: "Profile", value: "profile" },
+    { type: "item", label: "Settings", value: "settings" },
+    { type: "separator" },
+    { type: "item", label: "Logout", value: "logout" },
+  ]}
+/>
+```
+
+## Menu de contexto
+
+Um disparador configurado como `"contextMenu"` abre com o clique direito, ancorado
+no ponteiro, em vez de se comportar como um botão:
+
+```tsx
+<Dropdown
+  trigger={<div>Right-click this area</div>}
+  trigger={"contextMenu"}
+  items={[
+    { type: "item", label: "Copy", value: "copy" },
+    { type: "item", label: "Paste", value: "paste" },
+  ]}
+/>
+```
+
+## Estado de abertura controlado
+
+```tsx
+const [open, setOpen] = useState(false);
+
+<Dropdown
+  open={open}
+  onOpenChange={setOpen}
+  trigger={<Button>Open Dropdown</Button>}
+  items={[{ type: "item", label: "Edit", value: "edit" }]}
+/>;
+```
+
+## Construtor de páginas CMS
+
+Este componente está disponível como um bloco `menu` no [Construtor de páginas](/docs/PageBuilder) (`content/pages/*.json`) — o bloco do CMS é rotulado "Menu", mas é renderizado por meio deste componente `Dropdown`:
+
+```json
+{
+  "type": "menu",
+  "triggerText": "Open Dropdown",
+  "items": [
+    { "type": "item", "label": "Edit", "value": "edit" },
+    { "type": "separator" },
+    { "type": "item", "label": "Delete", "value": "delete" }
+  ]
+}
+```
+
+# Propriedades
+
+## Dropdown
+
+| Prop | Tipo | Descrição | Padrão |
+| --- | --- | --- | --- |
+| `trigger` | `JSX.Element` | Elemento que abre o menu ao ser ativado. | - |
+| `items` | `DropdownItem[]` | Os itens do menu a renderizar. | - |
+| `open` | `boolean` | Se o menu está aberto (controlado). | - |
+| `defaultOpen` | `boolean` | Se o menu está aberto por padrão (não controlado). | `false` |
+| `disabled` | `boolean` | Desabilita todos os modos de disparo e torna o disparador inerte. | `false` |
+| `interactive` | `boolean` | Força a hidratação como ilha. Padrão `true`. | `true` |
+
+| `arrow` | \`boolean \ | \{ pointAtCenter?: boolean \}\` | Mostra uma seta indicadora apontando do menu para o disparador. Pode se alinhar exatamente com o centro do disparador. | `false` |
+
+| `placement` | `string` | Posicionamento do menu: `"top"` \ | `"topLeft"` \ | `"topRight"` \ | `"bottom"` \ | `"bottomLeft"` \ | `"bottomRight"` \ | `"left"` \ | `"leftTop"` \ | `"leftBottom"` \ | `"right"` \ | `"rightTop"` \ | `"rightBottom"`. Aliases em dash-case também são aceitos. | `"bottomLeft"` |
+
+| `trigger` | \`("click" \ | "hover" \ | "contextMenu" \ | "contextDropdown")[] \ | string\` | Modos de interação de disparo para abrir/fechar o menu. (Aliás `triggerMode`). | `["click"]` |
+
+| `mouseEnterDelay` | `number` | Atraso em ms antes de abrir quando o disparador inclui `"hover"`. | `150` |
+| `mouseLeaveDelay` | `number` | Atraso em ms antes de fechar quando o disparador inclui `"hover"`. | `100` |
+| `closeOnEscape` | `boolean` | Fecha ao pressionar Escape. | `true` |
+
+| `onOpenChange` | \`(open: boolean, info?: \{ source: 'trigger' \ | 'menu' \}) => void\` | Chamado quando o menu abre ou fecha. `source` especifica o que desencadeou a ação. | - |
+
+| `onSelect` | `(value: string) => void` | Chamado com o `value` de um item quando ele é ativado. | - |
+
+| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg" \ | "xl"\` | O tamanho do menu. | `"md"` |
+
+| `class` | `string` | Classes CSS personalizadas para o elemento raiz. | - |
+| `contentClass` | `string` | Classes CSS personalizadas para o elemento de conteúdo. | - |
+| `positionerClass` | `string` | Classes CSS personalizadas para o elemento posicionador. | - |
+| `destroyOnHidden` | `boolean` | Se deve destruir/desmontar o conteúdo do popup do DOM quando oculto. (Aliás `destroyPopupOnHide`). | `false` |
+| `popupRender` | `(menu: JSX.Element) => JSX.Element` | Personaliza/envolve o conteúdo do popup. (Aliás `dropdownRender`). | - |
+| `classNames` | `Record<string, string>` | Classes CSS personalizadas para cada componente de estrutura semântica dentro do Dropdown. | - |
+| `styles` | `Record<string, any>` | Estilos inline personalizados para cada componente de estrutura semântica dentro do Dropdown. | - |
+
+### Slots de classNames e styles:
+
+- `root` (ou `positioner`): O contêiner de posicionamento absoluto da sobreposição.
+- `content`: O cartão do popup contendo os itens da lista.
+- `item`: Item de lista individual (incluindo itens de checkbox e radio).
+- `trigger`: O botão/wrapper disparador principal.
+- `arrow`: O wrapper externo da seta.
+- `arrowTip`: O losango interno estilizado.
+
+### DropdownItem
+
+| Propriedade | Tipo | Descrição |
+| --- | --- | --- |
+
+| `type` | \`"item" \ | "separator" \ | "checkbox" \ | "radio" \ | "radio-group" \ | "submenu" \ | "group"\` | O tipo de entrada do menu. |
+
+| `label` | `string` | Texto de exibição (para `item`, `checkbox`, `radio`, `submenu`, e opcionalmente `group`). |
+| `value` | `string` | Valor único (para `item`, `checkbox`, `radio`, `radio-group`). |
+| `checked` | `boolean` | Estado marcado (para `checkbox`, `radio`). |
+| `icon` | `JSX.Element` | Ícone à esquerda (para `item`, `checkbox`, `radio`, `submenu`). |
+| `indicator` | `JSX.Element` | Elemento indicador final personalizado (para `item`). |
+| `items` | `DropdownItem[]` | Itens aninhados (para `radio-group`, `submenu`, `group`). Os itens de submenu/grupo podem ser, por si mesmos, qualquer `DropdownItem`, incluindo submenus adicionais. |
+| `disabled` | `boolean` | Se o item (ou, para `submenu`, todo o menu aninhado) está desabilitado. |
+| `class` | `string` | Classes CSS personalizadas para o item. |
+
+***
+
+## Dropdown.Button (DropdownButton)
+
+Um Button com um menu suspenso, renderizado como um grupo de botões anexados contínuo.
+
+| Prop | Tipo | Descrição | Padrão |
+| --- | --- | --- | --- |
+
+| `type` | \`"default" \ | "primary" \ | "dashed" \ | "link" \ | "text" \ | "solid" \ | "outline" \ | "subtle" \ | "plain" \ | "surface"\` | O tipo de botões a renderizar. | `"outline"` |
+
+| `danger` | `boolean` | Renderiza os botões com o tema visual de perigo. | `false` |
+| `disabled` | `boolean` | Desabilita tanto o botão principal quanto o disparador do dropdown. | `false` |
+| `loading` | `boolean` | Renderiza o botão principal em estado de carregamento/ocupado. | `false` |
+| `onClick` | `(e: MouseEvent) => void` | Manipulador do evento de clique para o botão esquerdo/principal. | - |
+| `icon` | `JSX.Element` | Ícone para o botão direito/disparador. | `<EllipsisIcon />` |
+| `buttonsRender` | `(buttons: JSX.Element[]) => JSX.Element[]` | Função de renderização personalizada para personalizar ambos os botões. | - |
+
+Suporta todos os props comuns do `Dropdown`, como `items`, `placement`, `arrow`, `classNames`, `styles`, etc.
+
+***
+
+# Nota
+
+Certifique-se de que `trigger` aceite `onMouseEnter`, `onMouseLeave`, `onFocus`,
+e `onClick` — o elemento disparador é clonado no lugar com esses (e os
+atributos ARIA/`data-*` relevantes) anexados, em vez de envolvido.
+
+# Limitações
+
+A ilha interativa posiciona o menu em relação ao próprio wrapper do seu
+disparador (`position: absolute`, não um portal): ela inverte para o lado oposto
+quando o posicionamento solicitado transbordaria do viewport, e limita o eixo
+transversal para que o menu nunca seja renderizado fora da tela. Ela não rastreia
+contêineres de scroll nem resize observers da forma como o Floating UI faz
+— o reposicionamento só é executado novamente no `resize` da janela enquanto
+está aberto, e rolar a página move o menu junto com o disparador de forma
+gratuita. Um menu aberto de dentro de um contêiner com scroll ou
+`overflow: hidden` profundo ainda pode ser recortado visualmente por esse
+contêiner, a mesma compensação que `Popover` e `Tooltip` fazem.
+
+Os menus de contexto e os submenus são a
+exceção: como não estão ancorados à caixa de um disparador (um menu de contexto
+abre no ponteiro; um submenu abre ao lado de um item de menu), eles são posicionados
+com `position: fixed` e coordenadas calculadas manualmente, e são executados
+novamente em Escape/scroll/resize como o resto do menu.
+
+Cada submenu é sua própria ilha interativa aninhada, delimitada por meio de um
+marcador `data-overlay-root` para que a lógica de posicionamento e clique-fora de
+um menu pai não alcance o conteúdo próprio de um submenu (e vice-versa). Selecionar
+um item comum fecha todos os níveis de menu abertos pelos quais ele borbulha; alternar
+um item de checkbox/radio dentro de qualquer nível mantém toda a pilha aberta.
+
+A animação de saída `_closed` (`slide-fade-out`) é reproduzida antes que o menu
+seja realmente removido do layout — fechar não o oculta instantaneamente.

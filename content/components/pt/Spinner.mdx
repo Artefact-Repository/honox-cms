@@ -1,0 +1,48 @@
+---
+title: Spinner Indicador de Carregamento
+hydration: 3
+category: Feedback
+---
+
+import { Spinner } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introdução
+
+Um componente usado para indicar um estado de carregamento.
+
+# Uso
+
+<DemoPreview>
+  <Spinner size="md" label="Loading..." />
+</DemoPreview>
+
+```tsx
+import { Spinner } from "../components/ui";
+
+export default function MyPage() {
+  return <Spinner size="md" label="Loading..." />;
+}
+```
+
+## Construtor de páginas CMS
+
+Este componente está disponível como um bloco `spinner` no [Construtor de páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "spinner",
+  "size": "lg",
+  "label": "Loading"
+}
+```
+
+# Propriedades
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `class` | `string` | Classes CSS personalizadas. |
+
+| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg" \ | "xl" \ | "2xl" \ | "inherit"\` | O tamanho do spinner. |
+
+| `label` | `string` | Um rótulo acessível para leitores de tela. |

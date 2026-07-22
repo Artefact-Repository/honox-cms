@@ -1,0 +1,184 @@
+---
+title: RadioCardGroup Grupo de Cartões de Rádio
+hydration: 2
+category: Forms
+---
+
+import { RadioCardGroup, Stack } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introdução
+
+Um grupo de botões de rádio apresentado como um conjunto de cartões selecionáveis, para
+escolhas exclusivas que precisam de mais peso visual do que os simples botões de rádio —
+níveis de preços, velocidades de envio e similares.
+
+# Hidratação
+
+**Nível 2 — detecção automática inteligente.** Um `RadioCardGroup` é renderizado como HTML
+estático e não envia JS do cliente a menos que um sinal de comportamento esteja presente.
+Passe `interactive={true}` para forçar a hidratação, ou `interactive={false}` para forçar uma
+renderização estática.
+
+Ele se hidrata como ilha quando **qualquer** um dos seguintes sinais está presente (ou
+`interactive={true}` é definido):
+
+- `value` (seleção controlada)
+- `defaultValue` (seleção inicial não controlada)
+- `onValueChange`
+
+| `interactive` prop | Result |
+| --- | --- |
+| omitido, **sem** sinal | Estático — sem JS do cliente |
+| omitido, sinal presente | Se hidrata como ilha |
+| `true` | Se hidrata como ilha |
+| `false` | Estático — sem JS do cliente |
+
+# Uso
+
+<DemoPreview>
+  <Stack gap="6" style={{ width: "100%" }}>
+    <RadioCardGroup
+      label="Plan"
+      defaultValue="pro"
+      items={[
+        { label: "Hobby", value: "hobby" },
+        { label: "Pro", value: "pro" },
+        { label: "Enterprise", value: "enterprise" },
+      ]}
+      interactive
+    />
+    <RadioCardGroup
+      label="Billing"
+      variant="subtle"
+      defaultValue="monthly"
+      items={[
+        { label: "Monthly", value: "monthly" },
+        { label: "Yearly", value: "yearly" },
+      ]}
+      interactive
+    />
+  </Stack>
+</DemoPreview>
+
+```tsx
+import { RadioCardGroup } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <RadioCardGroup
+      label="Plan"
+      defaultValue="pro"
+      items={[
+        { label: "Hobby", value: "hobby" },
+        { label: "Pro", value: "pro" },
+        { label: "Enterprise", value: "enterprise" },
+      ]}
+    />
+  );
+}
+```
+
+## Composição personalizada
+
+Passe `children` para ter controle total sobre o conteúdo de cada cartão em vez do array
+`items`:
+
+```tsx
+import { RadioCardGroup } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <RadioCardGroup label="Plan" defaultValue="pro">
+      <RadioCardGroup.Item value="hobby">
+        <RadioCardGroup.ItemText>Hobby — $0/mo</RadioCardGroup.ItemText>
+        <RadioCardGroup.ItemControl />
+        <RadioCardGroup.ItemHiddenInput />
+      </RadioCardGroup.Item>
+      <RadioCardGroup.Item value="pro">
+        <RadioCardGroup.ItemText>Pro — $20/mo</RadioCardGroup.ItemText>
+        <RadioCardGroup.ItemControl />
+        <RadioCardGroup.ItemHiddenInput />
+      </RadioCardGroup.Item>
+      <RadioCardGroup.Indicator />
+    </RadioCardGroup>
+  );
+}
+```
+
+## Construtor de páginas do CMS
+
+Este componente está disponível como um bloco `radioCardGroup` no
+[Construtor de Páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "radioCardGroup",
+  "label": "Plan",
+  "defaultValue": "pro",
+  "variant": "outline",
+  "items": [
+    { "label": "Hobby", "value": "hobby" },
+    { "label": "Pro", "value": "pro" },
+    { "label": "Enterprise", "value": "enterprise", "disabled": true }
+  ]
+}
+```
+
+Ele sempre é renderizado `interactive` no Construtor de Páginas.
+
+# Propriedades
+
+## Root
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `value` | `string` | O valor atualmente selecionado (controlado). |
+| `defaultValue` | `string` | O valor selecionado inicialmente (não controlado). |
+| `onValueChange` | `(details: { value: string }) => void` | Chamado quando a seleção muda. |
+| `id` | `string` | O id do elemento raiz. |
+| `name` | `string` | Nome dos inputs de rádio subjacentes, para envio de formulário nativo. |
+| `disabled` | `boolean` | Desabilita todos os itens. |
+| `readOnly` | `boolean` | Evita mudanças de seleção enquanto ainda permite o foco. |
+| `variant` | `"subtle" \| "outline" \| "surface" \| "solid"` | Estilo visual. Padrão `"outline"`. |
+| `size` | `"md"` | Tamanho visual. |
+| `colorPalette` | `"blue" \| "green" \| "red" \| "purple" \| "orange" \| "amber" \| "cyan" \| "slate" \| "gray"` | O tema de cor. |
+| `interactive` | `boolean` | Sobrescreve a decisão de hidratação (ver acima). |
+| `class` | `string` | Classes CSS personalizadas para o elemento raiz. |
+
+## Composição padrão
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `items` | `(string \| RadioCardGroupItem)[]` | Cartões a renderizar. Uma string simples é um atalho para `{ value, label: value }`. |
+| `label` | `string \| JSX.Element` | Rótulo renderizado acima dos cartões. |
+
+## RadioCardGroupItem
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `value` | `string` | O valor único do item. |
+| `label` | `string \| JSX.Element` | O conteúdo exibido do cartão. |
+| `disabled` | `boolean` | Desabilita este cartão. |
+| `invalid` | `boolean` | Marca este cartão como inválido. |
+
+## Subcomponentes
+
+| Part | Description |
+| --- | --- |
+| `RadioCardGroup.Label` | O rótulo do grupo (`<span>`). |
+| `RadioCardGroup.Item` | Um cartão selecionável. `role="radio"`, requer uma prop `value`. |
+| `RadioCardGroup.ItemText` | O texto/conteúdo exibido do cartão. |
+| `RadioCardGroup.ItemControl` | O invólucro do indicador visual de rádio do cartão. |
+| `RadioCardGroup.ItemHiddenInput` | O `<input type="radio">` nativo, visualmente oculto, que mantém a seleção para o envio de formulário. |
+| `RadioCardGroup.Indicator` | Um elemento indicador deslizante compartilhado para o estado marcado. |
+
+# Acessibilidade
+
+- A raiz tem `role="radiogroup"`; cada item tem `role="radio"` com `aria-checked`
+  refletindo a seleção.
+- Os itens usam `tabIndex` itinerante — apenas o item marcado (ou o primeiro habilitado)
+  está na sequência de tabulação, igualando o comportamento nativo de teclado de um grupo de
+  rádio.
+- `data-state` (`checked`/`unchecked`) e `data-disabled` são refletidos nos itens e em suas
+  partes de texto/controle, para fins de estilo.

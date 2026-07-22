@@ -1,0 +1,212 @@
+---
+title: DatePicker Seletor de Data
+hydration: 2
+category: Forms
+---
+
+import { DatePicker } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introdução
+
+Um seletor de data que combina um campo de texto com um calendário em popup. Ele suporta seleção única, múltipla e de intervalo, visualizações de painel de mês/ano, predefinições de seleção rápida, números de semana e entrada manual de data — renderizado no lado do servidor com HonoX e hidratado como ilha somente quando a interatividade é necessária.
+
+O componente é **headless por design**: `app/components/ui/date-picker-primitive.tsx` produz marcação semântica e acessível e o estado, enquanto `app/islands/date-picker.tsx` adiciona o comportamento do lado do cliente (navegação por teclado, pré-visualização ao passar o mouse, clique fora, digitação). Nenhuma nova dependência de tempo de execução é introduzida — ele se baseia em Hono JSX e Panda CSS, a mesma stack do restante do design system.
+
+# Novidades desta revisão
+
+- **Os valores selecionados agora sobrevivem à renderização estática.** O input antes renderizava seu valor por meio de `defaultValue`, que o hono/jsx serializa como um atributo `defaultValue="…"` morto — um seletor renderizado estaticamente com um `value`/`defaultValue` mostrava um input vazio. Agora ele renderiza um atributo `value` real; a digitação permanece não controlada porque o runtime do DOM só atribui a propriedade value quando o prop realmente muda.
+- **Os menus suspensos de mês/ano agora pré-selecionam corretamente no SSR.** `MonthSelect`/`YearSelect` usavam `value` em `<select>`, que não é um atributo HTML, então o mês/ano focado nunca era pré-selecionado na saída do servidor. A `<option>` correspondente agora carrega `selected`.
+- **Texto de calendário localizado.** Os cabeçalhos de dias da semana, as grades de meses e o menu suspenso de mês são gerados a partir de `Intl.DateTimeFormat` para o `locale` configurado (em cache por locale, com um fallback em inglês quando o locale é desconhecido). Anteriormente, apenas o cabeçalho respeitava `locale`.
+- **Os extremos do intervalo se conectam à faixa.** Os dias de início/fim de um intervalo agora carregam `data-range-start` / `data-range-end`, e a receita esquadra seus cantos internos para que os extremos se unam de forma contínua ao destaque dentro do intervalo.
+- **O foco do teclado sobrevive às trocas de visualização.** Aplicar zoom entre as visualizações de dia/mês/ano (pelo cabeçalho ou aprofundando em um mês/ano) costumava deixar o foco do DOM cair no `<body>` porque o controle previamente focado é ocultado. O foco agora se move para a célula ativa da nova visualização.
+- **Semântica de grade ajustada.** O `role="row"` solto em `<thead>` (que sobrescrevia seu papel implícito `rowgroup`) desapareceu, e a grade anuncia `aria-multiselectable` nos modos `multiple`/`range`.
+- **O popup permanece na tela.** O calendário em popup limita sua largura ao viewport em telas estreitas em vez de transbordar horizontalmente.
+
+Mantido da revisão anterior: navegação de grade com teclado em primeiro lugar, limitada a `[min, max]`, visualizações de mês/ano com limites, pré-visualização de intervalo ao passar o mouse, entrada de texto livre com confirmação ao pressionar Enter/perder o foco, envio de formulário nativo por meio de inputs ocultos, números de semana ISO, disparador de limpeza condicional, semântica de grade ARIA com uma parada de tabulação itinerante, e animações de abertura/fechamento baseadas em `data-state`.
+
+# Funcionalidade
+
+- **Calendário em popup** — abre a partir do disparador do calendário ou ao focar/clicar no input; fecha ao clicar fora, com <kbd>Escape</kbd> (o foco retorna ao disparador), ou após uma seleção concluída quando `closeOnSelect` está definido.
+- **Visualizações de painel** — clique no cabeçalho de mês/ano para dar zoom out de dias → meses → anos; selecionar um ano ou mês aprofunda de volta. As setas anterior/próximo paginam por mês, ano ou década dependendo da visualização.
+- **Seleção limitada** — `min`/`max` são aplicados em todas as visualizações: dias fora do intervalo são desabilitados, meses e anos que caem completamente fora do intervalo também são desabilitados, e o foco do teclado é limitado para que nunca possa parar em uma célula desabilitada.
+- **Entrada manual** — digite uma data no input e pressione <kbd>Enter</kbd> (ou perca o foco). Valores válidos no formato `YYYY-MM-DD` são confirmados e normalizados; valores inválidos ou fora do intervalo revertem para o último valor confirmado. Limpar o input limpa a seleção.
+- **Seleção de intervalo** — o primeiro clique define o início, o segundo define o fim (ordenados automaticamente); os dias intermediários são destacados, e passar o mouse pré-visualiza o intervalo antes de confirmar.
+- **Seleção múltipla** — clicar alterna dias individuais entre ativado e desativado.
+- **Números de semana** — com `showWeekNumbers`, uma coluna de número de semana ISO é exibida ao lado da grade de dias.
+- **Envio de formulário** — passe um prop `name` e um input oculto é renderizado para cada data selecionada, de modo que o seletor funciona dentro de um `<form>` simples sem código adicional.
+- **Predefinições** — `DatePicker.PresetTrigger` suporta os valores `today`, `last3Days`, `last7Days`, `last14Days`, `last30Days` e `last90Days`. No modo de intervalo, uma predefinição seleciona todo o intervalo; caso contrário, seleciona a única data âncora.
+
+# Suporte a teclado
+
+Quando o popup está aberto e o foco está dentro do calendário, as seguintes teclas estão ativas:
+
+| Tecla | Visualização de dia | Visualização de mês | Visualização de ano |
+| --- | --- | --- | --- |
+| <kbd>←</kbd> / <kbd>→</kbd> | Dia anterior / próximo | Mês anterior / próximo | Ano anterior / próximo |
+| <kbd>↑</kbd> / <kbd>↓</kbd> | ±1 semana | ±3 meses | ±3 anos |
+| <kbd>Home</kbd> / <kbd>End</kbd> | Início / fim da semana | — | — |
+| <kbd>PageUp</kbd> / <kbd>PageDown</kbd> | Mês anterior / próximo | Ano anterior / próximo | Década anterior / próxima |
+| <kbd>Shift</kbd>+<kbd>PageUp</kbd> / <kbd>Shift</kbd>+<kbd>PageDown</kbd> | Ano anterior / próximo | — | — |
+| <kbd>Enter</kbd> / <kbd>Space</kbd> | Seleciona o dia focado | Aprofunda no mês | Aprofunda no ano |
+| <kbd>Esc</kbd> | Fecha o popup, retorna o foco ao disparador |  |  |
+
+O disparador e o input são alcançáveis com <kbd>Tab</kbd>; abrir pelo teclado move o foco diretamente para a grade, de modo que o calendário é operável sem mouse.
+
+# Acessibilidade
+
+- A grade usa semântica de grade ARIA (`role="grid"`, `row`, `gridcell`, `columnheader`, `rowheader`) com `aria-selected`, `aria-current="date"` na célula de hoje, e `aria-multiselectable` nos modos `multiple`/`range`.
+- Um **tabindex itinerante** mantém uma única parada de tabulação na data focada; as teclas de seta movem o foco sem tabular por cada célula.
+- O foco é gerenciado: abrir pelo teclado foca o dia ativo; fechar retorna o foco ao disparador; alternar entre as visualizações de dia/mês/ano move o foco para a célula ativa da nova visualização em vez de perdê-lo.
+- Todos os controles interativos carregam `aria-label` (`Open date picker`, `Clear selected dates`, `Previous`, `Next`, `Switch calendar view`, `Select month`, `Select year`).
+- A cor nunca é o único sinal — os estados selecionado, hoje, dentro do intervalo e desabilitado combinam preenchimento, peso e (para hoje) um marcador de ponto.
+- Respeita `disabled` / `readOnly` / `invalid` por meio de `aria-disabled`, `readonly` e `aria-invalid`.
+
+# Slots de estilo
+
+A receita de slots do Panda CSS (`app/theme/recipes/date-picker.ts`) expõe os seguintes slots `data-part` para personalização de tema. Sobrescreva por meio dos props `class`/`className` ou de um mapa semântico `classNames`:
+
+`root`, `label`, `control`, `input`, `trigger`, `clearTrigger`, `positioner`, `content`, `view`, `viewControl`, `prevTrigger`, `nextTrigger`, `viewTrigger`, `rangeText`, `table`, `tableHead`, `tableHeader`, `tableRow`, `tableBody`, `tableCell`, `tableCellTrigger`, `weekNumber`, `monthSelect`, `yearSelect`, `presetTrigger`, `valueText`. A parte `hidden-input` só é renderizada quando `name` é definido e não carrega estilo visível.
+
+Os estados selecionado / hoje / dentro do intervalo / pré-visualização de intervalo / desabilitado são controlados pelos atributos `data-selected`, `data-today`, `data-in-range`, `data-outside-range`, `data-range-preview` e `data-disabled` (aplicados nas três visualizações de painel), de modo que podem receber uma nova aparência independentemente da receita. Os extremos do intervalo adicionalmente carregam `data-range-start` / `data-range-end` (somente quando o intervalo abrange mais de um dia), que a receita usa para esquadrar seus cantos internos contra a faixa dentro do intervalo. A animação de abertura/fechamento se baseia em `data-state="open"` / `data-state="closed"`.
+
+# Hidratação
+
+**Nível 1 — interativo por padrão.** Um `DatePicker` hidrata como ilha a menos que seja explicitamente desativado com `interactive={false}`, caso em que é renderizado como HTML estático sem JS de cliente.
+
+| `interactive` prop | Resultado |
+| --- | --- |
+| omitido | Hidrata como ilha |
+| `true` | Hidrata como ilha |
+| `false` | Estático — sem JS de cliente |
+
+Todas as decisões de interatividade na biblioteca passam pelo helper compartilhado `shouldHydrate()` em `app/components/ui/island-utils.ts`.
+
+# Uso
+
+<DemoPreview>
+  <DatePicker label="Choose Date" selectionMode="single" />
+</DemoPreview>
+
+```tsx
+import { DatePicker } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <>
+      {/* Single date */}
+      <DatePicker label="Choose Date" selectionMode="single" />
+
+      {/* Date range with bounds */}
+      <DatePicker
+        label="Travel Dates"
+        selectionMode="range"
+        min="2026-01-01"
+        max="2026-12-31"
+      />
+
+      {/* Week numbers + accent colour */}
+      <DatePicker
+        label="Pick a day"
+        selectionMode="single"
+        showWeekNumbers
+        colorPalette="purple"
+      />
+
+      {/* Preselected value */}
+      <DatePicker label="Due Date" defaultValue="2026-07-15" />
+
+      {/* Inside a native form — the selected date submits as `due` */}
+      <form method="post" action="/submit">
+        <DatePicker label="Due Date" name="due" selectionMode="single" />
+        <button type="submit">Save</button>
+      </form>
+
+      {/* Range submission — start/end submit as two `range` entries */}
+      <form method="post" action="/report">
+        <DatePicker
+          label="Reporting Window"
+          name="range"
+          selectionMode="range"
+        />
+        <button type="submit">Run</button>
+      </form>
+    </>
+  );
+}
+```
+
+## Construtor de páginas CMS
+
+Este componente está disponível como um bloco `datePicker` no [Construtor de páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "datePicker",
+  "label": "Check-in Date",
+  "selectionMode": "single",
+  "placeholder": "YYYY-MM-DD",
+  "colorPalette": "blue"
+}
+```
+
+# Propriedades
+
+| Prop | Tipo | Descrição |
+| --- | --- | --- |
+| `label` | `string` | Renderiza um rótulo associado ao primeiro input (apenas estrutura padrão). |
+| `placeholder` | `string` | Espaço reservado do input. Padrão `YYYY-MM-DD`. |
+
+| `selectionMode` | \`"single" \ | "multiple" \ | "range"\` | Como as datas são selecionadas. Padrão `"single"`. O modo de intervalo renderiza inputs de início e fim. |
+
+| `value` | \`CalendarDate[] \ | string[] \ | string \ | Date[]\` | Data(s) selecionada(s) (controlado). As strings usam o formato `YYYY-MM-DD`. |
+| `defaultValue` | \`CalendarDate[] \ | string[] \ | string \ | Date[]\` | Data(s) selecionada(s) inicial(is) (não controlado). |
+
+| `focusedValue` | \`CalendarDate \ | string \ | Date\` | A data em que o painel do calendário está focado (controlado). |
+| `defaultFocusedValue` | \`CalendarDate \ | string \ | Date\` | Data inicial do painel (não controlado). |
+| `min` | \`CalendarDate \ | string \ | Date\` | Data selecionável mais antiga. Dias, meses e anos anteriores são desabilitados; datas digitadas fora do intervalo são rejeitadas; o foco do teclado é limitado ao intervalo. |
+| `max` | \`CalendarDate \ | string \ | Date\` | Data selecionável mais recente. |
+
+| `isDateUnavailable` | `(date, locale) => boolean` | Marca datas individuais como não selecionáveis (uso estático/composto). |
+
+| `view` | \`"day" \ | "month" \ | "year"\` | A visualização de painel ativa (controlado). |
+
+| `open` | `boolean` | Se o calendário em popup está aberto (controlado). |
+| `closeOnSelect` | `boolean` | Fecha o popup após uma seleção concluída. Padrão `true`. |
+| `showWeekNumbers` | `boolean` | Renderiza uma coluna de número de semana ISO-8601. Padrão `false`. |
+| `numOfMonths` | `number` | Reservado para renderização de múltiplos meses. Atualmente, sempre é exibido um único painel de mês; valores maiores que `1` são aceitos mas ainda não renderizados. |
+| `name` | `string` | Quando definido, renderiza um input oculto para cada data selecionada sob este nome, habilitando o envio nativo de `<form>`. No modo intervalo/múltiplo, cada data selecionada se torna uma entrada separada (ordenada). |
+| `locale` | `string` | Locale BCP 47 usado para o cabeçalho, os cabeçalhos de dias da semana, os nomes de mês e os rótulos de célula (por meio de `Intl.DateTimeFormat`, com um fallback em inglês). Padrão `en-US`. |
+| `disabled` | `boolean` | Desabilita o seletor inteiro. |
+| `readOnly` | `boolean` | Torna o input somente leitura. |
+| `invalid` | `boolean` | Marca o input como inválido (`aria-invalid` + estilo de erro). |
+
+| `colorPalette` | \`"blue" \ | "green" \ | "red" \ | "orange" \ | "gray" \ | "cyan" \ | "amber" \ | "purple"\` | Cor de destaque para a data selecionada, o indicador de hoje e o destaque de intervalo. Padrão `"blue"`. |
+
+| `interactive` | `boolean` | Força (ou suprime) a hidratação como ilha. |
+| `onValueChange` | `(details: { value: CalendarDate[] }) => void` | Chamado quando a seleção muda. |
+| `onOpenChange` | `(details: { open: boolean }) => void` | Chamado quando o popup abre ou fecha. |
+
+## CalendarDate
+
+As datas são representadas pela classe `CalendarDate` (`{ year, month, day }`, month é baseado em 1) para evitar desvios de fuso horário. Os helpers são exportados junto com o componente:
+
+| Helper | Descrição |
+| --- | --- |
+| `parseDate(str)` | Analisa uma string `YYYY-MM-DD`, limitando partes fora do intervalo. |
+| `isValidDateString(str)` | Valida estritamente uma string `YYYY-MM-DD` (incluindo comprimentos de mês e anos bissextos). |
+| `daysInMonth(year, month)` | Número de dias no mês informado. |
+| `fromJSDate(date)` | Converte um `Date` do JavaScript em um `CalendarDate`. |
+| `getWeekNumber(date)` | Número de semana ISO-8601 para um `CalendarDate` (usado por `showWeekNumbers`). |
+| `getWeekDays(locale)` | Nomes de dias da semana localizados (`{ short, narrow, long }`, começando no domingo), em cache por locale. |
+| `getMonthNames(locale, format?)` | Nomes de mês localizados (`"short"` ou `"long"`), começando em janeiro, em cache por locale. |
+
+# Notas de produção
+
+- **Sem novas dependências.** Construído inteiramente sobre Hono JSX + Panda CSS, consistente com o restante do design system.
+- **Seguro para SSR.** A marcação é renderizada no servidor; somente o ramo da ilha incorpora comportamento de cliente, e apenas quando sinalizado.
+- **Baseado em tokens.** Cores, espaçamento, raios e sombras vêm dos tokens de tema compartilhados, de modo que o seletor herda automaticamente o modo escuro e o `colorPalette` configurado.
+- **Valores com tipagem segura.** `CalendarDate` evita as armadilhas de fuso horário do tratamento bruto de `Date`/`string`.
+- **Limitado por design.** `min`/`max` são aplicados de forma consistente nas visualizações de dia, mês e ano — tanto para a seleção com mouse quanto para o foco de teclado — de modo que um valor fora do intervalo nunca pode ser confirmado nem focado.
+- **Pronto para formulários.** O prop opcional `name` renderiza inputs ocultos, de modo que o seletor se integra a formulários nativos sem manipuladores de envio personalizados.
+- **Painel de um único mês.** `numOfMonths` é aceito para compatibilidade futura, mas atualmente renderiza um único mês. A renderização de múltiplos meses está no roteiro.

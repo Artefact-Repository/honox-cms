@@ -1,0 +1,139 @@
+---
+title: Textarea Área de Texto
+hydration: 2
+category: Forms
+---
+
+import { Textarea } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introdução
+
+Um componente de entrada de texto multilinha que se integra com o contexto `Field`. Pode ser usado de forma independente ou como parte de um componente `Field`.
+
+# Uso
+
+## Uso independente com integração de Field
+
+`Textarea` se envolve automaticamente em um `Field` se você fornecer `label`, `helperText`, etc.
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <Textarea
+      label="Bio"
+      placeholder="Write here..."
+      rows={4}
+      minLength={10}
+      interactive
+    />
+  </div>
+</DemoPreview>
+
+```tsx
+import { Textarea } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Textarea
+      label="Bio"
+      placeholder="Write here..."
+      rows={4}
+      minLength={10}
+      interactive
+    />
+  );
+}
+```
+
+## Variantes
+
+```tsx
+import { Stack } from "../design-system/jsx";
+import { Textarea } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Stack gap="4">
+      <Textarea variant="outline" placeholder="Outline" />
+      <Textarea variant="surface" placeholder="Surface" />
+      <Textarea variant="subtle" placeholder="Subtle" />
+      <Textarea variant="flushed" placeholder="Flushed" />
+    </Stack>
+  );
+}
+```
+
+## Tamanhos
+
+```tsx
+import { Stack } from "../design-system/jsx";
+import { Textarea } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Stack gap="4">
+      <Textarea size="xs" placeholder="Extra Small" />
+      <Textarea size="sm" placeholder="Small" />
+      <Textarea size="md" placeholder="Medium" />
+      <Textarea size="lg" placeholder="Large" />
+      <Textarea size="xl" placeholder="Extra Large" />
+    </Stack>
+  );
+}
+```
+
+## Dentro de um componente Field
+
+Você também pode usá-lo dentro de um componente `Field` para layouts mais complexos.
+
+```tsx
+import { Field, Textarea } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Field label="Comments">
+      <Textarea placeholder="Leave a comment..." interactive />
+    </Field>
+  );
+}
+```
+
+## Construtor de páginas CMS
+
+Este componente está disponível como um bloco `textarea` no [Construtor de páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "textarea",
+  "label": "Bio",
+  "helperText": "Tell us about yourself.",
+  "rows": 4
+}
+```
+
+# Propriedades
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `class` | `string` | Classes CSS personalizadas. |
+
+| `variant` | \`"outline" \ | "surface" \ | "subtle" \ | "flushed"\` | O estilo visual do textarea. |
+
+| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg" \ | "xl"\` | O tamanho do textarea. |
+
+| `resize` | \`"none" \ | "both" \ | "horizontal" \ | "vertical"\` | Se o textarea pode ser redimensionado. |
+
+| `label` | `string` | O rótulo do campo (quando usado como Field independente). |
+| `helperText` | `string` | O texto de ajuda do campo. |
+| `errorText` | `string` | O texto de erro do campo. |
+| `value` | `string` | O valor atual. |
+| `defaultValue` | `string` | O valor inicial. |
+| `onValueChange` | `(val: string) => void` | Callback acionado quando o valor muda. |
+| `onInput` | `(e: any) => void` | Manipulador de eventos para mudanças de entrada. |
+| `rows` | `number` | Número de linhas de texto visíveis. |
+| `placeholder` | `string` | Texto de sugestão. |
+| `minLength` | `number` | Validação de comprimento mínimo. |
+
+| `validator` | \`(val: string) => boolean \ | string\` | Lógica de validação personalizada. |
+
+| `interactive` | `boolean` | Força a hidratação como island. |

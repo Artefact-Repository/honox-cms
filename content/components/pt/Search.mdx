@@ -1,0 +1,178 @@
+---
+title: Search Busca
+hydration: 1
+category: Forms
+---
+
+import { Search } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introdução
+
+Um campo de busca instantânea sobre um índice JSON pré-gerado: as teclas digitadas são
+aplicadas com debounce, as correspondências aparecem como um menu suspenso de
+autocompletar, e escolher um resultado navega até seu `href`. Pode opcionalmente filtrar
+in loco elementos renderizados no servidor (por exemplo, uma lista de cartões de blog) e
+sempre degrada para um formulário GET `?q=` simples quando JS não está disponível.
+
+`Search` não realiza uma requisição a cada tecla digitada contra um endpoint ao vivo — ele
+carrega de forma preguiçosa um único documento JSON (`src`) na primeira interação, e então
+filtra inteiramente do lado do cliente. Construa um índice adequado (veja
+[Search Index Format](#search-index-format) abaixo) para o conteúdo que você quer que seja
+pesquisável.
+
+# Hidratação
+
+**Nível 1 — automaticamente interativo.** A filtragem com debounce, o menu suspenso de
+autocompletar e a navegação por teclado exigem JS do cliente, portanto `Search` se hidrata
+por padrão. Passe `interactive={false}` para forçar o retorno estático: um simples
+`<input type="search" name="q">`, envolto em um `<form>` GET quando `action` é definido.
+
+| `interactive` prop | Result |
+| --- | --- |
+| omitido | Se hidrata como ilha |
+| `true` | Se hidrata como ilha |
+| `false` | Estático — um simples input de formulário GET, sem JS do cliente |
+
+Todas as decisões de interatividade na biblioteca passam pelo auxiliar compartilhado
+`shouldHydrate()` em `app/components/ui/island-utils.ts`.
+
+# Uso
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "420px" }}>
+    <Search
+      src="/api/posts/search.json"
+      placeholder="Search articles..."
+      itemLabel="articles"
+    />
+  </div>
+</DemoPreview>
+
+```tsx
+import { Search } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Search
+      src="/api/posts/search.json"
+      placeholder="Search articles..."
+      itemLabel="articles"
+    />
+  );
+}
+```
+
+## Formato do índice de busca
+
+`src` aponta para um documento JSON estático com a forma de `SearchIndexDocument` (`app/utils/search.ts`):
+
+```ts
+interface SearchIndexEntry {
+  /** Stable id (e.g. post slug) — matched against DOM filter attributes */
+  key: string;
+  /** Navigation target when the entry is picked from autocomplete */
+  href: string;
+  title: string;
+  description?: string;
+  tags?: string[];
+  /** Precomputed lowercase text blob the query tokens are matched against */
+  haystack: string;
+}
+
+interface SearchIndexDocument {
+  generated: string;
+  entries: SearchIndexEntry[];
+}
+```
+
+`buildHaystack()` e `tokenize()` / `filterEntries()` no mesmo módulo são compartilhados
+pelo construtor de índices SSG, pelo retorno do servidor sem JS `?q=`, e pela ilha do
+cliente, de modo que os três concordam sobre o que conta como uma correspondência.
+`/api/posts/search.json` e `/api/docs/search.json` são os dois índices já gerados neste
+projeto — aponte `src` para qualquer um deles, ou construa o seu próprio da mesma maneira.
+
+## Filtrando resultados in loco
+
+Defina `filterAttribute` para também mostrar/ocultar elementos correspondentes
+renderizados no servidor à medida que a consulta muda, em vez de oferecer apenas um menu
+suspenso de autocompletar. É assim que a página de índice do blog
+(`app/routes/blog/index.tsx`) combina a caixa de busca com seus cartões de post já
+renderizados:
+
+```tsx
+<Search
+  src="/api/posts/search.json"
+  action="/blog"
+  initialQuery={searchQuery}
+  placeholder="Search articles..."
+  itemLabel="articles"
+  total={blogPosts.length}
+  filterAttribute="data-post-slug"
+  emptyStateId="blog-search-empty"
+/>
+
+{blogPosts.map((post) => (
+  <article data-post-slug={post.slug}>...</article>
+))}
+
+<div id="blog-search-empty" hidden>
+  No articles match your search.
+</div>
+```
+
+Cada elemento que carrega `data-post-slug` é ocultado a menos que seu valor corresponda à
+`key` de uma entrada nos resultados atuais; o elemento cujo `id` corresponde a
+`emptyStateId` é revelado assim que as correspondências chegam a zero. `total` inicializa
+a contagem de resultados exibida antes que o índice tenha terminado de carregar.
+
+## Retorno sem JS
+
+Quando `action` é definido, tanto a variante estática quanto a hidratada renderizam um
+`<form method="get">` ao redor do input, nomeado `q`. Sem JS do cliente, isso envia `?q=`
+diretamente para `action`; uma rota que leia esse parâmetro de consulta (por exemplo, via
+`filterEntries()` no servidor) responde à mesma requisição que a ilha de outra forma teria
+tratado — as leituras de `/blog?q=...` da página do blog funcionam tanto se JS foi
+executado quanto se não foi.
+
+## Interação por teclado
+
+| Key | Behavior |
+| --- | --- |
+| `ArrowDown` | Abre o menu suspenso, ou move o destaque para a próxima sugestão (cíclico). |
+| `ArrowUp` | Move o destaque para a sugestão anterior (cíclico). |
+| `Enter` | Navega até o `href` da sugestão destacada. |
+| `Escape` | Fecha o menu suspenso se estiver aberto; caso contrário, limpa a consulta. |
+
+## Construtor de páginas do CMS
+
+Este componente está disponível como um bloco `search` no [Construtor de Páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "search",
+  "src": "/api/posts/search.json",
+  "placeholder": "Search posts...",
+  "itemLabel": "posts",
+  "maxSuggestions": 5,
+  "debounceMs": 150
+}
+```
+
+# Propriedades
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `src` | `string` | `/api/posts/search.json` | URL do índice de busca JSON gerado por SSG. |
+| `placeholder` | `string` | `"Search..."` | Texto de espaço reservado para o input. |
+| `initialQuery` | `string` | - | Consulta inicial, por exemplo, obtida de um parâmetro `?q=` da URL na primeira renderização. |
+| `debounceMs` | `number` | `150` | Atraso antes de uma tecla digitada ser aplicada como consulta ativa. |
+| `maxSuggestions` | `number` | `8` | Número máximo de entradas exibidas no menu suspenso de autocompletar. |
+| `filterAttribute` | `string` | - | Quando definido, elementos que carregam este atributo (por exemplo, `data-post-slug`) são mostrados/ocultados conforme seu valor corresponda à `key` de uma entrada. |
+| `emptyStateId` | `string` | - | `id` de um elemento a revelar quando a lista filtrada não tiver correspondências. |
+| `total` | `number` | - | Contagem de resultados exibida antes que o índice tenha carregado. |
+| `itemLabel` | `string` | `"results"` | Substantivo usado na contagem de resultados, por exemplo, `"articles"`. |
+| `showCount` | `boolean` | `true` | Exibe a linha de contagem de resultados "Showing X of N". |
+| `action` | `string` | - | Retorno sem JS: envia `?q=` para este caminho via um formulário GET simples. |
+| `syncUrl` | `boolean` | `true` | Reflete a consulta ativa na barra de endereços como `?q=`. |
+| `interactive` | `boolean` | - | Sobrescreve a decisão de hidratação (ver acima). |

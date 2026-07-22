@@ -1,0 +1,82 @@
+---
+title: Avatar
+category: Data Display
+hydration: 2
+---
+
+import { Avatar, Stack } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introdução
+
+Exibe a imagem de perfil de um usuário, recorrendo às suas iniciais ou a um ícone de usuário genérico quando nenhuma imagem está disponível ou a imagem falha ao carregar.
+
+# Hidratação
+
+**Nível 2 — detecção automática inteligente.** `Avatar` é renderizado como HTML estático e não envia JS do cliente a menos que um `src` seja fornecido.
+
+| `interactive` prop | Result |
+| --- | --- |
+| omitted, no `src` | Estático — sem JS do cliente |
+| omitted, `src` present | Hidrata como uma ilha |
+| `true` | Hidrata como uma ilha |
+| `false` | Estático — sem JS do cliente (a imagem é renderizada de forma antecipada, sem alternativa em caso de erro de carregamento) |
+
+# Uso
+
+<DemoPreview>
+  <Stack direction="horizontal" gap="4">
+    <Avatar name="Artefact UI" size="sm" variant="solid" colorPalette="blue" />
+    <Avatar
+      src="https://i.pravatar.cc/80"
+      name="Jane Doe"
+      size="md"
+      shape="rounded"
+    />
+    <Avatar size="lg" />
+  </Stack>
+</DemoPreview>
+
+```tsx
+import { Avatar } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Avatar
+      src="https://i.pravatar.cc/80"
+      name="Jane Doe"
+      size="md"
+      shape="rounded"
+    />
+  );
+}
+```
+
+# Propriedades
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `src` | `string` | URL da imagem. Fornecer isso é o sinal de hidratação de Nível 2. |
+| `alt` | `string` | Texto alternativo para a imagem. |
+| `name` | `string` | Usado para derivar as iniciais (primeiro nome + sobrenome) quando não há imagem. |
+| `fallback` | `JSX.Element` | Conteúdo alternativo personalizado, substituindo as iniciais/ícone derivados. |
+
+| `status` | \`"idle" \ | "loading" \ | "loaded" \ | "error"\` | O estado de carregamento da imagem. Gerenciado automaticamente pela ilha; defina isso manualmente apenas em uma renderização estática. |
+
+| `size` | \`"full" \ | "2xs" \ | "xs" \ | "sm" \ | "md" \ | "lg" \ | "xl" \ | "2xl"\` | Tamanho visual. Padrão `"md"`. |
+
+| `variant` | \`"solid" \ | "surface" \ | "subtle" \ | "outline"\` | Estilo visual. Padrão `"subtle"`. |
+
+| `shape` | \`"square" \ | "rounded" \ | "full"\` | Formato dos cantos. Padrão `"full"`. |
+
+| `interactive` | `boolean` | Substitui a decisão de hidratação (ver acima). |
+| `class` | `string` | Classes CSS personalizadas para o elemento raiz. |
+
+## Subcomponentes
+
+Para composições personalizadas, `Avatar.Root` / `Avatar.Image` / `Avatar.Fallback` são exportados a partir do primitivo junto com o componente padrão — as mesmas partes que a API `src`/`name`/`fallback` padrão renderiza internamente.
+
+# Acessibilidade
+
+- O conteúdo alternativo é renderizado como um `<span>`; forneça à imagem um `alt` significativo (ou omita-o para avatares puramente decorativos), já que o conteúdo alternativo em si não carrega um nome acessível independente além de suas iniciais/ícone visíveis.
+- `data-state` (`idle`/`loading`/`loaded`/`error`) é definido na raiz, na imagem e no conteúdo alternativo para estilização baseada em estado.

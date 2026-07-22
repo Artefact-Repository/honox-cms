@@ -1,0 +1,96 @@
+---
+title: Popover Janela Flutuante
+hydration: 1
+category: Overlays
+---
+
+import { Popover, Button } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introdução
+
+Um elemento interativo que exibe conteúdo adicional em uma camada sobre sua âncora.
+
+# Uso
+
+<DemoPreview>
+  <Popover
+    placement="right"
+    trigger={<Button>Open Popover</Button>}
+    title="Title"
+    description="Description"
+    body="Popover Body"
+  />
+</DemoPreview>
+
+```tsx
+import { Popover } from "../components/ui/popover";
+import { Button } from "../components/ui/button";
+
+<Popover
+  placement="right"
+  trigger={<Button>Open Popover</Button>}
+  title="Title"
+  description="Description"
+  body="Popover Body"
+/>;
+```
+
+## Construtor de páginas do CMS
+
+Este componente está disponível como um bloco `popover` no [Construtor de Páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "popover",
+  "triggerText": "Open Popover",
+  "title": "Title",
+  "description": "Description",
+  "body": "Popover Body"
+}
+```
+
+# Propriedades
+
+## Root
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `children` | `any` | Subcomponentes de Popover. |
+| `open` | `boolean` | Se o popover está aberto (controlado). |
+| `defaultOpen` | `boolean` | Estado de abertura inicial (não controlado). Padrão `false`. |
+| `onOpenChange` | `(details: { open: boolean }) => void` | Chamado quando o popover abre ou fecha. |
+
+| `placement` | \`"top" \ | "bottom" \ | "left" \ | "right"\` | De que lado do disparador o conteúdo se abre. Padrão `"bottom"`. Inverte automaticamente para o lado oposto se não houver espaço suficiente no viewport. |
+
+| `interactive` | `boolean` | Força a hidratação como ilha. Padrão `true`. |
+| `id` | `string` | Identificador único para o popover. |
+| `closeOnEscape` | `boolean` | Fecha ao pressionar Escape. Padrão `true`. |
+| `closeOnInteractOutside` | `boolean` | Fecha ao interagir com o ponteiro fora, ou quando o foco sai do popover por tabulação. Padrão `true`. |
+| `onClose` | `() => void` | Callback acionado quando o popover fecha. |
+| `onToggle` | `() => void` | Callback acionado quando o popover alterna de estado. |
+
+## Trigger
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `asChild` | `boolean` | Se deve fundir as props no elemento filho imediato. |
+
+# Limitações
+
+A ilha interativa posiciona e dimensiona o popover em relação ao seu disparador: ele se
+inverte para o lado oposto (por exemplo, `bottom` → `top`) quando o posicionamento
+solicitado transbordaria o viewport, e limita o eixo transversal para que o conteúdo nunca
+seja renderizado fora da tela. Ele não rastreia contêineres de rolagem nem observadores de
+redimensionamento como o Floating UI faz — o reposicionamento só é reexecutado no evento
+`resize` da janela enquanto o popover está aberto, e (já que o posicionador é ancorado via
+`position: absolute` ao próprio invólucro do disparador) rolar a página o move junto com o
+disparador de graça.
+
+Aninhar o disparador de um Popover dentro do conteúdo de outro Popover é suportado (a
+delegação de cliques é delimitada por instância de popover), mas aninhar um Popover dentro do
+disparador de um Tooltip, ou vice-versa, não é — os dois componentes não coordenam a
+propriedade de `data-part` entre tipos de componentes.
+
+A animação de saída `_closed` (`scale-fade-out`) é reproduzida antes que o popover seja
+realmente removido do layout — fechar não o oculta instantaneamente.

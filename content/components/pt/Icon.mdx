@@ -1,0 +1,113 @@
+---
+title: Icon Ícone
+hydration: 3
+category: Data Display
+---
+
+import { Icon } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introdução
+
+Um invólucro leve, consciente do tamanho e da cor, para ícones SVG. Aplica um tamanho
+consistente (`2xs`–`xl`) e herda `currentcolor` para que os ícones combinem por padrão com a
+cor do texto/ícone ao redor, sem exigir nenhuma dependência de biblioteca de ícones.
+
+`Icon` se compõe de duas formas, decididas automaticamente a partir de seu `children`:
+
+- **Wrap (envolver)** — se `children` for conteúdo SVG puro (`<path>`, `<circle>`, `<g>`, …),
+  texto, ou mais de um elemento, `Icon` renderiza seu próprio `<svg>` ao redor.
+- **Merge (`asChild`, `true` por padrão)** — se `children` for um único elemento que não é
+  conteúdo SVG puro (por exemplo, um `<svg>…</svg>` escrito à mão), `Icon` funde sua class
+  (e quaisquer outras props passadas) diretamente nesse elemento em vez de envolvê-lo em um
+  segundo `<svg>`. Passe `asChild={false}` para forçar o envolvimento mesmo nesse caso.
+
+# Uso
+
+## Caminhos SVG puros (sem necessidade de biblioteca de ícones)
+
+<DemoPreview>
+  <Icon size="lg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    <path d="M12 2 2 7l10 5 10-5-10-5z" />
+  </Icon>
+</DemoPreview>
+
+```tsx
+import { Icon } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Icon size="lg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path d="M12 2 2 7l10 5 10-5-10-5z" />
+    </Icon>
+  );
+}
+```
+
+## Compondo com um `<svg>` escrito à mão (`asChild`, padrão)
+
+```tsx
+import { Icon } from "../components/ui";
+
+function HeartSvg(props: { class?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <path d="M12 21s-6.7-4.35-9.3-8.1C.8 9.7 2 6 5.4 6c1.9 0 3.2 1 4.6 2.6C11.4 7 12.7 6 14.6 6 18 6 19.2 9.7 17.3 12.9 14.7 16.65 12 21 12 21z" />
+    </svg>
+  );
+}
+
+export default function MyPage() {
+  return (
+    <span style={{ color: "red" }}>
+      <Icon size="sm">
+        <HeartSvg />
+      </Icon>
+    </span>
+  );
+}
+```
+
+A class `icon` (e o tamanho) é fundida no `<svg>` retornado por `HeartSvg`, então não há
+nenhum elemento envolvente extra no markup renderizado. Como a receita do ícone define
+`color: currentcolor`, o ícone assume a cor do texto ao redor (aqui, `red`), desde que suas
+rotas usem `fill="currentColor"` ou `stroke="currentColor"`.
+
+## Ícone rotulado (não decorativo)
+
+```tsx
+<Icon aria-label="Search" viewBox="0 0 24 24">
+  <path d="M10 2a8 8 0 105.3 14.03l4.34 4.34 1.42-1.42-4.34-4.34A8 8 0 0010 2z" />
+</Icon>
+```
+
+## Construtor de páginas do CMS
+
+Este componente está disponível como um bloco `icon` no [Construtor de Páginas](/docs/PageBuilder) (`content/pages/*.json`) — `svg` contém o markup SVG interno bruto:
+
+```json
+{
+  "type": "icon",
+  "svg": "<path d=\"M12 2 2 7l10 5 10-5-10-5z\" />",
+  "viewBox": "0 0 24 24",
+  "size": "lg"
+}
+```
+
+# Propriedades
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `children` | `Child` | Conteúdo SVG (`<path>`, etc.) ou um único elemento tipo SVG para renderizar/fundir. |
+| `class` | `string` | Classes CSS personalizadas. |
+
+| `size` | \`"2xs" \ | "xs" \ | "sm" \ | "md" \ | "lg" \ | "xl"\` | O tamanho do ícone. Padrão `"md"`. |
+
+| `asChild` | `boolean` | Funde as props no único elemento filho em vez de envolvê-lo em um novo `<svg>`. Padrão `true`. |
+| `viewBox` | `string` | Repassado ao `<svg>` renderizado/fundido. |
+| `xmlns` | `string` | Repassado ao invólucro `<svg>` gerado. Padrão o namespace SVG. |
+| `fill` | `string` | Repassado ao `<svg>` renderizado/fundido. |
+| `stroke` | `string` | Repassado ao `<svg>` renderizado/fundido. |
+| `aria-label` | `string` | Rótulo acessível. Quando fornecido, `aria-hidden` é omitido. |
+
+| `aria-hidden` | \`boolean \ | "true" \ | "false"\` | Padrão `"true"` quando nenhum `aria-label` é fornecido (ícones são decorativos por padrão). |

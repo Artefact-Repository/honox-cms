@@ -10,6 +10,8 @@ export default jsxRenderer(({ children }, c) => {
 		currentLocale = "zh";
 	} else if (currentPath.startsWith("/es")) {
 		currentLocale = "es";
+	} else if (currentPath.startsWith("/pt")) {
+		currentLocale = "pt";
 	}
 	return (
 		<html lang={currentLocale}>

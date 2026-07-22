@@ -1,0 +1,134 @@
+---
+title: ToggleGroup Grupo de Alternância
+hydration: 2
+category: Forms
+---
+
+import { ToggleGroup, Stack } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introdução
+
+Um conjunto de botões de alternância para seleção única ou múltipla, excludente ou includente — por exemplo, controles de formatação de texto (negrito/itálico/sublinhado) ou um alternador de visualização.
+
+# Hidratação
+
+**Nível 2 — detecção automática inteligente.** Um `ToggleGroup` é renderizado como HTML estático e não envia JS do cliente a menos que um sinal de comportamento esteja presente. Passe `interactive={true}` para forçar a hidratação, ou `interactive={false}` para forçar uma renderização estática.
+
+Ele hidrata como island quando **qualquer** um dos seguintes sinais está presente (ou `interactive={true}` é definido):
+
+- `value` (seleção controlada)
+- `defaultValue` (seleção inicial não controlada)
+- `onValueChange`
+
+| `interactive` prop | Result |
+| --- | --- |
+| omitido, **sem** sinal | Estático — sem JS do cliente |
+| omitido, sinal presente | Hidrata como island |
+| `true` | Hidrata como island |
+| `false` | Estático — sem JS do cliente |
+
+# Uso
+
+<DemoPreview>
+  <Stack direction="horizontal" gap="6">
+    <ToggleGroup
+      multiple
+      defaultValue={["bold"]}
+      items={[
+        { label: "B", value: "bold" },
+        { label: "I", value: "italic" },
+        { label: "U", value: "underline" },
+      ]}
+      interactive
+    />
+    <ToggleGroup
+      defaultValue={["list"]}
+      items={[
+        { label: "Grid", value: "grid" },
+        { label: "List", value: "list" },
+      ]}
+      interactive
+    />
+  </Stack>
+</DemoPreview>
+
+```tsx
+import { ToggleGroup } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <ToggleGroup
+      multiple
+      defaultValue={["bold"]}
+      items={[
+        { label: "B", value: "bold" },
+        { label: "I", value: "italic" },
+        { label: "U", value: "underline" },
+      ]}
+    />
+  );
+}
+```
+
+## Composição personalizada
+
+Passe `children` em vez de `items` para ter controle total sobre o conteúdo de cada botão:
+
+```tsx
+import { ToggleGroup } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <ToggleGroup defaultValue={["list"]}>
+      <ToggleGroup.Item value="grid">Grid</ToggleGroup.Item>
+      <ToggleGroup.Item value="list">List</ToggleGroup.Item>
+    </ToggleGroup>
+  );
+}
+```
+
+# Propriedades
+
+## Root
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `value` | `string[]` | Os valores atualmente pressionados (controlado). |
+| `defaultValue` | `string[]` | Os valores inicialmente pressionados (não controlado). |
+| `onValueChange` | `(value: string[]) => void` | Chamado quando a seleção muda. |
+| `multiple` | `boolean` | Permite que mais de um item seja pressionado por vez. Padrão `false` (seleção única, desativável ao alternar novamente). |
+| `disabled` | `boolean` | Desabilita todos os itens. |
+| `orientation` | `"horizontal" \| "vertical"` | Fluxo de layout, e o eixo pelo qual as teclas de seta se deslocam. Padrão `"horizontal"`. |
+| `id` | `string` | O id do elemento raiz. |
+| `variant` | `"outline" \| "ghost"` | Estilo visual. Padrão `"outline"`. |
+| `size` | `"sm" \| "md" \| "lg"` | Tamanho visual. Padrão `"md"`. |
+| `interactive` | `boolean` | Substitui a decisão de hidratação (ver acima). |
+| `class` | `string` | Classes CSS personalizadas para o elemento raiz. |
+
+## Composição padrão
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `items` | `ToggleGroupItem[]` | Botões a renderizar quando `children` é omitido. |
+
+## ToggleGroupItem
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `value` | `string` | O valor único do item. |
+| `label` | `string \| JSX.Element` | O conteúdo exibido do botão. |
+| `disabled` | `boolean` | Desabilita este botão. |
+
+## Subcomponentes
+
+| Part | Description |
+| --- | --- |
+| `ToggleGroup.Item` | Um botão de alternância. Requer uma propriedade `value`; renderiza `role="checkbox"` no modo `multiple` ou `role="radio"` caso contrário. |
+
+# Acessibilidade
+
+- O elemento raiz tem `role="group"`.
+- Os itens renderizam `role="checkbox"` + `aria-pressed` quando `multiple`, ou `role="radio"` + `aria-checked` caso contrário.
+- As teclas de seta (Direita/Baixo para avançar, Esquerda/Cima para retroceder) deslocam o foco entre os itens habilitados; Home/End saltam para o primeiro/último item habilitado — de acordo com `orientation`.
+- `data-state` (`on`/`off`) e `data-disabled` são refletidos em cada item para estilização.

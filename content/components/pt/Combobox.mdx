@@ -1,0 +1,114 @@
+---
+title: Combobox Caixa de Combinação
+hydration: 2
+category: Forms
+---
+
+import { Combobox } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introdução
+
+Um widget que combina um campo de texto com uma lista de opções, permitindo aos usuários filtrar e selecionar itens de uma lista.
+
+# Hidratação
+
+**Nível 2 — detecção automática inteligente.** Um `Combobox` é renderizado como HTML estático e não envia JS de cliente a menos que haja presente um sinal de comportamento. Passe `interactive={true}` para forçar a hidratação, ou `interactive={false}` para forçar uma renderização estática.
+
+Ele hidrata como ilha quando **qualquer um** dos seguintes sinais está presente (ou `interactive={true}` é definido):
+
+- `open` (estado de abertura controlado)
+- `inputValue` (valor de entrada controlado)
+- `onToggle`
+- `onInputChange`
+- `onItemSelect` (callback de seleção de item — comboboxes somente de seleção hidratam por isso)
+
+| `interactive` prop | Resultado |
+| --- | --- |
+| omitido, **sem** sinal | Estático — sem JS de cliente |
+| omitido, sinal presente | Hidrata como ilha |
+| `true` | Hidrata como ilha |
+| `false` | Estático — sem JS de cliente |
+
+Todas as decisões de interatividade na biblioteca passam pelo helper compartilhado `shouldHydrate()` em `app/components/ui/island-utils.ts`.
+
+# Uso
+
+<DemoPreview>
+  <Combobox
+    interactive
+    items={[
+      { label: "React", value: "react" },
+      { label: "Solid", value: "solid" },
+      { label: "Svelte", value: "svelte" },
+      { label: "Vue", value: "vue" },
+      { label: "Hono", value: "hono" },
+    ]}
+    label="Framework"
+    placeholder="Select a Framework"
+    allowClear
+  />
+</DemoPreview>
+
+```tsx
+import { Combobox } from "../components/ui";
+
+const items = [
+  { label: "React", value: "react" },
+  { label: "Solid", value: "solid" },
+  { label: "Svelte", value: "svelte" },
+  { label: "Vue", value: "vue" },
+  { label: "Hono", value: "hono" },
+];
+
+export default function MyPage() {
+  return (
+    <Combobox
+      interactive
+      items={items}
+      label="Framework"
+      placeholder="Select a Framework"
+      allowClear
+    />
+  );
+}
+```
+
+## Construtor de páginas CMS
+
+Este componente está disponível como um bloco `combobox` no [Construtor de páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "combobox",
+  "label": "Framework",
+  "placeholder": "Select a Framework",
+  "items": [
+    { "label": "React", "value": "react" },
+    { "label": "Hono", "value": "hono" }
+  ]
+}
+```
+
+# Propriedades
+
+| Prop | Tipo | Descrição |
+| --- | --- | --- |
+| `items` | `ComboboxItem[]` | Um array de itens para exibir na lista. |
+| `label` | `Child` | O rótulo do combobox. |
+| `placeholder` | `string` | O texto de espaço reservado do input. |
+| `allowClear` | `boolean` | Se deve mostrar um botão de limpar no input. |
+| `interactive` | `boolean` | Força a hidratação como ilha. |
+| `open` | `boolean` | Se a lista do combobox está aberta (controlado). |
+| `inputValue` | `string` | O valor atual do input (controlado). |
+| `onToggle` | `() => void` | Callback acionado quando a lista é alternada. |
+| `onInputChange` | `(value: string) => void` | Callback acionado quando o valor do input muda. |
+| `onItemSelect` | `(value: string) => void` | Callback acionado quando um item é selecionado. |
+
+## ComboboxItem
+
+| Prop | Tipo | Descrição |
+| --- | --- | --- |
+| `label` | `string` | O texto de exibição do item. |
+| `value` | `string` | O valor único do item. |
+| `disabled` | `boolean` | Se o item está desabilitado. |

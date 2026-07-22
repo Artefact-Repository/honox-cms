@@ -26,12 +26,14 @@ import { filterEntries } from "../../utils/search";
 // rather than a shared component (see app/routes/docs/index.tsx).
 function getLocaleToggleUrl(
 	currentPath: string,
-	targetLocale: "en" | "zh" | "es",
+	targetLocale: "en" | "zh" | "es" | "pt",
 ): string {
 	let cleanPath = currentPath;
 	if (cleanPath.startsWith("/zh")) {
 		cleanPath = cleanPath.slice(3);
 	} else if (cleanPath.startsWith("/es")) {
+		cleanPath = cleanPath.slice(3);
+	} else if (cleanPath.startsWith("/pt")) {
 		cleanPath = cleanPath.slice(3);
 	}
 	if (cleanPath === "") {
@@ -174,6 +176,19 @@ function BlogHeader({
 							Español
 						</Anchor>
 					)}
+					{currentLocale !== "pt" && (
+						<Anchor
+							href={getLocaleToggleUrl(currentPath, "pt")}
+							variant="plain"
+							class={css({
+								textStyle: "sm",
+								fontWeight: "medium",
+								color: "blue.11",
+							})}
+						>
+							Português
+						</Anchor>
+					)}
 				</nav>
 			</div>
 		</header>
@@ -187,6 +202,8 @@ export default createRoute(async (c) => {
 		currentLocale = "zh";
 	} else if (currentPath.startsWith("/es")) {
 		currentLocale = "es";
+	} else if (currentPath.startsWith("/pt")) {
+		currentLocale = "pt";
 	}
 	const [{ posts: blogPosts, searchEntries, tags }, config] = await Promise.all(
 		[loadPosts(currentLocale), loadDocsConfig()],

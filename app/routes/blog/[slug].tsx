@@ -35,6 +35,8 @@ export default createRoute(
 			currentLocale = "zh";
 		} else if (currentPath.startsWith("/es")) {
 			currentLocale = "es";
+		} else if (currentPath.startsWith("/pt")) {
+			currentLocale = "pt";
 		}
 
 		const post = await loadPostBySlug(slug, currentLocale);

@@ -1,0 +1,67 @@
+---
+title: Stack Pilha
+hydration: 3
+category: Layout
+---
+
+import { Stack } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+Um primitivo de layout que pode ser usado para criar uma pilha vertical ou horizontal de elementos.
+
+## Uso
+
+<DemoPreview>
+  <Stack direction="row" gap="4">
+    <div style={{ padding: "0.75rem 1rem", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Item 1</div>
+    <div style={{ padding: "0.75rem 1rem", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Item 2</div>
+    <div style={{ padding: "0.75rem 1rem", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Item 3</div>
+  </Stack>
+</DemoPreview>
+
+```tsx
+import { Stack } from '../components/ui/stack'
+
+export const Example = () => (
+  <Stack direction="row" gap="4">
+    <div>Item 1</div>
+    <div>Item 2</div>
+    <div>Item 3</div>
+  </Stack>
+)
+```
+
+### Construtor de páginas CMS
+
+Este componente está disponível como um bloco `stack` no [Construtor de páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "stack",
+  "direction": "horizontal",
+  "gap": "4",
+  "children": [
+    { "type": "text", "content": "Item 1" },
+    { "type": "text", "content": "Item 2" }
+  ]
+}
+```
+
+## Propriedades
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `direction` | `flex-direction` | `column` | A direção flex da pilha. |
+| `gap` | `spacing` | `8px` | O espaço entre os elementos da pilha. |
+| `align` | `align-items` | - | O alinhamento dos elementos da pilha. |
+| `justify` | `justify-content` | - | A justificação dos elementos da pilha. |
+
+## Responsividade
+
+O componente `Stack` suporta valores responsivos para todas as suas propriedades.
+
+```tsx
+<Stack direction={{ base: 'column', md: 'row' }} gap={{ base: '4', md: '8' }}>
+  {/* Elements will be stacked vertically on mobile and horizontally on desktop */}
+</Stack>
+```

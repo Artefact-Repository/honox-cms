@@ -35,6 +35,7 @@ const LOCALE_NAMES: Record<string, string> = {
 	en: "English",
 	zh: "中文",
 	es: "Español",
+	pt: "Português",
 };
 
 // Page-chrome strings that aren't part of translated doc content or the
@@ -62,6 +63,12 @@ const UI_STRINGS: Record<
 	},
 	es: {
 		searchPlaceholder: "Buscar documentación...",
+		searchItemLabel: "documentos",
+		edit: "Editar",
+		admin: "Administrar",
+	},
+	pt: {
+		searchPlaceholder: "Buscar documentação...",
 		searchItemLabel: "documentos",
 		edit: "Editar",
 		admin: "Administrar",
@@ -593,7 +600,9 @@ export default createRoute(
 			? "zh"
 			: currentPath.startsWith("/es")
 				? "es"
-				: "en";
+				: currentPath.startsWith("/pt")
+					? "pt"
+					: "en";
 		const [doc, docs, config] = await Promise.all([
 			loadDocBySlug(slug, currentLocale),
 			loadDocs(currentLocale),

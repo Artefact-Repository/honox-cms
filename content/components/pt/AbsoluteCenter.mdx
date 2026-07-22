@@ -1,0 +1,62 @@
+---
+title: AbsoluteCenter Centralização Absoluta
+hydration: 3
+category: Layout
+---
+
+import { AbsoluteCenter } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introdução
+
+Um componente utilitário para centralizar conteúdo dentro de seu contêiner pai.
+
+# Uso
+
+<DemoPreview>
+  <div style={{ position: "relative", height: "140px", width: "260px", border: "1px solid var(--colors-border)" }}>
+    <AbsoluteCenter axis="both">Centered Content</AbsoluteCenter>
+  </div>
+</DemoPreview>
+
+```tsx
+import { AbsoluteCenter } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <div
+      style={{
+        position: "relative",
+        height: "200px",
+        width: "200px",
+        border: "1px solid black",
+      }}
+    >
+      <AbsoluteCenter axis="both">Centered Content</AbsoluteCenter>
+    </div>
+  );
+}
+```
+
+## Construtor de Páginas CMS
+
+Este componente está disponível como um bloco `absoluteCenter` no [Construtor de Páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```markdown
+{
+  "type": "absoluteCenter",
+  "axis": "both",
+  "children": [
+    { "type": "badge", "text": "Centered Badge", "colorPalette": "purple", "variant": "solid" }
+  ]
+}
+```
+
+# Propriedades
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `children` | `any` | Conteúdo a ser renderizado dentro do componente. |
+| `class` | `string` | Classes CSS personalizadas. |
+
+| `axis` | \`"horizontal" \ | "vertical" \ | "both"\` | O eixo no qual centralizar o conteúdo. |

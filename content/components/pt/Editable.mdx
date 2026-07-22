@@ -1,0 +1,140 @@
+---
+title: Editable Texto Editável
+hydration: 2
+category: Forms
+---
+
+import { Editable, Stack } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introdução
+
+Um campo de texto em linha que é exibido como texto simples até ser ativado (por
+foco, clique ou clique duplo), e então muda para um input editável com
+controles de enviar/cancelar.
+
+# Uso
+
+<DemoPreview>
+  <Stack direction="vertical" gap="4" style={{ width: "100%", maxWidth: "320px" }}>
+    <Editable label="Project name" defaultValue="Artefact UI Suite" interactive />
+    <Editable label="Description" placeholder="Add a description…" interactive />
+  </Stack>
+</DemoPreview>
+
+```tsx
+import { Editable } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Editable label="Project name" defaultValue="Artefact UI Suite" />
+  );
+}
+```
+
+## Composição personalizada
+
+Passe `children` para ter controle total sobre o layout de preview/input/controles:
+
+```tsx
+import { Editable } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Editable defaultValue="Untitled" activationMode="dblclick">
+      <Editable.Label>Title</Editable.Label>
+      <Editable.Area>
+        <Editable.Preview />
+        <Editable.Input />
+      </Editable.Area>
+      <Editable.Control>
+        <Editable.EditTrigger>Edit</Editable.EditTrigger>
+        <Editable.SubmitTrigger>Save</Editable.SubmitTrigger>
+        <Editable.CancelTrigger>Cancel</Editable.CancelTrigger>
+      </Editable.Control>
+    </Editable>
+  );
+}
+```
+
+## Construtor de páginas CMS
+
+Este componente está disponível como um bloco `editable` no
+[Construtor de páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "editable",
+  "label": "Project name",
+  "defaultValue": "Artefact UI Suite",
+  "placeholder": "Untitled",
+  "size": "md",
+  "activationMode": "focus",
+  "submitMode": "both"
+}
+```
+
+Ele sempre renderiza `interactive` no Construtor de páginas.
+
+# Propriedades
+
+## Root
+
+| Prop | Tipo | Descrição |
+| --- | --- | --- |
+| `value` | `string` | O valor atual (controlado). |
+| `defaultValue` | `string` | O valor inicial (não controlado). |
+| `edit` | `boolean` | Se o modo de edição está ativo (controlado). |
+| `defaultEdit` | `boolean` | O estado inicial do modo de edição (não controlado). |
+| `activationMode` | `"focus" \| "dblclick" \| "click" \| "none"` | Como o preview entra em modo de edição. Padrão `"focus"`. |
+| `submitMode` | `"enter" \| "blur" \| "both" \| "none"` | Quais interações confirmam o valor. Padrão `"both"`. |
+| `selectOnFocus` | `boolean` | Se o texto do input é selecionado quando ele é focado. Padrão `true`. |
+| `autoResize` | `boolean` | Mantém o preview visível (dimensionado ao conteúdo) durante a edição, em vez de ocultá-lo. |
+| `disabled` | `boolean` | Desabilita toda a interação. |
+| `readOnly` | `boolean` | Impede entrar em modo de edição enquanto ainda permite o foco. |
+| `required` | `boolean` | Marca o input subjacente como obrigatório. |
+| `invalid` | `boolean` | Marca o campo como inválido. |
+| `placeholder` | `string \| { edit: string; preview: string }` | Texto de espaço reservado, opcionalmente diferente entre o input e o preview. |
+| `maxLength` | `number` | Comprimento máximo do input. |
+| `name` | `string` | Nome do input subjacente, para envio nativo de formulário. |
+| `form` | `string` | Associa o input a um `<form>` pelo id. |
+| `translations` | `Partial<EditableTranslations>` | Sobrescritas para as strings ARIA de editar/enviar/cancelar/input. |
+| `size` | `"2xs" \| "xs" \| "sm" \| "md" \| "lg"` | Tamanho visual. Padrão `"md"`. |
+| `onValueChange` | `(details: { value: string }) => void` | Chamado conforme o valor do input muda. |
+| `onValueCommit` | `(details: { value: string }) => void` | Chamado quando o valor é enviado. |
+| `onValueRevert` | `(details: { value: string }) => void` | Chamado quando a edição é cancelada. |
+| `onEditChange` | `(details: { edit: boolean }) => void` | Chamado quando o modo de edição é alternado. |
+| `interactive` | `boolean` | Força (ou suprime) a hidratação como ilha. |
+| `class` | `string` | Classes CSS personalizadas para o elemento raiz. |
+
+## Composição padrão
+
+| Prop | Tipo | Descrição |
+| --- | --- | --- |
+| `label` | `JSX.Element \| string` | Rótulo renderizado acima do campo. |
+| `children` | `JSX.Element` | Conteúdo extra anexado após o preview/input/controles padrão. |
+
+## Subcomponentes
+
+| Parte | Descrição |
+| --- | --- |
+| `Editable.Label` | `<label>` vinculado ao input; clicar nele foca o preview. |
+| `Editable.Area` | Envolve `Preview` e `Input` no mesmo slot de layout. |
+| `Editable.Preview` | A exibição somente leitura mostrada quando não se está editando; `role="button"`, ativável por teclado conforme `activationMode`. |
+| `Editable.Input` | O `<input>` mostrado durante a edição; trata Escape para cancelar e Enter/perda de foco para enviar conforme `submitMode`. |
+| `Editable.Control` | Envolve os disparadores de editar/enviar/cancelar. |
+| `Editable.EditTrigger` | Entra em modo de edição. Oculto enquanto já se está editando. |
+| `Editable.SubmitTrigger` | Confirma o valor e sai do modo de edição. Oculto enquanto não se está editando. |
+| `Editable.CancelTrigger` | Descarta as alterações e sai do modo de edição. Oculto enquanto não se está editando. |
+| `Editable.Context` | Acesso via render-prop ao contexto editável: `<Editable.Context>{(ctx) => ...}</Editable.Context>`. |
+
+# Acessibilidade
+
+- `Preview` é operável por teclado (`tabIndex={0}`, Enter/Space) sempre que
+  `activationMode` for `"click"` ou `"dblclick"`; com o modo `"focus"`,
+  simplesmente tabular até ele abre o modo de edição.
+- `EditTrigger` / `SubmitTrigger` / `CancelTrigger` obtêm seus `aria-label` de
+  `translations`, e são ocultados (não apenas visualmente, por meio do atributo
+  `hidden`) quando não são aplicáveis ao modo atual.
+- `Input` carrega `aria-invalid` quando `invalid` é definido, e `aria-label`
+  a partir de `translations.input`.

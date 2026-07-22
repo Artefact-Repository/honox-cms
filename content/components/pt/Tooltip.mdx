@@ -1,0 +1,80 @@
+---
+title: Tooltip Descrição Instantânea
+hydration: 1
+category: Overlays
+---
+
+import { Tooltip, Button } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introdução
+
+Um componente para exibir informações contextuais ao passar o cursor ou focar.
+
+# Uso
+
+## Wrapper de alto nível
+
+<DemoPreview>
+  <Tooltip content="This is the tooltip content" placement="bottom" showArrow asChild>
+    <Button>Hover me</Button>
+  </Tooltip>
+</DemoPreview>
+
+```tsx
+import { Tooltip } from "../components/ui/tooltip";
+import { Button } from "../components/ui/button";
+
+export default function MyPage() {
+  return (
+    <Tooltip content="This is the tooltip content" placement="bottom" showArrow asChild>
+      <Button>Hover me</Button>
+    </Tooltip>
+  );
+}
+```
+
+Prefira `asChild` quando o trigger já for um elemento focável (um `Button`, um link, …): ele mescla o `aria-describedby` do tooltip, os listeners de hover/focus e os atributos `data-*` diretamente nesse elemento. Sem `asChild`, o trigger é envolvido em uma `<div tabindex="0">` extra — útil para envolver conteúdo inerte (texto simples, um ícone) que não é em si focável, mas adiciona uma segunda parada de tabulação redundante quando o filho já é interativo.
+
+## Construtor de páginas CMS
+
+Este componente está disponível como um bloco `tooltip` no [Construtor de páginas](/docs/PageBuilder) (`content/pages/*.json`). O trigger do CMS é uma simples string `triggerText`, automaticamente envolvida em um `Button` outline com `asChild` (o mesmo padrão que `Popover`/`HoverCard` usam):
+
+```json
+{
+  "type": "tooltip",
+  "content": "Free cancellation up to 24 hours before check-in.",
+  "triggerText": "Cancellation Policy",
+  "placement": "top",
+  "showArrow": true
+}
+```
+
+# Propriedades
+
+## Tooltip (wrapper de alto nível)
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `children` | `any` | O elemento que aciona o tooltip. |
+| `content` | `any` | O conteúdo a ser exibido dentro do tooltip. |
+| `showArrow` | `boolean` | Se deve exibir uma seta apontando para o trigger. |
+
+| `placement` | \`"top" \ | "bottom" \ | "left" \ | "right"\` | O lado do trigger em que o conteúdo é aberto. Padrão `"top"`. Inverte automaticamente para o lado oposto se não houver espaço suficiente no viewport. |
+
+| `open` | `boolean` | Se o tooltip está aberto (controlado). |
+| `defaultOpen` | `boolean` | Estado inicial aberto (não controlado). Padrão `false`. |
+| `onOpenChange` | `(details: { open: boolean }) => void` | Chamado quando o tooltip abre ou fecha. |
+| `openDelay` | `number` | Atraso (ms) antes de exibir ao passar o cursor. Padrão `100`. |
+| `closeDelay` | `number` | Atraso (ms) antes de ocultar ao retirar o cursor. Padrão `100`. |
+| `closeOnEscape` | `boolean` | Fecha quando Escape é pressionado. Padrão `true`. |
+| `disabled` | `boolean` | Se o tooltip está desabilitado. |
+| `interactive` | `boolean` | Força a hidratação como island. Padrão `true`. |
+| `id` | `string` | Identificador único para o tooltip. |
+| `asChild` | `boolean` | Se deve mesclar as propriedades no elemento filho imediato em vez de envolvê-lo em uma `div`. |
+
+Passar o cursor sobre ou focar o trigger abre o tooltip; mover o ponteiro sobre o próprio conteúdo do tooltip (por exemplo, um link dentro dele) o mantém aberto, conforme [WCAG 1.4.13](https://www.w3.org/WAI/WCAG21/Understanding/content-on-hover-or-focus.html). Focar o trigger (navegação por teclado) o abre imediatamente, e perder o foco o fecha imediatamente — `openDelay`/`closeDelay` se aplicam apenas ao hover.
+
+# Limitações
+
+O island interativo posiciona e dimensiona o tooltip em relação ao seu trigger: ele inverte para o lado oposto (por exemplo, `top` → `bottom`) quando o posicionamento solicitado transbordaria o viewport, e limita o eixo transversal para que o conteúdo nunca seja renderizado fora da tela. Ele não rastreia contêineres de rolagem ou observadores de redimensionamento da forma como o Floating UI faz — o reposicionamento só é executado novamente quando o tooltip abre e no `resize` da janela.

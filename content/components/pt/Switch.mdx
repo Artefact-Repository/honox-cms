@@ -1,0 +1,62 @@
+---
+title: Switch Interruptor
+hydration: 2
+category: Forms
+---
+
+import { Switch } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introdução
+
+Um controle que permite ao usuário alternar entre os estados ativado e desativado.
+
+# Uso
+
+<DemoPreview>
+  <Switch defaultChecked interactive>Enable Notifications</Switch>
+</DemoPreview>
+
+```tsx
+import { Switch } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Switch
+      defaultChecked={true}
+      onCheckedChange={(details) => console.log(details.checked)}
+      interactive
+    >
+      Enable Notifications
+    </Switch>
+  );
+}
+```
+
+## Construtor de páginas CMS
+
+Este componente está disponível como um bloco `switch` no [Construtor de páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "switch",
+  "label": "Dark Mode",
+  "checked": true,
+  "colorPalette": "blue"
+}
+```
+
+# Propriedades
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `children` | `any` | Conteúdo do rótulo renderizado ao lado do switch. |
+| `class` | `string` | Classes CSS personalizadas. |
+| `checked` | `boolean` | Se o switch está ativado (controlado). |
+| `defaultChecked` | `boolean` | O estado inicial ativado (não controlado). |
+| `disabled` | `boolean` | Se o switch está desabilitado. |
+| `onCheckedChange` | `(details: { checked: boolean }) => void` | Callback acionado quando o estado ativado muda. |
+
+| `size` | \`"sm" \ | "md" \ | "lg"\` | O tamanho do switch. |
+
+| `interactive` | `boolean` | Força a hidratação como island. |

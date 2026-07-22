@@ -1,0 +1,102 @@
+---
+title: Card
+hydration: 2
+category: Data Display
+---
+
+import { Card, Button } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introdução
+
+Um contêiner flexível para agrupar conteúdo relacionado, com slots opcionais de cabeçalho, corpo, rodapé, imagem e avatar.
+
+# Uso
+
+## Card básico
+
+<DemoPreview>
+  <Card
+    variant="elevated"
+    title="Project title"
+    description="A short description of the project."
+    body="Main content of the card goes here."
+    footer={<Button>View</Button>}
+  />
+</DemoPreview>
+
+```tsx
+import { Card, Button } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Card
+      variant="elevated"
+      title="Project title"
+      description="A short description of the project."
+      body="Main content of the card goes here."
+      footer={<Button>View</Button>}
+    />
+  );
+}
+```
+
+## Card com imagem
+
+```tsx
+import { Card } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Card
+      image="/cover.png"
+      imagePosition="top"
+      title="Card with image"
+      body="Content beneath the image."
+    />
+  );
+}
+```
+
+## Construtor de Páginas CMS
+
+Este componente está disponível como um bloco `card` no [Construtor de Páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "card",
+  "title": "Project title",
+  "description": "A short description of the project.",
+  "body": "Main content of the card goes here.",
+  "variant": "elevated"
+}
+```
+
+# Propriedades
+
+## Card
+
+| Prop | Type | Description |
+| --- | --- | --- |
+
+| `title` | \`string \ | JSX.Element\` | O título do card. |
+| `description` | \`string \ | JSX.Element\` | A descrição do card. |
+| `body` | \`string \ | JSX.Element\` | O conteúdo principal do corpo. |
+| `footer` | \`string \ | JSX.Element\` | Conteúdo do rodapé. |
+
+| `avatar` | `JSX.Element` | Elemento exibido no cabeçalho (por exemplo, um avatar). |
+| `headerAction` | `JSX.Element` | Elemento exibido no final do cabeçalho (por exemplo, um menu). |
+
+| `image` | \`string \ | JSX.Element\` | Fonte da imagem ou elemento. |
+
+| `imagePosition` | \`"top" \ | "bottom" \ | "left" \ | "right"\` | Onde a imagem é posicionada. Padrão: `"top"`. |
+
+| `headerClass` | `string` | Classes CSS personalizadas para o cabeçalho. |
+| `bodyClass` | `string` | Classes CSS personalizadas para o corpo. |
+| `footerClass` | `string` | Classes CSS personalizadas para o rodapé. |
+| `imageClass` | `string` | Classes CSS personalizadas para a imagem. |
+
+| `variant` | \`"elevated" \ | "outline" \ | "subtle"\` | O estilo visual do card. |
+
+| `interactive` | `boolean` | Habilita a hidratação do lado do cliente. |
+| `class` | `string` | Classes CSS personalizadas para o elemento raiz. |

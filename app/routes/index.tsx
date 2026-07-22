@@ -187,12 +187,14 @@ const customShowcaseSlides = [
 
 function getLocaleToggleUrl(
 	currentPath: string,
-	targetLocale: "en" | "zh" | "es",
+	targetLocale: "en" | "zh" | "es" | "pt",
 ): string {
 	let cleanPath = currentPath;
 	if (cleanPath.startsWith("/zh")) {
 		cleanPath = cleanPath.slice(3);
 	} else if (cleanPath.startsWith("/es")) {
+		cleanPath = cleanPath.slice(3);
+	} else if (cleanPath.startsWith("/pt")) {
 		cleanPath = cleanPath.slice(3);
 	}
 	if (cleanPath === "") {
@@ -214,6 +216,8 @@ export default createRoute((c) => {
 		currentLocale = "zh";
 	} else if (currentPath.startsWith("/es")) {
 		currentLocale = "es";
+	} else if (currentPath.startsWith("/pt")) {
+		currentLocale = "pt";
 	}
 	const name = c.req.query("name") ?? "Design System";
 
@@ -368,6 +372,19 @@ export default createRoute((c) => {
 								})}
 							>
 								Español
+							</Anchor>
+						)}
+						{currentLocale !== "pt" && (
+							<Anchor
+								href={getLocaleToggleUrl(currentPath, "pt")}
+								variant="plain"
+								class={css({
+									textStyle: "sm",
+									fontWeight: "medium",
+									color: "blue.11",
+								})}
+							>
+								Português
 							</Anchor>
 						)}
 						<Button

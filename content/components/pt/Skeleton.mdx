@@ -1,0 +1,79 @@
+---
+title: Skeleton Esqueleto
+hydration: 3
+category: Feedback
+---
+
+import { Skeleton } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introdução
+
+Um espaço reservado usado para indicar que o conteúdo está carregando, com uma variedade de opções de animação e forma.
+
+# Uso
+
+## Skeleton básico
+
+<DemoPreview>
+  <div style={{ display: "flex", flexDirection: "column", gap: "1rem", width: "100%", maxWidth: "320px" }}>
+    <Skeleton shape="circle" size="12" />
+    <Skeleton height="6" width="40" />
+    <Skeleton shape="text" noOfLines={3} />
+  </div>
+</DemoPreview>
+
+```tsx
+import { Skeleton, SkeletonCircle, SkeletonText } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <div>
+      <SkeletonCircle size="12" />
+      <Skeleton height="6" width="40" />
+      <SkeletonText noOfLines={3} />
+    </div>
+  );
+}
+```
+
+## Construtor de páginas CMS
+
+Este componente está disponível como um bloco `skeleton` no [Construtor de Páginas](/docs/PageBuilder) (`content/pages/*.json`). As opções `shape` do CMS são `box`/`circle`/`text`, mapeadas para a propriedade real `shape` (`box` recai para o padrão simples):
+
+```json
+{
+  "type": "skeleton",
+  "shape": "text",
+  "noOfLines": 3
+}
+```
+
+# Propriedades
+
+## Skeleton
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `loading` | `boolean` | Se deve exibir o skeleton. Padrão: `true`. |
+| `circle` | `boolean` | Renderiza o skeleton como um círculo. |
+
+| `variant` | \`"pulse" \ | "shine" \ | "none"\` | O estilo de animação. |
+
+| `class` | `string` | Classes CSS personalizadas para o elemento raiz. |
+
+Todos os outros atributos nativos de `<div>` (por exemplo, `style`, `id`, `width`, `height`) são repassados ao elemento subjacente.
+
+## SkeletonCircle
+
+Mesmas propriedades que `Skeleton`, pré-configurado com `circle`.
+
+## SkeletonText
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `noOfLines` | `number` | Número de linhas a exibir. Padrão: `3`. |
+
+| `gap` | \`string \ | number\` | Espaço entre as linhas. Padrão: `"2"`. |
+
+Mais todas as propriedades de `Skeleton`.

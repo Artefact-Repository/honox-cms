@@ -1,0 +1,203 @@
+---
+title: FileUpload Upload de Arquivos
+hydration: 2
+category: Forms
+---
+
+import { FileUpload } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introdução
+
+Uma zona de soltar e seletor de arquivos para escolher um ou mais arquivos, com arrastar e soltar,
+validação do lado do cliente (tipo/tamanho/quantidade) e uma lista de preview ao vivo — tudo
+composto a partir de partes equivalentes ao Ark UI sobre um `<input type="file">` nativo,
+de modo que o formulário continua funcionando com JavaScript desabilitado.
+
+# Uso
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "360px" }}>
+    <FileUpload
+      label="Upload Images"
+      name="images"
+      accept="image/*"
+      maxFiles={2}
+      dropzoneText="Drag and drop or browse files"
+      interactive
+    />
+  </div>
+</DemoPreview>
+
+```tsx
+import { FileUpload } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <FileUpload
+      label="Upload Images"
+      name="images"
+      accept="image/*"
+      maxFiles={2}
+      dropzoneText="Drag and drop or browse files"
+    />
+  );
+}
+```
+
+## Composição personalizada
+
+A composição padrão (props `label` + `dropzoneText` + `triggerText`) cobre
+o caso comum. Passe `children` explícitos para ter controle total sobre o layout — substitua
+qualquer subconjunto das partes abaixo:
+
+```tsx
+import { FileUpload } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <FileUpload name="attachments" maxFiles={5} accept="image/*,.pdf">
+      <FileUpload.Label>Attachments</FileUpload.Label>
+      <FileUpload.Dropzone>
+        <span>Drop files here, or</span>
+        <FileUpload.Trigger>browse</FileUpload.Trigger>
+      </FileUpload.Dropzone>
+      <FileUpload.List showSize clearable />
+      <FileUpload.ClearTrigger>Clear all</FileUpload.ClearTrigger>
+      <FileUpload.HiddenInput />
+    </FileUpload>
+  );
+}
+```
+
+## Construtor de páginas CMS
+
+Este componente está disponível como um bloco `file-upload` (aliás `fileUpload`) no
+[Construtor de páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "file-upload",
+  "label": "Resume",
+  "name": "resume",
+  "accept": ".pdf,.docx",
+  "maxFiles": 1,
+  "maxFileSize": 5242880,
+  "dropzoneText": "Drag your file(s) here",
+  "triggerText": "Open file picker",
+  "showSize": true,
+  "clearable": true
+}
+```
+
+`maxFiles` e `maxFileSize` são convertidos de strings para números pelo
+renderizador; todos os outros campos são repassados diretamente para `FileUpload`. Ele sempre
+renderiza `interactive` no Construtor de páginas.
+
+# Propriedades
+
+## Root
+
+| Prop | Tipo | Descrição |
+| --- | --- | --- |
+| `accept` | `string \| string[] \| Record<string, string[]>` | Tipos de arquivo aceitos — uma string MIME, uma lista, ou um registro MIME→extensões. Normalizado para o atributo nativo `accept`. |
+| `allowDrop` | `boolean` | Se deve permitir arrastar e soltar na zona de soltar. Padrão `true`. |
+| `capture` | `"user" \| "environment"` | A câmera padrão a usar ao capturar mídia. |
+| `directory` | `boolean` | Se deve aceitar diretórios (`webkitdirectory`). |
+| `disabled` | `boolean` | Desabilita a zona de soltar, o disparador e o input oculto. |
+| `invalid` | `boolean` | Marca o campo como inválido (`data-invalid` em cada parte). |
+| `required` | `boolean` | Marca o input subjacente como obrigatório. |
+| `maxFiles` | `number` | Número máximo de arquivos. Padrão `1`. Selecionar `> 1` muda a ilha do modo substituir para o modo anexar. |
+| `maxFileSize` | `number` | Tamanho máximo de arquivo em bytes. Padrão `Infinity`. |
+| `minFileSize` | `number` | Tamanho mínimo de arquivo em bytes. Padrão `0`. |
+| `name` | `string` | Nome do input de arquivo subjacente, para envio nativo de formulário. |
+| `locale` | `string` | Locale BCP-47 usado para a formatação do tamanho do arquivo. Padrão `"en-US"`. |
+| `translations` | `Partial<FileUploadTranslations>` | Sobrescritas para as strings ARIA de zona de soltar/preview/excluir/limpar. |
+| `size` | `"sm" \| "md" \| "lg"` | Variante de tamanho visual. Padrão `"md"`. |
+| `acceptedFiles` | `File[]` | Lista controlada de arquivos aceitos (somente ilha). |
+| `defaultAcceptedFiles` | `File[]` | Lista inicial de arquivos aceitos, não controlada (somente ilha). |
+| `preventDocumentDrop` | `boolean` | Impede que o navegador navegue para um arquivo solto fora da zona de soltar. Padrão `true` (somente ilha). |
+| `validate` | `(file: File, details: FileValidateDetails) => FileError[] \| null` | Validação personalizada, executada após as verificações integradas de tipo/tamanho/quantidade (somente ilha). |
+| `transformFiles` | `(files: File[]) => Promise<File[]>` | Transforma os arquivos recém-aceitos (por exemplo, comprimir) antes de serem confirmados (somente ilha). |
+| `onFileAccept` | `(details: FileAcceptDetails) => void` | Chamado com os arquivos aceitos da seleção ou soltar mais recente. |
+| `onFileReject` | `(details: FileRejectDetails) => void` | Chamado com qualquer arquivo rejeitado e seus códigos de erro. |
+| `onFileChange` | `(details: FileChangeDetails) => void` | Chamado após cada seleção com o conjunto completo de aceitos/rejeitados. |
+| `interactive` | `boolean` | Força (ou suprime) a hidratação como ilha. |
+
+## Composição padrão
+
+Esses props só se aplicam quando `children` é omitido — então `FileUpload` renderiza
+`Label` + `Dropzone` + `Trigger` + `List` + `HiddenInput` para você.
+
+| Prop | Tipo | Descrição |
+| --- | --- | --- |
+| `label` | `string` | Rótulo renderizado acima da zona de soltar. |
+| `dropzoneText` | `string` | Texto de ajuda da zona de soltar. Padrão `"Drag your file(s) here"`. |
+| `triggerText` | `string` | Texto do botão disparador. Padrão `"Open file picker"`. |
+| `showSize` | `boolean` | Mostra o tamanho formatado de cada arquivo na lista. Padrão `true`. |
+| `clearable` | `boolean` | Mostra um disparador de exclusão por arquivo na lista. Padrão `true`. |
+
+## Subcomponentes
+
+`FileUpload` é um componente composto — cada parte abaixo lê do
+contexto de `FileUpload.Root`, então elas só funcionam aninhadas dentro dele (ou dentro de um
+`FileUpload.Item` para as partes com escopo de item).
+
+| Parte | Descrição |
+| --- | --- |
+| `FileUpload.Label` | `<label>` vinculado ao input oculto por meio de `for`. |
+| `FileUpload.Dropzone` | Alvo de soltar; renderiza `role="button"` com suporte de teclado (Enter/Space abre o seletor). |
+| `FileUpload.Trigger` | Abre o seletor de arquivos. Renderiza como um `<label for>` (não um `<button>`) para que continue funcionando sem JavaScript. |
+| `FileUpload.HiddenInput` | O `<input type="file">` nativo, visualmente oculto, que de fato contém a seleção para o envio do formulário. |
+| `FileUpload.ItemGroup` | `<ul>` que envolve os `Item` de arquivos aceitos. |
+| `FileUpload.Item` | Um arquivo aceito. Requer um prop `file`; fornece contexto de arquivo para seus filhos. |
+| `FileUpload.ItemName` | O nome do arquivo, ou `children` para sobrescrevê-lo. |
+| `FileUpload.ItemSizeText` | O tamanho formatado do arquivo (por meio de `formatBytes`), ou `children` para sobrescrevê-lo. |
+| `FileUpload.ItemPreview` | Wrapper mostrado apenas quando o tipo MIME do arquivo corresponde ao seu prop regex `type` (padrão `".*"`). |
+| `FileUpload.ItemPreviewImage` | Preview `<img>` somente de cliente por meio de `URL.createObjectURL`; não renderiza nada durante o SSR ou para arquivos que não são imagens. |
+| `FileUpload.ItemDeleteTrigger` | Remove este item da lista de arquivos aceitos. |
+| `FileUpload.ClearTrigger` | Limpa todos os arquivos aceitos. Ocultado automaticamente quando a lista está vazia. |
+| `FileUpload.Items` | Composto: mapeia os arquivos aceitos para `Item` com um preview de imagem/ícone de arquivo, nome, tamanho opcional e disparador de exclusão opcional. Aceita `showSize` / `clearable` / `files`. |
+| `FileUpload.List` | Composto: `ItemGroup` envolvendo `Items`. Os mesmos props `showSize` / `clearable` / `files`. |
+| `FileUpload.FileText` | Mostra o nome do primeiro arquivo selecionado, uma contagem `"N files"` para seleção múltipla, ou uma string `fallback` quando nada está selecionado. |
+
+```tsx
+import { FileUpload, formatBytes } from "../components/ui";
+```
+
+`formatBytes(bytes, locale?)` e os tipos `FileAccept` / `FileError` /
+`FileRejection` / `FileChangeDetails` / `FileUploadTranslations` também são
+exportados para quem estiver construindo uma composição totalmente personalizada.
+
+# Validação
+
+Cada arquivo selecionado é verificado em ordem e rejeitado na primeira regra
+que falhar; `validate` é executado por último, depois que todas as verificações integradas passarem:
+
+| Código `FileError` | Disparador |
+| --- | --- |
+| `FILE_INVALID_TYPE` | Não corresponde a `accept`. |
+| `FILE_TOO_LARGE` | `file.size > maxFileSize`. |
+| `FILE_TOO_SMALL` | `file.size < minFileSize`. |
+| `FILE_EXISTS` | Já foi aceito um arquivo com o mesmo nome/tamanho/tipo (somente no modo multiarquivo). |
+| `TOO_MANY_FILES` | Aceitar este arquivo excederia `maxFiles`. |
+| `FILE_INVALID` | Reservado para resultados personalizados de `validate`. |
+
+Com `maxFiles={1}` (padrão), um novo arquivo aceito **substitui** a
+seleção atual. Com `maxFiles > 1`, os novos arquivos são **anexados** à
+seleção existente até o limite.
+
+# Acessibilidade
+
+- `Dropzone` renderiza `role="button"` com `aria-label` de
+  `translations.dropzone`, `aria-disabled` quando desabilitado, e é operável
+  por teclado (`tabIndex={0}`, Enter/Space abre o seletor de arquivos).
+- `Label` e `Trigger` são elementos `<label for>` reais vinculados ao id do
+  input oculto, então clicar em qualquer um deles abre o seletor de arquivos nativo
+  mesmo antes da hidratação.
+- `ItemDeleteTrigger` e `ClearTrigger` obtêm seus `aria-label` de
+  `translations.deleteFile(file)` / `translations.clearFiles`, sobrescritíveis
+  por meio do prop `translations`.
+- `data-disabled` / `data-invalid` / `data-required` / `data-readonly` /
+  `data-dragging` são espelhados em cada parte para estilo e estado de tecnologia
+  assistiva.

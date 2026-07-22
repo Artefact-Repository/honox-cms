@@ -1,0 +1,146 @@
+---
+title: Button Botão
+hydration: 2
+category: Forms
+---
+
+import { Button, ButtonGroup } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introdução
+
+Um componente clicável para acionar ações e interações do usuário. Inclui variantes para ícones e botões agrupados.
+
+# Uso
+
+## Botão básico
+
+<DemoPreview>
+  <Button variant="solid" colorPalette="blue">Click me</Button>
+  <Button variant="outline" colorPalette="blue">Click me</Button>
+  <Button variant="subtle" colorPalette="blue">Click me</Button>
+  <Button variant="surface" colorPalette="blue">Click me</Button>
+  <Button variant="plain" colorPalette="blue">Click me</Button>
+</DemoPreview>
+
+```tsx
+import { Button } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Button variant="solid" colorPalette="blue">
+      Click me
+    </Button>
+  );
+}
+```
+
+## Estado de carregamento
+
+<DemoPreview>
+  <Button loading loadingText="Saving...">Save</Button>
+</DemoPreview>
+
+```tsx
+import { Button } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Button loading loadingText="Saving...">
+      Save
+    </Button>
+  );
+}
+```
+
+## IconButton
+
+Um botão otimizado para ícones.
+
+```tsx
+import { IconButton } from "../components/ui";
+import { SearchIcon } from "./icons";
+
+export default function MyPage() {
+  return (
+    <IconButton aria-label="Search">
+      <SearchIcon />
+    </IconButton>
+  );
+}
+```
+
+## CloseButton
+
+Um botão pré-estilizado para fechar elementos.
+
+```tsx
+import { CloseButton } from "../components/ui";
+
+export default function MyPage() {
+  return <CloseButton onClick={() => console.log("closed")} interactive />;
+}
+```
+
+## ButtonGroup
+
+<DemoPreview>
+  <ButtonGroup attached>
+    <Button>First</Button>
+    <Button>Second</Button>
+  </ButtonGroup>
+</DemoPreview>
+
+```tsx
+import { Button, ButtonGroup } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <ButtonGroup attached>
+      <Button>First</Button>
+      <Button>Second</Button>
+    </ButtonGroup>
+  );
+}
+```
+
+## Construtor de Páginas CMS
+
+Este componente está disponível como um bloco `button` no [Construtor de Páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "button",
+  "text": "Click me",
+  "variant": "solid",
+  "colorPalette": "blue"
+}
+```
+
+# Propriedades
+
+## Button
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `children` | `any` | Conteúdo a ser renderizado dentro do componente. |
+| `class` | `string` | Classes CSS personalizadas. |
+
+| `variant` | \`"solid" \ | "surface" \ | "subtle" \ | "outline" \ | "plain"\` | O estilo visual do botão. |
+
+| `size` | \`"2xs" \ | "xs" \ | "sm" \ | "md" \ | "lg" \ | "xl" \ | "2xl"\` | O tamanho do botão. |
+
+| `loading` | `boolean` | Se `true`, o botão mostrará um spinner de carregamento. |
+| `loadingText` | `string` | O texto exibido durante o carregamento. |
+
+| `type` | \`"button" \ | "submit" \ | "reset"\` | O tipo HTML do botão. |
+
+| `colorPalette` | `string` | O tema de cor do botão. |
+| `interactive` | `boolean` | Se deve habilitar a hidratação do lado do cliente. |
+
+## ButtonGroup
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `children` | `any` | Botões a serem agrupados. |
+| `attached` | `boolean` | Se os botões devem ser unidos entre si. |

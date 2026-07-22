@@ -1,0 +1,53 @@
+---
+title: Text Texto
+hydration: 3
+category: Typography
+---
+
+import { Text } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introdução
+
+Um componente polimórfico para exibir texto de corpo, parágrafos ou spans com tipografia consistente.
+
+# Uso
+
+<DemoPreview>
+  <Text size="lg">This is a paragraph.</Text>
+</DemoPreview>
+
+```tsx
+import { Text } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Text size="lg" class="muted">
+      This is a paragraph.
+    </Text>
+  );
+}
+```
+
+## Construtor de páginas CMS
+
+Este componente está disponível como um bloco `text` no [Construtor de páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "text",
+  "content": "This is a paragraph.",
+  "size": "lg"
+}
+```
+
+# Propriedades
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `children` | `any` | O texto ou conteúdo. |
+| `class` | `string` | Classes CSS personalizadas. |
+| `as` | `string` | O elemento HTML a renderizar (por exemplo, "p", "span"). Padrão "p". |
+| `size` | `string` | A variante de tamanho da fonte. |
+| `variant` | `string` | Variante de estilo tipográfico (por exemplo, "heading", "label"). |
+| `interactive` | `boolean` | Se deve habilitar a hidratação do lado do cliente. |

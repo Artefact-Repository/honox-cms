@@ -38,7 +38,7 @@ const mdxModules = import.meta.glob([
 
 // Translated-content locale codes — must track public/admin/config.yml's
 // i18n.locales (minus the default) and the app/routes/<locale> dirs.
-export const LOCALES = ["zh", "es"] as const;
+export const LOCALES = ["zh", "es", "pt"] as const;
 
 export interface DocSummary {
 	slug: string;

@@ -1,0 +1,67 @@
+---
+title: Alert Alerta
+hydration: 3
+category: Feedback
+---
+
+import { Alert, AlertIcon } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introdução
+
+Exibe uma mensagem breve e importante de uma forma que atrai a atenção do usuário sem interromper suas tarefas.
+
+# Uso
+
+<DemoPreview>
+  <Alert
+    status="success"
+    title="Success"
+    description="Your changes have been saved."
+    indicator={<AlertIcon />}
+  />
+</DemoPreview>
+
+```tsx
+import { Alert, AlertIcon } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Alert
+      status="success"
+      title="Success"
+      description="Your changes have been saved."
+      indicator={<AlertIcon />}
+    />
+  );
+}
+```
+
+## Construtor de Páginas CMS
+
+Este componente está disponível como um bloco `alert` no [Construtor de Páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "alert",
+  "status": "success",
+  "title": "Success",
+  "description": "Your changes have been saved.",
+  "variant": "subtle"
+}
+```
+
+# Propriedades
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `title` | `string` | O título do alerta. |
+| `description` | `string` | A descrição do alerta. |
+| `indicator` | `Child` | Um ícone ou elemento a ser renderizado como indicador. |
+| `children` | `Child` | Conteúdo adicional a ser renderizado dentro do componente. |
+| `class` | `string` | Classes CSS personalizadas. |
+
+| `status` | \`"info" \ | "success" \ | "warning" \ | "error" \ | "neutral"\` | A paleta de cores de status do alerta. |
+
+| `variant` | \`"subtle" \ | "solid" \ | "outline"\` | O estilo visual do alerta. |
+| `aria-live` | \`"polite" \ | "assertive" \ | "off"\` | A configuração aria-live do alerta. Por padrão "polite". |
