@@ -2,7 +2,7 @@
 title: Hydration
 ---
 
-This project uses [HonoX](https://github.com/honojs/honox)'s **Islands Hydration** architecture and [**@hono/vite-ssg**](https://github.com/honojs/vite-plugins/tree/main/packages/ssg) for Static Site Generation of pages, emitting **static HTML** by default, and only components that genuinely need client-side interactivity are "promoted" to islands (client JS snippets). 
+This project uses [HonoX](https://github.com/honojs/honox)'s **Islands Hydration** architecture and [**@hono/vite-ssg**](https://github.com/honojs/vite-plugins/tree/main/packages/ssg) for **SSG**, Static Site Generation of pages, emitting **static HTML** by default, and only components that genuinely need client-side interactivity are "promoted" to islands (client JS snippets). 
 
 > Every component's hydration behaviour funnels through the `shouldHydrate` predicate
 > in `app/components/ui/island-utils.ts`. Any decision about _when to render static HTML_
