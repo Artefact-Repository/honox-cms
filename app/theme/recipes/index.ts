@@ -1,3 +1,4 @@
+import { ratingGroup } from "./rating-group";
 import { absoluteCenter } from "./absolute-center";
 import { alert } from "./alert";
 import { anchor } from "./anchor";
@@ -53,21 +54,22 @@ import { toggleGroup } from "./toggle-group";
 import { tooltip } from "./tooltip";
 
 export const recipes = {
-	absoluteCenter,
-	badge,
-	button,
-	group,
-	heading,
-	spinner,
-	text,
-	textarea,
-	skeleton,
-	code,
-	input,
-	gridCol,
-	gridRow,
-	anchor,
-	icon,
+    absoluteCenter,
+    badge,
+    button,
+    group,
+    heading,
+    spinner,
+    text,
+    textarea,
+    skeleton,
+    code,
+    input,
+    gridCol,
+    gridRow,
+    anchor,
+    icon,
+    ratingGroup
 };
 
 export const slotRecipes = {
