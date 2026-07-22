@@ -2,7 +2,7 @@
 title: 水合
 ---
 
-本项目采用 [HonoX](https://github.com/honojs/honox) 的 **岛屿水合（IslandsHydration）** 架构以及 [**@hono/vite-ssg**](https://github.com/honojs/vite-plugins/tree/main/packages/ssg) 进行页面的静态站点生成（SSG）。默认输出 **静态 HTML**，只有真正需要客户端交互的组件才会被“提升”为岛屿（即客户端 JS 片段）。
+本项目采用 [HonoX](https://github.com/honojs/honox) 的 **岛屿水合（Islands Hydration）** 架构以及 [**@hono/vite-ssg**](https://github.com/honojs/vite-plugins/tree/main/packages/ssg) 进行页面的静态站点生成（SSG）。默认输出 **静态 HTML**，只有真正需要客户端交互的组件才会被“提升”为岛屿（即客户端 JS 片段）。
 
 > 每个组件的水合行为都经由 `app/components/ui/island-utils.ts` 中的 `shouldHydrate` 谓词统一收敛。任何关于 _何时渲染静态 HTML_ 与 _何时挂载客户端岛屿_ 的决策都在这里完成 —— 完整的分层模型、决策规则以及逐组件分类详见 [Hydration](/docs/Hydration)。
 
