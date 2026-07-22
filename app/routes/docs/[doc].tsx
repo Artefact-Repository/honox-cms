@@ -221,17 +221,41 @@ function DocsSidenav({
 	);
 }
 
+interface MobileNavProps extends DocsSidenavProps {
+	headerLinks?: DocsNavLinkConfig[];
+	editUrl?: string;
+	docsUi?: DocsUiConfig;
+	currentPath: string;
+}
+
 // Mobile sidenav: a native <details> disclosure bar attached under the header
 // row instead of a Drawer overlay. Zero JS / no island, so it works before
 // hydration and without JS at all — and since every doc link is a full-page
 // MPA navigation, the collapsed-after-navigation state of an in-flow
 // disclosure is the natural resting position rather than a bug to fight.
+//
+// The top-level header nav (headerLinks, edit/admin, language switcher,
+// GitHub) is hidden in the desktop header row below `md`, so its actions
+// render here instead, as a block inside the expandable panel, above the doc
+// groups list. That keeps them inside <details>'s native show/hide behavior
+// (no extra CSS needed for visibility) while staying out of <summary> itself
+// — interactive links/buttons in there would also toggle the disclosure on
+// every click, and the language switcher is a client-hydrated dropdown, not
+// a plain link, so that conflict would be visible in practice.
 function MobileNav({
 	groups,
 	activeSlug,
 	links,
-	currentLocale,
-}: DocsSidenavProps) {
+	headerLinks,
+	editUrl,
+	docsUi,
+	currentPath,
+	currentLocale = "en",
+}: MobileNavProps) {
+	const githubLink = links?.find(isGithubLink);
+	const localiseLink = (href: string) => localiseHref(href, currentLocale);
+	const ui = { ...DEFAULT_DOCS_UI, ...docsUi };
+
 	return (
 		<details
 			class={css({
@@ -277,6 +301,69 @@ function MobileNav({
 					pb: "4",
 				})}
 			>
+				<div
+					class={css({
+						display: "flex",
+						flexWrap: "wrap",
+						alignItems: "center",
+						gap: "3",
+						pb: "4",
+						mb: "4",
+						borderBottomWidth: "1px",
+						borderColor: { _light: "white.a4", _dark: "black.a4" },
+					})}
+				>
+					{headerLinks?.map((link) => (
+						<Anchor
+							key={link.href}
+							href={localiseLink(link.href)}
+							variant="plain"
+							class={css({ textStyle: "xs", fontWeight: "medium" })}
+						>
+							{link.label}
+						</Anchor>
+					))}
+					{editUrl ? (
+						<Anchor
+							href={editUrl}
+							class={cx(
+								button({ variant: "outline", size: "sm" }),
+								css({ textStyle: "xs", fontWeight: "medium" }),
+							)}
+						>
+							{ui.edit}
+						</Anchor>
+					) : (
+						<Anchor
+							href={"/admin"}
+							class={cx(
+								button({ variant: "outline", size: "sm" }),
+								css({ textStyle: "xs", fontWeight: "medium" }),
+							)}
+						>
+							{ui.admin}
+						</Anchor>
+					)}
+					<LanguageSwitcher
+						currentPath={currentPath}
+						currentLocale={currentLocale}
+					/>
+					{githubLink && (
+						<Anchor
+							href={githubLink.href}
+							target="_blank"
+							rel="noopener noreferrer"
+							aria-label="View on GitHub"
+							class={cx(
+								button({ variant: "plain", size: "sm" }),
+								css({ px: "0" }),
+							)}
+						>
+							<GitHubIcon />
+						</Anchor>
+					)}
+				</div>
+
 				<DocsSidenav
 					groups={groups}
 					activeSlug={activeSlug}
@@ -322,9 +409,8 @@ function DocsHeader({
 					px: { base: "4", md: "6", lg: "8" },
 					py: "4",
 					display: "flex",
-					flexWrap: { base: "wrap", md: "nowrap" },
 					alignItems: "center",
-					gap: { base: "3", md: "8" },
+					gap: { base: "4", md: "8" },
 				})}
 			>
 				<Anchor
@@ -365,10 +451,8 @@ function DocsHeader({
 
 				<nav
 					class={css({
-						display: "flex",
-						flexWrap: "wrap",
-						flexBasis: { base: "100%", md: "auto" },
-						gap: { base: "3", md: "6" },
+						display: { base: "none", md: "flex" },
+						gap: "6",
 						alignItems: "center",
 						flexShrink: "0",
 					})}
@@ -429,6 +513,10 @@ function DocsHeader({
 				groups={groups}
 				activeSlug={activeSlug}
 				links={links}
+				headerLinks={headerLinks}
+				editUrl={editUrl}
+				docsUi={docsUi}
+				currentPath={currentPath}
 				currentLocale={currentLocale}
 			/>
 		</>
