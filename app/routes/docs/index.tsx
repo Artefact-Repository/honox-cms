@@ -21,7 +21,7 @@ import {
 	loadDocsConfig,
 } from "../../lib/configs";
 import { type DocSummary, loadDocs } from "../../lib/docs";
-import { detectLocale, localiseHref } from "../../lib/i18n";
+import { DOCS_UI_STRINGS, detectLocale, localiseHref } from "../../lib/i18n";
 
 // ---------------------------------------------------------------------------
 // Inlined docs nav shell.
@@ -285,6 +285,7 @@ function DocsHeader({
 }: DocsHeaderProps) {
 	const githubLink = links?.find(isGithubLink);
 	const localiseLink = (href: string) => localiseHref(href, currentLocale);
+	const ui = DOCS_UI_STRINGS[currentLocale] ?? DOCS_UI_STRINGS.en!;
 
 	return (
 		<>
@@ -326,11 +327,10 @@ function DocsHeader({
 					})}
 				>
 					<Search
+						locale={currentLocale}
 						src="/api/docs/search.json"
-						placeholder={
-							currentLocale === "zh" ? "搜索文档..." : "Search docs..."
-						}
-						itemLabel={currentLocale === "zh" ? "文档" : "docs"}
+						placeholder={ui.searchPlaceholder}
+						itemLabel={ui.searchItemLabel}
 						showCount={false}
 						syncUrl={false}
 					/>

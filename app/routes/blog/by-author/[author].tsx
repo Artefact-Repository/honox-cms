@@ -16,6 +16,7 @@ import {
 import { ArrowLeftIcon } from "../../../icons/arrow-left";
 import { ArrowRightIcon } from "../../../icons/arrow-right";
 import { UserIcon } from "../../../icons/user";
+import { BLOG_SEARCH_STRINGS, detectLocale } from "../../../lib/i18n";
 import { loadPosts } from "../../../lib/posts";
 
 export default createRoute(
@@ -32,6 +33,9 @@ export default createRoute(
 	// Actual route handler
 	async (c) => {
 		const authorParam = decodeURIComponent(c.req.param("author") ?? "");
+		const currentLocale = detectLocale(c.req.path);
+		const searchStrings =
+			BLOG_SEARCH_STRINGS[currentLocale] ?? BLOG_SEARCH_STRINGS.en;
 
 		const { posts } = await loadPosts();
 		const blogPosts = posts.filter(
@@ -192,8 +196,9 @@ export default createRoute(
 						{/* Search (island) — global autocomplete over /api/posts/search.json */}
 						<section class={css({ mb: "8", maxWidth: "xl", mx: "auto" })}>
 							<Search
-								placeholder="Search all articles..."
-								itemLabel="articles"
+								locale={currentLocale}
+								placeholder={searchStrings.placeholderAll}
+								itemLabel={searchStrings.itemLabel}
 								showCount={false}
 								syncUrl={false}
 							/>

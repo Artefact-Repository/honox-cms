@@ -23,45 +23,13 @@ import {
 	loadDocsConfig,
 } from "../../lib/configs";
 import { type DocSummary, loadDocBySlug, loadDocs } from "../../lib/docs";
-import { detectLocale, isLocale, localiseHref } from "../../lib/i18n";
+import {
+	DOCS_UI_STRINGS,
+	detectLocale,
+	isLocale,
+	localiseHref,
+} from "../../lib/i18n";
 import { markdownContentClass } from "../../utils/markdown-content-style";
-
-// Page-chrome strings that aren't part of translated doc content or the
-// configs.<locale>.json singleton (search box, Edit/Admin button).
-const UI_STRINGS: Record<
-	string,
-	{
-		searchPlaceholder: string;
-		searchItemLabel: string;
-		edit: string;
-		admin: string;
-	}
-> = {
-	en: {
-		searchPlaceholder: "Search docs...",
-		searchItemLabel: "docs",
-		edit: "Edit",
-		admin: "Admin",
-	},
-	zh: {
-		searchPlaceholder: "搜索文档...",
-		searchItemLabel: "文档",
-		edit: "编辑",
-		admin: "内容管理",
-	},
-	es: {
-		searchPlaceholder: "Buscar documentación...",
-		searchItemLabel: "documentos",
-		edit: "Editar",
-		admin: "Administrar",
-	},
-	pt: {
-		searchPlaceholder: "Buscar documentação...",
-		searchItemLabel: "documentos",
-		edit: "Editar",
-		admin: "Administrar",
-	},
-};
 
 // ---------------------------------------------------------------------------
 // Inlined docs nav shell.
@@ -344,7 +312,7 @@ function DocsHeader({
 }: DocsHeaderProps) {
 	const githubLink = links?.find(isGithubLink);
 	const localiseLink = (href: string) => localiseHref(href, currentLocale);
-	const ui = UI_STRINGS[currentLocale] ?? UI_STRINGS.en!;
+	const ui = DOCS_UI_STRINGS[currentLocale] ?? DOCS_UI_STRINGS.en!;
 
 	return (
 		<>
@@ -386,6 +354,7 @@ function DocsHeader({
 					})}
 				>
 					<Search
+						locale={currentLocale}
 						src="/api/docs/search.json"
 						placeholder={ui.searchPlaceholder}
 						itemLabel={ui.searchItemLabel}

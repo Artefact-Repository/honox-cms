@@ -19,7 +19,11 @@ import { FilterIcon } from "../../icons/filter";
 import { MailIcon } from "../../icons/mail";
 import { SearchIcon } from "../../icons/search";
 import { type DocsNavLinkConfig, loadDocsConfig } from "../../lib/configs";
-import { detectLocale, localiseHref } from "../../lib/i18n";
+import {
+	BLOG_SEARCH_STRINGS,
+	detectLocale,
+	localiseHref,
+} from "../../lib/i18n";
 import { loadPosts } from "../../lib/posts";
 import { filterEntries } from "../../utils/search";
 
@@ -121,6 +125,8 @@ export default createRoute(async (c) => {
 	);
 
 	const localiseLink = (href: string) => localiseHref(href, currentLocale);
+	const searchStrings =
+		BLOG_SEARCH_STRINGS[currentLocale] ?? BLOG_SEARCH_STRINGS.en;
 
 	// Get URL parameters for searching
 	const url = new URL(c.req.url);
@@ -395,13 +401,12 @@ export default createRoute(async (c) => {
 						{/* Instant Search (island) — lazily fetches /api/posts/search.json */}
 						<div class={css({ flex: "1", minWidth: "260px" })}>
 							<Search
+								locale={currentLocale}
 								src="/api/posts/search.json"
 								action={localiseLink("/blog")}
 								initialQuery={searchQuery}
-								placeholder={
-									currentLocale === "zh" ? "搜索文章..." : "Search articles..."
-								}
-								itemLabel={currentLocale === "zh" ? "文章" : "articles"}
+								placeholder={searchStrings.placeholder}
+								itemLabel={searchStrings.itemLabel}
 								total={blogPosts.length}
 								filterAttribute="data-post-slug"
 								emptyStateId="blog-search-empty"

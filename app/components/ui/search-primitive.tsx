@@ -37,7 +37,25 @@ const SearchIcon = (props: any) => (
 	<SearchIconImport width="20" height="20" {...props} />
 );
 
+export const DEFAULT_PLACEHOLDERS: Record<string, string> = {
+	en: "Search...",
+	zh: "搜索...",
+	es: "Buscar...",
+	pt: "Buscar...",
+	fr: "Rechercher...",
+};
+
+export const DEFAULT_ITEM_LABELS: Record<string, string> = {
+	en: "results",
+	zh: "结果",
+	es: "resultados",
+	pt: "resultados",
+	fr: "résultats",
+};
+
 export interface SearchBaseProps {
+	/** Language locale code (defaults to "en") */
+	locale?: string;
 	/** URL of the SSG-generated JSON search index */
 	src?: string;
 	placeholder?: string;
@@ -67,7 +85,10 @@ export interface SearchBaseProps {
 
 /** Static (non-hydrated) variant: a plain GET form the server can answer. */
 export function SearchBase(props: SearchBaseProps) {
-	const { placeholder = "Search...", initialQuery = "", action } = props;
+	const { locale = "en", placeholder, initialQuery = "", action } = props;
+	const resolvedPlaceholder =
+		placeholder ?? DEFAULT_PLACEHOLDERS[locale] ?? DEFAULT_PLACEHOLDERS.en;
+
 	const input = (
 		<div class={inputWrapClass}>
 			<div class={iconClass}>
@@ -76,7 +97,7 @@ export function SearchBase(props: SearchBaseProps) {
 			<input
 				type="search"
 				name="q"
-				placeholder={placeholder}
+				placeholder={resolvedPlaceholder}
 				value={initialQuery}
 				class={inputClass}
 			/>

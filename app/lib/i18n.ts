@@ -26,6 +26,90 @@ export const LOCALE_NAMES: Record<string, string> = {
 /** Route collections that support locale-scoped sub-paths. */
 const COLLECTIONS = ["docs", "blog", "pages"] as const;
 
+/**
+ * Page-chrome strings for the docs search box + header (Edit/Admin buttons)
+ * that aren't part of translated doc content or the configs.<locale>.json
+ * singleton. Shared by app/routes/docs/[doc].tsx and app/routes/docs/index.tsx
+ * so both pages stay in sync across locales.
+ */
+export const DOCS_UI_STRINGS: Record<
+	string,
+	{
+		searchPlaceholder: string;
+		searchItemLabel: string;
+		edit: string;
+		admin: string;
+	}
+> = {
+	en: {
+		searchPlaceholder: "Search docs...",
+		searchItemLabel: "docs",
+		edit: "Edit",
+		admin: "Admin",
+	},
+	zh: {
+		searchPlaceholder: "搜索文档...",
+		searchItemLabel: "文档",
+		edit: "编辑",
+		admin: "内容管理",
+	},
+	es: {
+		searchPlaceholder: "Buscar documentación...",
+		searchItemLabel: "documentos",
+		edit: "Editar",
+		admin: "Administrar",
+	},
+	pt: {
+		searchPlaceholder: "Buscar documentação...",
+		searchItemLabel: "documentos",
+		edit: "Editar",
+		admin: "Administrar",
+	},
+	fr: {
+		searchPlaceholder: "Rechercher dans les docs...",
+		searchItemLabel: "documents",
+		edit: "Modifier",
+		admin: "Administration",
+	},
+};
+
+/**
+ * Search box strings for blog pages (index, by-author, by-tag). `placeholder`
+ * is used on the blog index (searches all articles in context); `placeholderAll`
+ * is used on filtered views (by-author/by-tag) where the box explicitly
+ * searches beyond the current filter.
+ */
+export const BLOG_SEARCH_STRINGS: Record<
+	string,
+	{ placeholder: string; placeholderAll: string; itemLabel: string }
+> = {
+	en: {
+		placeholder: "Search articles...",
+		placeholderAll: "Search all articles...",
+		itemLabel: "articles",
+	},
+	zh: {
+		placeholder: "搜索文章...",
+		placeholderAll: "搜索所有文章...",
+		itemLabel: "文章",
+	},
+	es: {
+		placeholder: "Buscar artículos...",
+		placeholderAll: "Buscar todos los artículos...",
+		itemLabel: "artículos",
+	},
+	pt: {
+		placeholder: "Buscar artigos...",
+		placeholderAll: "Buscar todos os artigos...",
+		itemLabel: "artigos",
+	},
+	fr: {
+		placeholder: "Rechercher des articles...",
+		placeholderAll: "Rechercher tous les articles...",
+		itemLabel: "articles",
+	},
+};
+
 export function isLocale(value: string | undefined): value is string {
 	return !!value && (TRANSLATED_LOCALES as readonly string[]).includes(value);
 }

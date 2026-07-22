@@ -112,7 +112,78 @@ function Highlighted({ text, tokens }: { text: string; tokens: string[] }) {
 	);
 }
 
+const DEFAULT_PLACEHOLDERS: Record<string, string> = {
+	en: "Search...",
+	zh: "搜索...",
+	es: "Buscar...",
+	pt: "Buscar...",
+	fr: "Rechercher...",
+};
+
+const DEFAULT_ITEM_LABELS: Record<string, string> = {
+	en: "results",
+	zh: "结果",
+	es: "resultados",
+	pt: "resultados",
+	fr: "résultats",
+};
+
+const DEFAULT_TRANSLATIONS: Record<
+	string,
+	{
+		loading: string;
+		noMatches: string;
+		showingResults: string;
+		totalResults: string;
+		forQuery: string;
+		clear: string;
+	}
+> = {
+	en: {
+		loading: "Loading…",
+		noMatches: 'No matches for "{query}"',
+		showingResults: "Showing {count} of {total} {label}",
+		totalResults: "{total} {label}",
+		forQuery: ' for "{query}"',
+		clear: "Clear",
+	},
+	zh: {
+		loading: "加载中…",
+		noMatches: '无匹配 "{query}" 的结果',
+		showingResults: "显示 {total} 个{label}中的 {count} 个",
+		totalResults: "{total} 个{label}",
+		forQuery: ' 针对 "{query}"',
+		clear: "清除",
+	},
+	es: {
+		loading: "Cargando…",
+		noMatches: 'No hay coincidencias para "{query}"',
+		showingResults: "Mostrando {count} de {total} {label}",
+		totalResults: "{total} {label}",
+		forQuery: ' para "{query}"',
+		clear: "Limpiar",
+	},
+	pt: {
+		loading: "Carregando…",
+		noMatches: 'Nenhum resultado para "{query}"',
+		showingResults: "Exibindo {count} de {total} {label}",
+		totalResults: "{total} {label}",
+		forQuery: ' para "{query}"',
+		clear: "Limpar",
+	},
+	fr: {
+		loading: "Chargement…",
+		noMatches: 'Aucun résultat pour "{query}"',
+		showingResults: "Affichage de {count} sur {total} {label}",
+		totalResults: "{total} {label}",
+		forQuery: ' pour "{query}"',
+		clear: "Effacer",
+	},
+};
+
 export interface SearchBaseProps {
+	/** Language locale code (defaults to "en") */
+	locale?: string;
 	/** URL of the SSG-generated JSON search index */
 	src?: string;
 	placeholder?: string;
@@ -142,19 +213,34 @@ export interface SearchBaseProps {
 
 export function InteractiveSearch(props: SearchBaseProps) {
 	const {
-		src = "/api/posts/search.json",
-		placeholder = "Search...",
+		locale = "en",
+		src,
+		placeholder,
 		initialQuery = "",
 		debounceMs = 150,
 		maxSuggestions = 8,
 		filterAttribute,
 		emptyStateId,
 		total,
-		itemLabel = "results",
+		itemLabel,
 		showCount = true,
 		action,
 		syncUrl = true,
 	} = props;
+
+	const resolvedPlaceholder =
+		placeholder ?? DEFAULT_PLACEHOLDERS[locale] ?? DEFAULT_PLACEHOLDERS.en;
+	const resolvedItemLabel =
+		itemLabel ?? DEFAULT_ITEM_LABELS[locale] ?? DEFAULT_ITEM_LABELS.en;
+
+	const defaultSrc = "/api/posts/search.json";
+	const baseSrc = src ?? defaultSrc;
+	const resolvedSrc =
+		locale !== "en" && baseSrc.endsWith("/search.json")
+			? baseSrc.replace(/\/search\.json$/, `/${locale}/search.json`)
+			: baseSrc;
+
+	const t = DEFAULT_TRANSLATIONS[locale] ?? DEFAULT_TRANSLATIONS.en;
 
 	const [rawQuery, setRawQuery] = useState(initialQuery);
 	const [query, setQuery] = useState(initialQuery);
@@ -168,14 +254,17 @@ export function InteractiveSearch(props: SearchBaseProps) {
 	const ensureLoaded = () => {
 		if (fetchStarted.current) return;
 		fetchStarted.current = true;
-		fetch(src)
+		fetch(resolvedSrc)
 			.then((response) => {
 				if (!response.ok) throw new Error(`HTTP ${response.status}`);
 				return response.json() as Promise<SearchIndexDocument>;
 			})
 			.then((document_) => setEntries(document_.entries))
 			.catch((error) => {
-				console.error(`Search: failed to load index from ${src}:`, error);
+				console.error(
+					`Search: failed to load index from ${resolvedSrc}:`,
+					error,
+				);
 				setLoadFailed(true);
 			});
 	};
@@ -283,7 +372,7 @@ export function InteractiveSearch(props: SearchBaseProps) {
 					aria-controls={listboxId}
 					aria-autocomplete="list"
 					aria-activedescendant={activeId}
-					placeholder={placeholder}
+					placeholder={resolvedPlaceholder}
 					value={rawQuery}
 					class={inputClass}
 					onInput={(event: Event) => {
@@ -321,12 +410,12 @@ export function InteractiveSearch(props: SearchBaseProps) {
 					>
 						{!matches && (
 							<div class={css({ px: "4", py: "3", color: "fg.muted" })}>
-								Loading…
+								{t.loading}
 							</div>
 						)}
 						{matches && suggestions.length === 0 && (
 							<div class={css({ px: "4", py: "3", color: "fg.muted" })}>
-								No matches for "{query}"
+								{t.noMatches.replace("{query}", query)}
 							</div>
 						)}
 						{suggestions.map((entry, index) => (
@@ -387,11 +476,16 @@ export function InteractiveSearch(props: SearchBaseProps) {
 				<div class={countRowClass}>
 					<span>
 						{matches
-							? `Showing ${matches.length} of ${entries?.length ?? 0} ${itemLabel}`
+							? t.showingResults
+									.replace("{count}", String(matches.length))
+									.replace("{total}", String(entries?.length ?? 0))
+									.replace("{label}", resolvedItemLabel)
 							: total !== undefined
-								? `${total} ${itemLabel}`
+								? t.totalResults
+										.replace("{total}", String(total))
+										.replace("{label}", resolvedItemLabel)
 								: ""}
-						{matches && query ? ` for "${query}"` : ""}
+						{matches && query ? t.forQuery.replace("{query}", query) : ""}
 					</span>
 					{rawQuery && (
 						<button
@@ -411,7 +505,7 @@ export function InteractiveSearch(props: SearchBaseProps) {
 								_hover: { textDecoration: "underline" },
 							})}
 						>
-							Clear
+							{t.clear}
 						</button>
 					)}
 				</div>
