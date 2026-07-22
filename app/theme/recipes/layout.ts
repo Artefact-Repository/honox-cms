@@ -52,10 +52,14 @@ export const layout = defineSlotRecipe({
 			display: "none",
 			borderTopWidth: "1px",
 			borderColor: "border",
-			"& svg": {
+			// Scoped to `summary svg` (the chevron), not just `svg` — this is a
+			// <details> for the whole sider content, which can include its own
+			// icons (e.g. a GitHub link), and an unscoped `svg` selector would
+			// flip those upside down along with the chevron when opened.
+			"& summary svg": {
 				transition: "transform 0.2s",
 			},
-			"&[open] svg": {
+			"&[open] summary svg": {
 				transform: "rotate(180deg)",
 			},
 		},
