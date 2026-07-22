@@ -74,6 +74,32 @@ export function Sider(props: SiderProps) {
 	);
 }
 
+export interface BodyProps
+	extends PropsWithChildren<{
+		class?: string;
+	}> {}
+
+/** Groups `<Layout.Sider>` + `<Layout.Content>` into the row Panda's `body`
+ * slot lays out (it's `display: flex` unconditionally, no variant needed).
+ * Required when a compound-mode layout also has a Header/Footer: without
+ * it, the only way to lay Sider+Content out side by side is flipping the
+ * *root* to `flexDirection: row` via `data-has-sider`, which drags Header
+ * and Footer into that row too instead of leaving them as full-width bars.
+ * The shorthand (`sider`/`content` props) form gets this for free by always
+ * wrapping sider+content in its own `body` div; `<Layout.Body>` gives
+ * compound-mode consumers the same structure explicitly. */
+export function Body(props: BodyProps) {
+	const { children, class: classProp, ...rest } = props;
+	const context = useLayoutContext();
+	const bodyClass = context?.classes.body ?? layout({}).body;
+
+	return (
+		<div class={cx(bodyClass, classProp)} {...rest}>
+			{children}
+		</div>
+	);
+}
+
 export interface ContentProps
 	extends PropsWithChildren<{
 		class?: string;
@@ -147,7 +173,14 @@ export interface LayoutProps
 		bodyClass?: string;
 	}> {}
 
-// Helper to check recursively if any nested child is a Sider component.
+// Detects a bare `<Layout.Sider>` among compound-mode children so root can
+// switch to `flexDirection: row` on its own. Only correct when Sider (and
+// Content) are root's only children — if a Header/Footer is also present,
+// wrap Sider+Content in `<Layout.Body>` instead of relying on this, since
+// flipping root to a row would drag the Header/Footer into it too. Doesn't
+// (and shouldn't) look inside `<Layout.Body>` for this reason: once Sider is
+// nested there, root correctly stays a column and `Body`'s own unconditional
+// `display: flex` handles the row.
 function hasSiderChild(children: unknown): boolean {
 	if (!children) return false;
 	const arr = Array.isArray(children) ? children : [children];
@@ -255,6 +288,7 @@ export const LayoutComponent = Object.assign(Layout, {
 	Footer,
 	Content,
 	Sider,
+	Body,
 });
 
 export default LayoutComponent;

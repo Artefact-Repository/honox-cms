@@ -92,4 +92,26 @@ describe("Layout Component", () => {
 		expect(html).toContain("custom-root");
 		expect(html).toContain("custom-header");
 	});
+
+	it("should keep Header/Footer out of the sider row when Sider+Content are wrapped in Layout.Body", () => {
+		const html = (
+			<Layout>
+				<Layout.Header>Header</Layout.Header>
+				<Layout.Body>
+					<Layout.Sider>Sider</Layout.Sider>
+					<Layout.Content>Content</Layout.Content>
+				</Layout.Body>
+				<Layout.Footer>Footer</Layout.Footer>
+			</Layout>
+		).toString();
+
+		// Root must NOT flip to a row here — Body owns the sider+content row
+		// on its own (it's `display: flex` unconditionally), so Header/Footer
+		// stay full-width bars instead of joining that row.
+		expect(html).not.toContain("data-has-sider");
+		expect(html).toContain("layout__body");
+		// Header renders before the body row, Footer after.
+		expect(html.indexOf("<header")).toBeLessThan(html.indexOf("layout__body"));
+		expect(html.indexOf("layout__body")).toBeLessThan(html.indexOf("<footer"));
+	});
 });
