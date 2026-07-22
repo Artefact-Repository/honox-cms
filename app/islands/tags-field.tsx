@@ -1,8 +1,5 @@
 import { useEffect, useId, useRef, useState } from "hono/jsx";
-import {
-	Root,
-	type RootProps,
-} from "../components/ui/tags-field-primitive";
+import { Root, type RootProps } from "../components/ui/tags-field-primitive";
 
 export interface TagsFieldIslandProps extends RootProps {
 	onValueChange?: (details: { value: string[] }) => void;

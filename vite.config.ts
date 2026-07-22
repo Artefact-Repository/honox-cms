@@ -69,24 +69,24 @@ function fixSsgRoutingPlugin() {
 				traverse(distDir);
 			}
 
-		// Locale homepages (zh/es/pt/fr) are emitted as a flat dist/<lang>.html
-		// with NO sibling dist/<lang>/ directory, so the loop above skips them.
-		// Move each to dist/<lang>/index.html so /<lang> resolves as a directory
-		// index on any static host, not just ones that rewrite .html clean URLs.
-		const LOCALE_HOMEPAGES = ["zh", "es", "pt", "fr"];
-		for (const lang of LOCALE_HOMEPAGES) {
-			const htmlPath = path.join(distDir, `${lang}.html`);
-			if (!existsSync(htmlPath) || !statSync(htmlPath).isFile()) continue;
-			const dirPath = path.join(distDir, lang);
-			const indexPath = path.join(dirPath, "index.html");
-			mkdirSync(dirPath, { recursive: true });
-			renameSync(htmlPath, indexPath);
-			console.log(
-				`[fix-ssg-routing] ✓ dist/${lang}.html → dist/${lang}/index.html`,
-			);
-		}
-	},
-};
+			// Locale homepages (zh/es/pt/fr) are emitted as a flat dist/<lang>.html
+			// with NO sibling dist/<lang>/ directory, so the loop above skips them.
+			// Move each to dist/<lang>/index.html so /<lang> resolves as a directory
+			// index on any static host, not just ones that rewrite .html clean URLs.
+			const LOCALE_HOMEPAGES = ["zh", "es", "pt", "fr"];
+			for (const lang of LOCALE_HOMEPAGES) {
+				const htmlPath = path.join(distDir, `${lang}.html`);
+				if (!existsSync(htmlPath) || !statSync(htmlPath).isFile()) continue;
+				const dirPath = path.join(distDir, lang);
+				const indexPath = path.join(dirPath, "index.html");
+				mkdirSync(dirPath, { recursive: true });
+				renameSync(htmlPath, indexPath);
+				console.log(
+					`[fix-ssg-routing] ✓ dist/${lang}.html → dist/${lang}/index.html`,
+				);
+			}
+		},
+	};
 }
 
 const config = defineConfig(({ mode }) =>
