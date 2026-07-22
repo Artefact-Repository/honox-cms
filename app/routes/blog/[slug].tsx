@@ -16,7 +16,7 @@ import { ChevronRightIcon } from "../../icons/chevron-right";
 import { ClockIcon } from "../../icons/clock";
 import { EditIcon } from "../../icons/edit";
 import { ShareIcon } from "../../icons/share";
-import { detectLocale, localiseHref } from "../../lib/i18n";
+import { detectLocale, isLocale, localiseHref } from "../../lib/i18n";
 import { loadPostBySlug, loadPosts } from "../../lib/posts";
 import { markdownContentClass } from "../../utils/markdown-content-style";
 
@@ -28,8 +28,12 @@ export default createRoute(
 	}),
 
 	// Actual route handler
-	async (c) => {
+	async function handler(c) {
 		const slug = c.req.param("slug");
+		if (isLocale(slug)) {
+			const next = arguments[1];
+			return next();
+		}
 		const currentPath = c.req.path;
 		const currentLocale = detectLocale(currentPath);
 

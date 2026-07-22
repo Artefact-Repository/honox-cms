@@ -23,7 +23,7 @@ import {
 	loadDocsConfig,
 } from "../../lib/configs";
 import { type DocSummary, loadDocBySlug, loadDocs } from "../../lib/docs";
-import { detectLocale, localiseHref } from "../../lib/i18n";
+import { detectLocale, isLocale, localiseHref } from "../../lib/i18n";
 import { markdownContentClass } from "../../utils/markdown-content-style";
 
 // Page-chrome strings that aren't part of translated doc content or the
@@ -531,8 +531,12 @@ export default createRoute(
 		return docs.map((doc) => ({ doc: doc.slug }));
 	}),
 
-	async (c) => {
+	async function handler(c) {
 		const slug = c.req.param("doc");
+		if (isLocale(slug)) {
+			const next = arguments[1];
+			return next();
+		}
 		const currentPath = c.req.path;
 		// Content locale drives loadDocs/loadDocBySlug/loadDocsConfig and the
 		// header/sidenav chrome (search placeholder, Edit/Admin, link labels,
