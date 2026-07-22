@@ -57,7 +57,7 @@ O Construtor de Páginas suporta uma rica paleta de mais de 40 componentes de la
 
 * **Select**: Dropdown personalizado de seleção única/múltipla, enviável em formulário.
 * **DatePicker**: Seleção de data única/múltipla/intervalo com um calendário pop-up.
-* **TagsInput**: Lista livre de tags de texto.
+* **TagsField**: Lista livre de tags de texto.
 * **RadioGroup** / **RadioCardGroup**: Listas de rádio personalizadas com lógica de seleção única acessível.
 * **SegmentGroup**: Controles segmentados deslizantes para seleção em estilo de abas.
 * **Slider**: Componentes de controle deslizante de intervalo.

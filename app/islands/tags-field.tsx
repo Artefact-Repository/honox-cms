@@ -1,21 +1,15 @@
 import { useEffect, useId, useRef, useState } from "hono/jsx";
 import {
-	Control,
-	HiddenInput,
-	Input,
-	Items,
-	Label,
 	Root,
 	type RootProps,
-} from "../components/ui/tags-input-primitive";
+} from "../components/ui/tags-field-primitive";
 
-export interface TagsInputIslandProps extends RootProps {
+export interface TagsFieldIslandProps extends RootProps {
 	onValueChange?: (details: { value: string[] }) => void;
 	onInputValueChange?: (details: { inputValue: string }) => void;
-	label?: string;
 }
 
-export default function TagsInputIsland(props: TagsInputIslandProps) {
+export default function TagsFieldIsland(props: TagsFieldIslandProps) {
 	const {
 		value: valueProp,
 		defaultValue = [],
@@ -25,7 +19,6 @@ export default function TagsInputIsland(props: TagsInputIslandProps) {
 		onInputValueChange,
 		children,
 		id: idProp,
-		label,
 		...rest
 	} = props;
 
@@ -35,7 +28,7 @@ export default function TagsInputIsland(props: TagsInputIslandProps) {
 	);
 
 	const fallbackId = useId();
-	const rootId = idProp || `tags-input-root-${fallbackId}`;
+	const rootId = idProp || `tags-field-root-${fallbackId}`;
 
 	const valueRef = useRef<string[]>(value);
 	const inputValueRef = useRef<string>(inputValue);
@@ -150,16 +143,7 @@ export default function TagsInputIsland(props: TagsInputIslandProps) {
 			inputValue={inputValue}
 			data-interactive="true"
 		>
-			{children || (
-				<>
-					{label && <Label>{label}</Label>}
-					<Control>
-						<Items />
-						<Input />
-					</Control>
-					<HiddenInput />
-				</>
-			)}
+			{children}
 		</Root>
 	);
 }

@@ -1,8 +1,8 @@
-import TagsInputIsland from "../../islands/tags-input";
+import TagsFieldIsland from "../../islands/tags-field";
 import { shouldHydrate } from "./island-utils";
-import * as Primitives from "./tags-input-primitive";
+import * as Primitives from "./tags-field-primitive";
 
-export interface TagsInputProps extends Primitives.RootProps {
+export interface TagsFieldProps extends Primitives.RootProps {
 	/**
 	 * Whether to enable interactivity (hydration).
 	 * - `true`  → always hydrate (explicit opt-in)
@@ -15,7 +15,7 @@ export interface TagsInputProps extends Primitives.RootProps {
 	onInputValueChange?: (details: { inputValue: string }) => void;
 }
 
-export function TagsInput(props: TagsInputProps) {
+export function TagsField(props: TagsFieldProps) {
 	const {
 		value,
 		defaultValue,
@@ -42,7 +42,7 @@ export function TagsInput(props: TagsInputProps) {
 
 	if (shouldHydrate(interactive, hasSignal)) {
 		return (
-			<TagsInputIsland
+			<TagsFieldIsland
 				value={value}
 				defaultValue={defaultValue}
 				onValueChange={onValueChange}
@@ -52,7 +52,7 @@ export function TagsInput(props: TagsInputProps) {
 				{...rest}
 			>
 				{children}
-			</TagsInputIsland>
+			</TagsFieldIsland>
 		);
 	}
 
@@ -64,16 +64,7 @@ export function TagsInput(props: TagsInputProps) {
 			defaultInputValue={defaultInputValue}
 			{...rest}
 		>
-			{children || (
-				<>
-					{rest.label && <Primitives.Label>{rest.label}</Primitives.Label>}
-					<Primitives.Control>
-						<Primitives.Items />
-						<Primitives.Input />
-					</Primitives.Control>
-					<Primitives.HiddenInput />
-				</>
-			)}
+			{children}
 		</Primitives.Root>
 	);
 }
@@ -90,8 +81,10 @@ export const ItemDeleteTrigger = Primitives.ItemDeleteTrigger;
 export const ClearTrigger = Primitives.ClearTrigger;
 export const HiddenInput = Primitives.HiddenInput;
 export const Items = Primitives.Items;
+export const HelperText = Primitives.HelperText;
+export const ErrorText = Primitives.ErrorText;
 
-Object.assign(TagsInput, {
+Object.assign(TagsField, {
 	Root: Primitives.Root,
 	Label: Primitives.Label,
 	Control: Primitives.Control,
@@ -104,4 +97,6 @@ Object.assign(TagsInput, {
 	ClearTrigger: Primitives.ClearTrigger,
 	HiddenInput: Primitives.HiddenInput,
 	Items: Primitives.Items,
+	HelperText: Primitives.HelperText,
+	ErrorText: Primitives.ErrorText,
 });

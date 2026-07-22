@@ -1,0 +1,63 @@
+---
+title: TagsField
+hydration: 2
+category: Forms
+---
+
+import { TagsField } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
+A component that allows users to enter multiple tags as a list, with the same
+label / helper text / error text conventions as `Field`.
+
+## Usage
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <TagsField
+      label="Skills"
+      helperText="Press Enter to add a tag"
+      defaultValue={["React", "Hono"]}
+    />
+  </div>
+</DemoPreview>
+
+### CMS Page Builder
+
+This component is available as a `tagsField` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "tagsField",
+  "label": "Amenities",
+  "defaultValue": ["WiFi", "Fireplace", "Hot Tub"]
+}
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `string[]` | - | Current tags. |
+| `defaultValue` | `string[]` | - | Initial tags. |
+| `label` | `Child` | - | The field's label. |
+| `helperText` | `Child` | - | Helper text shown below the tags. |
+| `errorText` | `Child` | - | Error text shown when `invalid` is set. |
+| `invalid` | `boolean` | - | Forces the invalid state, showing `errorText`. |
+
+## CMS Configuration
+
+```yaml
+- label: Tags Field
+  name: tagsField
+  widget: object
+  fields:
+    - { label: Label, name: label, widget: string, required: false }
+    - { label: Helper Text, name: helperText, widget: string, required: false }
+    - { label: Error Text, name: errorText, widget: string, required: false }
+    - { label: Default Tags, name: defaultValue, widget: list, required: false }
+```
+
+## Hydration
+
+Tier-2: Hydrates when `value`, `defaultValue`, `onValueChange`, or input state is present.

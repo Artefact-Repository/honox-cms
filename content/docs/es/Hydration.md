@@ -80,7 +80,7 @@ Se aplica a:
 - Grupos seleccionables (segment-group, toggle-group)
 - Tablas con clic en filas (table)
 - Avatar con `src` (la carga asíncrona de la imagen / el ciclo de vida de error es una señal exclusiva del cliente)
-- Paginación / tags-input (estado + manejadores; una paginación `type="link"` que proporciona
+- Paginación / tags-field (estado + manejadores; una paginación `type="link"` que proporciona
   `getPageUrl` es navegación pura y permanece estática)
 
 ### Nivel 3 — Presentacional
@@ -138,7 +138,7 @@ Se aplica a:
 | `radio-group` | `value` / `defaultValue` / `onValueChange` | ✅ `radio-group.tsx` |
 | `avatar` | `src` (carga asíncrona de imagen / ciclo de vida de error) | ✅ `avatar.tsx` (Nivel 2) |
 | `pagination` | `onPageChange`, o `page` / `defaultPage` / `pageSize` / `defaultPageSize` fuera del modo enlace | ✅ `pagination.tsx` |
-| `tags-input` | `onValueChange` / `onInputValueChange` / `value` / `inputValue` / `defaultValue` / `defaultInputValue` | ✅ `tags-input.tsx` |
+| `tags-field` | `onValueChange` / `onInputValueChange` / `value` / `inputValue` / `defaultValue` / `defaultInputValue` | ✅ `tags-field.tsx` |
 | `paginated-table` | Siempre isla (gestiona el estado interno de paginación) | ✅ `paginated-table.tsx` (lógica de Nivel 2) |
 | `date-picker` | `value` / `defaultValue` / `focusedValue` / `open` / `defaultOpen` / `onValueChange` / `onOpenChange` / (eventos de teclado/clic/escritura) | ✅ `date-picker.tsx` |
 | `color-picker` | `value` / `defaultValue` / `format` / `defaultFormat` / `open` / `defaultOpen` / `onValueChange` / `onFormatChange` / `onOpenChange` / (eventos de puntero/teclado/entrada) | ✅ `color-picker.tsx` |

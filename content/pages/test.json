@@ -282,7 +282,7 @@
       "colorPalette": "blue"
     },
     {
-      "type": "tagsInput",
+      "type": "tagsField",
       "label": "Amenities",
       "defaultValue": [
         "WiFi",

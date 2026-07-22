@@ -48,7 +48,7 @@ import {
 	Switch,
 	Table,
 	Tabs,
-	TagsInput,
+	TagsField,
 	Text,
 	Textarea,
 	Tooltip,
@@ -71,6 +71,7 @@ const TYPE_ALIASES: Record<string, string> = {
 	"color-picker": "colorPicker",
 	menu: "dropdown",
 	link: "anchor",
+	tagsInput: "tagsField",
 };
 
 function resolveType(type: string): string {
@@ -780,7 +781,7 @@ const registry: Record<string, BlockRenderer> = {
 	datePicker: (b) => <DatePicker interactive {...propsOf(b)} />,
 	loader: (b) => <Loader {...propsOf(b)} />,
 	spinner: (b) => <Spinner {...propsOf(b)} />,
-	tagsInput: (b) => <TagsInput interactive {...propsOf(b)} />,
+	tagsField: (b) => <TagsField interactive {...propsOf(b)} />,
 
 	table: (b) => {
 		const { columns, rows, ...rest } = propsOf(b);

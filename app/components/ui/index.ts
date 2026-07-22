@@ -88,8 +88,8 @@ export {
 	type TableRow,
 } from "./table";
 export { Tabs, type TabsProps } from "./tabs";
-export { TagsInput, type TagsInputProps } from "./tags-input";
-export * as TagsInputPrimitive from "./tags-input-primitive";
+export { TagsField, type TagsFieldProps } from "./tags-field";
+export * as TagsFieldPrimitive from "./tags-field-primitive";
 export { Text, type TextProps } from "./text";
 export { Textarea, type TextareaProps } from "./textarea";
 export * as Toast from "./toast";

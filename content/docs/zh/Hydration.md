@@ -71,7 +71,7 @@ export function shouldHydrate(interactive: unknown, hasSignal: boolean): boolean
 - 可选组（segment-group、toggle-group）
 - 带行点击的表格（table）
 - 带 `src` 的 avatar（异步图片加载 / 错误生命周期属于仅客户端的线索）
-- 分页 / tags-input（状态 + 处理器；提供 `getPageUrl` 的 `type="link"` 分页属于纯导航，保持静态）
+- 分页 / tags-field（状态 + 处理器；提供 `getPageUrl` 的 `type="link"` 分页属于纯导航，保持静态）
 
 ### 第三层 —— 展示型
 
@@ -125,7 +125,7 @@ export function shouldHydrate(interactive: unknown, hasSignal: boolean): boolean
 | `radio-group` | `value` / `defaultValue` / `onValueChange` | ✅ `radio-group.tsx` |
 | `avatar` | `src`（异步图片加载 / 错误生命周期） | ✅ `avatar.tsx`（第二层） |
 | `pagination` | `onPageChange`，或非 link 模式的 `page` / `defaultPage` / `pageSize` / `defaultPageSize` | ✅ `pagination.tsx` |
-| `tags-input` | `onValueChange` / `onInputValueChange` / `value` / `inputValue` / `defaultValue` / `defaultInputValue` | ✅ `tags-input.tsx` |
+| `tags-field` | `onValueChange` / `onInputValueChange` / `value` / `inputValue` / `defaultValue` / `defaultInputValue` | ✅ `tags-field.tsx` |
 | `paginated-table` | 始终为岛屿（管理内部分页状态） | ✅ `paginated-table.tsx`（第二层逻辑） |
 | `date-picker` | `value` / `defaultValue` / `focusedValue` / `open` / `defaultOpen` / `onValueChange` / `onOpenChange` /（键盘/点击/输入事件） | ✅ `date-picker.tsx` |
 | `color-picker` | `value` / `defaultValue` / `format` / `defaultFormat` / `open` / `defaultOpen` / `onValueChange` / `onFormatChange` / `onOpenChange` /（指针/键盘/输入事件） | ✅ `color-picker.tsx` |

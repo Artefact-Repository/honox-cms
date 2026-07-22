@@ -1,0 +1,62 @@
+---
+title: TagsField Champ de Tags
+hydration: 2
+category: Forms
+---
+
+import { TagsField } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+Un composant qui permet aux utilisateurs de saisir plusieurs balises sous forme de liste, avec les mêmes conventions de libellé / texte d'aide / texte d'erreur que `Field`.
+
+## Utilisation
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <TagsField
+      label="Skills"
+      helperText="Appuyez sur Entrée pour ajouter une balise"
+      defaultValue={["React", "Hono"]}
+    />
+  </div>
+</DemoPreview>
+
+### Constructeur de pages CMS
+
+Ce composant est disponible sous forme de bloc `tagsField` dans [Page Builder](/docs/PageBuilder) (`content/pages/*.json`) :
+
+```json
+{
+  "type": "tagsField",
+  "label": "Amenities",
+  "defaultValue": ["WiFi", "Fireplace", "Hot Tub"]
+}
+```
+
+## Propriétés
+
+| Propriété | Type | Défaut | Description |
+| --- | --- | --- | --- |
+| `value` | `string[]` | - | Balises actuelles. |
+| `defaultValue` | `string[]` | - | Balises initiales. |
+| `label` | `Child` | - | Libellé du champ. |
+| `helperText` | `Child` | - | Texte d'aide affiché sous les balises. |
+| `errorText` | `Child` | - | Texte d'erreur affiché quand `invalid` est défini. |
+| `invalid` | `boolean` | - | Force l'état invalide, affichant `errorText`. |
+
+## Configuration du CMS
+
+```yaml
+- label: Tags Field
+  name: tagsField
+  widget: object
+  fields:
+    - { label: Label, name: label, widget: string, required: false }
+    - { label: Helper Text, name: helperText, widget: string, required: false }
+    - { label: Error Text, name: errorText, widget: string, required: false }
+    - { label: Default Tags, name: defaultValue, widget: list, required: false }
+```
+
+## Hydratation
+
+Niveau 2 : s'hydrate lorsque « value », « defaultValue », « onValueChange » ou un état d'entrée est présent.

@@ -53,7 +53,7 @@ import {
 	Switch,
 	Table,
 	Tabs,
-	TagsInput,
+	TagsField,
 	Text,
 	Textarea,
 	Toast,
@@ -833,15 +833,16 @@ export default createRoute((c) => {
 										</div>
 									</Card>
 
-									{/* TagsInput */}
+									{/* TagsField */}
 									<Card
-										title="Tags Input"
+										title="Tags Field"
 										description="Add and remove keyword tags"
 									>
 										<div class={css({ mt: "2" })}>
-											<TagsInput
+											<TagsField
 												interactive
 												label="Interests"
+												helperText="Press Enter to add a tag"
 												defaultValue={["Hono", "Vite", "Panda"]}
 											/>
 										</div>

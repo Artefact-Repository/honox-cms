@@ -46,7 +46,7 @@ import { splitter } from "./splitter";
 import { switchRecipe } from "./switch";
 import { table } from "./table";
 import { tabs } from "./tabs";
-import { tagsInput } from "./tags-input";
+import { tagsField } from "./tags-field";
 import { text } from "./text";
 import { textarea } from "./textarea";
 import { toast } from "./toast";
@@ -74,7 +74,7 @@ export const recipes = {
 export const slotRecipes = {
 	layout,
 	fileUpload,
-	tagsInput,
+	tagsField,
 	pagination,
 	radioCardGroup,
 	radioGroup,

@@ -57,7 +57,7 @@ The Page Builder supports a rich palette of over 40 layout, typography, decorati
 
 * **Select**: Custom single/multi-select dropdown, form-submittable.
 * **DatePicker**: Single/multiple/range date selection with a popup calendar.
-* **TagsInput**: Free-form list of string tags.
+* **TagsField**: Free-form list of string tags.
 * **RadioGroup** / **RadioCardGroup**: Custom radio lists with accessible single-select logic.
 * **SegmentGroup**: Sliding segmented controls for tabbed selection.
 * **Slider**: Range slider components.

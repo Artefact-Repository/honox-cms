@@ -57,7 +57,7 @@ TITLE_MAP = {
     "Switch": "Switch Commutateur",
     "Table": "Table Tableau",
     "Tabs": "Tabs Onglets",
-    "TagsInput": "TagsInput Saisie de Tags",
+    "TagsField": "TagsField Champ de Tags",
     "Text": "Text Texte",
     "Textarea": "Textarea Zone de Texte",
     "Toast": "Toast Toast",

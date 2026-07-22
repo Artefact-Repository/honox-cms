@@ -746,11 +746,13 @@ collections:
                                 options: [xs, sm, md, lg, xl, "2xl"]
                                 default: md
                               - { label: Accessible Label, name: label, widget: string, required: false }
-                          - label: TagsInput
-                            name: tagsInput
+                          - label: Tags Field
+                            name: tagsField
                             widget: object
-                            fields: &tagsinput_fields
+                            fields: &tagsfield_fields
                               - { label: Label, name: label, widget: string, required: false }
+                              - { label: Helper Text, name: helperText, widget: string, required: false }
+                              - { label: Error Text, name: errorText, widget: string, required: false }
                               - label: Default Tags
                                 name: defaultValue
                                 widget: list
@@ -1020,10 +1022,10 @@ collections:
                     name: spinner
                     widget: object
                     fields: *spinner_fields
-                  - label: TagsInput
-                    name: tagsInput
+                  - label: Tags Field
+                    name: tagsField
                     widget: object
-                    fields: *tagsinput_fields
+                    fields: *tagsfield_fields
                   - label: Search
                     name: search
                     widget: object
@@ -1524,10 +1526,10 @@ collections:
             name: spinner
             widget: object
             fields: *spinner_fields
-          - label: TagsInput
-            name: tagsInput
+          - label: Tags Field
+            name: tagsField
             widget: object
-            fields: *tagsinput_fields
+            fields: *tagsfield_fields
           - label: Search
             name: search
             widget: object

@@ -1,30 +1,37 @@
 import { cx } from "design-system/css";
-import type { TagsInputVariantProps } from "design-system/recipes";
-import { tagsInput } from "design-system/recipes";
-import type { PropsWithChildren } from "hono/jsx";
+import type { TagsFieldVariantProps } from "design-system/recipes";
+import { tagsField } from "design-system/recipes";
+import type { Child, PropsWithChildren } from "hono/jsx";
 import { createContext, useContext, useId } from "hono/jsx";
 import { CloseIcon } from "../../icons/close";
 
-type TagsInputStyles = ReturnType<typeof tagsInput>;
+type TagsFieldStyles = ReturnType<typeof tagsField>;
 
-interface TagsInputContextValue {
-	styles: TagsInputStyles;
+interface TagsFieldContextValue {
+	id: string;
+	styles: TagsFieldStyles;
 	value: string[];
 	inputValue?: string;
 	disabled?: boolean;
 	readOnly?: boolean;
 	invalid?: boolean;
 	name?: string;
+	labelId: string;
+	helperTextId: string;
+	errorTextId: string;
+	hasHelperText: boolean;
+	hasErrorText: boolean;
+	errorText?: string;
 }
 
-const TagsInputContext = createContext<TagsInputContextValue | null>(null);
+const TagsFieldContext = createContext<TagsFieldContextValue | null>(null);
 
-export const useTagsInputContext = () => {
-	const context = useContext(TagsInputContext);
+export const useTagsFieldContext = () => {
+	const context = useContext(TagsFieldContext);
 	return context;
 };
 
-export interface RootProps extends TagsInputVariantProps, PropsWithChildren {
+export interface RootProps extends TagsFieldVariantProps, PropsWithChildren {
 	value?: string[];
 	defaultValue?: string[];
 	inputValue?: string;
@@ -38,11 +45,13 @@ export interface RootProps extends TagsInputVariantProps, PropsWithChildren {
 	dir?: "ltr" | "rtl";
 	onValueChange?: (details: { value: string[] }) => void;
 	onInputValueChange?: (details: { inputValue: string }) => void;
-	label?: string;
+	label?: Child;
+	helperText?: Child;
+	errorText?: Child;
 }
 
 export function Root(props: RootProps) {
-	const [variantProps, localProps] = tagsInput.splitVariantProps(props);
+	const [variantProps, localProps] = tagsField.splitVariantProps(props);
 	const {
 		children,
 		value: valueProp,
@@ -55,20 +64,23 @@ export function Root(props: RootProps) {
 		class: classProp,
 		id: idProp,
 		name,
-		onValueChange,
-		onInputValueChange,
+		onValueChange: _onValueChange,
+		onInputValueChange: _onInputValueChange,
 		label,
+		helperText,
+		errorText: errorTextProp,
 		...restProps
 	} = localProps;
 
-	const styles = tagsInput(variantProps);
+	const styles = tagsField(variantProps);
 	const fallbackId = useId();
-	const id = idProp || `tags-input-root-${fallbackId}`;
+	const id = idProp || `tags-field-${fallbackId}`;
 
 	const value = valueProp ?? defaultValue;
 	const inputValue = inputValueProp ?? defaultInputValue;
 
-	const contextValue: TagsInputContextValue = {
+	const contextValue: TagsFieldContextValue = {
+		id,
 		styles,
 		value,
 		inputValue,
@@ -76,13 +88,19 @@ export function Root(props: RootProps) {
 		readOnly,
 		invalid,
 		name,
+		labelId: `tags-field::${id}::label`,
+		helperTextId: `tags-field::${id}::helper-text`,
+		errorTextId: `tags-field::${id}::error-text`,
+		hasHelperText: !!helperText,
+		hasErrorText: !!errorTextProp,
+		errorText: typeof errorTextProp === "string" ? errorTextProp : undefined,
 	};
 
 	return (
-		<TagsInputContext.Provider value={contextValue}>
+		<TagsFieldContext.Provider value={contextValue}>
 			<div
 				id={id}
-				data-scope="tags-input"
+				data-scope="tags-field"
 				data-part="root"
 				data-disabled={disabled ? "" : undefined}
 				data-readonly={readOnly ? "" : undefined}
@@ -90,20 +108,35 @@ export function Root(props: RootProps) {
 				class={cx(styles.root, classProp)}
 				{...restProps}
 			>
-				{children}
+				{children || (
+					<>
+						{label && <Label>{label}</Label>}
+						<Control>
+							<Items />
+							<Input />
+						</Control>
+						<HiddenInput />
+						{helperText && <HelperText>{helperText}</HelperText>}
+						<ErrorText>{errorTextProp}</ErrorText>
+					</>
+				)}
 			</div>
-		</TagsInputContext.Provider>
+		</TagsFieldContext.Provider>
 	);
 }
 
-export function Label(props: PropsWithChildren<{ class?: string }>) {
-	const { children, class: classProp, ...rest } = props;
-	const context = useTagsInputContext();
+export function Label(
+	props: PropsWithChildren<{ class?: string; for?: string }>,
+) {
+	const { children, class: classProp, for: forProp, ...rest } = props;
+	const context = useTagsFieldContext();
 	if (!context) return null;
-	const { styles, disabled, invalid, readOnly } = context;
+	const { styles, disabled, invalid, readOnly, id, labelId } = context;
 	return (
 		<label
+			id={labelId}
 			data-part="label"
+			for={forProp || `${id}-input`}
 			data-disabled={disabled ? "" : undefined}
 			data-invalid={invalid ? "" : undefined}
 			data-readonly={readOnly ? "" : undefined}
@@ -117,7 +150,7 @@ export function Label(props: PropsWithChildren<{ class?: string }>) {
 
 export function Control(props: PropsWithChildren<{ class?: string }>) {
 	const { children, class: classProp, ...rest } = props;
-	const context = useTagsInputContext();
+	const context = useTagsFieldContext();
 	if (!context) return <div {...rest}>{children}</div>;
 	const { styles, disabled, invalid, readOnly } = context;
 	return (
@@ -136,11 +169,29 @@ export function Control(props: PropsWithChildren<{ class?: string }>) {
 
 export function Input(props: { class?: string; placeholder?: string } & any) {
 	const { class: classProp, ...rest } = props;
-	const context = useTagsInputContext();
+	const context = useTagsFieldContext();
 	if (!context) return <input {...rest} />;
-	const { styles, disabled, invalid, readOnly, inputValue } = context;
+	const {
+		styles,
+		disabled,
+		invalid,
+		readOnly,
+		inputValue,
+		id,
+		hasHelperText,
+		hasErrorText,
+		helperTextId,
+		errorTextId,
+	} = context;
+	const describedBy = [
+		hasHelperText ? helperTextId : null,
+		invalid && hasErrorText ? errorTextId : null,
+	]
+		.filter(Boolean)
+		.join(" ");
 	return (
 		<input
+			id={`${id}-input`}
 			data-part="input"
 			data-disabled={disabled ? "" : undefined}
 			data-invalid={invalid ? "" : undefined}
@@ -148,6 +199,8 @@ export function Input(props: { class?: string; placeholder?: string } & any) {
 			disabled={disabled}
 			readOnly={readOnly}
 			value={inputValue}
+			aria-invalid={invalid ? "true" : undefined}
+			aria-describedby={describedBy || undefined}
 			class={cx(styles?.input, classProp)}
 			{...rest}
 		/>
@@ -165,7 +218,7 @@ const ItemContext = createContext<ItemContextValue | null>(null);
 export const useItemContext = () => {
 	const context = useContext(ItemContext);
 	if (!context) {
-		throw new Error("useItemContext must be used within a TagsInput Item");
+		throw new Error("useItemContext must be used within a TagsField Item");
 	}
 	return context;
 };
@@ -179,7 +232,7 @@ export interface ItemProps extends PropsWithChildren {
 
 export function Item(props: ItemProps) {
 	const { children, index, value, disabled, class: classProp, ...rest } = props;
-	const context = useTagsInputContext();
+	const context = useTagsFieldContext();
 	const styles = context?.styles;
 
 	const itemContextValue = {
@@ -206,7 +259,7 @@ export function Item(props: ItemProps) {
 
 export function ItemPreview(props: PropsWithChildren<{ class?: string }>) {
 	const { children, class: classProp, ...rest } = props;
-	const context = useTagsInputContext();
+	const context = useTagsFieldContext();
 	const styles = context?.styles;
 	const { index, value, disabled } = useItemContext();
 	return (
@@ -225,7 +278,7 @@ export function ItemPreview(props: PropsWithChildren<{ class?: string }>) {
 
 export function ItemText(props: PropsWithChildren<{ class?: string }>) {
 	const { children, class: classProp, ...rest } = props;
-	const context = useTagsInputContext();
+	const context = useTagsFieldContext();
 	const styles = context?.styles;
 	const { index, value, disabled } = useItemContext();
 	return (
@@ -244,7 +297,7 @@ export function ItemText(props: PropsWithChildren<{ class?: string }>) {
 
 export function ItemInput(props: { class?: string } & any) {
 	const { class: classProp, ...rest } = props;
-	const context = useTagsInputContext();
+	const context = useTagsFieldContext();
 	const styles = context?.styles;
 	const { index, value, disabled } = useItemContext();
 	return (
@@ -266,7 +319,7 @@ export function ItemDeleteTrigger(
 	props: PropsWithChildren<{ class?: string }>,
 ) {
 	const { children, class: classProp, ...rest } = props;
-	const context = useTagsInputContext();
+	const context = useTagsFieldContext();
 	const styles = context?.styles;
 	const { index, value, disabled } = useItemContext();
 	return (
@@ -286,7 +339,7 @@ export function ItemDeleteTrigger(
 
 export function ClearTrigger(props: PropsWithChildren<{ class?: string }>) {
 	const { children, class: classProp, ...rest } = props;
-	const context = useTagsInputContext();
+	const context = useTagsFieldContext();
 	const styles = context?.styles;
 	const disabled = context?.disabled;
 	return (
@@ -304,7 +357,7 @@ export function ClearTrigger(props: PropsWithChildren<{ class?: string }>) {
 
 export function HiddenInput(props: { name?: string } & any) {
 	const { name, ...rest } = props;
-	const context = useTagsInputContext();
+	const context = useTagsFieldContext();
 	const value = context?.value ?? [];
 	const contextName = context?.name;
 	return (
@@ -319,7 +372,7 @@ export function HiddenInput(props: { name?: string } & any) {
 }
 
 export function Items(props: { class?: string }) {
-	const context = useTagsInputContext();
+	const context = useTagsFieldContext();
 	const value = context?.value ?? [];
 	return (
 		<>
@@ -334,4 +387,43 @@ export function Items(props: { class?: string }) {
 			))}
 		</>
 	);
+}
+
+export function HelperText(props: { children?: Child; class?: string }) {
+	const context = useTagsFieldContext();
+	const styles = context?.styles;
+	return (
+		<div
+			id={context?.helperTextId}
+			data-part="helper-text"
+			class={cx(styles?.helperText, props.class)}
+			data-disabled={context?.disabled ? "" : undefined}
+			data-invalid={context?.invalid ? "" : undefined}
+			data-readonly={context?.readOnly ? "" : undefined}
+		>
+			{props.children}
+		</div>
+	);
+}
+
+export function ErrorText(props: { children?: Child; class?: string }) {
+	const context = useTagsFieldContext();
+	const styles = context?.styles;
+	const content = props.children || context?.errorText;
+	if (context?.invalid && content) {
+		return (
+			<div
+				id={context?.errorTextId}
+				data-part="error-text"
+				aria-live="polite"
+				class={cx(styles?.errorText, props.class)}
+				data-disabled={context?.disabled ? "" : undefined}
+				data-invalid={context?.invalid ? "" : undefined}
+				data-readonly={context?.readOnly ? "" : undefined}
+			>
+				{content}
+			</div>
+		);
+	}
+	return null;
 }

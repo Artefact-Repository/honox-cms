@@ -1,7 +1,7 @@
 import { defineSlotRecipe } from "@pandacss/dev";
 
-export const tagsInput = defineSlotRecipe({
-	className: "tags-input",
+export const tagsField = defineSlotRecipe({
+	className: "tags-field",
 	slots: [
 		"root",
 		"label",
@@ -13,6 +13,8 @@ export const tagsInput = defineSlotRecipe({
 		"itemText",
 		"itemInput",
 		"itemDeleteTrigger",
+		"helperText",
+		"errorText",
 	],
 	base: {
 		root: {
@@ -23,6 +25,17 @@ export const tagsInput = defineSlotRecipe({
 		},
 		label: {
 			textStyle: "label",
+		},
+		helperText: {
+			color: "fg.muted",
+			textStyle: "sm",
+			_disabled: {
+				layerStyle: "disabled",
+			},
+		},
+		errorText: {
+			color: "error",
+			textStyle: "sm",
 		},
 		control: {
 			"--focus-color": "colors.colorPalette.solid.bg",

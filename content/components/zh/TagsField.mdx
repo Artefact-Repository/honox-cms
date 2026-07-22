@@ -1,0 +1,62 @@
+---
+title: TagsField 标签字段
+hydration: 2
+category: Forms
+---
+
+import { TagsField } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+允许用户以列表形式输入多个标签的组件，与 `Field` 共用相同的标签、帮助文本、错误文本约定。
+
+## 用法
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <TagsField
+      label="Skills"
+      helperText="按 Enter 添加标签"
+      defaultValue={["React", "Hono"]}
+    />
+  </div>
+</DemoPreview>
+
+### CMS 页面构建器
+
+该组件可作为 `tagsField` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用：
+
+```json
+{
+  "type": "tagsField",
+  "label": "Amenities",
+  "defaultValue": ["WiFi", "Fireplace", "Hot Tub"]
+}
+```
+
+## 属性
+
+| 属性 | 类型 | 默认 | 说明 |
+| --- | --- | --- | --- |
+| `value` | `string[]` | - | 当前标签。 |
+| `defaultValue` | `string[]` | - | 初始标签。 |
+| `label` | `Child` | - | 字段标签。 |
+| `helperText` | `Child` | - | 标签下方显示的帮助文本。 |
+| `errorText` | `Child` | - | `invalid` 为真时显示的错误文本。 |
+| `invalid` | `boolean` | - | 强制无效状态，显示 `errorText`。 |
+
+## CMS 配置
+
+```yaml
+- label: Tags Field
+  name: tagsField
+  widget: object
+  fields:
+    - { label: Label, name: label, widget: string, required: false }
+    - { label: Helper Text, name: helperText, widget: string, required: false }
+    - { label: Error Text, name: errorText, widget: string, required: false }
+    - { label: Default Tags, name: defaultValue, widget: list, required: false }
+```
+
+## 水合
+
+第二级：当存在 `value`、`defaultValue`、`onValueChange` 或输入状态时进行水合。

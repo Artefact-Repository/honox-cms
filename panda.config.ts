@@ -74,6 +74,7 @@ export default defineConfig({
 			splitter: ["*"],
 			switch: ["*"],
 			table: ["*"],
+			tagsField: ["*"],
 			text: ["*"],
 			textarea: ["*"],
 			toast: ["*"],

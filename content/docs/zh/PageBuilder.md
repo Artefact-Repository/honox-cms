@@ -57,7 +57,7 @@ title: CMS 页面构建器
 
 * **Select**：可提交的自定义单选/多选下拉框。
 * **DatePicker**：带弹出日历的单选/多选/区间日期选择。
-* **TagsInput**：自由格式的字符串标签列表。
+* **TagsField**：自由格式的字符串标签列表。
 * **RadioGroup** / **RadioCardGroup**：带无障碍单选逻辑的自定单选列表。
 * **SegmentGroup**：用于选项卡选择的滑动分段控件。
 * **Slider**：范围滑块组件。

@@ -80,7 +80,7 @@ Applies to:
 - Selectable groups (segment-group, toggle-group)
 - Tables with row clicks (table)
 - Avatar with a `src` (the async image load / error lifecycle is a client-only cue)
-- Pagination / tags-input / pin-field (state + handlers; a `type="link"` pagination that
+- Pagination / tags-field / pin-field (state + handlers; a `type="link"` pagination that
   supplies `getPageUrl` is pure navigation and stays static)
 
 ### Tier-3 — Presentational
@@ -137,7 +137,7 @@ Applies to:
 | `radio-group` | `value` / `defaultValue` / `onValueChange` | ✅ `radio-group.tsx` |
 | `avatar` | `src` (async image load / error lifecycle) | ✅ `avatar.tsx` (Tier-2) |
 | `pagination` | `onPageChange`, or non-link `page` / `defaultPage` / `pageSize` / `defaultPageSize` | ✅ `pagination.tsx` |
-| `tags-input` | `onValueChange` / `onInputValueChange` / `value` / `inputValue` / `defaultValue` / `defaultInputValue` | ✅ `tags-input.tsx` |
+| `tags-field` | `onValueChange` / `onInputValueChange` / `value` / `inputValue` / `defaultValue` / `defaultInputValue` | ✅ `tags-field.tsx` |
 | `pin-field` | `value` / `defaultValue` / `onValueChange` / `onValueComplete` / `onValueInvalid` / `validator` / `autoSubmit` / `onAutoSubmit` | ✅ `pin-field.tsx` |
 | `paginated-table` | Always island (manages internal pagination state) | ✅ `paginated-table.tsx` (Tier-2 logic) |
 | `date-picker` | `value` / `defaultValue` / `focusedValue` / `open` / `defaultOpen` / `onValueChange` / `onOpenChange` / (keyboard/click/typing events) | ✅ `date-picker.tsx` |
