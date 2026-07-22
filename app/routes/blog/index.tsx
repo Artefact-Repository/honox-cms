@@ -22,7 +22,6 @@ import { type DocsNavLinkConfig, loadDocsConfig } from "../../lib/configs";
 import { loadPosts } from "../../lib/posts";
 import { filterEntries } from "../../utils/search";
 
-
 function BlogHeader({
 	headerLinks,
 	currentPath,
@@ -112,7 +111,10 @@ function BlogHeader({
 					>
 						{currentLocale === "zh" ? "内容管理" : "Admin"}
 					</Anchor>
-					<LanguageSwitcher currentPath={currentPath} currentLocale={currentLocale} />
+					<LanguageSwitcher
+						currentPath={currentPath}
+						currentLocale={currentLocale}
+					/>
 				</nav>
 			</div>
 		</header>

@@ -29,7 +29,6 @@ import {
 } from "../../lib/docs";
 import { markdownContentClass } from "../../utils/markdown-content-style";
 
-
 // Page-chrome strings that aren't part of translated doc content or the
 // configs.<locale>.json singleton (search box, Edit/Admin button).
 const UI_STRINGS: Record<
@@ -80,7 +79,6 @@ function localiseHref(href: string, locale: string): string {
 	}
 	return `/${locale}${href}`;
 }
-
 
 // ---------------------------------------------------------------------------
 // Inlined docs nav shell.
@@ -342,7 +340,6 @@ function MobileNav({
 	);
 }
 
-
 interface DocsHeaderProps {
 	editUrl?: string;
 	groups: DocGroup[];
@@ -453,7 +450,10 @@ function DocsHeader({
 							{ui.admin}
 						</Anchor>
 					)}
-					<LanguageSwitcher currentPath={currentPath} currentLocale={currentLocale} />
+					<LanguageSwitcher
+						currentPath={currentPath}
+						currentLocale={currentLocale}
+					/>
 					{githubLink && (
 						<Anchor
 							href={githubLink.href}

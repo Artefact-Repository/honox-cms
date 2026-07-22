@@ -14,11 +14,7 @@ import { type DocsConfig, loadDocsConfig } from "./configs";
 // content/posts is excluded (any locale depth): blog posts have their own
 // loader/route (app/lib/posts.ts).
 const markdownModules = import.meta.glob(
-	[
-		"/content/*/*.md",
-		"/content/*/*/*.md",
-		"!/content/posts/**",
-	],
+	["/content/*/*.md", "/content/*/*/*.md", "!/content/posts/**"],
 	{ query: "?raw", import: "default" },
 ) as Record<string, () => Promise<string>>;
 
@@ -38,7 +34,7 @@ const mdxModules = import.meta.glob([
 
 // Translated-content locale codes — must track public/admin/config.yml's
 // i18n.locales (minus the default) and the app/routes/<locale> dirs.
-export const LOCALES = ["zh", "es", "pt"] as const;
+export const LOCALES = ["zh", "es", "pt", "fr"] as const;
 
 export interface DocSummary {
 	slug: string;

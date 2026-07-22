@@ -272,7 +272,6 @@ function MobileNav({ groups, activeSlug, links }: DocsSidenavProps) {
 	);
 }
 
-
 interface DocsHeaderProps {
 	editUrl?: string;
 	groups: DocGroup[];
@@ -397,7 +396,10 @@ function DocsHeader({
 							{currentLocale === "zh" ? "内容管理" : "Admin"}
 						</Anchor>
 					)}
-					<LanguageSwitcher currentPath={currentPath} currentLocale={currentLocale} />
+					<LanguageSwitcher
+						currentPath={currentPath}
+						currentLocale={currentLocale}
+					/>
 					{githubLink && (
 						<Anchor
 							href={githubLink.href}

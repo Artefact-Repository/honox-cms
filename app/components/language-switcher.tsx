@@ -1,13 +1,14 @@
-import { css, cx } from "design-system/css";
+import { css } from "design-system/css";
 import { Button, Dropdown } from "./ui";
 
-const ALL_LOCALES = ["en", "zh", "es", "pt"] as const;
+const ALL_LOCALES = ["en", "zh", "es", "pt", "fr"] as const;
 
 const LOCALE_NAMES: Record<string, string> = {
 	en: "English",
 	zh: "中文",
 	es: "Español",
 	pt: "Português",
+	fr: "Français",
 };
 
 function stripLocalePrefix(path: string, locale: string): string {
@@ -191,7 +192,9 @@ export function LanguageSwitcher({
 											</svg>
 										</span>
 									) : (
-										<span class={css({ width: "4", height: "4", flexShrink: 0 })} />
+										<span
+											class={css({ width: "4", height: "4", flexShrink: 0 })}
+										/>
 									)}
 									<span class={css({ fontSize: "sm" })}>
 										{LOCALE_NAMES[locale] ?? locale}
