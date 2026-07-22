@@ -1,0 +1,134 @@
+---
+title: ToggleGroup Grupo de Alternancia
+hydration: 2
+category: Forms
+---
+
+import { ToggleGroup, Stack } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introducción
+
+Un conjunto de botones de alternancia para selección única o múltiple, excluyente o incluyente — por ejemplo, controles de formato de texto (negrita/cursiva/subrayado) o un selector de vista.
+
+# Hidratación
+
+**Nivel 2 — detección automática inteligente.** Un `ToggleGroup` se renderiza como HTML estático y no envía JS del cliente a menos que esté presente una señal de comportamiento. Pasa `interactive={true}` para forzar la hidratación, o `interactive={false}` para forzar un renderizado estático.
+
+Se hidrata como island cuando está presente **cualquiera** de las siguientes señales (o se establece `interactive={true}`):
+
+- `value` (selección controlada)
+- `defaultValue` (selección inicial no controlada)
+- `onValueChange`
+
+| `interactive` prop | Result |
+| --- | --- |
+| omitido, **sin** señal | Estático — sin JS del cliente |
+| omitido, señal presente | Se hidrata como island |
+| `true` | Se hidrata como island |
+| `false` | Estático — sin JS del cliente |
+
+# Uso
+
+<DemoPreview>
+  <Stack direction="horizontal" gap="6">
+    <ToggleGroup
+      multiple
+      defaultValue={["bold"]}
+      items={[
+        { label: "B", value: "bold" },
+        { label: "I", value: "italic" },
+        { label: "U", value: "underline" },
+      ]}
+      interactive
+    />
+    <ToggleGroup
+      defaultValue={["list"]}
+      items={[
+        { label: "Grid", value: "grid" },
+        { label: "List", value: "list" },
+      ]}
+      interactive
+    />
+  </Stack>
+</DemoPreview>
+
+```tsx
+import { ToggleGroup } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <ToggleGroup
+      multiple
+      defaultValue={["bold"]}
+      items={[
+        { label: "B", value: "bold" },
+        { label: "I", value: "italic" },
+        { label: "U", value: "underline" },
+      ]}
+    />
+  );
+}
+```
+
+## Composición personalizada
+
+Pasa `children` en lugar de `items` para tener control total sobre el contenido de cada botón:
+
+```tsx
+import { ToggleGroup } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <ToggleGroup defaultValue={["list"]}>
+      <ToggleGroup.Item value="grid">Grid</ToggleGroup.Item>
+      <ToggleGroup.Item value="list">List</ToggleGroup.Item>
+    </ToggleGroup>
+  );
+}
+```
+
+# Propiedades
+
+## Root
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `value` | `string[]` | Los valores actualmente presionados (controlado). |
+| `defaultValue` | `string[]` | Los valores inicialmente presionados (no controlado). |
+| `onValueChange` | `(value: string[]) => void` | Se llama cuando cambia la selección. |
+| `multiple` | `boolean` | Permite que se presione más de un elemento a la vez. Predeterminado `false` (selección única, desactivable al volver a alternar). |
+| `disabled` | `boolean` | Deshabilita todos los elementos. |
+| `orientation` | `"horizontal" \| "vertical"` | Flujo de diseño, y el eje por el que se desplazan las teclas de flecha. Predeterminado `"horizontal"`. |
+| `id` | `string` | El id del elemento raíz. |
+| `variant` | `"outline" \| "ghost"` | Estilo visual. Predeterminado `"outline"`. |
+| `size` | `"sm" \| "md" \| "lg"` | Tamaño visual. Predeterminado `"md"`. |
+| `interactive` | `boolean` | Anula la decisión de hidratación (ver arriba). |
+| `class` | `string` | Clases CSS personalizadas para el elemento raíz. |
+
+## Composición predeterminada
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `items` | `ToggleGroupItem[]` | Botones a renderizar cuando se omite `children`. |
+
+## ToggleGroupItem
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `value` | `string` | El valor único del elemento. |
+| `label` | `string \| JSX.Element` | El contenido visible del botón. |
+| `disabled` | `boolean` | Deshabilita este botón. |
+
+## Subcomponentes
+
+| Part | Description |
+| --- | --- |
+| `ToggleGroup.Item` | Un botón de alternancia. Requiere una propiedad `value`; renderiza `role="checkbox"` en modo `multiple` o `role="radio"` en caso contrario. |
+
+# Accesibilidad
+
+- El elemento raíz tiene `role="group"`.
+- Los elementos renderizan `role="checkbox"` + `aria-pressed` cuando `multiple`, o `role="radio"` + `aria-checked` en caso contrario.
+- Las teclas de flecha (Derecha/Abajo para avanzar, Izquierda/Arriba para retroceder) desplazan el foco entre los elementos habilitados; Home/End saltan al primer/último elemento habilitado — según coincida con `orientation`.
+- `data-state` (`on`/`off`) y `data-disabled` se reflejan en cada elemento para su estilización.

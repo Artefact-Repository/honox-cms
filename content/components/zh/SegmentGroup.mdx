@@ -1,0 +1,64 @@
+---
+title: SegmentGroup 分段控件
+hydration: 2
+category: Forms
+---
+
+import { SegmentGroup } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+一组外观类似单个分段控件、行为类似单选按钮的按钮。
+
+## 用法
+
+<DemoPreview>
+  <SegmentGroup
+    label="View"
+    items={[
+      { label: "List", value: "list" },
+      { label: "Grid", value: "grid" },
+    ]}
+  />
+</DemoPreview>
+
+### CMS 页面构建器
+
+该组件可作为 `segmentGroup` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用：
+
+```json
+{
+  "type": "segmentGroup",
+  "label": "View",
+  "items": [
+    { "label": "List", "value": "list" },
+    { "label": "Grid", "value": "grid" }
+  ]
+}
+```
+
+## 属性
+
+| 属性 | 类型 | 默认 | 说明 |
+| --- | --- | --- | --- |
+| `label` | `string` | - | 组标签。 |
+| `items` | `SegmentGroupItem[]` | - | 包含 `label` 和 `value` 的条目数组。 |
+
+## CMS 配置
+
+```yaml
+- label: SegmentGroup
+  name: segment-group
+  widget: object
+  fields:
+    - { label: Label, name: label, widget: string, required: false }
+    - label: Items
+      name: items
+      widget: list
+      fields:
+        - { label: Label, name: label, widget: string }
+        - { label: Value, name: value, widget: string }
+```
+
+## 水合
+
+Tier-2：当提供了 `value`、`defaultValue` 或 `onValueChange` 时进行水合。

@@ -39,13 +39,35 @@ export interface PostDetail extends BlogPost {
 	relatedPosts: BlogPost[];
 }
 
-export async function loadPosts(): Promise<LoadedPosts> {
+export async function loadPosts(locale = "en"): Promise<LoadedPosts> {
 	const posts: BlogPost[] = [];
 	const searchEntries: SearchIndexEntry[] = [];
 	const allTags = new Set<string>();
 
-	for (const [path, loader] of Object.entries(postFiles)) {
+	// Get all unique base slugs
+	const uniqueSlugs = new Set<string>();
+	for (const path of Object.keys(postFiles)) {
+		const filename = path.replace("/content/posts/", "");
+		const baseName = filename
+			.replace(/\.[a-z]{2}\.md$/, "")
+			.replace(/\.md$/, "");
+		uniqueSlugs.add(baseName);
+	}
+
+	for (const slug of uniqueSlugs) {
 		try {
+			// Find the best path: prefer localized if locale !== "en", fallback to en
+			let targetPath = `/content/posts/${slug}.md`;
+			if (locale !== "en") {
+				const langPath = `/content/posts/${slug}.${locale}.md`;
+				if (postFiles[langPath]) {
+					targetPath = langPath;
+				}
+			}
+
+			const loader = postFiles[targetPath];
+			if (!loader) continue;
+
 			const markdown = await (loader as () => Promise<string>)();
 			const { data, content } = parseFrontmatter(markdown);
 
@@ -54,7 +76,6 @@ export async function loadPosts(): Promise<LoadedPosts> {
 				continue;
 			}
 
-			const slug = path.replace("/content/posts/", "").replace(".md", "");
 			const postTags = Array.isArray(data.tags) ? data.tags : [];
 			const title = data.title || "Untitled";
 			const description = data.description || "";
@@ -77,7 +98,7 @@ export async function loadPosts(): Promise<LoadedPosts> {
 
 			searchEntries.push({
 				key: slug,
-				href: `/blog/${slug}`,
+				href: locale === "zh" ? `/zh/blog/${slug}` : `/blog/${slug}`,
 				title,
 				description,
 				tags: postTags,
@@ -89,7 +110,7 @@ export async function loadPosts(): Promise<LoadedPosts> {
 				]),
 			});
 		} catch (error) {
-			console.error(`Error loading ${path}:`, error);
+			console.error(`Error loading slug ${slug}:`, error);
 		}
 	}
 
@@ -113,8 +134,17 @@ export async function loadPosts(): Promise<LoadedPosts> {
  */
 export async function loadPostBySlug(
 	slug: string,
+	locale = "en",
 ): Promise<PostDetail | undefined> {
-	const loader = postFiles[`/content/posts/${slug}.md`];
+	let targetPath = `/content/posts/${slug}.md`;
+	if (locale !== "en") {
+		const langPath = `/content/posts/${slug}.${locale}.md`;
+		if (postFiles[langPath]) {
+			targetPath = langPath;
+		}
+	}
+
+	const loader = postFiles[targetPath];
 	if (!loader) {
 		return undefined;
 	}
@@ -140,7 +170,7 @@ export async function loadPostBySlug(
 		cover: data.cover,
 	};
 
-	const { posts: allPosts } = await loadPosts();
+	const { posts: allPosts } = await loadPosts(locale);
 	const relatedPosts = allPosts
 		.filter(
 			(other) =>
@@ -155,8 +185,11 @@ export async function loadPostBySlug(
  * Loads all posts by a given author, newest first.
  * Returns an empty array if no posts match (including if the author doesn't exist).
  */
-export async function loadPostsByAuthor(author: string): Promise<BlogPost[]> {
-	const { posts } = await loadPosts();
+export async function loadPostsByAuthor(
+	author: string,
+	locale = "en",
+): Promise<BlogPost[]> {
+	const { posts } = await loadPosts(locale);
 	return posts.filter(
 		(post) =>
 			(post.author || "Artefact Team").toLowerCase() === author.toLowerCase(),

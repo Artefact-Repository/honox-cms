@@ -1,0 +1,52 @@
+---
+title: TagsInput Entrada de Etiquetas
+hydration: 2
+category: Forms
+---
+
+import { TagsInput } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+Un componente que permite a los usuarios introducir varias etiquetas en forma de lista.
+
+## Uso
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <TagsInput label="Skills" defaultValue={["React", "Hono"]} />
+  </div>
+</DemoPreview>
+
+### Constructor de páginas CMS
+
+Este componente está disponible como un bloque `tagsInput` en el [Constructor de páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "tagsInput",
+  "label": "Amenities",
+  "defaultValue": ["WiFi", "Fireplace", "Hot Tub"]
+}
+```
+
+## Propiedades
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `string[]` | - | Etiquetas actuales. |
+| `defaultValue` | `string[]` | - | Etiquetas iniciales. |
+
+## Configuración del CMS
+
+```yaml
+- label: TagsInput
+  name: tagsInput
+  widget: object
+  fields:
+    - { label: Label, name: label, widget: string, required: false }
+    - { label: Default Tags, name: defaultValue, widget: list, required: false }
+```
+
+## Hidratación
+
+Nivel 2: Se hidrata cuando está presente `value`, `defaultValue`, `onValueChange`, o el estado de entrada.

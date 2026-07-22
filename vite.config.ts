@@ -79,7 +79,7 @@ const mainConfig = (_mode: string) => ({
 	// dual CJS/ESM package where the runner resolves the `require()`-using CJS
 	// build, like `yaml`) — force Node's native module loader to handle them.
 	ssr: {
-		external: ["extend", "yaml"],
+		external: ["extend", "yaml", "debug"],
 	},
 	plugins: [
 		mdx({

@@ -1,0 +1,145 @@
+---
+title: Field 表单字段
+hydration: 2
+category: Forms
+---
+
+import { Field } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+一个用于表单字段的基础组件，管理标签、辅助文本、错误消息与校验状态。它遵循“Smart Switcher”模式，在需要时自动以水合形式作为交互式岛屿渲染。
+
+# 用法
+
+## 智能自动水合
+
+`Field` 组件会自动判断自身是否应该交互。如果提供了以下任意属性，它就会成为一个岛屿：`interactive`、`onValueChange`、`value`、`defaultValue`、`validator` 或 `minLength`。
+
+## 校验
+
+Field 支持内置与自定义校验。
+
+### 最小长度
+
+使用 `minLength` 会在输入过短时自动显示错误消息。
+
+```tsx
+<Field
+  label="Username"
+  minLength={5}
+  placeholder="Enter at least 5 characters"
+/>
+```
+
+### 自定义验证器
+
+`validator` 属性接受一个函数，返回 `true` 表示有效、返回 `false` 表示无效（使用默认错误消息），或返回一个 `string` 作为自定义错误消息。
+
+```tsx
+<Field
+  label="Email"
+  validator={(value) => {
+    if (!value.includes("@")) return "Must be a valid email";
+    return true;
+  }}
+/>
+```
+
+使用 Field 最简单的方式是使用扁平化的属性。它会自动渲染一个输入框。
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <Field
+      label="Username"
+      helperText="Choose a unique username."
+      placeholder="Type here..."
+      minLength={3}
+    />
+  </div>
+</DemoPreview>
+
+```tsx
+import { Field } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Field
+      label="Username"
+      helperText="Choose a unique username."
+      placeholder="Type here..."
+      minLength={3}
+    />
+  );
+}
+```
+
+## Fieldset 继承
+
+嵌套在 `Fieldset` 中的 `Field` 会继承该组的 `disabled`/`required` 状态，以及其 `invalid` 状态——但仅当 `Field` 自身没有任何校验时（没有 `validator`/`minLength`，也没有显式的 `invalid` 属性）。`Field` 上的显式属性始终优先于继承值。
+
+```tsx
+<Fieldset legend="Shipping address" disabled>
+  {/* inherits disabled — no need to repeat it */}
+  <Field label="Street" />
+</Fieldset>
+```
+
+注意，原生的 `<fieldset disabled>` 也会在浏览器层面禁用每一个后代表单控件，与这种继承无关——继承的 `disabled` 属性只是让 `Field` 自身的样式/ARIA 与之保持同步，它无法从被禁用的 fieldset 内部被重新启用为可用。
+
+## 组合
+
+如需更多控制，你可以包裹 `Textarea` 或其他自定义输入等其他组件。`Field` 会向它的子元素提供上下文。
+
+```tsx
+import { Field, Textarea } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Field
+      label="Bio"
+      helperText="Tell us about yourself."
+      minLength={10}
+    >
+      <Textarea placeholder="A short bio" />
+    </Field>
+  );
+}
+```
+
+## CMS 页面构建器
+
+该组件在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中作为 `field` 区块提供：
+
+```json
+{
+  "type": "field",
+  "label": "Username",
+  "helperText": "Choose a unique username.",
+  "required": true
+}
+```
+
+# 属性
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `children` | `any` | 组件内部要渲染的内容。如果提供，则不渲染内部输入框。 |
+| `class` | `string` | 自定义 CSS 类名。 |
+| `id` | `string` | 唯一标识符。如未提供，则自动生成。 |
+| `label` | `Child` | 字段的标签。 |
+| `helperText` | `Child` | 字段的辅助文本。 |
+| `errorText` | `Child` | 字段的错误文本。如果以字符串形式提供，则作为消息使用。 |
+| `disabled` | `boolean` | 字段是否被禁用。 |
+| `invalid` | `boolean` | 字段是否处于无效状态。 |
+| `required` | `boolean` | 字段是否为必填。 |
+| `readOnly` | `boolean` | 字段是否为只读。 |
+| `value` | `string` | 当前值（强制进入交互模式）。 |
+| `defaultValue` | `string` | 初始值（强制进入交互模式）。 |
+| `onValueChange` | `(val: string) => void` | 值变化时触发的回调（强制进入交互模式）。 |
+| `minLength` | `number` | 最小长度校验（强制进入交互模式）。 |
+
+| `validator` | \`(val: string) => boolean \ | string\` | 自定义校验函数（强制进入交互模式）。 |
+
+| `interactive` | `boolean` | 强制以水合形式作为岛屿渲染。 |

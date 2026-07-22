@@ -77,16 +77,37 @@ function sortNotes(notes: Note[]): void {
 	});
 }
 
-export async function loadNotes(): Promise<LoadedNotes> {
+export async function loadNotes(locale = "en"): Promise<LoadedNotes> {
 	const notes: Note[] = [];
 	const searchEntries: SearchIndexEntry[] = [];
 	const allTags = new Set<string>();
 
-	for (const [path, loader] of Object.entries(noteFiles)) {
+	// Get all unique base slugs
+	const uniqueSlugs = new Set<string>();
+	for (const path of Object.keys(noteFiles)) {
+		const filename = path.replace("/content/notes/", "");
+		const baseName = filename
+			.replace(/\.[a-z]{2}\.md$/, "")
+			.replace(/\.md$/, "");
+		uniqueSlugs.add(baseName);
+	}
+
+	for (const slug of uniqueSlugs) {
 		try {
+			// Find the best path: prefer localized if locale !== "en", fallback to en
+			let targetPath = `/content/notes/${slug}.md`;
+			if (locale !== "en") {
+				const langPath = `/content/notes/${slug}.${locale}.md`;
+				if (noteFiles[langPath]) {
+					targetPath = langPath;
+				}
+			}
+
+			const loader = noteFiles[targetPath];
+			if (!loader) continue;
+
 			const markdown = await (loader as () => Promise<string>)();
 			const { data, content } = parseFrontmatter(markdown);
-			const slug = path.replace("/content/notes/", "").replace(".md", "");
 			const note = toNote(slug, data);
 			const excerpt = stripMarkdown(content).trim().slice(0, 180);
 			note.excerpt = excerpt;
@@ -98,14 +119,14 @@ export async function loadNotes(): Promise<LoadedNotes> {
 			notes.push(note);
 			searchEntries.push({
 				key: slug,
-				href: `/notes/${slug}`,
+				href: locale === "zh" ? `/zh/notes/${slug}` : `/notes/${slug}`,
 				title: note.title,
 				description: excerpt,
 				tags: note.tags,
 				haystack: buildHaystack([note.title, note.tags, excerpt]),
 			});
 		} catch (error) {
-			console.error(`Error loading ${path}:`, error);
+			console.error(`Error loading note slug ${slug}:`, error);
 		}
 	}
 
@@ -124,8 +145,17 @@ export async function loadNotes(): Promise<LoadedNotes> {
  */
 export async function loadNoteBySlug(
 	slug: string,
+	locale = "en",
 ): Promise<NoteDetail | undefined> {
-	const loader = noteFiles[`/content/notes/${slug}.md`];
+	let targetPath = `/content/notes/${slug}.md`;
+	if (locale !== "en") {
+		const langPath = `/content/notes/${slug}.${locale}.md`;
+		if (noteFiles[langPath]) {
+			targetPath = langPath;
+		}
+	}
+
+	const loader = noteFiles[targetPath];
 	if (!loader) {
 		return undefined;
 	}

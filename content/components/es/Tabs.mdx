@@ -1,0 +1,111 @@
+---
+title: Tabs Pestañas
+hydration: 2
+category: Navigation
+---
+
+import { Tabs, Stack, Badge } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introducción
+
+Un elemento de navegación o diseño que organiza el contenido en paneles intercambiables y mutuamente excluyentes.
+
+# Uso
+
+<DemoPreview>
+  <Tabs defaultValue="features" interactive variant="enclosed" size="md">
+    <Tabs.List>
+      <Tabs.Trigger value="features">⚡ Key Features</Tabs.Trigger>
+      <Tabs.Trigger value="pricing">💎 Pricing Plans</Tabs.Trigger>
+      <Tabs.Indicator />
+    </Tabs.List>
+
+    <Tabs.Content value="features">
+      Our Hono/JSX Tabs component supports zero runtime styled-system classes, smooth sliding indicator transitions, and native keyboard interaction.
+    </Tabs.Content>
+
+    <Tabs.Content value="pricing">
+      Flexible subscription pricing for individuals, start-ups, and scaling enterprise workspaces.
+    </Tabs.Content>
+  </Tabs>
+</DemoPreview>
+
+```tsx
+import { Tabs } from "../components/ui/tabs";
+
+<Tabs defaultValue="features" interactive variant="enclosed" size="md">
+  <Tabs.List>
+    <Tabs.Trigger value="features">⚡ Key Features</Tabs.Trigger>
+    <Tabs.Trigger value="pricing">💎 Pricing Plans</Tabs.Trigger>
+    <Tabs.Indicator />
+  </Tabs.List>
+
+  <Tabs.Content value="features">
+    Our Hono/JSX Tabs component supports zero-runtime classes, smooth sliding transitions, and native keyboard interaction.
+  </Tabs.Content>
+
+  <Tabs.Content value="pricing">
+    Flexible subscription pricing for individuals, start-ups, and scaling enterprise workspaces.
+  </Tabs.Content>
+</Tabs>;
+```
+
+## Constructor de páginas CMS
+
+Este componente está disponible como un bloque `tabs` en el [Constructor de páginas](/docs/PageBuilder) (`content/pages/*.json`), diseñado con una API limpia y plana:
+
+```json
+{
+  "type": "tabs",
+  "variant": "enclosed",
+  "size": "md",
+  "items": [
+    {
+      "value": "features",
+      "label": "⚡ Key Features",
+      "content": [
+        {
+          "type": "text",
+          "content": "Our high-end tabs component is lightning fast."
+        }
+      ]
+    },
+    {
+      "value": "pricing",
+      "label": "💎 Pricing Plans",
+      "content": [
+        {
+          "type": "text",
+          "content": "Starting from $0/mo."
+        }
+      ]
+    }
+  ]
+}
+```
+
+# Propiedades
+
+## Root
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `defaultValue` | `string` | El valor de la pestaña inicialmente seleccionada al renderizar (no controlado). |
+| `value` | `string` | El valor de la pestaña seleccionada, controlado. |
+| `variant` | \`"line" \ | "subtle" \ | "enclosed"\` | Apariencia visual de la lista de pestañas y el indicador. Predeterminado `"line"`. |
+| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg"\` | La altura, espaciado y relleno general de los elementos de pestaña. Predeterminado `"md"`. |
+| `orientation` | \`"horizontal" \ | "vertical"\` | El flujo de diseño de los triggers. Predeterminado `"horizontal"`. |
+| `activationMode` | \`"automatic" \ | "manual"\` | En modo manual, los triggers se activan al hacer clic o pulsar Enter/Espacio; en modo automático, se activan instantáneamente al recibir el foco. Predeterminado `"automatic"`. |
+| `loopFocus` | `boolean` | Si el foco del teclado vuelve al inicio o al final de la lista. Predeterminado `true`. |
+| `lazyMount` | `boolean` | Retrasa el renderizado de los paneles de contenido de las pestañas hasta que se visitan por primera vez. Predeterminado `false`. |
+| `unmountOnExit` | `boolean` | Destruye los elementos del panel de pestañas del DOM cuando se vuelven inactivos. Predeterminado `false`. |
+| `onValueChange` | `(details: { value: string }) => void` | Se llama cuando cambia el valor de la pestaña activa. |
+| `onFocusChange` | `(details: { value: string }) => void` | Se llama cuando un trigger de pestaña diferente recibe el foco por teclado o clic. |
+
+# Accesibilidad
+
+Este componente cumple totalmente con el **patrón de diseño WAI-ARIA Tabs**:
+- Establece `role="tablist"` en el contenedor de la lista y `aria-orientation` mapeado al diseño.
+- Establece `role="tab"` en los triggers, con `aria-selected` correspondiente al estado activo y `aria-controls` referenciando los ID de los paneles.
+- Soporte de teclado: ArrowRight/ArrowLeft (o ArrowDown/ArrowUp en vertical) navega entre triggers con tabIndex de enfoque itinerante. Home/End mueve el foco inmediatamente a los extremos. Enter/Espacio activa los triggers en modo manual.

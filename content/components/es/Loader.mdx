@@ -1,0 +1,65 @@
+---
+title: Loader Cargador
+hydration: 3
+category: Feedback
+---
+
+import { Loader } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introducción
+
+Un componente utilitario que gestiona el estado visual de un `Spinner` y el texto asociado.
+
+# Uso
+
+<DemoPreview>
+  <Loader text="Loading data..." />
+</DemoPreview>
+
+```tsx
+import { Loader, Spinner } from "../components/ui";
+
+export default function MyPage() {
+  return <Loader text="Loading data..." />;
+}
+```
+
+## Spinner y ubicación personalizados
+
+```tsx
+import { Loader, Spinner } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Loader
+      spinner={<Spinner size="lg" colorPalette="blue" />}
+      spinnerPlacement="end"
+    >
+      Please wait
+    </Loader>
+  );
+}
+```
+
+## Constructor de páginas del CMS
+
+Este componente está disponible como un bloque `loader` en el [Constructor de páginas](/docs/PageBuilder) (`content/pages/*.json`) — el campo `text` del CMS se mapea directamente a la propiedad `text` propia de `Loader`:
+
+```json
+{
+  "type": "loader",
+  "text": "Checking availability...",
+  "spinnerPlacement": "start"
+}
+```
+
+# Propiedades
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `children` | `any` | Contenido de texto que se renderiza junto al spinner. |
+| `spinner` | `Child` | Elemento spinner personalizado. Por defecto `<Spinner size="inherit" />`. |
+| `text` | `Child` | Propiedad alternativa para el contenido de texto. |
+
+| `spinnerPlacement` | \`"start" \ | "end"\` | Dónde colocar el spinner en relación con el texto. Por defecto `"start"`. |

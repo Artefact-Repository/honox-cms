@@ -1,0 +1,193 @@
+---
+title: Layout 布局
+hydration: 3
+category: Layout
+---
+
+import { Layout, Heading, Text, Stack } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+将一个 `<Layout>` 嵌套到另一个 `<Layout>` 的 `content` 或嵌套子元素中，以构建组合式外壳，例如：外层 Layout 带页眉/页脚，内层 Layout 承载侧边导航栏。
+
+# 用法
+
+## 页眉 + 内容 + 页脚
+
+在没有 `sider` 的情况下，各部分在单列中堆叠。
+
+<DemoPreview>
+  <div style={{ width: "100%", border: "1px solid var(--colors-border)", borderRadius: "12px", overflow: "hidden" }}>
+    <Layout
+      header={
+        <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--colors-border)", background: "var(--colors-bg-subtle)" }}>
+          <Heading as="h4" size="sm">Header</Heading>
+        </div>
+      }
+      content={<div style={{ padding: "16px" }}><Text size="sm">Content</Text></div>}
+      footer={
+        <div style={{ padding: "12px 16px", borderTop: "1px solid var(--colors-border)", background: "var(--colors-bg-subtle)" }}>
+          <Text size="xs">Footer</Text>
+        </div>
+      }
+    />
+  </div>
+</DemoPreview>
+
+```tsx
+import { Layout } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Layout
+      header={<SiteHeader />}
+      content={<Article />}
+      footer={<SiteFooter />}
+    />
+  );
+}
+```
+
+## 页眉 + 侧边栏 + 内容
+
+传入 `sider` 会将其与 `content` 包裹在一行中。`siderWidth` 选择侧边栏宽度（`sm` 14rem，`md` 16rem 默认，`lg` 18rem）；`siderHideBelow` 在断点以下隐藏侧边栏，以适配小屏幕。
+
+<DemoPreview>
+  <div style={{ width: "100%", border: "1px solid var(--colors-border)", borderRadius: "12px", overflow: "hidden" }}>
+    <Layout
+      siderWidth="sm"
+      header={
+        <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--colors-border)", background: "var(--colors-bg-subtle)" }}>
+          <Heading as="h4" size="sm">Dashboard</Heading>
+        </div>
+      }
+      sider={
+        <div style={{ padding: "16px", borderRight: "1px solid var(--colors-border)", background: "var(--colors-bg-subtle)" }}>
+          <Stack direction="vertical" gap="2">
+            <Text size="sm">Overview</Text>
+            <Text size="sm">Reports</Text>
+            <Text size="sm">Settings</Text>
+          </Stack>
+        </div>
+      }
+      content={<div style={{ padding: "16px" }}><Text size="sm">Content next to the sider</Text></div>}
+    />
+  </div>
+</DemoPreview>
+
+```tsx
+import { Layout } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Layout
+      header={<SiteHeader />}
+      sider={<Sidenav />}
+      siderWidth="sm"
+      siderHideBelow="md"
+      content={<Article />}
+    />
+  );
+}
+```
+
+## 吸顶页眉与侧边栏
+
+`stickyHeader` 将页眉固定在页面滚动的顶部。`stickySider` 将其下方的侧边栏固定，并自行滚动其溢出内容 —— 适用于长导航搭配短内容（或反之）的场景。`fullHeight` 则为最外层页面外壳占满视口高度。
+
+```tsx
+import { Layout } from "../components/ui";
+
+export default function DocsPage() {
+  return (
+    <Layout
+      fullHeight
+      stickyHeader
+      stickySider
+      header={<SiteHeader />}
+      sider={<DocsSidenav />}
+      siderHideBelow="md"
+      content={<Article />}
+    />
+  );
+}
+```
+
+## 嵌套 Layout
+
+当页眉/页脚横跨整个宽度，但只有部分主体需要侧边栏时，可在 `content` 内嵌套一个 `<Layout>`：
+
+```tsx
+import { Layout } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Layout
+      header={<SiteHeader />}
+      content={
+        <Layout sider={<Sidenav />} content={<Article />} />
+      }
+      footer={<SiteFooter />}
+    />
+  );
+}
+```
+
+## CMS 页面构建器
+
+该组件可作为 `layout` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用。`header`、`sider`、`content` 与 `footer` 各自都是一个组件区块列表 —— 任何区块类型均可使用，包括用于嵌套外壳的另一个 `layout`：
+
+```json
+{
+  "type": "layout",
+  "siderWidth": "sm",
+  "siderHideBelow": "md",
+  "header": [
+    { "type": "heading", "text": "Dashboard", "as": "h3", "size": "lg" }
+  ],
+  "sider": [
+    {
+      "type": "stack",
+      "direction": "vertical",
+      "gap": "2",
+      "children": [
+        { "type": "link", "text": "Overview", "href": "#" },
+        { "type": "link", "text": "Reports", "href": "#" }
+      ]
+    }
+  ],
+  "content": [
+    { "type": "text", "content": "Pick a page from the rail on the left." }
+  ],
+  "footer": [
+    { "type": "text", "size": "sm", "content": "© 2026 Acme" }
+  ]
+}
+```
+
+将某个部分的列表留空（或省略）会完全跳过该部分的包裹元素 —— 类似 `siderWidth`/`siderHideBelow` 这类未被设置的可选字段，从 CMS 传入时为 `""`，被视为未设置，从而回退到组件的默认值。
+
+# 属性
+
+## Layout
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `header` | \`string \| JSX.Element\` | 渲染在主体上方的语义化 `<header>` 内。（仅速记 API） |
+| `sider` | \`string \| JSX.Element\` | 渲染在语义化 `<aside>` 侧边栏中。它的存在会将主体切换为侧边栏 + 内容的一行布局。（仅速记 API） |
+| `content` | \`string \| JSX.Element\` | 渲染在语义化 `<main>` 内。`children` 会追加在其后。（仅速记 API） |
+| `footer` | \`string \| JSX.Element\` | 渲染在主体下方的语义化 `<footer>` 内。（仅速记 API） |
+| `fullHeight` | `boolean` | 占满视口高度 —— 用于最外层页面外壳。 |
+| `stickyHeader` | `boolean` | 将页眉固定在页面滚动的顶部。 |
+| `stickySider` | `boolean` | 将侧边栏固定在吸顶页眉下方；侧边栏内部自行滚动。 |
+| `siderWidth` | \`"sm" \| "md" \| "lg"\` | 侧边栏宽度：sm（14rem）、md（16rem，默认）、lg（18rem）。 |
+| `siderHideBelow` | \`"sm" \| "md" \| "lg"\` | 在此断点以下隐藏侧边栏。搭配文档流内的展开控件使用。 |
+| `hasSider` | `boolean` | 手动强制布局方向为行。（复合 API） |
+| `headerClass` | `string` | 为 `<header>` 部分添加额外 class。（仅速记 API） |
+| `siderClass` | `string` | 为 `<aside>` 部分添加额外 class。（仅速记 API） |
+| `contentClass` | `string` | 为 `<main>` 部分添加额外 class。（仅速记 API） |
+| `footerClass` | `string` | 为 `<footer>` 部分添加额外 class。（仅速记 API） |
+| `bodyClass` | `string` | 为包裹侧边栏 + 内容的行容器添加额外 class（仅当设置了 `sider` 时渲染）。 |
+| `children` | `any` | 渲染在布局外壳内的子元素。 |
+| `class` | `string` | 根元素的自定义 CSS 类。 |

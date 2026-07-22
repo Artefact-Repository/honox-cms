@@ -1,0 +1,161 @@
+---
+title: ColorPicker 颜色选择器
+hydration: 2
+category: Forms
+---
+
+import { ColorPicker } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+一个颜色选择器，包含饱和度/亮度区域、色相与透明度滑块、可编辑的通道输入框（HEX / RGBA / HSLA）、预设色板，以及一个可选的色板触发器，可在弹出层中打开面板。它遵循 Ark UI / Park UI 颜色选择器的结构——每个部分都带有 `data-scope="colorPicker"` 和对应的 `data-part`——但完全基于 Hono JSX 和 Panda CSS 实现，**不依赖 React 和 `@ark-ui/react`**。
+
+该组件的拆分方式与库的其他部分一致：
+
+- `app/components/ui/color-picker-primitive.tsx` — 颜色计算、上下文以及每个结构部分，全部可在服务端渲染。
+- `app/islands/color-picker.tsx` — `InteractiveColorPicker` 的轻量岛屿包装，它持有状态并挂载指针/键盘事件处理器。
+- `app/theme/recipes/color-picker.ts` — Panda CSS 槽位配方。
+
+颜色在内部以 **HSVA**（`{ h: 0–360, s: 0–100, v: 0–100, a: 0–1 }`）形式保存，这是饱和度/亮度区域的自然模型，并在边界处进行转换。
+
+# 本版本更新内容
+
+- **HSLA 输出为真正的 HSL。** `hsvaToHslaString` 之前会将原始的 HSV 饱和度/明度数值直接填入 `hsla()` 字符串，产生的颜色与所选颜色不同（例如纯红被渲染为 `hsla(0, 100%, 100%, 1)`——白色）。现在它会正确地进行 HSV → HSL 转换（`hsla(0, 100%, 50%, 1)`）。
+- **HSLA 输入行编辑的是真正的 HSL 通道。** 饱和度/明度输入框过去在 HSL 标签下显示 HSV 值；现在编辑值与显示值保持一致，并且专用的 `l` 通道会将明度编辑映射回 HSV 模型。
+- **无效的十六进制输入会被拒绝而不是提交。** 过去在十六进制字段中输入垃圾内容会回退到白色并作为值变更发出。该字段现在会校验 `#RGB`、`#RGBA`、`#RRGGBB` 和 `#RRGGBBAA`（带或不带前导 `#`），并忽略其他任何内容。
+- **格式选择器带有标签**，供辅助技术使用。
+
+# 键盘支持
+
+区域和两个滑块均可通过键盘聚焦（`Tab`）并操作：
+
+| 按键 | 区域 | 色相滑块 | 透明度滑块 |
+| --- | --- | --- | --- |
+| <kbd>←</kbd> / <kbd>→</kbd> | 饱和度 ±1 | 色相 ±1° | 透明度 ±1% |
+| <kbd>↑</kbd> / <kbd>↓</kbd> | 明度 ±1 | — | — |
+| <kbd>Shift</kbd> + 箭头 | ±10 步 | ±10° | ±10% |
+| <kbd>Home</kbd> / <kbd>End</kbd> | 最小 / 最大角 | 0° / 360° | 0% / 100% |
+
+配合 `trigger` 时，<kbd>Esc</kbd> 和点击外部会关闭弹出层。
+
+# 无障碍
+
+- 区域和通道滑块暴露 `role="slider"`，并带有 `aria-valuemin`/`aria-valuemax`/`aria-valuenow`（区域还会通过 `aria-valuetext` 同时报告两个通道）。
+- 通道输入框、格式选择器、预设色板和取色器触发器都带有 `aria-label`；当前激活的预设色板通过 `aria-pressed` 播报。
+- `disabled` 和 `readOnly` 会移除交互式 Tab 停靠点并禁用色板按钮；状态会镜像到每个部分的 `data-disabled` / `data-readonly`。
+- 在 `EyeDropper` API 不可用时，取色器按钮会渲染为禁用状态，因此它永远不会成为一个无效控件。
+
+# 样式槽
+
+Panda CSS 槽位配方（`app/theme/recipes/color-picker.ts`）为"结构"一节列出的部分设置样式。状态由 data 属性驱动（`data-disabled`、`data-readonly`、当前激活色板上的 `data-state="checked"`、滑块部分上的 `data-channel`），因此自定义皮肤可以在不改动配方的情况下定位它们。`size` 变体会缩放区域、色板和间距。
+
+# 用法
+
+<DemoPreview>
+  <ColorPicker label="Brand colour" defaultValue="#3b82f6" />
+</DemoPreview>
+
+```tsx
+import { ColorPicker } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <>
+      {/* Inline picker, static SSR (no signal, no island) */}
+      <ColorPicker interactive={false} />
+
+      {/* Interactive inline picker */}
+      <ColorPicker
+        label="Brand colour"
+        defaultValue="#3b82f6"
+        onValueChange={({ value }) => console.log(value)}
+      />
+
+      {/* Swatch trigger + popover, custom presets */}
+      <ColorPicker
+        trigger
+        label="Accent"
+        defaultValue="#22c55e"
+        presets={["#ef4444", "#f97316", "#22c55e", "#3b82f6"]}
+        closeOnSelect
+      />
+
+      {/* Inside a native form — submits as `theme` (hex) */}
+      <form method="post" action="/settings">
+        <ColorPicker name="theme" defaultValue="#7c3aed" />
+        <button type="submit">Save</button>
+      </form>
+    </>
+  );
+}
+```
+
+## CMS 页面构建器
+
+此组件在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中以 `colorPicker` 块的形式提供：
+
+```json
+{
+  "type": "colorPicker",
+  "label": "Brand colour",
+  "defaultValue": "#3b82f6"
+}
+```
+
+# 属性
+
+`<ColorPicker />`（带样式的包装组件）接受：
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+
+| `value` | \`string \ | HSVA\` | 当前颜色（受控）。字符串接受十六进制（`#rgb`、`#rgba`、`#rrggbb`、`#rrggbbaa`）、`rgb()`/`rgba()` 以及 `hsl()`/`hsla()`。 |
+| `defaultValue` | \`string \ | HSVA\` | 初始颜色（非受控）。默认 `#7c3aed`。 |
+
+| `format` | \`"hex" \ | "rgba" \ | "hsla"\` | 当前输入格式（受控）。 |
+| `defaultFormat` | \`"hex" \ | "rgba" \ | "hsla"\` | 初始输入格式（非受控）。默认 `"hex"`。 |
+
+| `onValueChange` | `(details: { value: string; hsva: HSVA }) => void` | 每次颜色变化时调用；`value` 为十六进制字符串（半透明时带 alpha 后缀）。 |
+| `onFormatChange` | `(details: { format: ColorFormat }) => void` | 格式选择器变化时调用。 |
+| `trigger` | `boolean` | 渲染一个色板触发器，在弹出层中打开面板，而不是内联显示。 |
+| `open` / `defaultOpen` | `boolean` | 弹出层状态（受控 / 非受控）；仅在配合 `trigger` 时有意义。 |
+| `onOpenChange` | `(details: { open: boolean }) => void` | 弹出层打开或关闭时调用。 |
+| `closeOnSelect` | `boolean` | 选择预设色板后关闭弹出层。默认 `false`。 |
+| `presets` | `string[]` | 预设色板颜色。默认是一组精选的 14 色面板；传入 `[]` 可隐藏。 |
+| `name` | `string` | 渲染一个隐藏输入框，携带十六进制值用于原生 `<form>` 提交。 |
+
+| `label` | \`string \ | JSX.Element\` | 渲染在选择器上方的可选标签。 |
+
+| `showArea` / `showSliders` / `showInputs` / `showSwatches` | `boolean` | 切换各个面板区块。全部默认 `true`。 |
+| `disabled` | `boolean` | 禁用所有交互。 |
+| `readOnly` | `boolean` | 值可见但不可更改。 |
+
+| `size` | \`"sm" \ | "md" \ | "lg"\` | 配方尺寸变体（区域高度、色板大小、间距）。默认 `"md"`。 |
+
+| `interactive` | `boolean` | 强制（或抑制）作为岛屿进行水合。 |
+
+## 水合
+
+当存在行为信号时，包装组件会自动水合——任何回调、`value`/`defaultValue`、`open`/`defaultOpen` 或 `trigger`——否则渲染静态 HTML。`interactive={false}` 始终退出水合；`interactive`（或 `interactive={true}`）始终进入水合。该决策通过共享的 `shouldHydrate()` 辅助函数路由，与库中的每个岛屿一致。
+
+## 颜色工具
+
+从 primitive 中导出，用于复用和测试：
+
+| 辅助函数 | 说明 |
+| --- | --- |
+| `parseColor(input)` | 将 hex/rgb(a)/hsl(a) 字符串、类 HSVA 或类 RGB 对象解析为经过钳制的 `HSVA`。回退为白色。 |
+| `hsvToRgb(h, s, v)` / `rgbToHsv(r, g, b)` | HSV ↔ RGB 转换。 |
+| `hsvToHsl(h, s, v)` / `hslToHsv(h, s, l)` | HSV ↔ HSL 转换（s/v/l 取值 0–100）。 |
+| `hexToRgb(hex)` | 将 3/4/6/8 位十六进制解析为 `{ r, g, b, a }`，格式错误时返回 `null`。 |
+| `hsvaToHex(c, includeAlpha?)` | 十六进制字符串；仅在请求且半透明时追加 alpha 字节。 |
+| `hsvaToRgbaString(c)` / `hsvaToHslaString(c)` | CSS `rgba()` / `hsla()` 字符串。 |
+
+# 生产注意事项
+
+- **无新依赖。** 所有颜色计算（HSV/HSL/RGB/hex 转换、解析）均在本地实现并通过单元测试；不引入 `@rc-component`、`@ark-ui` 或 React 中的任何内容。
+- **SSR 安全。** 每个部分都在服务端渲染出有意义的标记——静态变体是岛屿所水合的那份完全相同 DOM 的忠实、非交互式预览。
+- **受控或非受控。** `value`/`format`/`open` 各自都支持两种模式，并带有常规的 `default*` 对应项。
+- **精度。** 在受控场景下，应赋值 `HSVA` 对象（来自 `onValueChange` 的 `details.hsva`），而不是重新解析的字符串，以避免不同格式之间的往返舍入偏差。
+- **表单就绪。** `name` 属性会渲染一个带有当前十六进制值的隐藏输入框，并在每次变更时保持同步。

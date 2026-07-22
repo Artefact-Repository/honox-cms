@@ -1,0 +1,203 @@
+---
+title: FileUpload Carga de Archivos
+hydration: 2
+category: Forms
+---
+
+import { FileUpload } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introducción
+
+Una zona de arrastre y selector de archivos para elegir uno o más archivos, con arrastrar y soltar,
+validación del lado del cliente (tipo/tamaño/cantidad) y una lista de vista previa en vivo —todo
+compuesto a partir de partes equivalentes a Ark UI sobre un `<input type="file">` nativo,
+de modo que el formulario sigue funcionando con JavaScript deshabilitado.
+
+# Uso
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "360px" }}>
+    <FileUpload
+      label="Upload Images"
+      name="images"
+      accept="image/*"
+      maxFiles={2}
+      dropzoneText="Drag and drop or browse files"
+      interactive
+    />
+  </div>
+</DemoPreview>
+
+```tsx
+import { FileUpload } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <FileUpload
+      label="Upload Images"
+      name="images"
+      accept="image/*"
+      maxFiles={2}
+      dropzoneText="Drag and drop or browse files"
+    />
+  );
+}
+```
+
+## Composición personalizada
+
+La composición por defecto (props `label` + `dropzoneText` + `triggerText`) cubre
+el caso común. Pasa `children` explícitos para tener control total sobre el layout —sustituye
+cualquier subconjunto de las partes de abajo:
+
+```tsx
+import { FileUpload } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <FileUpload name="attachments" maxFiles={5} accept="image/*,.pdf">
+      <FileUpload.Label>Attachments</FileUpload.Label>
+      <FileUpload.Dropzone>
+        <span>Drop files here, or</span>
+        <FileUpload.Trigger>browse</FileUpload.Trigger>
+      </FileUpload.Dropzone>
+      <FileUpload.List showSize clearable />
+      <FileUpload.ClearTrigger>Clear all</FileUpload.ClearTrigger>
+      <FileUpload.HiddenInput />
+    </FileUpload>
+  );
+}
+```
+
+## Constructor de páginas CMS
+
+Este componente está disponible como un bloque `file-upload` (alias `fileUpload`) en
+el [Constructor de páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "file-upload",
+  "label": "Resume",
+  "name": "resume",
+  "accept": ".pdf,.docx",
+  "maxFiles": 1,
+  "maxFileSize": 5242880,
+  "dropzoneText": "Drag your file(s) here",
+  "triggerText": "Open file picker",
+  "showSize": true,
+  "clearable": true
+}
+```
+
+`maxFiles` y `maxFileSize` se convierten de cadenas a números por el
+renderizador; todos los demás campos se transfieren directamente a `FileUpload`. Siempre
+se renderiza como `interactive` en el Constructor de páginas.
+
+# Propiedades
+
+## Root
+
+| Prop | Tipo | Descripción |
+| --- | --- | --- |
+| `accept` | `string \| string[] \| Record<string, string[]>` | Tipos de archivo aceptados —una cadena MIME, una lista, o un registro MIME→extensiones. Se normaliza al atributo nativo `accept`. |
+| `allowDrop` | `boolean` | Si se permite arrastrar y soltar en la zona de arrastre. Por defecto `true`. |
+| `capture` | `"user" \| "environment"` | La cámara por defecto a usar al capturar medios. |
+| `directory` | `boolean` | Si se aceptan directorios (`webkitdirectory`). |
+| `disabled` | `boolean` | Deshabilita la zona de arrastre, el disparador y el input oculto. |
+| `invalid` | `boolean` | Marca el campo como inválido (`data-invalid` en cada parte). |
+| `required` | `boolean` | Marca el input subyacente como obligatorio. |
+| `maxFiles` | `number` | Número máximo de archivos. Por defecto `1`. Seleccionar `> 1` cambia la isla del modo reemplazar al modo añadir. |
+| `maxFileSize` | `number` | Tamaño máximo de archivo en bytes. Por defecto `Infinity`. |
+| `minFileSize` | `number` | Tamaño mínimo de archivo en bytes. Por defecto `0`. |
+| `name` | `string` | Nombre del input de archivo subyacente, para el envío nativo de formulario. |
+| `locale` | `string` | Locale BCP-47 usado para el formato del tamaño de archivo. Por defecto `"en-US"`. |
+| `translations` | `Partial<FileUploadTranslations>` | Sobrescrituras para las cadenas ARIA de zona de arrastre/vista previa/eliminar/limpiar. |
+| `size` | `"sm" \| "md" \| "lg"` | Variante de tamaño visual. Por defecto `"md"`. |
+| `acceptedFiles` | `File[]` | Lista controlada de archivos aceptados (solo isla). |
+| `defaultAcceptedFiles` | `File[]` | Lista inicial de archivos aceptados, no controlada (solo isla). |
+| `preventDocumentDrop` | `boolean` | Impide que el navegador navegue a un archivo soltado fuera de la zona de arrastre. Por defecto `true` (solo isla). |
+| `validate` | `(file: File, details: FileValidateDetails) => FileError[] \| null` | Validación personalizada, ejecutada después de las comprobaciones integradas de tipo/tamaño/cantidad (solo isla). |
+| `transformFiles` | `(files: File[]) => Promise<File[]>` | Transforma los archivos recién aceptados (por ejemplo, comprimir) antes de que se confirmen (solo isla). |
+| `onFileAccept` | `(details: FileAcceptDetails) => void` | Se llama con los archivos aceptados de la selección o arrastre más reciente. |
+| `onFileReject` | `(details: FileRejectDetails) => void` | Se llama con cualquier archivo rechazado y sus códigos de error. |
+| `onFileChange` | `(details: FileChangeDetails) => void` | Se llama después de cada selección con el conjunto completo de aceptados/rechazados. |
+| `interactive` | `boolean` | Fuerza (o suprime) la hidratación como isla. |
+
+## Composición por defecto
+
+Estos props solo aplican cuando se omite `children` —entonces `FileUpload` renderiza
+`Label` + `Dropzone` + `Trigger` + `List` + `HiddenInput` por ti.
+
+| Prop | Tipo | Descripción |
+| --- | --- | --- |
+| `label` | `string` | Etiqueta renderizada encima de la zona de arrastre. |
+| `dropzoneText` | `string` | Texto de ayuda de la zona de arrastre. Por defecto `"Drag your file(s) here"`. |
+| `triggerText` | `string` | Texto del botón disparador. Por defecto `"Open file picker"`. |
+| `showSize` | `boolean` | Muestra el tamaño formateado de cada archivo en la lista. Por defecto `true`. |
+| `clearable` | `boolean` | Muestra un disparador de eliminación por archivo en la lista. Por defecto `true`. |
+
+## Subcomponentes
+
+`FileUpload` es un componente compuesto —cada parte de abajo lee del
+contexto de `FileUpload.Root`, por lo que solo funcionan anidadas dentro de él (o dentro de un
+`FileUpload.Item` para las partes con alcance de elemento).
+
+| Parte | Descripción |
+| --- | --- |
+| `FileUpload.Label` | `<label>` vinculado al input oculto mediante `for`. |
+| `FileUpload.Dropzone` | Zona de destino de arrastre; renderiza `role="button"` con soporte de teclado (Enter/Space abre el selector). |
+| `FileUpload.Trigger` | Abre el selector de archivos. Se renderiza como un `<label for>` (no un `<button>`) para que siga funcionando sin JavaScript. |
+| `FileUpload.HiddenInput` | El `<input type="file">` nativo, visualmente oculto, que realmente contiene la selección para el envío del formulario. |
+| `FileUpload.ItemGroup` | `<ul>` que envuelve los `Item` de archivos aceptados. |
+| `FileUpload.Item` | Un archivo aceptado. Requiere un prop `file`; proporciona contexto de archivo a sus hijos. |
+| `FileUpload.ItemName` | El nombre del archivo, o `children` para sobrescribirlo. |
+| `FileUpload.ItemSizeText` | El tamaño formateado del archivo (mediante `formatBytes`), o `children` para sobrescribirlo. |
+| `FileUpload.ItemPreview` | Envoltorio mostrado solo cuando el tipo MIME del archivo coincide con su prop regex `type` (por defecto `".*"`). |
+| `FileUpload.ItemPreviewImage` | Vista previa `<img>` solo de cliente mediante `URL.createObjectURL`; no renderiza nada durante SSR o para archivos que no son imágenes. |
+| `FileUpload.ItemDeleteTrigger` | Elimina este elemento de la lista de archivos aceptados. |
+| `FileUpload.ClearTrigger` | Elimina todos los archivos aceptados. Se oculta automáticamente cuando la lista está vacía. |
+| `FileUpload.Items` | Compuesto: mapea los archivos aceptados a `Item` con una vista previa de imagen/icono de archivo, nombre, tamaño opcional y disparador de eliminación opcional. Acepta `showSize` / `clearable` / `files`. |
+| `FileUpload.List` | Compuesto: `ItemGroup` que envuelve `Items`. Los mismos props `showSize` / `clearable` / `files`. |
+| `FileUpload.FileText` | Muestra el nombre del primer archivo seleccionado, un recuento `"N files"` para selección múltiple, o una cadena `fallback` cuando no hay nada seleccionado. |
+
+```tsx
+import { FileUpload, formatBytes } from "../components/ui";
+```
+
+`formatBytes(bytes, locale?)` y los tipos `FileAccept` / `FileError` /
+`FileRejection` / `FileChangeDetails` / `FileUploadTranslations` también se
+exportan para quienes construyan una composición totalmente personalizada.
+
+# Validación
+
+Cada archivo seleccionado se comprueba en orden y se rechaza en la primera regla
+fallida; `validate` se ejecuta al final, después de que pasen todas las comprobaciones integradas:
+
+| Código `FileError` | Disparador |
+| --- | --- |
+| `FILE_INVALID_TYPE` | No coincide con `accept`. |
+| `FILE_TOO_LARGE` | `file.size > maxFileSize`. |
+| `FILE_TOO_SMALL` | `file.size < minFileSize`. |
+| `FILE_EXISTS` | Ya se aceptó un archivo con el mismo nombre/tamaño/tipo (solo en modo multiarchivo). |
+| `TOO_MANY_FILES` | Aceptar este archivo excedería `maxFiles`. |
+| `FILE_INVALID` | Reservado para resultados personalizados de `validate`. |
+
+Con `maxFiles={1}` (por defecto), un nuevo archivo aceptado **reemplaza** la
+selección actual. Con `maxFiles > 1`, los nuevos archivos se **añaden** a la
+selección existente hasta el límite.
+
+# Accesibilidad
+
+- `Dropzone` renderiza `role="button"` con `aria-label` de
+  `translations.dropzone`, `aria-disabled` cuando está deshabilitado, y es operable
+  con teclado (`tabIndex={0}`, Enter/Space abre el selector de archivos).
+- `Label` y `Trigger` son elementos `<label for>` reales vinculados al id del
+  input oculto, por lo que hacer clic en cualquiera de los dos abre el selector de archivos nativo
+  incluso antes de la hidratación.
+- `ItemDeleteTrigger` y `ClearTrigger` obtienen sus `aria-label` de
+  `translations.deleteFile(file)` / `translations.clearFiles`, sobrescribibles
+  mediante el prop `translations`.
+- `data-disabled` / `data-invalid` / `data-required` / `data-readonly` /
+  `data-dragging` se reflejan en cada parte para estilo y estado de tecnología de
+  asistencia.

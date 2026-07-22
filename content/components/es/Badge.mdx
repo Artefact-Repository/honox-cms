@@ -1,0 +1,59 @@
+---
+title: Badge Insignia
+hydration: 3
+category: Feedback
+---
+
+import { Badge } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introducción
+
+Un pequeño elemento visual que etiqueta o categoriza contenido.
+
+# Uso
+
+<DemoPreview>
+  <Badge colorPalette="blue" variant="solid">New</Badge>
+  <Badge colorPalette="green" variant="subtle">Active</Badge>
+  <Badge colorPalette="red" variant="outline">Error</Badge>
+</DemoPreview>
+
+```tsx
+import { Badge } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Badge colorPalette="blue" variant="solid">
+      New
+    </Badge>
+  );
+}
+```
+
+## Constructor de Páginas CMS
+
+Este componente está disponible como un bloque `badge` en el [Constructor de Páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "badge",
+  "text": "New",
+  "colorPalette": "blue",
+  "variant": "solid"
+}
+```
+
+# Propiedades
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `children` | `any` | Contenido que se renderiza dentro del componente. |
+| `class` | `string` | Clases CSS personalizadas. |
+| `colorPalette` | `string` | El tema de color del badge. |
+
+| `variant` | \`"solid" \ | "subtle" \ | "surface" \ | "outline"\` | El estilo visual. |
+
+| `size` | \`"sm" \ | "md" \ | "lg" \ | "xl" \ | "2xl"\` | El tamaño del badge. |
+
+| `interactive` | `boolean` | Si se habilita la hidratación del lado del cliente. |

@@ -1,0 +1,79 @@
+---
+title: Checkbox Casilla de Verificación
+hydration: 2
+category: Forms
+---
+
+import { Checkbox } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introducción
+
+Un control que permite al usuario alternar entre los estados seleccionado, no seleccionado e indeterminado.
+
+# Uso
+
+<DemoPreview>
+  <Checkbox defaultChecked interactive>Accept Terms and Conditions</Checkbox>
+</DemoPreview>
+
+```tsx
+import { Checkbox } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Checkbox
+      defaultChecked={true}
+      onCheckedChange={(details) => console.log(details.checked)}
+      interactive
+    >
+      Accept Terms and Conditions
+    </Checkbox>
+  );
+}
+```
+
+## Estado indeterminado
+
+```tsx
+import { Checkbox } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Checkbox checked="indeterminate" interactive>
+      Parent Checkbox
+    </Checkbox>
+  );
+}
+```
+
+## Constructor de Páginas CMS
+
+Este componente está disponible como un bloque `checkbox` en el [Constructor de Páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "checkbox",
+  "label": "Accept Terms and Conditions",
+  "checked": true,
+  "colorPalette": "blue"
+}
+```
+
+# Propiedades
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `children` | `any` | Contenido de la etiqueta que se renderiza junto al checkbox. |
+| `class` | `string` | Clases CSS personalizadas. |
+
+| `checked` | \`boolean \ | "indeterminate"\` | Si el checkbox está seleccionado (controlado). |
+| `defaultChecked` | \`boolean \ | "indeterminate"\` | El estado de selección inicial (no controlado). |
+
+| `disabled` | `boolean` | Si el checkbox está deshabilitado. |
+
+| `onCheckedChange` | \`(details: \{ checked: boolean \ | "indeterminate" \}) => void\` | Callback disparado cuando cambia el estado de selección. |
+
+| `size` | \`"sm" \ | "md" \ | "lg"\` | El tamaño del checkbox. |
+
+| `interactive` | `boolean` | Fuerza la hidratación como isla. |

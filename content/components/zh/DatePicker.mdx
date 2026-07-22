@@ -1,0 +1,212 @@
+---
+title: DatePicker 日期选择器
+hydration: 2
+category: Forms
+---
+
+import { DatePicker } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+一个将文本输入框与弹出式日历组合在一起的日期选择器。它支持单选、多选和范围选择，月/年面板视图，快速选择预设，周数，以及手动输入日期——通过 HonoX 在服务端渲染，并仅在有交互需求时作为岛屿进行水合。
+
+该组件**在设计上是无头（headless）的**：`app/components/ui/date-picker-primitive.tsx` 生成语义化、可访问的标记和状态，而 `app/islands/date-picker.tsx` 添加了客户端行为（键盘导航、悬停预览、点击外部、输入）。不引入任何新的运行时依赖——它构建在 Hono JSX 和 Panda CSS 之上，与设计系统的其余部分使用相同的技术栈。
+
+# 本版本更新内容
+
+- **选中的值现在可以在静态渲染中保留。** 输入框之前通过 `defaultValue` 渲染其值，而 hono/jsx 会将其序列化为一个无效的 `defaultValue="…"` 属性——带有 `value`/`defaultValue` 的静态渲染选择器会显示空白输入框。现在它会渲染一个真正的 `value` 属性；由于 DOM 运行时仅在属性实际变化时才赋值 value 属性，因此输入仍保持非受控。
+- **月/年下拉框在 SSR 中正确预选。** `MonthSelect`/`YearSelect` 在 `<select>` 上使用了 `value`，而这不是 HTML 属性，因此在服务端输出中，聚焦的月/年从未被预选。现在对应的 `<option>` 会带有 `selected`。
+- **本地化的日历文本。** 星期表头、月份网格和月份下拉框均根据所配置的 `locale`，由 `Intl.DateTimeFormat` 生成（按 locale 缓存，当 locale 未知时回退为英语）。之前只有标题遵循 `locale`。
+- **范围端点与高亮带连接。** 范围的起始/结束日期现在带有 `data-range-start` / `data-range-end`，配方会将它们的内角变为方形，使端点与范围内高亮无缝衔接。
+- **键盘焦点在视图切换时保留。** 在日/月/年视图之间缩放（通过标题或下钻到某月/某年）过去会将 DOM 焦点丢失到 `<body>`，因为之前聚焦的控件被隐藏了。现在焦点会移动到新视图的活动单元格上。
+- **网格语义收紧。** `<thead>` 上多余的 `role="row"`（它覆盖了其隐式的 `rowgroup` 角色）已被移除，网格会在 `multiple`/`range` 模式下声明 `aria-multiselectable`。
+- **弹出层保持在屏幕内。** 日历弹出层在窄屏上会将其宽度限制为视口宽度，而不是横向溢出。
+
+从上一版本沿用：以键盘优先的网格导航（钳制到 `[min, max]`）、有边界的月/年视图、范围悬停预览、自由文本输入（在 Enter/失焦时提交）、通过隐藏输入框的原生表单提交、ISO 周数、条件性清除触发器、带有浮动 Tab 停靠点的 ARIA 网格语义，以及以 `data-state` 为键的开/关动画。
+
+# 功能
+
+- **弹出式日历** —— 从日历触发器打开，或通过聚焦/点击输入框打开；在点击外部、<kbd>Escape</kbd>（焦点返回到触发器）时关闭，或在设置了 `closeOnSelect` 时于完成选择后关闭。
+- **面板视图** —— 点击月/年标题可从日 → 月 → 年逐级缩小视图；选择某年或某月会下钻回去。上一个/下一个箭头会根据视图按月份、年份或十年进行翻页。
+- **有边界的选择** —— `min`/`max` 在每个视图中都强制生效：超出范围的日期被禁用，完全落在范围之外的月份和年份也被禁用，并且键盘焦点会被钳制，因此它永远不会停留在被禁用的单元格上。
+- **手动输入** —— 在输入框中输入日期并按 <kbd>Enter</kbd>（或失焦）。有效的 `YYYY-MM-DD` 值会被提交并规范化；无效或超出范围的值会回退到上次提交的值。清空输入框会清除选择。
+- **范围选择** —— 第一次点击设置起点，第二次点击设置终点（自动排序）；之间的日期会高亮显示，并且在提交前悬停可预览该区间。
+- **多选** —— 点击可切换各个日期的开/关状态。
+- **周数** —— 通过 `showWeekNumbers`，会在日网格旁边显示 ISO 周数列。
+- **表单提交** —— 传入 `name` 属性后，会为每个选中的日期渲染一个隐藏输入框，因此选择器可以在普通的 `<form>` 中工作，无需额外的胶水代码。
+- **预设** —— `DatePicker.PresetTrigger` 支持 `today`、`last3Days`、`last7Days`、`last14Days`、`last30Days` 和 `last90Days` 这些值。在范围模式下，预设会选择整个区间；否则它会选择单个锚定日期。
+
+# 键盘支持
+
+当弹出层打开且焦点在日历内部时，以下按键处于活动状态：
+
+| 按键 | 日视图 | 月视图 | 年视图 |
+| --- | --- | --- | --- |
+| <kbd>←</kbd> / <kbd>→</kbd> | 上一天 / 下一天 | 上一个月 / 下一个月 | 上一年 / 下一年 |
+| <kbd>↑</kbd> / <kbd>↓</kbd> | ±1 周 | ±3 个月 | ±3 年 |
+| <kbd>Home</kbd> / <kbd>End</kbd> | 周首 / 周末 | — | — |
+| <kbd>PageUp</kbd> / <kbd>PageDown</kbd> | 上一个月 / 下一个月 | 上一年 / 下一年 | 上一个十年 / 下一个十年 |
+| <kbd>Shift</kbd>+<kbd>PageUp</kbd> / <kbd>Shift</kbd>+<kbd>PageDown</kbd> | 上一年 / 下一年 | — | — |
+| <kbd>Enter</kbd> / <kbd>Space</kbd> | 选择聚焦的日期 | 下钻到月 | 下钻到年 |
+| <kbd>Esc</kbd> | 关闭弹出层，将焦点返回到触发器 |  |  |
+
+触发器和输入框可通过 <kbd>Tab</kbd> 到达；从键盘打开会将焦点直接移入网格，因此无需鼠标即可操作日历。
+
+# 无障碍
+
+- 网格使用 ARIA 网格语义（`role="grid"`、`row`、`gridcell`、`columnheader`、`rowheader`），带有 `aria-selected`、今日单元格上的 `aria-current="date"`，以及在 `multiple`/`range` 模式下的 `aria-multiselectable`。
+- **浮动 tabindex** 在聚焦的日期上只保留一个 Tab 停靠点；方向键移动焦点，而无需遍历每个单元格。
+- 焦点受到管理：从键盘打开时会聚焦活动日期；关闭时将焦点返回到触发器；在日/月/年视图之间切换时，焦点会移动到新视图的活动单元格，而不是丢失。
+- 所有交互控件都带有 `aria-label`（`Open date picker`、`Clear selected dates`、`Previous`、`Next`、`Switch calendar view`、`Select month`、`Select year`）。
+- 颜色从不作为唯一的信号——选中、今日、范围内和禁用状态会结合填充、字重以及（今日）圆点标记来表达。
+- 通过 `aria-disabled`、`readonly` 和 `aria-invalid` 遵循 `disabled` / `readOnly` / `invalid`。
+
+# 样式槽
+
+Panda CSS 槽位配方（`app/theme/recipes/date-picker.ts`）暴露以下 `data-part` 槽位用于主题定制。可通过 `class`/`className` 属性或语义化的 `classNames` 映射进行覆盖：
+
+`root`, `label`, `control`, `input`, `trigger`, `clearTrigger`, `positioner`, `content`, `view`, `viewControl`, `prevTrigger`, `nextTrigger`, `viewTrigger`, `rangeText`, `table`, `tableHead`, `tableHeader`, `tableRow`, `tableBody`, `tableCell`, `tableCellTrigger`, `weekNumber`, `monthSelect`, `yearSelect`, `presetTrigger`, `valueText`。`hidden-input` 部分仅在设置了 `name` 时渲染，且不携带可见样式。
+
+选中 / 今日 / 范围内 / 范围预览 / 禁用状态由 `data-selected`、`data-today`、`data-in-range`、`data-outside-range`、`data-range-preview` 和 `data-disabled` 属性驱动（应用于全部三种面板视图），因此它们可以在不依赖配方的情况下重新换肤。范围端点另外带有 `data-range-start` / `data-range-end`（仅在范围跨越多天时），配方用它将这些端点的内角变为方形，以衔接范围内的高亮带。开/关动画以 `data-state="open"` / `data-state="closed"` 为键。
+
+# 水合
+
+**Tier 1 — 默认交互。** `DatePicker` 会作为岛屿进行水合，除非显式通过 `interactive={false}` 退出，此时它会渲染为不带客户端 JS 的静态 HTML。
+
+| `interactive` 属性 | 结果 |
+| --- | --- |
+| 省略 | 作为岛屿水合 |
+| `true` | 作为岛屿水合 |
+| `false` | 静态 —— 无客户端 JS |
+
+库中所有的交互决策都通过 `app/components/ui/island-utils.ts` 中共享的 `shouldHydrate()` 辅助函数路由。
+
+# 用法
+
+<DemoPreview>
+  <DatePicker label="Choose Date" selectionMode="single" />
+</DemoPreview>
+
+```tsx
+import { DatePicker } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <>
+      {/* Single date */}
+      <DatePicker label="Choose Date" selectionMode="single" />
+
+      {/* Date range with bounds */}
+      <DatePicker
+        label="Travel Dates"
+        selectionMode="range"
+        min="2026-01-01"
+        max="2026-12-31"
+      />
+
+      {/* Week numbers + accent colour */}
+      <DatePicker
+        label="Pick a day"
+        selectionMode="single"
+        showWeekNumbers
+        colorPalette="purple"
+      />
+
+      {/* Preselected value */}
+      <DatePicker label="Due Date" defaultValue="2026-07-15" />
+
+      {/* Inside a native form — the selected date submits as `due` */}
+      <form method="post" action="/submit">
+        <DatePicker label="Due Date" name="due" selectionMode="single" />
+        <button type="submit">Save</button>
+      </form>
+
+      {/* Range submission — start/end submit as two `range` entries */}
+      <form method="post" action="/report">
+        <DatePicker
+          label="Reporting Window"
+          name="range"
+          selectionMode="range"
+        />
+        <button type="submit">Run</button>
+      </form>
+    </>
+  );
+}
+```
+
+## CMS 页面构建器
+
+此组件在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中以 `datePicker` 块的形式提供：
+
+```json
+{
+  "type": "datePicker",
+  "label": "Check-in Date",
+  "selectionMode": "single",
+  "placeholder": "YYYY-MM-DD",
+  "colorPalette": "blue"
+}
+```
+
+# 属性
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `label` | `string` | 渲染与第一个输入框关联的标签（仅默认结构）。 |
+| `placeholder` | `string` | 输入框的占位符。默认 `YYYY-MM-DD`。 |
+
+| `selectionMode` | \`"single" \ | "multiple" \ | "range"\` | 选择日期的方式。默认 `"single"`。范围模式会渲染起点和终点输入框。 |
+
+| `value` | \`CalendarDate[] \ | string[] \ | string \ | Date[]\` | 选中的日期（受控）。字符串使用 `YYYY-MM-DD` 格式。 |
+| `defaultValue` | \`CalendarDate[] \ | string[] \ | string \ | Date[]\` | 初始选中的日期（非受控）。 |
+
+| `focusedValue` | \`CalendarDate \ | string \ | Date\` | 日历面板所聚焦的日期（受控）。 |
+| `defaultFocusedValue` | \`CalendarDate \ | string \ | Date\` | 初始面板日期（非受控）。 |
+| `min` | \`CalendarDate \ | string \ | Date\` | 最早可选日期。更早的日期、月份和年份会被禁用；超出范围的输入日期会被拒绝；键盘焦点会被钳制到该范围内。 |
+| `max` | \`CalendarDate \ | string \ | Date\` | 最晚可选日期。 |
+
+| `isDateUnavailable` | `(date, locale) => boolean` | 将个别日期标记为不可选（静态/组合用法）。 |
+
+| `view` | \`"day" \ | "month" \ | "year"\` | 当前活动的面板视图（受控）。 |
+
+| `open` | `boolean` | 弹出式日历是否打开（受控）。 |
+| `closeOnSelect` | `boolean` | 完成选择后关闭弹出层。默认 `true`。 |
+| `showWeekNumbers` | `boolean` | 渲染 ISO-8601 周数列。默认 `false`。 |
+| `numOfMonths` | `number` | 为多月份渲染预留。目前始终显示单个月份面板；大于 `1` 的值会被接受但尚不渲染。 |
+| `name` | `string` | 设置后，会为每个选中的日期在此名称下渲染一个隐藏输入框，从而支持原生 `<form>` 提交。在范围/多选模式下，每个选中的日期会成为单独的条目（有序）。 |
+| `locale` | `string` | 用于标题、星期表头、月份名称和单元格标签的 BCP 47 locale（通过 `Intl.DateTimeFormat`，未知时回退为英语）。默认 `en-US`。 |
+| `disabled` | `boolean` | 禁用整个选择器。 |
+| `readOnly` | `boolean` | 使输入框变为只读。 |
+| `invalid` | `boolean` | 将输入框标记为无效（`aria-invalid` + 错误样式）。 |
+
+| `colorPalette` | \`"blue" \ | "green" \ | "red" \ | "orange" \ | "gray" \ | "cyan" \ | "amber" \ | "purple"\` | 选中日期、今日指示器和范围高亮的强调色。默认 `"blue"`。 |
+
+| `interactive` | `boolean` | 强制（或抑制）作为岛屿进行水合。 |
+| `onValueChange` | `(details: { value: CalendarDate[] }) => void` | 选择变化时调用。 |
+| `onOpenChange` | `(details: { open: boolean }) => void` | 弹出层打开或关闭时调用。 |
+
+## CalendarDate
+
+日期由 `CalendarDate` 类（`{ year, month, day }`，month 为从 1 开始）表示，以避免时区漂移。辅助函数与该组件一同导出：
+
+| 辅助函数 | 说明 |
+| --- | --- |
+| `parseDate(str)` | 解析 `YYYY-MM-DD` 字符串，对超出范围的部分进行钳制。 |
+| `isValidDateString(str)` | 严格校验 `YYYY-MM-DD` 字符串（包括月份天数和闰年）。 |
+| `daysInMonth(year, month)` | 给定月份的天数。 |
+| `fromJSDate(date)` | 将 JavaScript `Date` 转换为 `CalendarDate`。 |
+| `getWeekNumber(date)` | `CalendarDate` 的 ISO-8601 周数（供 `showWeekNumbers` 使用）。 |
+| `getWeekDays(locale)` | 本地化的星期名称（`{ short, narrow, long }`，以周日为首），按 locale 缓存。 |
+| `getMonthNames(locale, format?)` | 本地化的月份名称（`"short"` 或 `"long"`），以一月为首，按 locale 缓存。 |
+
+# 生产注意事项
+
+- **无新依赖。** 完全构建在 Hono JSX + Panda CSS 之上，与设计系统的其余部分一致。
+- **SSR 安全。** 标记在服务端渲染；只有岛屿分支会引入客户端行为，且仅在收到信号时。
+- **由 Token 驱动。** 颜色、间距、圆角和阴影都来自共享的主题 token，因此选择器会自动继承深色模式和所配置的 `colorPalette`。
+- **类型安全的值。** `CalendarDate` 避免了原始 `Date`/`string` 处理带来的时区陷阱。
+- **设计上有边界。** `min`/`max` 在日、月、年视图中一致地强制生效——无论是鼠标选择还是键盘焦点——因此超出范围的值永远不会被提交或聚焦。
+- **表单就绪。** 可选的 `name` 属性会渲染隐藏输入框，因此选择器可以直接放入原生表单，无需自定义提交处理器。
+- **单月份面板。** `numOfMonths` 为向前兼容而被接受，但目前仅渲染单个月份。多月份渲染已在路线图中。

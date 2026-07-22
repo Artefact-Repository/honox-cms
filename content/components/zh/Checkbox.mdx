@@ -1,0 +1,79 @@
+---
+title: Checkbox 复选框
+hydration: 2
+category: Forms
+---
+
+import { Checkbox } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+一种允许用户在选择、未选择和半选（不确定）状态之间切换的控件。
+
+# 用法
+
+<DemoPreview>
+  <Checkbox defaultChecked interactive>Accept Terms and Conditions</Checkbox>
+</DemoPreview>
+
+```tsx
+import { Checkbox } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Checkbox
+      defaultChecked={true}
+      onCheckedChange={(details) => console.log(details.checked)}
+      interactive
+    >
+      Accept Terms and Conditions
+    </Checkbox>
+  );
+}
+```
+
+## 不确定状态
+
+```tsx
+import { Checkbox } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Checkbox checked="indeterminate" interactive>
+      Parent Checkbox
+    </Checkbox>
+  );
+}
+```
+
+## CMS 页面构建器
+
+此组件在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中以 `checkbox` 块的形式提供：
+
+```json
+{
+  "type": "checkbox",
+  "label": "Accept Terms and Conditions",
+  "checked": true,
+  "colorPalette": "blue"
+}
+```
+
+# 属性
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `children` | `any` | 渲染在复选框旁边的标签内容。 |
+| `class` | `string` | 自定义 CSS 类。 |
+
+| `checked` | \`boolean \ | "indeterminate"\` | 复选框是否选中（受控）。 |
+| `defaultChecked` | \`boolean \ | "indeterminate"\` | 初始选中状态（非受控）。 |
+
+| `disabled` | `boolean` | 复选框是否禁用。 |
+
+| `onCheckedChange` | \`(details: \{ checked: boolean \ | "indeterminate" \}) => void\` | 选中状态变化时触发的回调。 |
+
+| `size` | \`"sm" \ | "md" \ | "lg"\` | 复选框的尺寸。 |
+
+| `interactive` | `boolean` | 强制作为岛屿进行水合。 |

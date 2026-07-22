@@ -1,0 +1,105 @@
+---
+title: Clipboard Portapapeles
+hydration: 2
+category: Forms
+---
+
+import { Clipboard } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introducción
+
+Un campo de solo lectura emparejado con un disparador de copiar al
+portapapeles, con estados de indicador copiado/no copiado incorporados.
+
+# Uso
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "360px" }}>
+    <Clipboard
+      label="Clone Command"
+      value="git clone https://github.com/honojs/honox"
+      interactive
+    />
+  </div>
+</DemoPreview>
+
+```tsx
+import { Clipboard } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Clipboard
+      label="Clone Command"
+      value="git clone https://github.com/honojs/honox"
+    />
+  );
+}
+```
+
+## Composición personalizada
+
+Pasa `children` a `Clipboard.Trigger` para sobrescribir el intercambio de iconos copiar/marca de verificación por defecto, o compone las partes directamente para tener control total:
+
+```tsx
+import { Clipboard } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Clipboard.Root value="npm install honox">
+      <Clipboard.Label>Install Command</Clipboard.Label>
+      <Clipboard.Control>
+        <Clipboard.Input />
+        <Clipboard.Trigger>
+          <Clipboard.CopyText />
+        </Clipboard.Trigger>
+      </Clipboard.Control>
+    </Clipboard.Root>
+  );
+}
+```
+
+# Propiedades
+
+## Root
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `value` | `string` | El texto a copiar (controlado). |
+| `defaultValue` | `string` | El texto inicial a copiar (no controlado). |
+| `disabled` | `boolean` | Deshabilita el disparador. |
+| `timeout` | `number` | Milisegundos que el estado copiado permanece activo antes de revertir. Por defecto `3000`. |
+| `translations` | `Partial<ClipboardTranslations>` | Sobrescrituras para el `aria-label` del disparador. |
+| `onValueChange` | `(details: { value: string }) => void` | Se llama cuando cambia el valor (por ejemplo, mediante una entrada personalizada). |
+| `onStatusChange` | `(details: { copied: boolean }) => void` | Se llama cuando el estado copiado cambia. |
+| `size` | `"sm" \| "md" \| "lg"` | Tamaño visual. Por defecto `"md"`. |
+| `colorPalette` | `string` | El tema de color. Por defecto `"green"`. |
+| `interactive` | `boolean` | Fuerza (o suprime) la hidratación como isla. |
+| `class` | `string` | Clases CSS personalizadas para el elemento raíz. |
+
+## Composición por defecto
+
+Estas solo se aplican al `<Clipboard>` de nivel superior (no a `Clipboard.Root`), que renderiza `Label` + `Control` (`Input` + `Trigger`) por ti.
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `label` | `JSX.Element \| string` | Etiqueta renderizada encima del control. |
+| `children` | `JSX.Element` | Contenido personalizado de `Trigger`, sobrescribiendo el intercambio de icono copiar/marca de verificación por defecto. |
+
+## Subcomponentes
+
+| Part | Description |
+| --- | --- |
+| `Clipboard.Label` | `<label>` vinculado a la entrada de solo lectura. |
+| `Clipboard.Control` | Envuelve `Input` y `Trigger`. |
+| `Clipboard.Input` | `<input>` de solo lectura que muestra el valor actual; selecciona su texto al enfocarse. Copiar manualmente mediante Ctrl/Cmd+C también dispara el estado copiado. |
+| `Clipboard.Trigger` | Copia `value` al portapapeles al hacer clic. Acepta `asChild` para fusionarse con un hijo personalizado en lugar de renderizar un `<button>`. |
+| `Clipboard.Indicator` | Renderiza tanto `children` como una variante `copied` como nodos hermanos, alternados mediante `hidden` — úsalo para intercambios personalizados de icono o texto copiado/no copiado. |
+| `Clipboard.CopyText` | `Indicator` de conveniencia que intercambia entre el texto `"Copy"` / `"Copied"` (sobrescribible mediante las props `children`/`copied`). |
+| `Clipboard.Context` | Acceso mediante render-prop al contexto del portapapeles: `<Clipboard.Context>{(ctx) => ...}</Clipboard.Context>`. |
+
+# Accesibilidad
+
+- `Trigger` obtiene un `aria-label` de `translations.triggerLabel(copied)` (por defecto `"Copy to clipboard"` / `"Copied to clipboard"`), anunciando el cambio de estado a la tecnología de asistencia.
+- `Input` es `readOnly`, no `disabled`, por lo que permanece enfocable y su texto es seleccionable/copiable mediante atajos de teclado nativos incluso sin hacer clic en el disparador.
+- `data-copied` se refleja en cada parte para el estilizado basado en estado.

@@ -1,0 +1,64 @@
+---
+title: Group 分组
+hydration: 3
+category: Layout
+---
+
+import { Group, Button } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+一个用于以视觉方式对相关元素进行分组的布局组件。
+
+# 用法
+
+<DemoPreview>
+  <Group attached>
+    <Button>First</Button>
+    <Button>Second</Button>
+    <Button>Third</Button>
+  </Group>
+</DemoPreview>
+
+```tsx
+import { Group } from "../components/ui";
+import { Button } from "../components/ui/button";
+
+export default function MyPage() {
+  return (
+    <Group attached>
+      <Button>First</Button>
+      <Button>Second</Button>
+      <Button>Third</Button>
+    </Group>
+  );
+}
+```
+
+## CMS 页面构建器
+
+该组件在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中作为 `group` 区块提供：
+
+```json
+{
+  "type": "group",
+  "attached": true,
+  "children": [
+    { "type": "button", "text": "First" },
+    { "type": "button", "text": "Second" }
+  ]
+}
+```
+
+# 属性
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `children` | `any` | 组件内部要渲染的内容。 |
+| `class` | `string` | 自定义 CSS 类名。 |
+
+| `orientation` | \`"horizontal" \ | "vertical"\` | 组的排列方向。 |
+
+| `attached` | `boolean` | 是否将子元素连接在一起。 |
+| `grow` | `boolean` | 子元素是否应增长以填充可用空间。 |

@@ -1,0 +1,295 @@
+---
+title: Dropdown 下拉菜单
+hydration: 1
+category: Overlays
+---
+
+import { Dropdown, Button } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+在触发时显示的操作或选项列表。支持自定义放置位置并自动在视口溢出时翻转，可选带居中指向几何的箭头，复选框/单选/分组项，级联子菜单，以及点击 / 悬停 / 右键菜单触发模式。
+
+# 用法
+
+## 基础下拉菜单
+
+<DemoPreview>
+  <Dropdown
+    trigger={<Button>Open Dropdown</Button>}
+    items={[
+      { type: "item", label: "Edit", value: "edit" },
+      { type: "separator" },
+      { type: "checkbox", label: "Bold", value: "bold", checked: true },
+      {
+        type: "radio-group",
+        value: "theme",
+        label: "Theme",
+        items: [
+          { type: "radio", label: "Light", value: "light" },
+          { type: "radio", label: "Dark", value: "dark" },
+        ],
+      },
+    ]}
+  />
+</DemoPreview>
+
+```tsx
+import { Dropdown, Button } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Dropdown
+      trigger={<Button>Open Dropdown</Button>}
+      items={[
+        { type: "item", label: "Edit", value: "edit" },
+        { type: "separator" },
+        { type: "checkbox", label: "Bold", value: "bold", checked: true },
+        {
+          type: "radio-group",
+          value: "theme",
+          label: "Theme",
+          items: [
+            { type: "radio", label: "Light", value: "light" },
+            { type: "radio", label: "Dark", value: "dark" },
+          ],
+        },
+      ]}
+    />
+  );
+}
+```
+
+## 带下拉菜单的按钮
+
+```tsx
+import { Dropdown } from "../components/ui";
+
+export default function Page() {
+  return (
+    <Dropdown.Button
+      type="primary"
+      items={[{ type: "item", label: "Submit & Close", value: "close" }]}
+      onClick={() => console.log("Primary click!")}
+    >
+      Submit Action
+    </Dropdown.Button>
+  );
+}
+```
+
+## 自定义样式与语义化 classNames
+
+```tsx
+<Dropdown
+  trigger={<Button>Styled Dropdown</Button>}
+  classNames={{
+    content: "custom-menu-card",
+    item: "custom-menu-item"
+  }}
+  styles={{
+    content: { boxShadow: "0 4px 20px rgba(0,0,0,0.15)" }
+  }}
+  items={[{ type: "item", label: "Custom Styled Item", value: "styled" }]}
+/>
+```
+
+## 居中的箭头
+
+```tsx
+<Dropdown
+  trigger={<Button>Center Arrow</Button>}
+  arrow={{ pointAtCenter: true }}
+  placement="bottomRight"
+  items={[{ type: "item", label: "Item 1", value: "1" }]}
+/>
+```
+
+## 分组与级联子菜单
+
+```tsx
+<Dropdown
+  trigger={<Button>Open Dropdown</Button>}
+  items={[
+    {
+      type: "group",
+      label: "File",
+      items: [
+        { type: "item", label: "New", value: "new" },
+        { type: "item", label: "Open", value: "open" },
+      ],
+    },
+    { type: "separator" },
+    {
+      type: "submenu",
+      label: "Share",
+      items: [
+        { type: "item", label: "Email", value: "email" },
+        { type: "item", label: "Link", value: "link" },
+      ],
+    },
+  ]}
+/>
+```
+
+## 自定义定位、箭头与悬停触发
+
+```tsx
+<Dropdown
+  trigger={<Button>Hover Me</Button>}
+  placement="bottomRight"
+  triggerMode="hover"
+  arrow={true}
+  mouseEnterDelay={100}
+  mouseLeaveDelay={150}
+  items={[
+    { type: "item", label: "Profile", value: "profile" },
+    { type: "item", label: "Settings", value: "settings" },
+    { type: "separator" },
+    { type: "item", label: "Logout", value: "logout" },
+  ]}
+/>
+```
+
+## 右键菜单
+
+配置为 `"contextMenu"` 的触发器会在右键点击时打开，锚定在指针位置，而非表现为一个按钮：
+
+```tsx
+<Dropdown
+  trigger={<div>Right-click this area</div>}
+  trigger={"contextMenu"}
+  items={[
+    { type: "item", label: "Copy", value: "copy" },
+    { type: "item", label: "Paste", value: "paste" },
+  ]}
+/>
+```
+
+## 受控展开状态
+
+```tsx
+const [open, setOpen] = useState(false);
+
+<Dropdown
+  open={open}
+  onOpenChange={setOpen}
+  trigger={<Button>Open Dropdown</Button>}
+  items={[{ type: "item", label: "Edit", value: "edit" }]}
+/>;
+```
+
+## CMS 页面构建器
+
+该组件在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中作为 `menu` 区块提供——CMS 区块标记为“Menu”，但通过此 `Dropdown` 组件渲染：
+
+```json
+{
+  "type": "menu",
+  "triggerText": "Open Dropdown",
+  "items": [
+    { "type": "item", "label": "Edit", "value": "edit" },
+    { "type": "separator" },
+    { "type": "item", "label": "Delete", "value": "delete" }
+  ]
+}
+```
+
+# 属性
+
+## Dropdown
+
+| 属性 | 类型 | 说明 | 默认值 |
+| --- | --- | --- | --- |
+| `trigger` | `JSX.Element` | 被激活时打开菜单的元素。 | - |
+| `items` | `DropdownItem[]` | 要渲染的菜单项。 | - |
+| `open` | `boolean` | 菜单是否展开（受控）。 | - |
+| `defaultOpen` | `boolean` | 菜单默认是否展开（非受控）。 | `false` |
+| `disabled` | `boolean` | 禁用所有触发模式并使触发器失效。 | `false` |
+| `interactive` | `boolean` | 强制以水合形式作为岛屿渲染。默认 `true`。 | `true` |
+
+| `arrow` | \`boolean \ | \{ pointAtCenter?: boolean \}\` | 显示从菜单指向触发器的指针箭头。可与触发器的中心点精确对齐。 | `false` |
+
+| `placement` | `string` | 菜单放置位置：`"top"` \ | `"topLeft"` \ | `"topRight"` \ | `"bottom"` \ | `"bottomLeft"` \ | `"bottomRight"` \ | `"left"` \ | `"leftTop"` \ | `"leftBottom"` \ | `"right"` \ | `"rightTop"` \ | `"rightBottom"`。也接受 dash-case 别名。 | `"bottomLeft"` |
+
+| `trigger` | \`("click" \ | "hover" \ | "contextMenu" \ | "contextDropdown")[] \ | string\` | 用于打开/关闭菜单的触发交互模式。（别名为 `triggerMode`。） | `["click"]` |
+
+| `mouseEnterDelay` | `number` | 当触发器包含 `"hover"` 时，打开前的延迟（毫秒）。 | `150` |
+| `mouseLeaveDelay` | `number` | 当触发器包含 `"hover"` 时，关闭前的延迟（毫秒）。 | `100` |
+| `closeOnEscape` | `boolean` | 按下 Escape 时关闭。 | `true` |
+
+| `onOpenChange` | \`(open: boolean, info?: \{ source: 'trigger' \ | 'menu' \}) => void\` | 菜单打开或关闭时调用。`source` 指明触发该操作的来源。 | - |
+
+| `onSelect` | `(value: string) => void` | 项被激活时，以其 `value` 调用。 | - |
+
+| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg" \ | "xl"\` | 菜单的尺寸。 | `"md"` |
+
+| `class` | `string` | 根元素的自定义 CSS 类名。 | - |
+| `contentClass` | `string` | 内容元素的自定义 CSS 类名。 | - |
+| `positionerClass` | `string` | 定位器元素的自定义 CSS 类名。 | - |
+| `destroyOnHidden` | `boolean` | 隐藏时是否从 DOM 中销毁/卸载弹出内容。（别名为 `destroyPopupOnHide`。） | `false` |
+| `popupRender` | `(menu: JSX.Element) => JSX.Element` | 自定义/包裹弹出内容。（别名为 `dropdownRender`。） | - |
+| `classNames` | `Record<string, string>` | Dropdown 内部每个语义化结构组件的自定义 CSS 类名。 | - |
+| `styles` | `Record<string, any>` | Dropdown 内部每个语义化结构组件的自定义内联样式。 | - |
+
+### classNames 与 styles 插槽：
+
+- `root`（或 `positioner`）：浮层的绝对定位容器。
+- `content`：包含列表项的弹出卡片。
+- `item`：单个列表项（含复选框和单选框项）。
+- `trigger`：主触发按钮/包裹元素。
+- `arrow`：外层箭头包裹元素。
+- `arrowTip`：样式化的内部菱形。
+
+### DropdownItem
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+
+| `type` | \`"item" \ | "separator" \ | "checkbox" \ | "radio" \ | "radio-group" \ | "submenu" \ | "group"\` | 菜单项的类型。 |
+
+| `label` | `string` | 显示文本（适用于 `item`、`checkbox`、`radio`、`submenu`，以及可选的 `group`）。 |
+| `value` | `string` | 唯一值（适用于 `item`、`checkbox`、`radio`、`radio-group`）。 |
+| `checked` | `boolean` | 选中状态（适用于 `checkbox`、`radio`）。 |
+| `icon` | `JSX.Element` | 前置图标（适用于 `item`、`checkbox`、`radio`、`submenu`）。 |
+| `indicator` | `JSX.Element` | 自定义尾随指示元素（适用于 `item`）。 |
+| `items` | `DropdownItem[]` | 嵌套项（适用于 `radio-group`、`submenu`、`group`）。子菜单/分组项本身可以是任何 `DropdownItem`，包括更深的子菜单。 |
+| `disabled` | `boolean` | 该项（或对于 `submenu`，整个嵌套菜单）是否被禁用。 |
+| `class` | `string` | 该项的自定义 CSS 类名。 |
+
+***
+
+## Dropdown.Button (DropdownButton)
+
+一个带下拉菜单的按钮，渲染为连成一体的附加按钮组。
+
+| 属性 | 类型 | 说明 | 默认值 |
+| --- | --- | --- | --- |
+
+| `type` | \`"default" \ | "primary" \ | "dashed" \ | "link" \ | "text" \ | "solid" \ | "outline" \ | "subtle" \ | "plain" \ | "surface"\` | 要渲染的按钮类型。 | `"outline"` |
+
+| `danger` | `boolean` | 以危险视觉主题渲染按钮。 | `false` |
+| `disabled` | `boolean` | 同时禁用主按钮和下拉触发器。 | `false` |
+| `loading` | `boolean` | 以加载/忙碌状态渲染主按钮。 | `false` |
+| `onClick` | `(e: MouseEvent) => void` | 左/主按钮的点击事件处理器。 | - |
+| `icon` | `JSX.Element` | 右/触发按钮的图标。 | `<EllipsisIcon />` |
+| `buttonsRender` | `(buttons: JSX.Element[]) => JSX.Element[]` | 自定义两个按钮渲染的自定义渲染函数。 | - |
+
+支持所有常见的 `Dropdown` 属性，如 `items`、`placement`、`arrow`、`classNames`、`styles` 等。
+
+***
+
+# 说明
+
+请确保 `trigger` 接受 `onMouseEnter`、`onMouseLeave`、`onFocus` 和 `onClick`——触发器元素会在原地被克隆，并附加这些（以及相关的 ARIA/`data-*`）属性，而非被包裹。
+
+# 限制
+
+交互式岛屿将菜单相对于其自身的触发器包裹元素定位（`position: absolute`，而非 portal）：当请求的放置位置会溢出视口时，它会翻转到相反的一侧，并钳制交叉轴，使菜单永远不会渲染到屏幕之外。它不会像 Floating UI 那样跟踪滚动容器或 resize observer——重定位仅在打开时随窗口 `resize` 重新运行，而滚动页面会顺便带着菜单随触发器一起移动。从深层滚动或 `overflow: hidden` 容器内打开的菜单仍可能被该容器在视觉上裁剪，这与 `Popover` 和 `Tooltip` 的取舍相同。
+
+右键菜单和子菜单是例外：由于它们不锚定在触发器的盒子上（右键菜单在指针处打开；子菜单在菜单项旁边打开），它们改用 `position: fixed` 和手工计算的坐标来定位，并像菜单的其余部分一样在 Escape/scroll/resize 时重新运行。
+
+每个子菜单都是自身嵌套的交互式岛屿，通过 `data-overlay-root` 标记划定作用域，使父菜单的定位和外部点击逻辑不会侵入子菜单自身的内容（反之亦然）。选择一个常规项会关闭其冒泡经过的每一级已打开菜单；在任意层级内切换复选框/单选框项则保持整个栈处于打开状态。
+
+`_closed` 退出动画（`slide-fade-out`）在菜单真正从布局中移除之前播放——关闭并不会使其立即隐藏。

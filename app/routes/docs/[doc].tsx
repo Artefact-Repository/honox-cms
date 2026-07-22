@@ -57,6 +57,15 @@ interface DocGroup {
 // the order the CMS singleton lists them. Anything no group claims falls into
 // a trailing fallback group, so this stays usable for any doc collection
 // shape without editing this file.
+//
+// `config` is already the locale-specific configs.<locale>.json (see
+// loadDocsConfig in lib/configs.ts): group `label`/`fallbackLabel` are
+// genuinely translated per locale (i18n: true), while `section`/`category`
+// are matching keys that stay in English across every locale file
+// (i18n: duplicate) — matching the `category` frontmatter field on doc/mdx
+// content, which is also i18n: duplicate and therefore always English
+// regardless of the doc's own locale. So no runtime translation/lookup is
+// needed here: loading the right file already gives the right language.
 function buildDocGroups(docs: DocSummary[], config: DocsConfig): DocGroup[] {
 	const claimed = new Set<string>();
 
@@ -91,9 +100,26 @@ interface DocsSidenavProps {
 	groups: DocGroup[];
 	activeSlug?: string;
 	links?: DocsNavLinkConfig[];
+	currentLocale?: string;
 }
 
-function DocsSidenav({ groups, activeSlug, links }: DocsSidenavProps) {
+function DocsSidenav({
+	groups,
+	activeSlug,
+	links,
+	currentLocale = "en",
+}: DocsSidenavProps) {
+	const localizeLink = (href: string) => {
+		if (
+			currentLocale === "zh" &&
+			!href.startsWith("/zh") &&
+			href.startsWith("/")
+		) {
+			return `/zh${href}`;
+		}
+		return href;
+	};
+
 	return (
 		<nav
 			class={css({
@@ -129,7 +155,7 @@ function DocsSidenav({ groups, activeSlug, links }: DocsSidenavProps) {
 							return (
 								<a
 									key={doc.slug}
-									href={`/docs/${doc.slug}`}
+									href={localizeLink(`/docs/${doc.slug}`)}
 									aria-current={isActive ? "page" : undefined}
 									class={css({
 										display: "block",
@@ -256,12 +282,32 @@ function MobileNav({ groups, activeSlug, links }: DocsSidenavProps) {
 	);
 }
 
+function getLocaleToggleUrl(
+	currentPath: string,
+	targetLocale: "en" | "zh",
+): string {
+	if (targetLocale === "zh") {
+		if (currentPath.startsWith("/zh")) {
+			return currentPath;
+		}
+		return currentPath === "/" ? "/zh" : `/zh${currentPath}`;
+	} else {
+		if (currentPath.startsWith("/zh")) {
+			const rest = currentPath.slice(3);
+			return rest === "" ? "/" : rest;
+		}
+		return currentPath;
+	}
+}
+
 interface DocsHeaderProps {
 	editUrl?: string;
 	groups: DocGroup[];
 	activeSlug?: string;
 	links?: DocsNavLinkConfig[];
 	headerLinks?: DocsNavLinkConfig[];
+	currentPath: string;
+	currentLocale: string;
 }
 
 function DocsHeader({
@@ -270,8 +316,21 @@ function DocsHeader({
 	activeSlug,
 	links,
 	headerLinks,
+	currentPath,
+	currentLocale,
 }: DocsHeaderProps) {
 	const githubLink = links?.find(isGithubLink);
+	const localizeLink = (href: string) => {
+		if (
+			currentLocale === "zh" &&
+			!href.startsWith("/zh") &&
+			href.startsWith("/")
+		) {
+			return `/zh${href}`;
+		}
+		return href;
+	};
+
 	return (
 		<>
 			<div
@@ -286,7 +345,7 @@ function DocsHeader({
 				})}
 			>
 				<Anchor
-					href="/"
+					href={localizeLink("/")}
 					variant="plain"
 					class={css({ textDecoration: "none", flexShrink: "0" })}
 				>
@@ -313,8 +372,10 @@ function DocsHeader({
 				>
 					<Search
 						src="/api/docs/search.json"
-						placeholder="Search docs..."
-						itemLabel="docs"
+						placeholder={
+							currentLocale === "zh" ? "搜索文档..." : "Search docs..."
+						}
+						itemLabel={currentLocale === "zh" ? "文档" : "docs"}
 						showCount={false}
 						syncUrl={false}
 					/>
@@ -331,11 +392,15 @@ function DocsHeader({
 					{headerLinks?.map((link) => (
 						<Anchor
 							key={link.href}
-							href={link.href}
+							href={localizeLink(link.href)}
 							variant="plain"
 							class={css({ textStyle: "sm", fontWeight: "medium" })}
 						>
-							{link.label}
+							{currentLocale === "zh" && link.label === "Blog"
+								? "博客"
+								: currentLocale === "zh" && link.label === "Docs"
+									? "文档"
+									: link.label}
 						</Anchor>
 					))}
 					{editUrl ? (
@@ -346,7 +411,7 @@ function DocsHeader({
 								css({ textStyle: "sm", fontWeight: "medium" }),
 							)}
 						>
-							Edit
+							{currentLocale === "zh" ? "编辑" : "Edit"}
 						</Anchor>
 					) : (
 						<Anchor
@@ -356,7 +421,32 @@ function DocsHeader({
 								css({ textStyle: "sm", fontWeight: "medium" }),
 							)}
 						>
-							Admin
+							{currentLocale === "zh" ? "内容管理" : "Admin"}
+						</Anchor>
+					)}
+					{currentLocale === "zh" ? (
+						<Anchor
+							href={getLocaleToggleUrl(currentPath, "en")}
+							variant="plain"
+							class={css({
+								textStyle: "sm",
+								fontWeight: "medium",
+								color: "blue.11",
+							})}
+						>
+							English
+						</Anchor>
+					) : (
+						<Anchor
+							href={getLocaleToggleUrl(currentPath, "zh")}
+							variant="plain"
+							class={css({
+								textStyle: "sm",
+								fontWeight: "medium",
+								color: "blue.11",
+							})}
+						>
+							中文
 						</Anchor>
 					)}
 					{githubLink && (
@@ -449,10 +539,22 @@ export default createRoute(
 
 	async (c) => {
 		const slug = c.req.param("doc");
+		const currentPath = c.req.path;
+		// Content locale: any /<locale>/docs/* prefix beyond /zh (e.g. /es)
+		// resolves translated content correctly via loadDocs/loadDocBySlug.
+		// NOTE: the header/sidenav chrome below (search placeholder, Edit/
+		// Admin, Blog/Docs labels, locale toggle) is still hardcoded to only
+		// branch on "zh" vs "en" — /es pages get correct translated doc
+		// content but English UI chrome until that's extended too.
+		const currentLocale = currentPath.startsWith("/zh")
+			? "zh"
+			: currentPath.startsWith("/es")
+				? "es"
+				: "en";
 		const [doc, docs, config] = await Promise.all([
-			loadDocBySlug(slug),
-			loadDocs(),
-			loadDocsConfig(),
+			loadDocBySlug(slug, currentLocale),
+			loadDocs(currentLocale),
+			loadDocsConfig(currentLocale),
 		]);
 
 		if (!doc) {
@@ -472,10 +574,17 @@ export default createRoute(
 						activeSlug={slug}
 						links={config.links}
 						headerLinks={config.headerLinks}
+						currentPath={currentPath}
+						currentLocale={currentLocale}
 					/>
 				}
 				sider={
-					<DocsSidenav groups={groups} activeSlug={slug} links={config.links} />
+					<DocsSidenav
+						groups={groups}
+						activeSlug={slug}
+						links={config.links}
+						currentLocale={currentLocale}
+					/>
 				}
 				content={
 					<>

@@ -1,0 +1,89 @@
+---
+title: Anchor Enlace
+hydration: 3
+category: Navigation
+---
+
+import { Anchor, Stack } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introducción
+
+Un elemento `<a>` con estilo para enlaces de navegación internos y externos, con valores predeterminados seguros para `target="_blank"`.
+
+# Uso
+
+<DemoPreview>
+  <Stack direction="horizontal" gap="4">
+    <Anchor href="/docs">Docs</Anchor>
+    <Anchor href="/blog" variant="plain">
+      Blog
+    </Anchor>
+    <Anchor href="https://github.com" target="_blank" colorPalette="purple">
+      GitHub ↗
+    </Anchor>
+  </Stack>
+</DemoPreview>
+
+```tsx
+import { Anchor } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Stack direction="horizontal" gap="4">
+      <Anchor href="/docs">Docs</Anchor>
+      <Anchor href="/blog" variant="plain">
+        Blog
+      </Anchor>
+      <Anchor href="https://github.com" target="_blank" colorPalette="purple">
+        GitHub ↗
+      </Anchor>
+    </Stack>
+  );
+}
+```
+
+## Composición con enrutadores
+
+Pasa `asChild` para fusionar los estilos del anchor y el manejo de target seguro en un único elemento hijo en lugar de renderizar un `<a>` — útil para envolver el propio `<Link />` de un enrutador:
+
+```tsx
+import { Anchor } from "../components/ui";
+
+<Anchor asChild variant="plain">
+  <MyRouterLink to="/dashboard">Dashboard</MyRouterLink>
+</Anchor>;
+```
+
+## Constructor de Páginas CMS
+
+Este componente está disponible como un bloque `link` en el [Constructor de Páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "link",
+  "text": "View Pricing",
+  "href": "/pricing",
+  "variant": "underline",
+  "colorPalette": "blue"
+}
+```
+
+`text` se convierte en los hijos del anchor; todos los demás campos se transmiten directamente a `Anchor`.
+
+# Propiedades
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `href` | `string` | El destino del enlace. |
+| `target` | `string` | Target estándar de anchor, p. ej. `"_blank"`. |
+| `rel` | `string` | Rel estándar de anchor. Se rellena automáticamente con `"noopener noreferrer"` cuando `target="_blank"` y `rel` no está establecido de otro modo. |
+| `as` | `ElementType` | Renderiza como un elemento/componente distinto en lugar de `<a>`. |
+| `asChild` | `boolean` | Fusiona los estilos del anchor y el manejo de target seguro en un único elemento hijo en lugar de renderizar un envoltorio. |
+| `variant` | `"underline" \| "plain"` | Estilo visual. Por defecto `"underline"`. |
+| `colorPalette` | `"blue" \| "green" \| "red" \| "orange" \| "gray" \| "cyan" \| "amber" \| "purple"` | El tema de color. Por defecto `"blue"`. |
+| `class` | `string` | Clases CSS personalizadas. |
+
+# Accesibilidad
+
+`Anchor` renderiza un `<a>` nativo (o, con `as`, el elemento que elijas), por lo que es enfocable con el teclado y activable por defecto sin cableado ARIA adicional. Al enlazar a una nueva pestaña mediante `target="_blank"`, siempre se aplica un `rel` explícito para evitar que la página abierta acceda a `window.opener`.

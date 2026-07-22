@@ -1,0 +1,79 @@
+---
+title: Skeleton 骨架屏
+hydration: 3
+category: Feedback
+---
+
+import { Skeleton } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+用于在内容加载时进行占位提示的元素，提供多种动画和形状选项。
+
+# 用法
+
+## 基础骨架
+
+<DemoPreview>
+  <div style={{ display: "flex", flexDirection: "column", gap: "1rem", width: "100%", maxWidth: "320px" }}>
+    <Skeleton shape="circle" size="12" />
+    <Skeleton height="6" width="40" />
+    <Skeleton shape="text" noOfLines={3} />
+  </div>
+</DemoPreview>
+
+```tsx
+import { Skeleton, SkeletonCircle, SkeletonText } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <div>
+      <SkeletonCircle size="12" />
+      <Skeleton height="6" width="40" />
+      <SkeletonText noOfLines={3} />
+    </div>
+  );
+}
+```
+
+## CMS 页面构建器
+
+该组件可作为 `skeleton` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用。CMS 的 `shape` 选项为 `box`/`circle`/`text`，它们映射到真实的 `shape` 属性（`box` 会回退到普通默认形状）：
+
+```json
+{
+  "type": "skeleton",
+  "shape": "text",
+  "noOfLines": 3
+}
+```
+
+# 属性
+
+## Skeleton
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `loading` | `boolean` | 是否显示骨架。默认值：`true`。 |
+| `circle` | `boolean` | 将骨架渲染为圆形。 |
+
+| `variant` | \`"pulse" \ | "shine" \ | "none"\` | 动画样式。 |
+
+| `class` | `string` | 根元素的自定义 CSS 类。 |
+
+所有其他原生 `<div>` 属性（例如 `style`、`id`、`width`、`height`）都会被透传到底层元素。
+
+## SkeletonCircle
+
+与 `Skeleton` 相同的属性，但预配置了 `circle`。
+
+## SkeletonText
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `noOfLines` | `number` | 显示的行数。默认值：`3`。 |
+
+| `gap` | \`string \ | number\` | 行间距。默认值：`"2"`。 |
+
+以及 `Skeleton` 的全部属性。

@@ -1,0 +1,150 @@
+---
+title: Toast 轻提示
+hydration: 1
+category: Feedback
+---
+
+import { Toast, Button } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+一种用于针对操作提供反馈的瞬时通知。Toast 通过 `toaster` API 以命令式方式创建。挂载一个 `<Toast.Toaster />` 即可渲染它们。
+
+内置行为：
+
+- **按类型着色的强调色** —— `success` / `error` / `warning` / `info` / `loading` 各自拥有不同的左边框强调色和着色指示器图标。
+- **进入/退出动画** —— toast 在挂载时滑动并淡入，并在从 DOM 移除前播放匹配的退出动画，方向会根据顶部或底部锚定位置自动调整。
+- **悬停/聚焦时暂停** —— 将指针移到视口中任意 toast 上方（或按 Tab 进入）会暂停所有活动的自动关闭计时器；离开视口后以剩余时间继续。
+- **滑动关闭** —— 指针/触摸拖动超过阈值即关闭 toast，方向取决于 toaster 的 `placement`（如 `bottom-end` 向右滑、`bottom-start` 向左滑、`top` 向上滑）。
+- **键盘关闭** —— 获得焦点的 toast 在按下 <kbd>Escape</kbd> 时关闭，与其是否渲染可见的关闭按钮无关。
+- **默认无障碍** —— 每个 toast 都是 `role="status"`（当 `type: "error"` 时为 `role="alert"`），并带有匹配的 `aria-live`，因此屏幕阅读器无需额外的隐藏播报器即可朗读。
+
+> 下方每个示例的可运行实时版本都位于 `app/routes/index.tsx` —— **Toast 组件示例** 部分。文档示例与该文件保持同步。
+
+# 用法
+
+<DemoPreview>
+  <Toast.Toaster />
+  <Button
+    variant="outline"
+    onclick="window.dispatchEvent(new CustomEvent('park-ui:toast:create', { detail: { id: Math.random().toString(36).substring(2, 9), title: 'Success', description: 'Action completed successfully', closable: true, type: 'success' } }))"
+  >
+    Show Success Toast
+  </Button>
+</DemoPreview>
+
+## 挂载 Toaster
+
+在应用根节点附近放置一次 `<Toast.Toaster />`（这与 `app/routes/index.tsx` 一致）：
+
+```tsx
+import { Toast } from "../components/ui";
+
+export default function App() {
+  return (
+    <>
+      {/* ...your application... */}
+      <Toast.Toaster />
+    </>
+  );
+}
+```
+
+## 显示 Toast（客户端组件 / 岛屿）
+
+在已水合的客户端组件或岛屿中，调用 `Toast.toaster.*`：
+
+```tsx
+import { Toast, Button } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Button
+      onClick={() =>
+        Toast.toaster.success("Saved!", { description: "Your changes are live." })
+      }
+    >
+      Save
+    </Button>
+  );
+}
+```
+
+## 显示 Toast（SSG 安全）
+
+首页演示通过直接派发底层的 `park-ui:toast:create` CustomEvent 来触发 toast。这种方式**无需客户端水合**，因此使用静态的 `onclick` 属性而非 JSX 的 `onClick` 处理器。以下代码块复制自 `app/routes/index.tsx`：
+
+```tsx
+<Toast.Toaster />
+<div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
+  <Button
+    variant="outline"
+    onclick="window.dispatchEvent(new CustomEvent('park-ui:toast:create', { detail: { id: Math.random().toString(36).substring(2, 9), title: 'Success', description: 'Action completed successfully', closable: true, type: 'success' } }))"
+  >
+    Show Success Toast
+  </Button>
+  <Button
+    variant="outline"
+    onclick="window.dispatchEvent(new CustomEvent('park-ui:toast:create', { detail: { id: Math.random().toString(36).substring(2, 9), title: 'Error', description: 'An error occurred', closable: true, type: 'error' } }))"
+  >
+    Show Error Toast
+  </Button>
+  <Button
+    variant="outline"
+    onclick="window.dispatchEvent(new CustomEvent('park-ui:toast:create', { detail: { id: Math.random().toString(36).substring(2, 9), title: 'Loading', description: 'Please wait...', type: 'loading' } }))"
+  >
+    Show Loading Toast
+  </Button>
+</div>
+```
+
+> 注意：Toast 内容以**命令式**方式创建 —— `title` 和 `description` 仅接受字符串，因此 toast 正文无法用 JSX 编写。`Toaster` 使用私有原语在内部渲染它。
+
+# API
+
+`Toast.toaster`（或 `createToaster` 返回的任何实例）提供以下辅助方法：
+
+| 方法 | 签名 |
+| --- | --- |
+| `create` | `(options: Omit<ToastOptions, "id">) => string` |
+| `success` | `(title: string, options?: Partial<ToastOptions>) => string` |
+| `error` | `(title: string, options?: Partial<ToastOptions>) => string` |
+| `warning` | `(title: string, options?: Partial<ToastOptions>) => string` |
+| `info` | `(title: string, options?: Partial<ToastOptions>) => string` |
+| `loading` | `(title: string, options?: Partial<ToastOptions>) => string` |
+| `promise` | `(promise: Promise<T>, options: PromiseOptions<T>) => Promise<T>` — shows a `loading` toast, then swaps it to `success`/`error` when the promise settles. |
+| `update` | `(id: string, options: Partial<ToastOptions>) => void` |
+| `dismiss` | `(id?: string) => void` — dismisses one toast, or all toasts if `id` is omitted. |
+| `pause` | `() => void` — freezes every active auto-dismiss timer, preserving remaining time. |
+| `resume` | `() => void` — continues timers frozen by `pause`. |
+| `subscribe` | `(callback: (toasts: ToastOptions[]) => void) => () => void` |
+| `getToasts` / `getCount` | Snapshot accessors. |
+
+`Toast.Toaster`（以及模块级的 `toaster`/`createToaster`）会自动在 toaster 视口内的指针悬停和聚焦时调用 `pause`/`resume` —— 通常你无需自行调用。
+
+## createToaster(config)
+
+| 属性 | 类型 | 默认 | 说明 |
+| --- | --- | --- | --- |
+
+| `placement` | \`"top-start" \ | "top" \ | "top-end" \ | "bottom-start" \ | "bottom" \ | "bottom-end"\` | `"bottom-end"` | 视口锚定的屏幕角落/边缘。同时决定默认的滑动关闭方向和进入/退出滑动方向。 |
+
+| `overlap` | `boolean` | `false` | 为堆叠/重叠布局预留。 |
+| `max` | `number` | `24` | 同时保留的最大 toast 数量；最旧的优先被移除。 |
+| `duration` | `number` | `5000` | 未自行指定时的默认自动关闭时长（毫秒）。 |
+| `gap` | `number` | `16` | 为堆叠 toast 之间的间距预留。 |
+| `removeDelay` | `number` | `200` | Toaster 在强制移除前等待 toast 退出动画的上限（毫秒），以防 `animationend` 始终不触发（例如减弱动效时）。 |
+
+## ToastOptions
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `title` | `string` | Toast 标题。 |
+| `description` | `string` | Toast 描述。 |
+
+| `type` | \`"info" \ | "success" \ | "warning" \ | "error" \ | "loading"\` | Toast 的意图/样式 —— 决定强调色、指示器图标以及无障碍 role/`aria-live`（`error` → `role="alert"`/`assertive`，其余 → `role="status"`/`polite`）。 |
+
+| `duration` | `number` | 自动关闭时长（毫秒）。`0` 或 `Infinity` 会禁用自动关闭。 |
+| `closable` | `boolean` | 是否渲染可见的关闭按钮。无论此标志如何，toast 仍可通过 <kbd>Escape</kbd> 或滑动关闭。 |
+| `action` | `{ label: string; onClick: () => void }` | 可选的操作按钮。 |

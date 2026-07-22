@@ -1,0 +1,172 @@
+---
+title: Carousel 轮播图
+hydration: 1
+category: Data Display
+---
+
+import { Carousel } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+一种通过真实、原生的 CSS scroll-snap（而非 transform 计算）来翻页浏览一组幻灯片的幻灯片组件。支持按组分页（`slidesPerPage`）、循环、自动播放、鼠标拖拽滚动、键盘导航以及垂直方向。
+
+# 用法
+
+## 基础轮播
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "360px" }}>
+    <Carousel
+      slides={[
+        <div style={{ padding: "3rem 1rem", textAlign: "center", background: "var(--colors-blue-3)" }}>Slide 1</div>,
+        <div style={{ padding: "3rem 1rem", textAlign: "center", background: "var(--colors-purple-3)" }}>Slide 2</div>,
+        <div style={{ padding: "3rem 1rem", textAlign: "center", background: "var(--colors-green-3)" }}>Slide 3</div>,
+      ]}
+    />
+  </div>
+</DemoPreview>
+
+```tsx
+import { Carousel } from "../components/ui";
+
+export default function Page() {
+  return (
+    <Carousel
+      slides={[
+        <div>Slide 1</div>,
+        <div>Slide 2</div>,
+        <div>Slide 3</div>,
+      ]}
+    />
+  );
+}
+```
+
+## 每页多张幻灯片，循环
+
+```tsx
+<Carousel
+  slides={slides}
+  slidesPerPage={3}
+  spacing="16px"
+  loop
+  colorPalette="purple"
+/>
+```
+
+## 自动播放并暂停于悬停
+
+```tsx
+<Carousel
+  slides={slides}
+  autoplay={{ delay: 2500 }}
+  pauseOnHover
+  loop
+  showAutoplayTrigger
+/>
+```
+
+## 垂直方向
+
+```tsx
+<div class={css({ height: "72" })}>
+  <Carousel slides={slides} orientation="vertical" class={css({ height: "full" })} />
+</div>
+```
+
+## 叠加（内联）控件
+
+```tsx
+<Carousel slides={slides} inline loop />
+```
+
+## CMS 页面构建器
+
+该组件在 [页面构建器](/docs/PageBuilder) (`content/pages/*.json`) 中作为 `carousel` 区块提供。幻灯片是扁平的 `{ image, caption, href }` 记录，而非嵌套的组件区块：
+
+```json
+{
+  "type": "carousel",
+  "slides": [
+    { "image": "/hero-1.jpg", "caption": "Slide 1" },
+    { "image": "/hero-2.jpg", "caption": "Slide 2" }
+  ],
+  "loop": true,
+  "autoplayDelay": 3000
+}
+```
+
+***
+
+# 属性
+
+## Carousel
+
+数据驱动的便捷组件：传入 `slides`，它会为你组合 `ItemGroup`/`Item` 以及默认的 `Control`（上/下一张触发器与指示点）。如需完全手动组合，请直接使用 `Carousel.Root` 及导出的各部分（参见 [手动组合](#manual-composition)）。
+
+| 属性 | 类型 | 说明 | 默认值 |
+| --- | --- | --- | --- |
+| `slides` | `JSX.Element[]` | 幻灯片内容。`slideCount` 由其长度推导。 | - |
+| `interactive` | `boolean` | 强制作为岛屿水合。 | `true` |
+| `page` | `number` | 轮播是否位于给定页面（受控）。 | - |
+| `defaultPage` | `number` | 初始页面（非受控）。 | `0` |
+| `slidesPerPage` | `number` | 一次可见的幻灯片数量。 | `1` |
+
+| `slidesPerMove` | \`number \ | "auto"\` | 每次翻页前进的幻灯片数。`"auto"` 使用 `slidesPerPage`。 | `"auto"` |
+| `orientation` | \`"horizontal" \ | "vertical"\` | 滚动轴。 | `"horizontal"` |
+
+| `loop` | `boolean` | 在首页/末页之间循环。 | `false` |
+| `spacing` | `string` | 幻灯片之间的间距（任意 CSS 长度）。 | `"0px"` |
+| `padding` | `string` | 两端额外的滚动内边距（任意 CSS 长度）。 | - |
+| `autoSize` | `boolean` | 让幻灯片自行决定尺寸，而非按 `slidesPerPage` 均匀切分。 | `false` |
+| `allowMouseDrag` | `boolean` | 启用鼠标的点击拖拽滚动（触摸/触控板滚动始终原生可用）。 | `false` |
+
+| `autoplay` | \`boolean \ | \{ delay: number \}\` | 自动前进页面。无论 `loop` 如何，始终在末尾循环。 | `false` |
+
+| `pauseOnHover` | `boolean` | 当指针悬停在轮播上方时暂停自动播放。 | `false` |
+
+| `snapType` | \`"proximity" \ | "mandatory"\` | CSS scroll-snap 的严格程度。 | `"mandatory"` |
+
+| `disabled` | `boolean` | 禁用所有触发器/指示器及拖拽。 | `false` |
+| `showControls` | `boolean` | 在默认的 `Control` 中渲染 `PrevTrigger`/`NextTrigger`。 | `true` |
+| `showIndicators` | `boolean` | 在默认的 `Control` 中渲染 `IndicatorGroup`。 | `true` |
+| `showAutoplayTrigger` | `boolean` | 在默认的 `Control` 中渲染 `AutoplayTrigger`。 | `false` |
+| `itemClass` | `string` | 应用于每个生成的 `Item` 的自定义类。 | - |
+
+| `size` | \`"sm" \ | "md" \ | "lg"\` | 触发器/指示器的尺寸。 | `"md"` |
+
+| `colorPalette` | \`"gray" \ | "blue" \ | "cyan" \ | "green" \ | "orange" \ | "purple" \ | "red" \ | "teal" \ | "indigo" \ | "pink" \ | "yellow" \ | "success" \ | "error" \ | "warning"\` | 当前指示器/按下的自动播放触发器的强调色。 | `"green"` |
+
+| `inline` | `boolean` | 将 `Control` 叠加在项组之上，而非堆叠在其下方。 | `false` |
+| `translations` | `CarouselTranslations` | 本地化字符串（aria 标签、进度文本）。 | - |
+| `onPageChange` | `(details: { page: number; pageSnapPoint: number }) => void` | 当活动页面稳定时调用。 | - |
+| `onAutoplayStatusChange` | `(details: { type: string; isPlaying: boolean; page: number }) => void` | 当自动播放开始/计时/停止时调用。 | - |
+| `onDragStatusChange` | `(details: { type: string; isDragging: boolean; page: number }) => void` | 在拖拽开始/移动/结束时调用。 | - |
+| `class` | `string` | 根元素的自定义 CSS 类。 | - |
+| `classNames` | `Record<string, string>` | 每个部分的自定义 CSS 类（`root`、`itemGroup`、`item`、`control`、`prevTrigger`、`nextTrigger`、`indicatorGroup`、`indicator`、`autoplayTrigger`）。 | - |
+
+### Carousel.Item
+
+| 属性 | 类型 | 说明 | 默认值 |
+| --- | --- | --- | --- |
+| `index` | `number` | 幻灯片的位置。必填。 | - |
+
+| `snapAlign` | \`"start" \ | "center" \ | "end"\` | 幻灯片哪一侧边缘吸附进入视图。 | `"start"` |
+
+### Carousel.Indicator
+
+| 属性 | 类型 | 说明 | 默认值 |
+| --- | --- | --- | --- |
+| `index` | `number` | 它跳转到的页面。必填。 | - |
+| `readOnly` | `boolean` | 渲染该圆点但不带点击处理器。 | `false` |
+
+***
+
+# 架构说明
+
+- **原生滚动，而非 transform。** `ItemGroup` 是一个真正的 `overflow: auto` 网格/弹性容器，带有 `scroll-snap-type`；翻页时对其调用 `scrollTo(...)`。这意味着触摸滑动、触控板滚动以及聚焦元素的方向键滚动在水合完成之前即可工作 —— 只有触发器/指示器的_点击_和自动播放需要 JavaScript。
+- **`pageSnapPoints`** 是每个页面起始处的项索引，使用与 Ark UI 的 `@zag-js/carousel` 机器相同的结构公式（`getPageSnapPoints`）计算 —— 仅由 `slideCount`/`slidesPerPage`/`slidesPerMove` 决定，因此在服务端与水合之前完全一致（SSR 无需布局测量）。
+- **子元素在水合时不会重新渲染。** 与本项目的其他岛屿一样，交互式 `Carousel` 根节点直接修补已渲染 DOM 上的 `data-current`、`disabled`、`data-inview` 和 `aria-hidden`（见 `carousel-primitive.tsx` 中的 `applyPageState`），而不是重新生成 `Item`/`Indicator` 子元素 —— HonoX 从序列化的 HTML 快照而非通过重新调用生成它们的组件来水合岛屿的子元素。
+- **绝不要依赖触发器/指示器按钮上的 JSX `onClick`。** 出于同样的原因：`PrevTrigger`/`NextTrigger`/`Indicator`/`AutoplayTrigger` 是作为子元素组合的，因此 hono/jsx/dom 永远不会将自身的合成事件属性协调到这些已挂载的节点上 —— 它们上的 `onClick` 会静默地永不触发。所有点击处理都由根节点在单个 `useEffect` 中委托（`target.closest('[data-part="..."]')`），与 `dropdown-primitive.tsx`/`combobox-primitive.tsx` 类似。该 effect（以及 `pauseOnHover` 的那个）恰好挂载一次，并通过 ref 而非直接闭包读取 `scrollNext`/`scrollPrev`/`isPlaying` 等 —— 将响应式状态放入其依赖数组会在每次变化时重新挂载监听器，而 `pauseOnHover` 自身的 `setIsPlaying`（由 `pointerenter` 触发，在真实点击手势中恰好位于配对的点击之前）否则会在鼠标到达与按钮按下之间的间隙中拆除点击监听器。
+- **相比上游 Ark UI 的简化：** 在视图内追踪使用与 SSR 渲染相同的索引区间数学（而非真实的 `IntersectionObserver`），并且 `ItemGroup` 的 `tabindex` 始终为 `0`（不根据某张幻灯片是否包含可聚焦元素来切换）。两者都是覆盖常见固定 `slidesPerPage` 场景的务实权衡；RTL（`dir`）不受支持，与本项目其余组件库一致。

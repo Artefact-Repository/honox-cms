@@ -89,9 +89,26 @@ interface DocsSidenavProps {
 	groups: DocGroup[];
 	activeSlug?: string;
 	links?: DocsNavLinkConfig[];
+	currentLocale?: string;
 }
 
-function DocsSidenav({ groups, activeSlug, links }: DocsSidenavProps) {
+function DocsSidenav({
+	groups,
+	activeSlug,
+	links,
+	currentLocale = "en",
+}: DocsSidenavProps) {
+	const localizeLink = (href: string) => {
+		if (
+			currentLocale === "zh" &&
+			!href.startsWith("/zh") &&
+			href.startsWith("/")
+		) {
+			return `/zh${href}`;
+		}
+		return href;
+	};
+
 	return (
 		<nav
 			class={css({
@@ -127,7 +144,7 @@ function DocsSidenav({ groups, activeSlug, links }: DocsSidenavProps) {
 							return (
 								<a
 									key={doc.slug}
-									href={`/docs/${doc.slug}`}
+									href={localizeLink(`/docs/${doc.slug}`)}
 									aria-current={isActive ? "page" : undefined}
 									class={css({
 										display: "block",
@@ -254,12 +271,32 @@ function MobileNav({ groups, activeSlug, links }: DocsSidenavProps) {
 	);
 }
 
+function getLocaleToggleUrl(
+	currentPath: string,
+	targetLocale: "en" | "zh",
+): string {
+	if (targetLocale === "zh") {
+		if (currentPath.startsWith("/zh")) {
+			return currentPath;
+		}
+		return currentPath === "/" ? "/zh" : `/zh${currentPath}`;
+	} else {
+		if (currentPath.startsWith("/zh")) {
+			const rest = currentPath.slice(3);
+			return rest === "" ? "/" : rest;
+		}
+		return currentPath;
+	}
+}
+
 interface DocsHeaderProps {
 	editUrl?: string;
 	groups: DocGroup[];
 	activeSlug?: string;
 	links?: DocsNavLinkConfig[];
 	headerLinks?: DocsNavLinkConfig[];
+	currentPath: string;
+	currentLocale: string;
 }
 
 function DocsHeader({
@@ -268,8 +305,21 @@ function DocsHeader({
 	activeSlug,
 	links,
 	headerLinks,
+	currentPath,
+	currentLocale,
 }: DocsHeaderProps) {
 	const githubLink = links?.find(isGithubLink);
+	const localizeLink = (href: string) => {
+		if (
+			currentLocale === "zh" &&
+			!href.startsWith("/zh") &&
+			href.startsWith("/")
+		) {
+			return `/zh${href}`;
+		}
+		return href;
+	};
+
 	return (
 		<>
 			<div
@@ -284,7 +334,7 @@ function DocsHeader({
 				})}
 			>
 				<Anchor
-					href="/"
+					href={localizeLink("/")}
 					variant="plain"
 					class={css({ textDecoration: "none", flexShrink: "0" })}
 				>
@@ -311,8 +361,10 @@ function DocsHeader({
 				>
 					<Search
 						src="/api/docs/search.json"
-						placeholder="Search docs..."
-						itemLabel="docs"
+						placeholder={
+							currentLocale === "zh" ? "搜索文档..." : "Search docs..."
+						}
+						itemLabel={currentLocale === "zh" ? "文档" : "docs"}
 						showCount={false}
 						syncUrl={false}
 					/>
@@ -329,11 +381,15 @@ function DocsHeader({
 					{headerLinks?.map((link) => (
 						<Anchor
 							key={link.href}
-							href={link.href}
+							href={localizeLink(link.href)}
 							variant="plain"
 							class={css({ textStyle: "sm", fontWeight: "medium" })}
 						>
-							{link.label}
+							{currentLocale === "zh" && link.label === "Blog"
+								? "博客"
+								: currentLocale === "zh" && link.label === "Docs"
+									? "文档"
+									: link.label}
 						</Anchor>
 					))}
 					{editUrl ? (
@@ -344,7 +400,7 @@ function DocsHeader({
 								css({ textStyle: "sm", fontWeight: "medium" }),
 							)}
 						>
-							Edit
+							{currentLocale === "zh" ? "编辑" : "Edit"}
 						</Anchor>
 					) : (
 						<Anchor
@@ -354,7 +410,32 @@ function DocsHeader({
 								css({ textStyle: "sm", fontWeight: "medium" }),
 							)}
 						>
-							Admin
+							{currentLocale === "zh" ? "内容管理" : "Admin"}
+						</Anchor>
+					)}
+					{currentLocale === "zh" ? (
+						<Anchor
+							href={getLocaleToggleUrl(currentPath, "en")}
+							variant="plain"
+							class={css({
+								textStyle: "sm",
+								fontWeight: "medium",
+								color: "blue.11",
+							})}
+						>
+							English
+						</Anchor>
+					) : (
+						<Anchor
+							href={getLocaleToggleUrl(currentPath, "zh")}
+							variant="plain"
+							class={css({
+								textStyle: "sm",
+								fontWeight: "medium",
+								color: "blue.11",
+							})}
+						>
+							中文
 						</Anchor>
 					)}
 					{githubLink && (
@@ -418,8 +499,24 @@ const docsShellProps = {
 } satisfies Partial<LayoutProps>;
 
 export default createRoute(async (c) => {
-	const [docs, config] = await Promise.all([loadDocs(), loadDocsConfig()]);
+	const currentPath = c.req.path;
+	const currentLocale = currentPath.startsWith("/zh") ? "zh" : "en";
+	const [docs, config] = await Promise.all([
+		loadDocs(currentLocale),
+		loadDocsConfig(),
+	]);
 	const groups = buildDocGroups(docs, config);
+
+	const localizeLink = (href: string) => {
+		if (
+			currentLocale === "zh" &&
+			!href.startsWith("/zh") &&
+			href.startsWith("/")
+		) {
+			return `/zh${href}`;
+		}
+		return href;
+	};
 
 	return c.render(
 		<Layout
@@ -429,19 +526,30 @@ export default createRoute(async (c) => {
 					groups={groups}
 					links={config.links}
 					headerLinks={config.headerLinks}
+					currentPath={currentPath}
+					currentLocale={currentLocale}
 				/>
 			}
-			sider={<DocsSidenav groups={groups} links={config.links} />}
+			sider={
+				<DocsSidenav
+					groups={groups}
+					links={config.links}
+					currentLocale={currentLocale}
+				/>
+			}
 			content={
 				<>
-					<title>Docs - Artefact</title>
+					<title>
+						{currentLocale === "zh" ? "文档 - Artefact" : "Docs - Artefact"}
+					</title>
 
 					<Heading as="h1" size="2xl" class={css({ mb: "3" })}>
-						Documentation
+						{currentLocale === "zh" ? "官方文档" : "Documentation"}
 					</Heading>
 					<Text class={css({ color: "fg.muted", mb: "10", maxWidth: "2xl" })}>
-						Guides and component reference for the Artefact UI suite. Pick a
-						page from the sidenav, or jump in below.
+						{currentLocale === "zh"
+							? "Artefact UI 组件套件的使用指南与参考文档。请从侧边栏中选择页面，或直接在下方浏览。"
+							: "Guides and component reference for the Artefact UI suite. Pick a page from the sidenav, or jump in below."}
 					</Text>
 
 					<div
@@ -458,7 +566,7 @@ export default createRoute(async (c) => {
 						{docs.map((doc) => (
 							<Anchor
 								key={doc.slug}
-								href={`/docs/${doc.slug}`}
+								href={localizeLink(`/docs/${doc.slug}`)}
 								variant="plain"
 								class={css({ textDecoration: "none" })}
 							>

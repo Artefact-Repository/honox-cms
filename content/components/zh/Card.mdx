@@ -1,0 +1,102 @@
+---
+title: Card 卡片
+hydration: 2
+category: Data Display
+---
+
+import { Card, Button } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+一个用于分组相关内容的灵活容器，带有可选的头部、主体、底部、图片和头像插槽。
+
+# 用法
+
+## 基础卡片
+
+<DemoPreview>
+  <Card
+    variant="elevated"
+    title="Project title"
+    description="A short description of the project."
+    body="Main content of the card goes here."
+    footer={<Button>View</Button>}
+  />
+</DemoPreview>
+
+```tsx
+import { Card, Button } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Card
+      variant="elevated"
+      title="Project title"
+      description="A short description of the project."
+      body="Main content of the card goes here."
+      footer={<Button>View</Button>}
+    />
+  );
+}
+```
+
+## 带图片的卡片
+
+```tsx
+import { Card } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Card
+      image="/cover.png"
+      imagePosition="top"
+      title="Card with image"
+      body="Content beneath the image."
+    />
+  );
+}
+```
+
+## CMS 页面构建器
+
+该组件在 [页面构建器](/docs/PageBuilder) (`content/pages/*.json`) 中作为 `card` 区块提供：
+
+```json
+{
+  "type": "card",
+  "title": "Project title",
+  "description": "A short description of the project.",
+  "body": "Main content of the card goes here.",
+  "variant": "elevated"
+}
+```
+
+# 属性
+
+## Card
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+
+| `title` | \`string \ | JSX.Element\` | 卡片标题。 |
+| `description` | \`string \ | JSX.Element\` | 卡片描述。 |
+| `body` | \`string \ | JSX.Element\` | 主要主体内容。 |
+| `footer` | \`string \ | JSX.Element\` | 底部内容。 |
+
+| `avatar` | `JSX.Element` | 显示在头部中的元素（例如头像）。 |
+| `headerAction` | `JSX.Element` | 显示在头部末尾的元素（例如菜单）。 |
+
+| `image` | \`string \ | JSX.Element\` | 图片来源或元素。 |
+
+| `imagePosition` | \`"top" \ | "bottom" \ | "left" \ | "right"\` | 图片放置的位置。默认：`"top"`。 |
+
+| `headerClass` | `string` | 头部的自定义 CSS 类。 |
+| `bodyClass` | `string` | 主体的自定义 CSS 类。 |
+| `footerClass` | `string` | 底部的自定义 CSS 类。 |
+| `imageClass` | `string` | 图片的自定义 CSS 类。 |
+
+| `variant` | \`"elevated" \ | "outline" \ | "subtle"\` | 卡片的视觉样式。 |
+
+| `interactive` | `boolean` | 启用客户端水合。 |
+| `class` | `string` | 根元素的自定义 CSS 类。 |

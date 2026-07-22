@@ -1,0 +1,119 @@
+---
+title: Slider 滑动条
+hydration: 2
+category: Forms
+---
+
+import { Slider } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+一种让用户从连续刻度中选择一个值（或一段值范围）的控件。
+
+# 用法
+
+## 基础滑块
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "280px" }}>
+    <Slider
+      label="Volume"
+      defaultValue={30}
+      min={0}
+      max={100}
+      showValueText
+      interactive
+    />
+  </div>
+</DemoPreview>
+
+```tsx
+import { Slider } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Slider
+      label="Volume"
+      defaultValue={30}
+      min={0}
+      max={100}
+      showValueText
+      interactive
+    />
+  );
+}
+```
+
+## 带刻度
+
+```tsx
+import { Slider } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Slider
+      defaultValue={50}
+      marks={[
+        { value: 0, label: "0" },
+        { value: 50, label: "50" },
+        { value: 100, label: "100" },
+      ]}
+      interactive
+    />
+  );
+}
+```
+
+## CMS 页面构建器
+
+该组件可作为 `slider` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用：
+
+```json
+{
+  "type": "slider",
+  "label": "Volume",
+  "defaultValue": 30,
+  "min": 0,
+  "max": 100,
+  "showValueText": true
+}
+```
+
+# 属性
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+
+| `value` | \`number \ | number[]\` | 当前值（受控）。 |
+| `defaultValue` | \`number \ | number[]\` | 初始值（非受控）。 |
+
+| `min` | `number` | 最小值。 |
+| `max` | `number` | 最大值。 |
+| `step` | `number` | 步长增量。 |
+| `onChange` | `(details: { value: number[] }) => void` | 值变化时触发的回调。 |
+| `onDraggingChange` | `(details: { dragging: boolean }) => void` | 拖拽状态变化时触发的回调。 |
+
+| `label` | \`string \ | JSX.Element\` | 滑块上方显示的标签。 |
+
+| `showValueText` | `boolean` | 是否显示当前值文本。 |
+| `formatValue` | `(value: number) => string` | 值文本的自定义格式化函数。 |
+
+| `marks` | \`\{ value: number; label: string \ | JSX.Element \}[]\` | 沿轨道显示的刻度标记。 |
+| `orientation` | \`"horizontal" \ | "vertical"\` | 滑块的方向。 |
+
+| `height` | `string` | 高度（垂直方向时必填）。 |
+| `disabled` | `boolean` | 滑块是否被禁用。 |
+| `readOnly` | `boolean` | 滑块是否为只读。 |
+| `interactive` | `boolean` | 启用客户端交互。 |
+
+| `size` | \`"sm" \ | "md" \ | "lg"\` | 滑块的尺寸。 |
+
+| `colorPalette` | `string` | 滑块的配色主题。 |
+| `class` | `string` | 根元素的自定义 CSS 类。 |
+| `trackClass` | `string` | 轨道的自定义 CSS 类。 |
+| `rangeClass` | `string` | 范围的自定义 CSS 类。 |
+| `thumbClass` | `string` | 滑块手柄的自定义 CSS 类。 |
+| `labelClass` | `string` | 标签的自定义 CSS 类。 |
+| `valueTextClass` | `string` | 值文本的自定义 CSS 类。 |
+| `markClass` | `string` | 刻度标记的自定义 CSS 类。 |

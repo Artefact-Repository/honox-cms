@@ -1,0 +1,187 @@
+---
+title: Select Selector
+hydration: 1
+category: Forms
+---
+
+import { Select } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introducción
+
+Un control desplegable para elegir una o varias opciones de una lista — una alternativa
+accesible y personalizable al elemento nativo `<select>`.
+
+Cuándo optar por otra cosa:
+
+- Con menos de \~5 opciones, un `RadioGroup` suele ser más claro.
+- Si el usuario debe poder escribir para filtrar las opciones, usa `Combobox`.
+
+El componente renderiza un `<select>` nativo visualmente oculto junto a la interfaz personalizada,
+de modo que una prop `name` hace que participe en el envío de formularios normal sin cableado
+adicional.
+
+# Interacción por teclado
+
+El disparador es un botón `role="combobox"`; el foco permanece en él mientras la opción resaltada
+se comunica mediante `aria-activedescendant`.
+
+| Key | Behavior |
+| --- | --- |
+| `Enter` / `Space` | Abre la lista; cuando está abierta, selecciona la opción resaltada. |
+| `ArrowDown` / `ArrowUp` | Abre la lista, o mueve el resaltado (cíclico, salta opciones deshabilitadas). |
+| `Home` / `End` | Resalta la primera / última opción habilitada. |
+| `Escape` | Cierra la lista. |
+| `Tab` | Cierra la lista y mueve el foco a otro lugar. |
+| Printable characters | Predicción de escritura (typeahead): salta a la primera opción cuya etiqueta coincida con el prefijo escrito. Cuando la lista está cerrada (modo simple), la coincidencia se selecciona directamente, como en un `<select>` nativo. |
+
+Abrir la lista resalta la opción actualmente seleccionada (o la primera habilitada), y la
+navegación por teclado mantiene la opción resaltada visible dentro del área de desplazamiento.
+
+# Hidratación
+
+**Nivel 1 — automáticamente interactivo.** Abrir el desplegable y seleccionar una opción requieren
+JS del cliente, y no existe un respaldo estático (el `<select>` nativo está visualmente oculto y
+solo existe para el envío de formularios), por lo que `Select` se hidrata por defecto. Pasa
+`interactive={false}` para forzar un renderizado puramente estático.
+
+| `interactive` prop | Result |
+| --- | --- |
+| omitido | Se hidrata como isla |
+| `true` | Se hidrata como isla |
+| `false` | Estático — sin JS del cliente |
+
+Todas las decisiones de interactividad en la biblioteca pasan por el ayudante compartido
+`shouldHydrate()` en `app/components/ui/island-utils.ts`.
+
+# Uso
+
+<DemoPreview>
+  <Select
+    items={[
+      { label: "React", value: "react" },
+      { label: "Solid", value: "solid" },
+      { label: "Svelte", value: "svelte", disabled: true },
+      { label: "Vue", value: "vue" },
+      { label: "Hono", value: "hono" },
+    ]}
+    label="Framework"
+    placeholder="Select a framework"
+    allowClear
+  />
+</DemoPreview>
+
+```tsx
+import { Select } from "../components/ui";
+
+const items = [
+  { label: "React", value: "react" },
+  { label: "Solid", value: "solid" },
+  { label: "Svelte", value: "svelte", disabled: true },
+  { label: "Vue", value: "vue" },
+  { label: "Hono", value: "hono" },
+];
+
+export default function MyPage() {
+  return (
+    <Select
+      items={items}
+      label="Framework"
+      placeholder="Select a framework"
+      allowClear
+    />
+  );
+}
+```
+
+## Selección múltiple
+
+La lista permanece abierta mientras se alternan las opciones, y el disparador muestra las
+etiquetas seleccionadas unidas por comas.
+
+```tsx
+<Select
+  multiple
+  items={items}
+  label="Frameworks"
+  placeholder="Select frameworks"
+  defaultValue={["hono"]}
+/>
+```
+
+## En un formulario
+
+El `<select>` nativo oculto conserva la selección, por lo que un envío de formulario simple
+funciona:
+
+```tsx
+<form method="post" action="/frameworks">
+  <Select name="framework" items={items} label="Framework" required />
+  <Button type="submit">Save</Button>
+</form>
+```
+
+## Tamaños y variantes
+
+```tsx
+<Select items={items} size="sm" placeholder="Small" />
+<Select items={items} size="lg" variant="surface" placeholder="Large surface" />
+<Select items={items} invalid placeholder="Invalid state" />
+```
+
+## Constructor de páginas del CMS
+
+Este componente está disponible como un bloque `select` en el [Constructor de páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "select",
+  "label": "Framework",
+  "placeholder": "Select a framework",
+  "items": [
+    { "label": "React", "value": "react" },
+    { "label": "Hono", "value": "hono" }
+  ]
+}
+```
+
+# Propiedades
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `items` | `SelectItem[]` | Las opciones a mostrar en la lista. |
+| `label` | `Child` | Etiqueta renderizada sobre el disparador y asociada a él. |
+| `placeholder` | `string` | Texto mostrado en el disparador mientras no hay nada seleccionado. |
+| `allowClear` | `boolean` | Muestra un botón de limpiar una vez que existe una selección. |
+| `multiple` | `boolean` | Permite seleccionar varias opciones; la lista permanece abierta mientras se alternan. |
+| `defaultValue` | `string[]` | Selección inicial (no controlada). Alias de `selectedValues`. |
+| `selectedValues` | `string[]` | Selección inicial (igual que `defaultValue`). |
+| `deselectable` | `boolean` | En modo simple, hacer clic de nuevo en la opción seleccionada la deselecciona. |
+| `name` | `string` | Nombre del `<select>` nativo oculto, para el envío de formularios. |
+| `disabled` | `boolean` | Deshabilita todo el control. |
+| `invalid` | `boolean` | Marca el control como inválido (`aria-invalid`, borde de error). |
+| `readOnly` | `boolean` | La selección es visible pero la lista no se puede abrir. |
+| `required` | `boolean` | Marca el control como obligatorio (`aria-required`, `required` del select oculto). |
+| `open` | `boolean` | Estado de apertura controlado del desplegable. |
+
+| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg" \ | "xl"\` | Tamaño del disparador y la lista. Por defecto `md`. |
+
+| `variant` | \`"outline" \ | "surface"\` | Variante visual del disparador. Por defecto `outline`. |
+
+| `interactive` | `boolean` | Sobrescribe la decisión de hidratación (ver abajo). |
+| `onValueChange` | `(values: string[]) => void` | Se llama con la selección completa cada vez que cambia (seleccionar, deseleccionar, limpiar). |
+| `onItemSelect` | `(value: string) => void` | Se llama con el valor de la opción con la que se interactuó. |
+| `onClear` | `() => void` | Se llama cuando el botón de limpiar vacía la selección. |
+| `onOpenChange` | `(open: boolean) => void` | Se llama cuando el desplegable se abre o se cierra. |
+
+> Las props de callback solo funcionan cuando el Select se compone desde código del lado del
+> cliente (dentro de otra isla). Las props serializadas desde una ruta renderizada en el servidor
+> deben ser datos simples.
+
+## SelectItem
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `label` | `string` | El texto visible de la opción. También se usa para la coincidencia por predicción de escritura. |
+| `value` | `string` | El valor único de la opción. |
+| `disabled` | `boolean` | Si la opción se puede seleccionar. |

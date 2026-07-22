@@ -1,0 +1,100 @@
+---
+title: Breadcrumb Migas de Pan
+hydration: 3
+category: Navigation
+---
+
+import { Breadcrumb } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introducción
+
+Una ayuda de navegación que muestra la ubicación de la página actual dentro de una jerarquía mediante una lista de enlaces.
+
+# Uso
+
+## Breadcrumb básico
+
+<DemoPreview>
+  <Breadcrumb
+    items={[
+      { label: "Home", href: "/" },
+      { label: "Components", href: "/components" },
+      { label: "Breadcrumb" },
+    ]}
+  />
+</DemoPreview>
+
+```tsx
+import { Breadcrumb } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Breadcrumb
+      items={[
+        { label: "Home", href: "/" },
+        { label: "Components", href: "/components" },
+        { label: "Breadcrumb" },
+      ]}
+    />
+  );
+}
+```
+
+## Separador personalizado
+
+```tsx
+import { Breadcrumb } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Breadcrumb
+      separator="/"
+      items={[
+        { label: "Home", href: "/" },
+        { label: "Breadcrumb" },
+      ]}
+    />
+  );
+}
+```
+
+## Constructor de Páginas CMS
+
+Este componente está disponible como un bloque `breadcrumb` en el [Constructor de Páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "breadcrumb",
+  "items": [
+    { "label": "Home", "href": "/" },
+    { "label": "Docs", "href": "/docs" },
+    { "label": "Breadcrumb" }
+  ],
+  "variant": "underline",
+  "size": "md"
+}
+```
+
+# Propiedades
+
+## Breadcrumb
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `items` | `BreadcrumbItem[]` | Los elementos del breadcrumb a renderizar. |
+| `separator` | `Child` | Separador personalizado entre elementos. Por defecto: un icono chevron-right. |
+
+| `variant` | \`"underline" \ | "plain"\` | El estilo visual del breadcrumb. |
+
+| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg"\` | El tamaño del breadcrumb. |
+
+| `class` | `string` | Clases CSS personalizadas para el elemento raíz. |
+
+### BreadcrumbItem
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `label` | `Child` | Texto a mostrar o nodo JSX. |
+| `href` | `string` | Si está presente, se renderiza como un enlace; de lo contrario, se renderiza como texto plano (página actual). |
+| `current` | `boolean` | Marca la página actual. Por defecto es `true` para el último elemento. |

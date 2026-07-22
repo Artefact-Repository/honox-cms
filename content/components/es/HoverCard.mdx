@@ -1,0 +1,74 @@
+---
+title: HoverCard Tarjeta Flotante
+hydration: 1
+category: Overlays
+---
+
+import { HoverCard } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introducción
+
+Una superposición que aparece cuando el usuario pasa el cursor sobre un disparador, útil para mostrar información complementaria.
+
+# Uso
+
+## HoverCard básico
+
+<DemoPreview>
+  <HoverCard
+    trigger={<a href="#">Hover me</a>}
+    title="Supplementary information"
+    description="Shown on hover, positioned automatically."
+    showArrow
+  />
+</DemoPreview>
+
+```tsx
+import { HoverCard } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <HoverCard.Root>
+      <HoverCard.Trigger>
+        <a href="#">Hover me</a>
+      </HoverCard.Trigger>
+      <HoverCard.Positioner>
+        <HoverCard.Content>
+          Supplementary information shown on hover.
+        </HoverCard.Content>
+      </HoverCard.Positioner>
+    </HoverCard.Root>
+  );
+}
+```
+
+## Constructor de páginas del CMS
+
+Este componente está disponible como un bloque `hoverCard` en el [Constructor de páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "hoverCard",
+  "triggerText": "Hover me",
+  "showArrow": true,
+  "title": "Supplementary information",
+  "description": "Shown on hover."
+}
+```
+
+# Propiedades
+
+## HoverCard
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `interactive` | `boolean` | Habilita la hidratación en el cliente. Por defecto: `true`. |
+| `open` | `boolean` | Estado de apertura controlado. |
+| `openDelay` | `number` | Retraso en ms antes de abrir al pasar el cursor. |
+| `closeDelay` | `number` | Retraso en ms antes de cerrar al salir. |
+| `class` | `string` | Clases CSS personalizadas para el elemento raíz. |
+
+# Subcomponentes
+
+`HoverCard.Root`, `HoverCard.Trigger`, `HoverCard.Positioner`, `HoverCard.Content`, `HoverCard.Arrow`, `HoverCard.ArrowTip`

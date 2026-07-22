@@ -16,84 +16,48 @@ import { ChevronRightIcon } from "../../icons/chevron-right";
 import { ClockIcon } from "../../icons/clock";
 import { EditIcon } from "../../icons/edit";
 import { ShareIcon } from "../../icons/share";
-import { markdownToHtml, parseFrontmatter } from "../../utils/markdown";
+import { loadPostBySlug, loadPosts } from "../../lib/posts";
 import { markdownContentClass } from "../../utils/markdown-content-style";
-
-// Use Vite's import.meta.glob to import all markdown files at build time
-const posts = import.meta.glob("/content/posts/*.md", {
-	query: "?raw",
-	import: "default",
-});
 
 export default createRoute(
 	// Use ssgParams middleware to tell SSG which params to generate
 	ssgParams(async () => {
-		const posts = import.meta.glob("/content/posts/*.md", {
-			query: "?raw",
-			import: "default",
-		});
-
-		const slugs: { slug: string }[] = [];
-
-		for (const path of Object.keys(posts)) {
-			const slug = path.replace("/content/posts/", "").replace(".md", "");
-			slugs.push({ slug });
-		}
-
-		return slugs;
+		const { posts } = await loadPosts();
+		return posts.map((post) => ({ slug: post.slug }));
 	}),
 
 	// Actual route handler
 	async (c) => {
 		const slug = c.req.param("slug");
-		const postPath = `/content/posts/${slug}.md`;
+		const currentPath = c.req.path;
+		let currentLocale = "en";
+		if (currentPath.startsWith("/zh")) {
+			currentLocale = "zh";
+		} else if (currentPath.startsWith("/es")) {
+			currentLocale = "es";
+		}
 
-		// Find the post with matching slug
-		const loader = posts[postPath];
+		const post = await loadPostBySlug(slug, currentLocale);
 
-		if (!loader) {
+		if (!post) {
 			return c.notFound();
 		}
 
 		try {
-			const markdown = await (loader as () => Promise<string>)();
-			const { data, content } = parseFrontmatter(markdown);
-			const htmlContent = markdownToHtml(content);
-
-			// Get all posts for reading time calculation and related posts
-			const allPosts: Array<{
-				slug: string;
-				title: string;
-				date: string;
-				tags: string[];
-			}> = [];
-			for (const [path, postLoader] of Object.entries(posts)) {
-				try {
-					const postMarkdown = await (postLoader as () => Promise<string>)();
-					const { data: postData } = parseFrontmatter(postMarkdown);
-					const postSlug = path
-						.replace("/content/posts/", "")
-						.replace(".md", "");
-					if (postSlug !== slug && !postData.draft) {
-						allPosts.push({
-							slug: postSlug,
-							title: postData.title || "Untitled",
-							date: postData.date || "",
-							tags: Array.isArray(postData.tags) ? postData.tags : [],
-						});
-					}
-				} catch (_error) {
-					// Ignore errors
-				}
-			}
-
-			// Find related posts (same tags)
-			const currentTags = Array.isArray(data.tags) ? data.tags : [];
-			const relatedPosts = allPosts
-				.filter((post) => post.tags.some((tag) => currentTags.includes(tag)))
-				.slice(0, 3);
-
+			const htmlContent = post.html;
+			const relatedPosts = post.relatedPosts;
 			const postUrl = `${c.req.url}`;
+
+			const localizeLink = (href: string) => {
+				if (
+					currentLocale !== "en" &&
+					!href.startsWith(`/${currentLocale}`) &&
+					href.startsWith("/")
+				) {
+					return `/${currentLocale}${href}`;
+				}
+				return href;
+			};
 
 			return c.render(
 				<div
@@ -102,7 +66,10 @@ export default createRoute(
 						bg: "bg.subtle",
 					})}
 				>
-					<title>{data.title || "Untitled"} - Blog</title>
+					<title>
+						{post.title || "Untitled"} -{" "}
+						{currentLocale === "zh" ? "博客" : "Blog"}
+					</title>
 
 					{/* Article Content */}
 					<section
@@ -121,7 +88,7 @@ export default createRoute(
 						>
 							{/* Back Button */}
 							<a
-								href="/blog"
+								href={localizeLink("/blog")}
 								class={css({
 									display: "inline-flex",
 									alignItems: "center",
@@ -141,7 +108,7 @@ export default createRoute(
 								})}
 							>
 								<ArrowLeftIcon width="20" height="20" />
-								Back to Blog
+								{currentLocale === "zh" ? "返回博客" : "Back to Blog"}
 							</a>
 
 							{/* Edit Button */}
@@ -166,7 +133,7 @@ export default createRoute(
 								})}
 							>
 								<EditIcon width="18" height="18" />
-								Edit Post
+								{currentLocale === "zh" ? "编辑文章" : "Edit Post"}
 							</a>
 						</Stack>
 
@@ -179,15 +146,15 @@ export default createRoute(
 							})}
 						>
 							{/* Cover Image (full width, no card padding) */}
-							{data.cover && (
+							{post.cover && (
 								<div
 									class={css({
 										overflow: "hidden",
 									})}
 								>
 									<img
-										src={data.cover}
-										alt={data.title || "Post cover"}
+										src={post.cover}
+										alt={post.title || "Post cover"}
 										class={css({
 											width: "full",
 											height: { base: "200px", md: "350px" },
@@ -207,9 +174,9 @@ export default createRoute(
 								})}
 							>
 								{/* Tags */}
-								{Array.isArray(data.tags) && data.tags.length > 0 && (
+								{Array.isArray(post.tags) && post.tags.length > 0 && (
 									<Stack gap="2" wrap="wrap" class={css({ mb: "4" })}>
-										{data.tags.map((tag: string) => (
+										{post.tags.map((tag: string) => (
 											<Badge
 												key={tag}
 												variant="subtle"
@@ -237,8 +204,8 @@ export default createRoute(
 										color: "fg",
 									})}
 								>
-									{data.title || "Untitled"}
-									{data.draft === true && (
+									{post.title || "Untitled"}
+									{post.draft === true && (
 										<Badge
 											variant="solid"
 											colorPalette="orange"
@@ -248,13 +215,13 @@ export default createRoute(
 												verticalAlign: "middle",
 											})}
 										>
-											Draft
+											{currentLocale === "zh" ? "草稿" : "Draft"}
 										</Badge>
 									)}
 								</Heading>
 
 								{/* Description */}
-								{data.description && (
+								{post.description && (
 									<Text
 										size={{ base: "lg", md: "xl" }}
 										class={css({
@@ -265,7 +232,7 @@ export default createRoute(
 											mb: "6",
 										})}
 									>
-										{data.description}
+										{post.description}
 									</Text>
 								)}
 
@@ -283,7 +250,9 @@ export default createRoute(
 									{/* Author */}
 									<Stack gap="3" align="center">
 										<Anchor
-											href={`/blog/by-author/${data.author || "Artefact Team"}`}
+											href={localizeLink(
+												`/blog/by-author/${post.author || "Artefact Team"}`,
+											)}
 											class={css({
 												display: "inline-flex",
 												alignItems: "center",
@@ -294,12 +263,14 @@ export default createRoute(
 												size="md"
 												variant="solid"
 												colorPalette="blue"
-												name={data.author || "Artefact Team"}
+												name={post.author || "Artefact Team"}
 											/>
 										</Anchor>
 										<div>
 											<Anchor
-												href={`/blog/by-author/${data.author || "Artefact Team"}`}
+												href={localizeLink(
+													`/blog/by-author/${post.author || "Artefact Team"}`,
+												)}
 												class={css({
 													textDecoration: "none",
 													color: "fg",
@@ -314,14 +285,14 @@ export default createRoute(
 														display: "block",
 													})}
 												>
-													{data.author || "Artefact Team"}
+													{post.author || "Artefact Team"}
 												</Text>
 											</Anchor>
 										</div>
 									</Stack>
 
 									{/* Date */}
-									{data.date && (
+									{post.date && (
 										<Stack gap="2" align="center">
 											<CalendarIcon width="18" height="18" />
 											<Text
@@ -330,17 +301,20 @@ export default createRoute(
 													color: "fg.muted",
 												})}
 											>
-												{new Date(data.date).toLocaleDateString("en-US", {
-													year: "numeric",
-													month: "long",
-													day: "numeric",
-												})}
+												{new Date(post.date).toLocaleDateString(
+													currentLocale === "zh" ? "zh-CN" : "en-US",
+													{
+														year: "numeric",
+														month: "long",
+														day: "numeric",
+													},
+												)}
 											</Text>
 										</Stack>
 									)}
 
 									{/* Read Time */}
-									{data.readTime ? (
+									{post.readTime ? (
 										<Stack gap="2" align="center">
 											<ClockIcon width="18" height="18" />
 											<Text
@@ -349,7 +323,7 @@ export default createRoute(
 													color: "fg.muted",
 												})}
 											>
-												{data.readTime}
+												{post.readTime}
 											</Text>
 										</Stack>
 									) : null}
@@ -372,7 +346,7 @@ export default createRoute(
 										onClick={() => {
 											if (navigator.share) {
 												navigator.share({
-													title: data.title || "Blog Post",
+													title: post.title || "Blog Post",
 													url: postUrl,
 												});
 											} else {
@@ -386,7 +360,7 @@ export default createRoute(
 										})}
 									>
 										<ShareIcon width="16" height="16" />
-										Share
+										{currentLocale === "zh" ? "分享" : "Share"}
 									</Button>
 								</Stack>
 
@@ -432,7 +406,7 @@ export default createRoute(
 										height="24"
 										class={css({ color: "blue.9" })}
 									/>
-									Related Posts
+									{currentLocale === "zh" ? "相关文章" : "Related Posts"}
 								</Heading>
 
 								<div
@@ -442,9 +416,9 @@ export default createRoute(
 										gap: "4",
 									})}
 								>
-									{relatedPosts.map((post) => (
+									{relatedPosts.map((relatedPost) => (
 										<a
-											href={`/blog/${post.slug}`}
+											href={localizeLink(`/blog/${relatedPost.slug}`)}
 											class={css({
 												textDecoration: "none",
 												display: "block",
@@ -468,11 +442,14 @@ export default createRoute(
 													display: "block",
 												})}
 											>
-												{new Date(post.date).toLocaleDateString("en-US", {
-													month: "short",
-													day: "numeric",
-													year: "numeric",
-												})}
+												{new Date(relatedPost.date).toLocaleDateString(
+													currentLocale === "zh" ? "zh-CN" : "en-US",
+													{
+														month: "short",
+														day: "numeric",
+														year: "numeric",
+													},
+												)}
 											</Text>
 											<Text
 												size="md"
@@ -482,7 +459,7 @@ export default createRoute(
 													lineHeight: "tight",
 												})}
 											>
-												{post.title}
+												{relatedPost.title}
 											</Text>
 										</a>
 									))}
@@ -501,7 +478,7 @@ export default createRoute(
 							textAlign: "center",
 						})}
 					>
-						<a href="/blog" style={{ textDecoration: "none" }}>
+						<a href={localizeLink("/blog")} style={{ textDecoration: "none" }}>
 							<Button
 								variant="solid"
 								colorPalette="blue"
@@ -513,7 +490,7 @@ export default createRoute(
 								})}
 							>
 								<ArrowLeftIcon width="20" height="20" />
-								Back to All Posts
+								{currentLocale === "zh" ? "返回所有文章" : "Back to All Posts"}
 							</Button>
 						</a>
 					</section>

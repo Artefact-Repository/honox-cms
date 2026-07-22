@@ -1,0 +1,59 @@
+---
+title: Badge 徽标
+hydration: 3
+category: Feedback
+---
+
+import { Badge } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+一个用于为内容添加标签或进行分类的小型视觉元素。
+
+# 用法
+
+<DemoPreview>
+  <Badge colorPalette="blue" variant="solid">New</Badge>
+  <Badge colorPalette="green" variant="subtle">Active</Badge>
+  <Badge colorPalette="red" variant="outline">Error</Badge>
+</DemoPreview>
+
+```tsx
+import { Badge } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Badge colorPalette="blue" variant="solid">
+      New
+    </Badge>
+  );
+}
+```
+
+## CMS 页面构建器
+
+该组件在 [页面构建器](/docs/PageBuilder) (`content/pages/*.json`) 中作为 `badge` 区块提供：
+
+```json
+{
+  "type": "badge",
+  "text": "New",
+  "colorPalette": "blue",
+  "variant": "solid"
+}
+```
+
+# 属性
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `children` | `any` | 组件内部渲染的内容。 |
+| `class` | `string` | 自定义 CSS 类。 |
+| `colorPalette` | `string` | badge 的色彩主题。 |
+
+| `variant` | \`"solid" \ | "subtle" \ | "surface" \ | "outline"\` | 视觉样式。 |
+
+| `size` | \`"sm" \ | "md" \ | "lg" \ | "xl" \ | "2xl"\` | badge 的尺寸。 |
+
+| `interactive` | `boolean` | 是否启用客户端水合。 |

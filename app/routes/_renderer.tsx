@@ -3,9 +3,16 @@ import { Link, Script } from "honox/server";
 
 export const __importing_islands = true;
 
-export default jsxRenderer(({ children }) => {
+export default jsxRenderer(({ children }, c) => {
+	const currentPath = c.req.path;
+	let currentLocale = "en";
+	if (currentPath.startsWith("/zh")) {
+		currentLocale = "zh";
+	} else if (currentPath.startsWith("/es")) {
+		currentLocale = "es";
+	}
 	return (
-		<html lang="en">
+		<html lang={currentLocale}>
 			<head>
 				<meta charset="utf-8" />
 				<meta name="viewport" content="width=device-width, initial-scale=1.0" />

@@ -1,0 +1,52 @@
+---
+title: Code 代码
+hydration: 3
+category: Typography
+---
+
+import { Code, Stack } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+一个行内 `<code>` 元素，用于在一段文本中展示代码片段或等宽文本的简短片段。
+
+# 用法
+
+<DemoPreview>
+  <Stack direction="horizontal" gap="4" align="center">
+    <Code>npm install</Code>
+    <Code variant="solid" colorPalette="blue">
+      const x = 5;
+    </Code>
+    <Code variant="outline" size="lg">
+      GET /api/users
+    </Code>
+  </Stack>
+</DemoPreview>
+
+```tsx
+import { Code } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <p>
+      Run <Code>npm install</Code> to install dependencies.
+    </p>
+  );
+}
+```
+
+# 属性
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `children` | `Child` | 代码内容。 |
+| `variant` | `"solid" \| "surface" \| "subtle" \| "outline" \| "plain"` | 视觉样式。默认 `"subtle"`。 |
+| `size` | `"sm" \| "md" \| "lg" \| "xl"` | 字号/内边距尺寸。默认 `"md"`。 |
+| `colorPalette` | `"blue" \| "green" \| "red" \| "purple" \| "orange" \| "cyan" \| "yellow" \| "pink" \| "teal" \| "indigo" \| "gray" \| "success" \| "error" \| "warning"` | 颜色主题。 |
+| `class` | `string` | 自定义 CSS 类。 |
+
+# 无障碍
+
+`Code` 渲染一个原生 `<code>` 元素，因此屏幕阅读器会将其作为代码内容播报，无需额外的 ARIA 接线。对于多行代码块，请自行用 `<pre>` 包裹——`Code` 仅样式化行内场景。

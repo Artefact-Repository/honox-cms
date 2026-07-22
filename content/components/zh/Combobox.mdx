@@ -1,0 +1,114 @@
+---
+title: Combobox 组合框
+hydration: 2
+category: Forms
+---
+
+import { Combobox } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+一个将文本输入框与列表框组合在一起的组件，允许用户从选项列表中进行筛选和选择。
+
+# 水合
+
+**Tier 2 — 智能自动检测。** `Combobox` 渲染为静态 HTML，且不发送任何客户端 JS，除非存在行为信号。传入 `interactive={true}` 可强制水合，或传入 `interactive={false}` 可强制静态渲染。
+
+当存在以下**任一**信号（或设置了 `interactive={true}`）时，它会作为岛屿进行水合：
+
+- `open`（受控展开状态）
+- `inputValue`（受控输入值）
+- `onToggle`
+- `onInputChange`
+- `onItemSelect`（项目选择回调——仅选择型组合框会基于此进行水合）
+
+| `interactive` 属性 | 结果 |
+| --- | --- |
+| 省略，**无**信号 | 静态 —— 无客户端 JS |
+| 省略，存在信号 | 作为岛屿水合 |
+| `true` | 作为岛屿水合 |
+| `false` | 静态 —— 无客户端 JS |
+
+库中所有的交互决策都通过 `app/components/ui/island-utils.ts` 中共享的 `shouldHydrate()` 辅助函数路由。
+
+# 用法
+
+<DemoPreview>
+  <Combobox
+    interactive
+    items={[
+      { label: "React", value: "react" },
+      { label: "Solid", value: "solid" },
+      { label: "Svelte", value: "svelte" },
+      { label: "Vue", value: "vue" },
+      { label: "Hono", value: "hono" },
+    ]}
+    label="Framework"
+    placeholder="Select a Framework"
+    allowClear
+  />
+</DemoPreview>
+
+```tsx
+import { Combobox } from "../components/ui";
+
+const items = [
+  { label: "React", value: "react" },
+  { label: "Solid", value: "solid" },
+  { label: "Svelte", value: "svelte" },
+  { label: "Vue", value: "vue" },
+  { label: "Hono", value: "hono" },
+];
+
+export default function MyPage() {
+  return (
+    <Combobox
+      interactive
+      items={items}
+      label="Framework"
+      placeholder="Select a Framework"
+      allowClear
+    />
+  );
+}
+```
+
+## CMS 页面构建器
+
+此组件在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中以 `combobox` 块的形式提供：
+
+```json
+{
+  "type": "combobox",
+  "label": "Framework",
+  "placeholder": "Select a Framework",
+  "items": [
+    { "label": "React", "value": "react" },
+    { "label": "Hono", "value": "hono" }
+  ]
+}
+```
+
+# 属性
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `items` | `ComboboxItem[]` | 要在列表中显示的选项数组。 |
+| `label` | `Child` | 组合框的标签。 |
+| `placeholder` | `string` | 输入框的占位符文本。 |
+| `allowClear` | `boolean` | 是否在输入框中显示清除按钮。 |
+| `interactive` | `boolean` | 强制作为岛屿进行水合。 |
+| `open` | `boolean` | 组合框列表是否展开（受控）。 |
+| `inputValue` | `string` | 输入框的当前值（受控）。 |
+| `onToggle` | `() => void` | 列表切换时触发的回调。 |
+| `onInputChange` | `(value: string) => void` | 输入值变化时触发的回调。 |
+| `onItemSelect` | `(value: string) => void` | 选中某项时触发的回调。 |
+
+## ComboboxItem
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `label` | `string` | 选项的显示文本。 |
+| `value` | `string` | 选项的唯一值。 |
+| `disabled` | `boolean` | 选项是否禁用。 |

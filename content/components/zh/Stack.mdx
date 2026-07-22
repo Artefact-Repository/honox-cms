@@ -1,0 +1,67 @@
+---
+title: Stack 堆栈
+hydration: 3
+category: Layout
+---
+
+import { Stack } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+一种可用于创建垂直或水平元素堆叠的布局原语。
+
+## 用法
+
+<DemoPreview>
+  <Stack direction="row" gap="4">
+    <div style={{ padding: "0.75rem 1rem", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Item 1</div>
+    <div style={{ padding: "0.75rem 1rem", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Item 2</div>
+    <div style={{ padding: "0.75rem 1rem", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Item 3</div>
+  </Stack>
+</DemoPreview>
+
+```tsx
+import { Stack } from '../components/ui/stack'
+
+export const Example = () => (
+  <Stack direction="row" gap="4">
+    <div>Item 1</div>
+    <div>Item 2</div>
+    <div>Item 3</div>
+  </Stack>
+)
+```
+
+### CMS 页面构建器
+
+该组件可作为 `stack` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用：
+
+```json
+{
+  "type": "stack",
+  "direction": "horizontal",
+  "gap": "4",
+  "children": [
+    { "type": "text", "content": "Item 1" },
+    { "type": "text", "content": "Item 2" }
+  ]
+}
+```
+
+## 属性
+
+| 属性 | 类型 | 默认 | 说明 |
+| --- | --- | --- | --- |
+| `direction` | `flex-direction` | `column` | 堆叠的 flex 方向。 |
+| `gap` | `spacing` | `8px` | 堆叠中元素之间的间距。 |
+| `align` | `align-items` | - | 堆叠中元素的对齐方式。 |
+| `justify` | `justify-content` | - | 堆叠中元素的对齐分布。 |
+
+## 响应式
+
+`Stack` 组件的所有属性都支持响应式值。
+
+```tsx
+<Stack direction={{ base: 'column', md: 'row' }} gap={{ base: '4', md: '8' }}>
+  {/* Elements will be stacked vertically on mobile and horizontally on desktop */}
+</Stack>
+```

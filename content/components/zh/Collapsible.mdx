@@ -1,0 +1,101 @@
+---
+title: Collapsible 折叠面板
+hydration: 1
+category: Overlays
+---
+
+import { Collapsible } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+一个可展开或折叠以显示或隐藏内容的交互式组件。
+
+# 用法
+
+## 基础折叠
+
+<DemoPreview>
+  <Collapsible
+    trigger="Show more"
+    content={<p>Additional details go here.</p>}
+    defaultOpen
+  />
+</DemoPreview>
+
+```tsx
+import { Collapsible } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Collapsible
+      trigger="Show more"
+      content={<p>Additional details go here.</p>}
+      defaultOpen
+    />
+  );
+}
+```
+
+## 带指示器与受控状态
+
+```tsx
+import { Collapsible } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Collapsible
+      trigger="Details"
+      content={<p>Content revealed on toggle.</p>}
+      indicatorPlacement="start"
+      onOpenChange={(open) => console.log("open:", open)}
+    />
+  );
+}
+```
+
+## CMS 页面构建器
+
+此组件在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中以 `collapsible` 块的形式提供。`trigger` 是一个嵌套的块列表（CMS 始终提交一个数组，即使是单个触发器元素）：
+
+```json
+{
+  "type": "collapsible",
+  "trigger": [{ "type": "button", "text": "Show more" }],
+  "showIndicator": true,
+  "children": [
+    { "type": "text", "content": "Additional details go here." }
+  ]
+}
+```
+
+# 属性
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+
+| `trigger` | \`JSX.Element \ | string\` | 触发器元素或字符串。字符串会被包裹进一个按钮。 |
+
+| `content` | `JSX.Element` | 要显示或隐藏的内容。 |
+| `indicator` | `JSX.Element` | 可选的指示器元素（例如一个箭头图标）。 |
+
+| `indicatorPlacement` | \`"start" \ | "end"\` | 指示器相对于触发器的位置。默认：`"end"`。 |
+
+| `open` | `boolean` | 折叠面板是否展开（受控）。 |
+| `defaultOpen` | `boolean` | 折叠面板默认是否展开（非受控）。 |
+| `onOpenChange` | `(open: boolean) => void` | 展开状态变化时的回调。 |
+| `disabled` | `boolean` | 折叠面板是否禁用。 |
+| `interactive` | `boolean` | 启用客户端交互。折叠面板属于 **Tier-1（自动交互）**：它始终作为岛屿进行水合，除非传入 `interactive={false}`。 |
+| `class` | `string` | 根元素的类名。 |
+| `triggerClass` | `string` | 触发器元素的类名。 |
+| `contentClass` | `string` | 内容元素的类名。 |
+| `indicatorClass` | `string` | 指示器元素的类名。 |
+| `id` | `string` | 折叠面板的 ID。 |
+
+# 水合
+
+折叠面板被归类为 **Tier-1（自动交互）**。
+
+- 它始终渲染为一个已水合的客户端岛屿（它需要 JS 来展开/折叠并执行 `onOpenChange`）。
+- 退出水合的唯一方式是传入 `interactive={false}`，此时它会渲染不带切换行为的静态 `*-primitive` 标记。
+- 这是通过 `app/components/ui/island-utils.ts` 中共享的 `shouldHydrate(interactive, true)` 谓词实现的，它是所有水合决策的唯一真相来源。

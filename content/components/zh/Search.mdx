@@ -1,0 +1,150 @@
+---
+title: Search 搜索
+hydration: 1
+category: Forms
+---
+
+import { Search } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+一个基于预生成 JSON 索引的即时搜索输入框：按键输入会进行防抖处理，匹配结果以自动补全下拉框的形式呈现，选择结果后会跳转到其 `href`。它还可以选择性地就地过滤服务端渲染的元素（例如博客卡片列表），并且在 JS 不可用时始终降级为一个普通的 `?q=` GET 表单。
+
+`Search` 不会在每次按键时向实时接口发起请求——它会在首次交互时惰性加载一个 JSON 文档（`src`），然后完全在客户端进行过滤。为你希望可被搜索的内容构建对应的索引（参见下方的 [Search Index Format](#search-index-format)）。
+
+# 水合
+
+**Tier 1 — 自动交互。** 防抖过滤、自动补全下拉框和键盘导航都需要客户端 JS，因此 `Search` 默认会进行水合。传入 `interactive={false}` 可强制使用静态回退：一个普通的 `<input type="search" name="q">`，当设置了 `action` 时会被包裹在一个 GET `<form>` 中。
+
+| `interactive` 属性 | 结果 |
+| --- | --- |
+| omitted | 作为岛屿进行水合 |
+| `true` | 作为岛屿进行水合 |
+| `false` | 静态 —— 一个普通的 GET 表单输入框，无客户端 JS |
+
+库中所有交互相关的决策都通过 `app/components/ui/island-utils.ts` 中共享的 `shouldHydrate()` 辅助函数进行。
+
+# 用法
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "420px" }}>
+    <Search
+      src="/api/posts/search.json"
+      placeholder="Search articles..."
+      itemLabel="articles"
+    />
+  </div>
+</DemoPreview>
+
+```tsx
+import { Search } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Search
+      src="/api/posts/search.json"
+      placeholder="Search articles..."
+      itemLabel="articles"
+    />
+  );
+}
+```
+
+## Search Index Format
+
+`src` 指向一个静态 JSON 文档，其结构类似 `SearchIndexDocument`（`app/utils/search.ts`）：
+
+```ts
+interface SearchIndexEntry {
+  /** Stable id (e.g. post slug) — matched against DOM filter attributes */
+  key: string;
+  /** Navigation target when the entry is picked from autocomplete */
+  href: string;
+  title: string;
+  description?: string;
+  tags?: string[];
+  /** Precomputed lowercase text blob the query tokens are matched against */
+  haystack: string;
+}
+
+interface SearchIndexDocument {
+  generated: string;
+  entries: SearchIndexEntry[];
+}
+```
+
+`buildHaystack()` 以及 `tokenize()` / `filterEntries()` 在同一模块中，被 SSG 索引构建器、无 JS 的 `?q=` 服务端回退，以及客户端岛屿所共享，因此三者对“怎样的才算匹配”的判断保持一致。`/api/posts/search.json` 和 `/api/docs/search.json` 是本项目已生成的两个索引——将 `src` 指向其中任意一个，或以相同方式自行构建。
+
+## 就地过滤结果
+
+设置 `filterAttribute` 还可以在查询变化时显示/隐藏匹配的、服务端渲染的元素，而不仅仅提供自动补全下拉框。博客索引页（`app/routes/blog/index.tsx`）就是这样将搜索框与其已渲染的文章卡片配合使用的：
+
+```tsx
+<Search
+  src="/api/posts/search.json"
+  action="/blog"
+  initialQuery={searchQuery}
+  placeholder="Search articles..."
+  itemLabel="articles"
+  total={blogPosts.length}
+  filterAttribute="data-post-slug"
+  emptyStateId="blog-search-empty"
+/>
+
+{blogPosts.map((post) => (
+  <article data-post-slug={post.slug}>...</article>
+))}
+
+<div id="blog-search-empty" hidden>
+  No articles match your search.
+</div>
+```
+
+每个带有 `data-post-slug` 的元素都会被隐藏，除非其值与当前结果中某个条目的 `key` 匹配；当匹配数量降为零时，其 `id` 与 `emptyStateId` 匹配的元素会显示出来。`total` 用于初始化索引加载完成前显示的结果数量。
+
+## 无 JS 回退
+
+当设置了 `action` 时，静态和水合两种变体都会在输入框外渲染一个 `<form method="get">`，其名称为 `q`。在没有客户端 JS 的情况下，这会直接将 `?q=` 提交到 `action`；读取该查询参数的路由（例如通过服务端的 `filterEntries()`）会响应同样的请求，否则该请求将由岛屿处理——博客页面的 `/blog?q=...` 读取无论 JS 是否运行都能正常工作。
+
+## 键盘交互
+
+| 按键 | 行为 |
+| --- | --- |
+| `ArrowDown` | 打开下拉框，或将高亮移动到下一条建议（循环）。 |
+| `ArrowUp` | 将高亮移动到上一条建议（循环）。 |
+| `Enter` | 跳转到高亮建议的 `href`。 |
+| `Escape` | 若下拉框已打开则关闭；否则清空查询。 |
+
+## CMS 页面构建器
+
+该组件可作为 `search` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用：
+
+```json
+{
+  "type": "search",
+  "src": "/api/posts/search.json",
+  "placeholder": "Search posts...",
+  "itemLabel": "posts",
+  "maxSuggestions": 5,
+  "debounceMs": 150
+}
+```
+
+# 属性
+
+| 属性 | 类型 | 默认 | 说明 |
+| --- | --- | --- | --- |
+| `src` | `string` | `/api/posts/search.json` | SSG 生成的 JSON 搜索索引的 URL。 |
+| `placeholder` | `string` | `"Search..."` | 输入框的占位符文本。 |
+| `initialQuery` | `string` | - | 初始查询，例如在首次渲染时从 `?q=` URL 参数中获取。 |
+| `debounceMs` | `number` | `150` | 将按键输入作为活动查询应用前的延迟。 |
+| `maxSuggestions` | `number` | `8` | 自动补全下拉框中显示的最大条目数。 |
+| `filterAttribute` | `string` | - | 设置后，带有该属性的元素（例如 `data-post-slug`）会依据其值是否与某条目的 `key` 匹配而显示/隐藏。 |
+| `emptyStateId` | `string` | - | 当过滤后的列表零匹配时，需要显示出来的元素的 `id`。 |
+| `total` | `number` | - | 索引加载前显示的结果数量。 |
+| `itemLabel` | `string` | `"results"` | 结果计数中使用的名词，例如 `"articles"`。 |
+| `showCount` | `boolean` | `true` | 显示“共 N 条，显示 X 条”的结果计数行。 |
+| `action` | `string` | - | 无 JS 回退：通过普通 GET 表单将 `?q=` 提交到该路径。 |
+| `syncUrl` | `boolean` | `true` | 将活动查询以 `?q=` 的形式同步到地址栏。 |
+| `interactive` | `boolean` | - | 覆盖水合决策（见上文）。 |

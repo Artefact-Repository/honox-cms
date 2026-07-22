@@ -1,0 +1,67 @@
+---
+title: Alert 警告
+hydration: 3
+category: Feedback
+---
+
+import { Alert, AlertIcon } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+以吸引用户注意但不打断其任务的方式，显示简短而重要的消息。
+
+# 用法
+
+<DemoPreview>
+  <Alert
+    status="success"
+    title="Success"
+    description="Your changes have been saved."
+    indicator={<AlertIcon />}
+  />
+</DemoPreview>
+
+```tsx
+import { Alert, AlertIcon } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Alert
+      status="success"
+      title="Success"
+      description="Your changes have been saved."
+      indicator={<AlertIcon />}
+    />
+  );
+}
+```
+
+## CMS 页面构建器
+
+该组件在 [页面构建器](/docs/PageBuilder) (`content/pages/*.json`) 中作为 `alert` 区块提供：
+
+```json
+{
+  "type": "alert",
+  "status": "success",
+  "title": "Success",
+  "description": "Your changes have been saved.",
+  "variant": "subtle"
+}
+```
+
+# 属性
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `title` | `string` | alert 的标题。 |
+| `description` | `string` | alert 的描述。 |
+| `indicator` | `Child` | 作为指示器渲染的图标或元素。 |
+| `children` | `Child` | 组件内部渲染的额外内容。 |
+| `class` | `string` | 自定义 CSS 类。 |
+
+| `status` | \`"info" \ | "success" \ | "warning" \ | "error" \ | "neutral"\` | alert 的状态色彩方案。 |
+
+| `variant` | \`"subtle" \ | "solid" \ | "outline"\` | alert 的视觉样式。 |
+| `aria-live` | \`"polite" \ | "assertive" \ | "off"\` | alert 的 aria-live 设置。默认为 "polite"。 |

@@ -1,0 +1,113 @@
+---
+title: Icon Icono
+hydration: 3
+category: Data Display
+---
+
+import { Icon } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introducción
+
+Un envoltorio ligero, consciente del tamaño y del color, para iconos SVG. Aplica un tamaño
+coherente (`2xs`–`xl`) y hereda `currentcolor` para que los iconos coincidan por defecto con el
+color del texto/icono circundante, sin requerir ninguna dependencia de biblioteca de iconos.
+
+`Icon` se compone de dos formas, decididas automáticamente a partir de su `children`:
+
+- **Wrap (envolver)** — si `children` es contenido SVG desnudo (`<path>`, `<circle>`, `<g>`, …),
+  texto, o más de un elemento, `Icon` renderiza su propio `<svg>` alrededor.
+- **Merge (`asChild`, `true` por defecto)** — si `children` es un único elemento que no es
+  contenido SVG desnudo (por ejemplo, un `<svg>…</svg>` escrito a mano), `Icon` fusiona su class
+  (y cualquier otra prop pasada) directamente en ese elemento en lugar de envolverlo en un segundo
+  `<svg>`. Pasa `asChild={false}` para forzar el envoltorio incluso en ese caso.
+
+# Uso
+
+## Rutas SVG desnudas (sin necesidad de biblioteca de iconos)
+
+<DemoPreview>
+  <Icon size="lg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    <path d="M12 2 2 7l10 5 10-5-10-5z" />
+  </Icon>
+</DemoPreview>
+
+```tsx
+import { Icon } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Icon size="lg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path d="M12 2 2 7l10 5 10-5-10-5z" />
+    </Icon>
+  );
+}
+```
+
+## Componiendo con un `<svg>` escrito a mano (`asChild`, por defecto)
+
+```tsx
+import { Icon } from "../components/ui";
+
+function HeartSvg(props: { class?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <path d="M12 21s-6.7-4.35-9.3-8.1C.8 9.7 2 6 5.4 6c1.9 0 3.2 1 4.6 2.6C11.4 7 12.7 6 14.6 6 18 6 19.2 9.7 17.3 12.9 14.7 16.65 12 21 12 21z" />
+    </svg>
+  );
+}
+
+export default function MyPage() {
+  return (
+    <span style={{ color: "red" }}>
+      <Icon size="sm">
+        <HeartSvg />
+      </Icon>
+    </span>
+  );
+}
+```
+
+La class `icon` (y el tamaño) se fusiona en el `<svg>` devuelto por `HeartSvg`, por lo que no hay
+ningún elemento envolvente adicional en el markup renderizado. Dado que la receta del icono
+establece `color: currentcolor`, el icono adopta el color del texto circundante (aquí, `red`)
+siempre que sus rutas usen `fill="currentColor"` o `stroke="currentColor"`.
+
+## Icono etiquetado (no decorativo)
+
+```tsx
+<Icon aria-label="Search" viewBox="0 0 24 24">
+  <path d="M10 2a8 8 0 105.3 14.03l4.34 4.34 1.42-1.42-4.34-4.34A8 8 0 0010 2z" />
+</Icon>
+```
+
+## Constructor de páginas del CMS
+
+Este componente está disponible como un bloque `icon` en el [Constructor de páginas](/docs/PageBuilder) (`content/pages/*.json`) — `svg` contiene el markup SVG interno en bruto:
+
+```json
+{
+  "type": "icon",
+  "svg": "<path d=\"M12 2 2 7l10 5 10-5-10-5z\" />",
+  "viewBox": "0 0 24 24",
+  "size": "lg"
+}
+```
+
+# Propiedades
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `children` | `Child` | Contenido SVG (`<path>`, etc.) o un único elemento tipo SVG para renderizar/fusionar. |
+| `class` | `string` | Clases CSS personalizadas. |
+
+| `size` | \`"2xs" \ | "xs" \ | "sm" \ | "md" \ | "lg" \ | "xl"\` | El tamaño del icono. Por defecto `"md"`. |
+
+| `asChild` | `boolean` | Fusiona las props en el único elemento hijo en lugar de envolverlo en un nuevo `<svg>`. Por defecto `true`. |
+| `viewBox` | `string` | Se transmite al `<svg>` renderizado/fusionado. |
+| `xmlns` | `string` | Se transmite al envoltorio `<svg>` generado. Por defecto, el espacio de nombres SVG. |
+| `fill` | `string` | Se transmite al `<svg>` renderizado/fusionado. |
+| `stroke` | `string` | Se transmite al `<svg>` renderizado/fusionado. |
+| `aria-label` | `string` | Etiqueta accesible. Cuando se proporciona, se omite `aria-hidden`. |
+
+| `aria-hidden` | \`boolean \ | "true" \ | "false"\` | Por defecto `"true"` cuando no se proporciona `aria-label` (los iconos son decorativos por defecto). |

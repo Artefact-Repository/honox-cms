@@ -1,0 +1,174 @@
+---
+title: Select 选择器
+hydration: 1
+category: Forms
+---
+
+import { Select } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+一个用于从列表中选择一个或多个选项的 dropdown 控件——可访问、可定制的原生 `<select>` 元素的替代方案。
+
+何时选择其他组件：
+
+- 当选项少于 \~5 个时，`RadioGroup` 通常更清晰。
+- 如果用户需要输入来过滤选项，请使用 `Combobox`。
+
+该组件会在自定义 UI 旁渲染一个视觉上隐藏的原生 `<select>`，因此只需提供 `name` 属性即可使其参与常规表单提交，无需额外配置。
+
+# 键盘交互
+
+触发器是一个 `role="combobox"` 按钮；焦点停留在按钮上，而高亮的选项通过 `aria-activedescendant` 进行播报。
+
+| 按键 | 行为 |
+| --- | --- |
+| `Enter` / `Space` | 打开列表；打开后，选择高亮的选项。 |
+| `ArrowDown` / `ArrowUp` | 打开列表，或移动高亮（循环，跳过禁用项）。 |
+| `Home` / `End` | 高亮第一个 / 最后一个可用选项。 |
+| `Escape` | 关闭列表。 |
+| `Tab` | 关闭列表并将焦点移走。 |
+| 可打印字符 | 预输入（Typeahead）：跳转到标签与所输入前缀匹配的第一个选项。当列表关闭时（单选模式），会直接选中匹配项，类似于原生 `<select>`。 |
+
+打开列表时会高亮当前选中的选项（或第一个可用选项），键盘导航会保持高亮选项始终在视野内。
+
+# 水合
+
+**Tier 1 — 自动交互。** 打开下拉框和选择选项都需要客户端 JS，且不存在静态回退（原生 `<select>` 在视觉上隐藏，仅用于表单提交），因此 `Select` 默认会进行水合。传入 `interactive={false}` 可强制使用纯静态渲染。
+
+| `interactive` 属性 | 结果 |
+| --- | --- |
+| omitted | 作为岛屿进行水合 |
+| `true` | 作为岛屿进行水合 |
+| `false` | 静态 —— 无客户端 JS |
+
+库中所有交互相关的决策都通过 `app/components/ui/island-utils.ts` 中共享的 `shouldHydrate()` 辅助函数进行。
+
+# 用法
+
+<DemoPreview>
+  <Select
+    items={[
+      { label: "React", value: "react" },
+      { label: "Solid", value: "solid" },
+      { label: "Svelte", value: "svelte", disabled: true },
+      { label: "Vue", value: "vue" },
+      { label: "Hono", value: "hono" },
+    ]}
+    label="Framework"
+    placeholder="Select a framework"
+    allowClear
+  />
+</DemoPreview>
+
+```tsx
+import { Select } from "../components/ui";
+
+const items = [
+  { label: "React", value: "react" },
+  { label: "Solid", value: "solid" },
+  { label: "Svelte", value: "svelte", disabled: true },
+  { label: "Vue", value: "vue" },
+  { label: "Hono", value: "hono" },
+];
+
+export default function MyPage() {
+  return (
+    <Select
+      items={items}
+      label="Framework"
+      placeholder="Select a framework"
+      allowClear
+    />
+  );
+}
+```
+
+## 多选
+
+在切换选项时列表保持打开，触发器会以逗号连接的方式显示已选标签。
+
+```tsx
+<Select
+  multiple
+  items={items}
+  label="Frameworks"
+  placeholder="Select frameworks"
+  defaultValue={["hono"]}
+/>
+```
+
+## 在表单中
+
+隐藏的原生 `<select>` 承载所选内容，因此普通的表单提交即可正常工作：
+
+```tsx
+<form method="post" action="/frameworks">
+  <Select name="framework" items={items} label="Framework" required />
+  <Button type="submit">Save</Button>
+</form>
+```
+
+## 尺寸与变体
+
+```tsx
+<Select items={items} size="sm" placeholder="Small" />
+<Select items={items} size="lg" variant="surface" placeholder="Large surface" />
+<Select items={items} invalid placeholder="Invalid state" />
+```
+
+## CMS 页面构建器
+
+该组件可作为 `select` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用：
+
+```json
+{
+  "type": "select",
+  "label": "Framework",
+  "placeholder": "Select a framework",
+  "items": [
+    { "label": "React", "value": "react" },
+    { "label": "Hono", "value": "hono" }
+  ]
+}
+```
+
+# 属性
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `items` | `SelectItem[]` | 列表中显示的选项。 |
+| `label` | `Child` | 渲染在触发器上方并与其关联的标签。 |
+| `placeholder` | `string` | 未选择任何内容时触发器显示的文本。 |
+| `allowClear` | `boolean` | 一旦有选中项即显示清除按钮。 |
+| `multiple` | `boolean` | 允许选择多个选项；切换时列表保持打开。 |
+| `defaultValue` | `string[]` | 初始选择（非受控）。`selectedValues` 的别名。 |
+| `selectedValues` | `string[]` | 初始选择（与 `defaultValue` 相同）。 |
+| `deselectable` | `boolean` | 在单选模式下，再次点击已选选项可将其清除。 |
+| `name` | `string` | 隐藏的原生 `<select>` 的名称，用于表单提交。 |
+| `disabled` | `boolean` | 禁用整个控件。 |
+| `invalid` | `boolean` | 标记控件为无效（`aria-invalid`，错误边框）。 |
+| `readOnly` | `boolean` | 选择可见，但无法打开列表。 |
+| `required` | `boolean` | 标记控件为必填（`aria-required`，隐藏的 select 的 `required`）。 |
+| `open` | `boolean` | 下拉框的受控打开状态。 |
+
+| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg" \ | "xl"\` | 触发器与列表的尺寸。默认为 `md`。 |
+
+| `variant` | \`"outline" \ | "surface"\` | 触发器的视觉变体。默认为 `outline`。 |
+
+| `interactive` | `boolean` | 覆盖水合决策（见下文）。 |
+| `onValueChange` | `(values: string[]) => void` | 每当选择变化时（选择、取消选择、清除）都会调用，并传入完整的选项。 |
+| `onItemSelect` | `(value: string) => void` | 传入被交互的选项的 value 进行调用。 |
+| `onClear` | `() => void` | 清除按钮清空选择时调用。 |
+| `onOpenChange` | `(open: boolean) => void` | 下拉框打开或关闭时调用。 |
+
+> 回调属性仅在 Select 由客户端代码（位于另一个岛屿内部）组合时才能生效。从服务端渲染路由序列化而来的属性必须是纯数据。
+
+## SelectItem
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `label` | `string` | 选项的显示文本。也用于预输入匹配。 |
+| `value` | `string` | 选项的唯一值。 |
+| `disabled` | `boolean` | 该选项是否可被选中。 |

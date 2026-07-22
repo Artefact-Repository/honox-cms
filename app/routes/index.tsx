@@ -185,8 +185,49 @@ const customShowcaseSlides = [
 	</div>,
 ];
 
+function getLocaleToggleUrl(
+	currentPath: string,
+	targetLocale: "en" | "zh" | "es",
+): string {
+	let cleanPath = currentPath;
+	if (cleanPath.startsWith("/zh")) {
+		cleanPath = cleanPath.slice(3);
+	} else if (cleanPath.startsWith("/es")) {
+		cleanPath = cleanPath.slice(3);
+	}
+	if (cleanPath === "") {
+		cleanPath = "/";
+	}
+
+	if (targetLocale === "en") {
+		return cleanPath;
+	}
+	return cleanPath === "/"
+		? `/${targetLocale}`
+		: `/${targetLocale}${cleanPath}`;
+}
+
 export default createRoute((c) => {
+	const currentPath = c.req.path;
+	let currentLocale = "en";
+	if (currentPath.startsWith("/zh")) {
+		currentLocale = "zh";
+	} else if (currentPath.startsWith("/es")) {
+		currentLocale = "es";
+	}
 	const name = c.req.query("name") ?? "Design System";
+
+	const localizeLink = (href: string) => {
+		if (
+			currentLocale === "zh" &&
+			!href.startsWith("/zh") &&
+			href.startsWith("/")
+		) {
+			return `/zh${href}`;
+		}
+		return href;
+	};
+
 	return c.render(
 		<div class={css({ bg: "bg.canvas", minH: "screen", color: "fg.default" })}>
 			<title>Artefact — Modern UI Suite</title>
@@ -247,7 +288,7 @@ export default createRoute((c) => {
 						})}
 					>
 						<Anchor
-							href="/blog"
+							href={localizeLink("/blog")}
 							variant="plain"
 							class={css({
 								display: { base: "none", md: "block" },
@@ -255,10 +296,10 @@ export default createRoute((c) => {
 								fontWeight: "medium",
 							})}
 						>
-							Blog
+							{currentLocale === "zh" ? "博客" : "Blog"}
 						</Anchor>
 						<Anchor
-							href="/docs"
+							href={localizeLink("/docs")}
 							variant="plain"
 							class={css({
 								display: { base: "none", md: "block" },
@@ -266,10 +307,10 @@ export default createRoute((c) => {
 								fontWeight: "medium",
 							})}
 						>
-							Docs
+							{currentLocale === "zh" ? "文档" : "Docs"}
 						</Anchor>
 						<Anchor
-							href="/pages/product-landing"
+							href={localizeLink("/pages/product-landing")}
 							variant="plain"
 							class={css({
 								display: { base: "none", md: "block" },
@@ -277,7 +318,7 @@ export default createRoute((c) => {
 								fontWeight: "medium",
 							})}
 						>
-							Pulse Landing Page
+							{currentLocale === "zh" ? "产品着陆页" : "Pulse Landing Page"}
 						</Anchor>
 						<Anchor
 							href="/admin"
@@ -288,8 +329,47 @@ export default createRoute((c) => {
 								fontWeight: "medium",
 							})}
 						>
-							Sveltia CMS
+							{currentLocale === "zh" ? "内容管理" : "Sveltia CMS"}
 						</Anchor>
+						{currentLocale !== "en" && (
+							<Anchor
+								href={getLocaleToggleUrl(currentPath, "en")}
+								variant="plain"
+								class={css({
+									textStyle: "sm",
+									fontWeight: "medium",
+									color: "blue.11",
+								})}
+							>
+								English
+							</Anchor>
+						)}
+						{currentLocale !== "zh" && (
+							<Anchor
+								href={getLocaleToggleUrl(currentPath, "zh")}
+								variant="plain"
+								class={css({
+									textStyle: "sm",
+									fontWeight: "medium",
+									color: "blue.11",
+								})}
+							>
+								中文
+							</Anchor>
+						)}
+						{currentLocale !== "es" && (
+							<Anchor
+								href={getLocaleToggleUrl(currentPath, "es")}
+								variant="plain"
+								class={css({
+									textStyle: "sm",
+									fontWeight: "medium",
+									color: "blue.11",
+								})}
+							>
+								Español
+							</Anchor>
+						)}
 						<Button
 							variant="solid"
 							colorPalette="blue"
@@ -297,7 +377,7 @@ export default createRoute((c) => {
 							interactive
 							onclick="window.scrollTo({top: document.getElementById('hub').offsetTop - 80, behavior: 'smooth'})"
 						>
-							Explore Hub
+							{currentLocale === "zh" ? "探索中心" : "Explore Hub"}
 						</Button>
 					</nav>
 				</div>
@@ -331,15 +411,17 @@ export default createRoute((c) => {
 							lineHeight: "tight",
 						})}
 					>
-						A beautifully engineered, accessible component suite.
+						{currentLocale === "zh"
+							? "精美设计、完全无障碍的组件套件"
+							: "A beautifully engineered, accessible component suite."}
 					</Heading>
 					<Text
 						size="lg"
 						class={css({ mt: "4", color: "fg.muted", maxW: "2xl", mx: "auto" })}
 					>
-						A complete 3-tier design system built for HonoX, PandaCSS, and
-						Sveltia CMS. Fast, lightweight, and fully accessible, following
-						standard user habits.
+						{currentLocale === "zh"
+							? "一个专为 HonoX、PandaCSS 和 Sveltia CMS 构建的完整三层设计系统。快速、轻量且完全符合无障碍标准。"
+							: "A complete 3-tier design system built for HonoX, PandaCSS, and Sveltia CMS. Fast, lightweight, and fully accessible, following standard user habits."}
 					</Text>
 
 					<div

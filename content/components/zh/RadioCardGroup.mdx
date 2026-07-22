@@ -1,0 +1,172 @@
+---
+title: RadioCardGroup 单选卡片组
+hydration: 2
+category: Forms
+---
+
+import { RadioCardGroup, Stack } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+一组以可选卡片形式呈现的单选组，适用于比普通单选按钮需要更多视觉权重的选择 —— 例如价格档位、配送速度等。
+
+# 水合
+
+**第 2 级 —— 智能自动检测。** `RadioCardGroup` 会渲染为静态 HTML，并且除非存在行为信号，否则不会发送任何客户端 JS。传入 `interactive={true}` 可强制水合，或传入 `interactive={false}` 强制静态渲染。
+
+当存在以下任一信号（或设置了 `interactive={true}`）时，它会作为岛屿进行水合：
+
+- `value`（受控选择）
+- `defaultValue`（非受控初始选择）
+- `onValueChange`
+
+| `interactive` 属性 | 结果 |
+| --- | --- |
+| 省略，且**无**信号 | 静态 —— 无客户端 JS |
+| 省略，但存在信号 | 作为岛屿水合 |
+| `true` | 作为岛屿水合 |
+| `false` | 静态 —— 无客户端 JS |
+
+# 用法
+
+<DemoPreview>
+  <Stack gap="6" style={{ width: "100%" }}>
+    <RadioCardGroup
+      label="Plan"
+      defaultValue="pro"
+      items={[
+        { label: "Hobby", value: "hobby" },
+        { label: "Pro", value: "pro" },
+        { label: "Enterprise", value: "enterprise" },
+      ]}
+      interactive
+    />
+    <RadioCardGroup
+      label="Billing"
+      variant="subtle"
+      defaultValue="monthly"
+      items={[
+        { label: "Monthly", value: "monthly" },
+        { label: "Yearly", value: "yearly" },
+      ]}
+      interactive
+    />
+  </Stack>
+</DemoPreview>
+
+```tsx
+import { RadioCardGroup } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <RadioCardGroup
+      label="Plan"
+      defaultValue="pro"
+      items={[
+        { label: "Hobby", value: "hobby" },
+        { label: "Pro", value: "pro" },
+        { label: "Enterprise", value: "enterprise" },
+      ]}
+    />
+  );
+}
+```
+
+## 自定义组合
+
+传入 `children` 以完全掌控每张卡片的内容，取代 `items` 数组：
+
+```tsx
+import { RadioCardGroup } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <RadioCardGroup label="Plan" defaultValue="pro">
+      <RadioCardGroup.Item value="hobby">
+        <RadioCardGroup.ItemText>Hobby — $0/mo</RadioCardGroup.ItemText>
+        <RadioCardGroup.ItemControl />
+        <RadioCardGroup.ItemHiddenInput />
+      </RadioCardGroup.Item>
+      <RadioCardGroup.Item value="pro">
+        <RadioCardGroup.ItemText>Pro — $20/mo</RadioCardGroup.ItemText>
+        <RadioCardGroup.ItemControl />
+        <RadioCardGroup.ItemHiddenInput />
+      </RadioCardGroup.Item>
+      <RadioCardGroup.Indicator />
+    </RadioCardGroup>
+  );
+}
+```
+
+## CMS 页面构建器
+
+该组件可作为 `radioCardGroup` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用：
+
+```json
+{
+  "type": "radioCardGroup",
+  "label": "Plan",
+  "defaultValue": "pro",
+  "variant": "outline",
+  "items": [
+    { "label": "Hobby", "value": "hobby" },
+    { "label": "Pro", "value": "pro" },
+    { "label": "Enterprise", "value": "enterprise", "disabled": true }
+  ]
+}
+```
+
+在页面构建器中，它始终以 `interactive` 渲染。
+
+# 属性
+
+## Root
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `value` | `string` | 当前选中的值（受控）。 |
+| `defaultValue` | `string` | 初始选中的值（非受控）。 |
+| `onValueChange` | `(details: { value: string }) => void` | 选择发生变化时调用。 |
+| `id` | `string` | 根元素的 id。 |
+| `name` | `string` | 底层 radio 输入的 name，用于原生表单提交。 |
+| `disabled` | `boolean` | 禁用所有项。 |
+| `readOnly` | `boolean` | 阻止选择变更，但仍允许聚焦。 |
+| `variant` | `"subtle" \| "outline" \| "surface" \| "solid"` | 视觉样式。默认 `"outline"`。 |
+| `size` | `"md"` | 视觉尺寸。 |
+| `colorPalette` | `"blue" \| "green" \| "red" \| "purple" \| "orange" \| "amber" \| "cyan" \| "slate" \| "gray"` | 配色主题。 |
+| `interactive` | `boolean` | 覆盖水合决策（见上文）。 |
+| `class` | `string` | 根元素的自定义 CSS 类。 |
+
+## 默认组合
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `items` | `(string \| RadioCardGroupItem)[]` | 要渲染的卡片。普通字符串是 `{ value, label: value }` 的简写。 |
+| `label` | `string \| JSX.Element` | 渲染在卡片上方的标签。 |
+
+## RadioCardGroupItem
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `value` | `string` | 该项的唯一值。 |
+| `label` | `string \| JSX.Element` | 卡片的展示内容。 |
+| `disabled` | `boolean` | 禁用此卡片。 |
+| `invalid` | `boolean` | 将此卡片标记为无效。 |
+
+## 子组件
+
+| 部分 | 说明 |
+| --- | --- |
+| `RadioCardGroup.Label` | 组的标签（`<span>`）。 |
+| `RadioCardGroup.Item` | 一张可选卡片。`role="radio"`，需要 `value` 属性。 |
+| `RadioCardGroup.ItemText` | 卡片的展示文本/内容。 |
+| `RadioCardGroup.ItemControl` | 卡片的视觉单选指示器包裹元素。 |
+| `RadioCardGroup.ItemHiddenInput` | 用于保存选择以供表单提交的视觉隐藏原生 `<input type="radio">`。 |
+| `RadioCardGroup.Indicator` | 用于表示选中状态的共享滑动指示器元素。 |
+
+# 无障碍
+
+- 根元素具有 `role="radiogroup"`；每个项具有 `role="radio"`，并通过 `aria-checked` 反映选中状态。
+- 项使用漫游式 `tabIndex` —— 只有选中的（或第一个可用的）项位于 tab 序列中，与原生单选组的键盘行为一致。
+- `data-state`（`checked`/`unchecked`）与 `data-disabled` 会镜像到各项及其文本/控制部分，用于样式设置。

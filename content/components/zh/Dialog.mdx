@@ -1,0 +1,114 @@
+---
+title: Dialog 对话框
+hydration: 1
+category: Overlays
+---
+
+import { Dialog, Button } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+一个覆盖在页面上的模态窗口，要求在继续之前进行用户交互。
+
+# 水合
+
+**Tier 1 — 默认自动交互。** `Dialog` 没有有意义的静态回退——打开、焦点陷阱和 ESC 处理都需要客户端 JavaScript——因此默认会作为岛屿进行水合。传入 `interactive={false}` 可渲染一个静态、无响应的对话框外壳，不发送任何客户端 JS。
+
+| `interactive` 属性 | 结果 |
+| --- | --- |
+| 省略 | 作为岛屿水合（默认） |
+| `true` | 作为岛屿水合 |
+| `false` | 静态 —— 无客户端 JS |
+
+库中所有的交互决策都通过 `app/components/ui/island-utils.ts` 中共享的 `shouldHydrate()` 辅助函数路由。
+
+# 无障碍
+
+遵循 [Dialog (Modal) WAI-ARIA 设计模式](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/)。当水合时（`interactive` 默认为 `true`），对话框提供以下行为：
+
+- **打开时焦点移入对话框** —— 优先到 `initialFocusEl()`，否则到第一个可聚焦元素，否则到内容本身。
+- **打开时焦点被陷阱捕获** —— `Tab` / `Shift+Tab` 仅在对话框内容内部循环。嵌套对话框会被处理：只有最上层的对话框会捕获并拥有 `Escape`。
+- **`Escape` 关闭**对话框（除非 `closeOnEscape={false}`）。
+- **背景无响应** —— 对话框外部的一切（包括嵌套对话框背后的父对话框）都会获得 `inert` 并从 Tab 顺序中移除，而对话框子树保持可交互。
+- 当至少有一个对话框打开时，**body 滚动被锁定**，并在最后一个关闭时恢复。
+- 关闭时**焦点返回到触发器**（如果提供了 `finalFocusEl()`，则返回到它）。
+- **可访问名称** —— 来源于 `title`（`aria-labelledby`）或显式的 `aria-label`。如果二者都不存在，会在客户端发出 `console.warn`。
+- **`role="alertdialog"`** —— 为破坏性确认传入 `role="alertdialog"`，并将 `initialFocusEl` 指向取消/安全操作，使其首先获得焦点。当 `closeOnInteractOutside={false}` 时，对话框只能通过按钮或 `Escape` 关闭。
+
+# 用法
+
+## 基础对话框
+
+<DemoPreview>
+  <Dialog
+    trigger={<Button>Open Dialog</Button>}
+    title="Confirm action"
+    description="Are you sure you want to continue?"
+    body="This action cannot be undone."
+    cancel={<Button variant="outline">Cancel</Button>}
+    confirm={<Button>Confirm</Button>}
+  />
+</DemoPreview>
+
+```tsx
+import { Dialog, Button } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Dialog
+      trigger={<Button>Open Dialog</Button>}
+      title="Confirm action"
+      description="Are you sure you want to continue?"
+      body="This action cannot be undone."
+      cancel={<Button variant="outline">Cancel</Button>}
+      confirm={<Button>Confirm</Button>}
+    />
+  );
+}
+```
+
+## CMS 页面构建器
+
+此组件在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中以 `dialog` 块的形式提供。`trigger` 是一个嵌套的块列表（CMS 始终提交一个数组）：
+
+```json
+{
+  "type": "dialog",
+  "title": "Confirm action",
+  "description": "Are you sure you want to continue?",
+  "confirmText": "Confirm",
+  "cancelText": "Cancel",
+  "trigger": [{ "type": "button", "text": "Open Dialog" }]
+}
+```
+
+# 属性
+
+## Dialog
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `trigger` | `JSX.Element` | 激活时打开对话框的元素。 |
+
+| `title` | \`string \ | JSX.Element\` | 对话框标题。 |
+| `description` | \`string \ | JSX.Element\` | 对话框描述。 |
+| `body` | \`string \ | JSX.Element\` | 主体内容。 |
+| `footer` | \`string \ | JSX.Element\` | 自定义页脚内容。 |
+
+| `cancel` | `JSX.Element` | 渲染为关闭（取消）触发器的元素。 |
+| `confirm` | `JSX.Element` | 渲染为操作触发器的元素。 |
+| `closable` | `boolean` | 是否显示关闭按钮。默认：`true`。 |
+| `interactive` | `boolean` | 为交互行为启用客户端水合。 |
+| `class` | `string` | 根元素的自定义 CSS 类。 |
+
+| `role` | \`"dialog" \ | "alertdialog"\` | 对话框变体。破坏性确认请使用 `"alertdialog"`。默认：`"dialog"`。 |
+
+| `aria-label` | `string` | 未提供 `title` 时的可访问名称。 |
+| `closeOnEscape` | `boolean` | 按下 `Escape` 时关闭。默认：`true`。 |
+| `closeOnInteractOutside` | `boolean` | 点击背景遮罩时关闭。默认：`true`。 |
+
+| `initialFocusEl` | \`() => HTMLElement \ | null\` | 打开时聚焦的元素。默认聚焦第一个可聚焦元素。 |
+| `finalFocusEl` | \`() => HTMLElement \ | null\` | 关闭时聚焦的元素。默认聚焦触发器。 |
+
+其他属性（例如 `open`、`defaultOpen`、`onOpenChange`、`id`）会转发到底层的对话框 primitive。

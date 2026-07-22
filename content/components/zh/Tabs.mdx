@@ -1,0 +1,111 @@
+---
+title: Tabs 标签页
+hydration: 2
+category: Navigation
+---
+
+import { Tabs, Stack, Badge } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+用于将内容组织为可切换、互斥面板的导航或布局元素。
+
+# 用法
+
+<DemoPreview>
+  <Tabs defaultValue="features" interactive variant="enclosed" size="md">
+    <Tabs.List>
+      <Tabs.Trigger value="features">⚡ Key Features</Tabs.Trigger>
+      <Tabs.Trigger value="pricing">💎 Pricing Plans</Tabs.Trigger>
+      <Tabs.Indicator />
+    </Tabs.List>
+
+    <Tabs.Content value="features">
+      Our Hono/JSX Tabs component supports zero runtime styled-system classes, smooth sliding indicator transitions, and native keyboard interaction.
+    </Tabs.Content>
+
+    <Tabs.Content value="pricing">
+      Flexible subscription pricing for individuals, start-ups, and scaling enterprise workspaces.
+    </Tabs.Content>
+  </Tabs>
+</DemoPreview>
+
+```tsx
+import { Tabs } from "../components/ui/tabs";
+
+<Tabs defaultValue="features" interactive variant="enclosed" size="md">
+  <Tabs.List>
+    <Tabs.Trigger value="features">⚡ Key Features</Tabs.Trigger>
+    <Tabs.Trigger value="pricing">💎 Pricing Plans</Tabs.Trigger>
+    <Tabs.Indicator />
+  </Tabs.List>
+
+  <Tabs.Content value="features">
+    Our Hono/JSX Tabs component supports zero-runtime classes, smooth sliding transitions, and native keyboard interaction.
+  </Tabs.Content>
+
+  <Tabs.Content value="pricing">
+    Flexible subscription pricing for individuals, start-ups, and scaling enterprise workspaces.
+  </Tabs.Content>
+</Tabs>;
+```
+
+## CMS 页面构建器
+
+该组件可作为 `tabs` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用，采用简洁、扁平化的 API 设计：
+
+```json
+{
+  "type": "tabs",
+  "variant": "enclosed",
+  "size": "md",
+  "items": [
+    {
+      "value": "features",
+      "label": "⚡ Key Features",
+      "content": [
+        {
+          "type": "text",
+          "content": "Our high-end tabs component is lightning fast."
+        }
+      ]
+    },
+    {
+      "value": "pricing",
+      "label": "💎 Pricing Plans",
+      "content": [
+        {
+          "type": "text",
+          "content": "Starting from $0/mo."
+        }
+      ]
+    }
+  ]
+}
+```
+
+# 属性
+
+## 根组件
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `defaultValue` | `string` | 渲染时的初始选中标签值（非受控）。 |
+| `value` | `string` | 受控的选中标签值。 |
+| `variant` | \`"line" \ | "subtle" \ | "enclosed"\` | 标签列表与指示器的视觉外观。默认 `"line"`。 |
+| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg"\` | 标签项的整体高度、间距与内边距。默认 `"md"`。 |
+| `orientation` | \`"horizontal" \ | "vertical"\` | 触发器的布局流向。默认 `"horizontal"`。 |
+| `activationMode` | \`"automatic" \ | "manual"\` | 在手动模式下，触发器在 Enter/Space 点击时激活；在自动模式下，在获得焦点时立即激活。默认 `"automatic"`。 |
+| `loopFocus` | `boolean` | 键盘焦点是否在列表的首尾之间循环。默认 `true`。 |
+| `lazyMount` | `boolean` | 延迟渲染标签内容面板，直到首次访问。默认 `false`。 |
+| `unmountOnExit` | `boolean` | 当标签面板变为非激活时，将其从 DOM 中销毁。默认 `false`。 |
+| `onValueChange` | `(details: { value: string }) => void` | 激活标签值发生变化时调用。 |
+| `onFocusChange` | `(details: { value: string }) => void` | 不同的标签触发器获得键盘或点击焦点时调用。 |
+
+# 无障碍
+
+该组件完全符合 **WAI-ARIA Tabs 设计模式**：
+- 在列表容器上设置 `role="tablist"`，并将 `aria-orientation` 映射到布局。
+- 在触发器上设置 `role="tab"`，其中 `aria-selected` 对应激活状态，`aria-controls` 引用面板 ID。
+- 键盘支持：ArrowRight/ArrowLeft（垂直时为 ArrowDown/ArrowUp）通过 focus-roving tabIndex 在触发器间导航。Home/End 立即将焦点移动到两端。在手动模式下，Enter/Space 激活触发器。

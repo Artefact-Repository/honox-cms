@@ -1,0 +1,62 @@
+---
+title: AbsoluteCenter 绝对居中
+hydration: 3
+category: Layout
+---
+
+import { AbsoluteCenter } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+用于在其父容器内居中内容的工具组件。
+
+# 用法
+
+<DemoPreview>
+  <div style={{ position: "relative", height: "140px", width: "260px", border: "1px solid var(--colors-border)" }}>
+    <AbsoluteCenter axis="both">Centered Content</AbsoluteCenter>
+  </div>
+</DemoPreview>
+
+```tsx
+import { AbsoluteCenter } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <div
+      style={{
+        position: "relative",
+        height: "200px",
+        width: "200px",
+        border: "1px solid black",
+      }}
+    >
+      <AbsoluteCenter axis="both">Centered Content</AbsoluteCenter>
+    </div>
+  );
+}
+```
+
+## CMS 页面构建器
+
+该组件在 [页面构建器](/docs/PageBuilder) (`content/pages/*.json`) 中作为 `absoluteCenter` 区块提供：
+
+```markdown
+{
+  "type": "absoluteCenter",
+  "axis": "both",
+  "children": [
+    { "type": "badge", "text": "Centered Badge", "colorPalette": "purple", "variant": "solid" }
+  ]
+}
+```
+
+# 属性
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `children` | `any` | 组件内部渲染的内容。 |
+| `class` | `string` | 自定义 CSS 类。 |
+
+| `axis` | \`"horizontal" \ | "vertical" \ | "both"\` | 内容居中所沿用的轴。 |

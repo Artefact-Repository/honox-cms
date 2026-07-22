@@ -24,7 +24,48 @@ import { filterEntries } from "../../utils/search";
 // Site header — same shape/data as the docs section's header (both read the
 // "configs" CMS singleton's `headerLinks`), kept as a local, un-DRY copy
 // rather than a shared component (see app/routes/docs/index.tsx).
-function BlogHeader({ headerLinks }: { headerLinks?: DocsNavLinkConfig[] }) {
+function getLocaleToggleUrl(
+	currentPath: string,
+	targetLocale: "en" | "zh" | "es",
+): string {
+	let cleanPath = currentPath;
+	if (cleanPath.startsWith("/zh")) {
+		cleanPath = cleanPath.slice(3);
+	} else if (cleanPath.startsWith("/es")) {
+		cleanPath = cleanPath.slice(3);
+	}
+	if (cleanPath === "") {
+		cleanPath = "/";
+	}
+
+	if (targetLocale === "en") {
+		return cleanPath;
+	}
+	return cleanPath === "/"
+		? `/${targetLocale}`
+		: `/${targetLocale}${cleanPath}`;
+}
+
+function BlogHeader({
+	headerLinks,
+	currentPath,
+	currentLocale,
+}: {
+	headerLinks?: DocsNavLinkConfig[];
+	currentPath: string;
+	currentLocale: string;
+}) {
+	const localizeLink = (href: string) => {
+		if (
+			currentLocale !== "en" &&
+			!href.startsWith(`/${currentLocale}`) &&
+			href.startsWith("/")
+		) {
+			return `/${currentLocale}${href}`;
+		}
+		return href;
+	};
+
 	return (
 		<header
 			class={css({
@@ -50,7 +91,7 @@ function BlogHeader({ headerLinks }: { headerLinks?: DocsNavLinkConfig[] }) {
 				})}
 			>
 				<Anchor
-					href="/"
+					href={localizeLink("/")}
 					variant="plain"
 					class={css({ textDecoration: "none", flexShrink: "0" })}
 				>
@@ -76,11 +117,15 @@ function BlogHeader({ headerLinks }: { headerLinks?: DocsNavLinkConfig[] }) {
 					{headerLinks?.map((link) => (
 						<Anchor
 							key={link.href}
-							href={link.href}
+							href={localizeLink(link.href)}
 							variant="plain"
 							class={css({ textStyle: "sm", fontWeight: "medium" })}
 						>
-							{link.label}
+							{currentLocale === "zh" && link.label === "Blog"
+								? "博客"
+								: currentLocale === "zh" && link.label === "Docs"
+									? "文档"
+									: link.label}
 						</Anchor>
 					))}
 					<Anchor
@@ -88,8 +133,47 @@ function BlogHeader({ headerLinks }: { headerLinks?: DocsNavLinkConfig[] }) {
 						variant="plain"
 						class={css({ textStyle: "sm", fontWeight: "medium" })}
 					>
-						Admin
+						{currentLocale === "zh" ? "内容管理" : "Admin"}
 					</Anchor>
+					{currentLocale !== "en" && (
+						<Anchor
+							href={getLocaleToggleUrl(currentPath, "en")}
+							variant="plain"
+							class={css({
+								textStyle: "sm",
+								fontWeight: "medium",
+								color: "blue.11",
+							})}
+						>
+							English
+						</Anchor>
+					)}
+					{currentLocale !== "zh" && (
+						<Anchor
+							href={getLocaleToggleUrl(currentPath, "zh")}
+							variant="plain"
+							class={css({
+								textStyle: "sm",
+								fontWeight: "medium",
+								color: "blue.11",
+							})}
+						>
+							中文
+						</Anchor>
+					)}
+					{currentLocale !== "es" && (
+						<Anchor
+							href={getLocaleToggleUrl(currentPath, "es")}
+							variant="plain"
+							class={css({
+								textStyle: "sm",
+								fontWeight: "medium",
+								color: "blue.11",
+							})}
+						>
+							Español
+						</Anchor>
+					)}
 				</nav>
 			</div>
 		</header>
@@ -97,9 +181,27 @@ function BlogHeader({ headerLinks }: { headerLinks?: DocsNavLinkConfig[] }) {
 }
 
 export default createRoute(async (c) => {
+	const currentPath = c.req.path;
+	let currentLocale = "en";
+	if (currentPath.startsWith("/zh")) {
+		currentLocale = "zh";
+	} else if (currentPath.startsWith("/es")) {
+		currentLocale = "es";
+	}
 	const [{ posts: blogPosts, searchEntries, tags }, config] = await Promise.all(
-		[loadPosts(), loadDocsConfig()],
+		[loadPosts(currentLocale), loadDocsConfig()],
 	);
+
+	const localizeLink = (href: string) => {
+		if (
+			currentLocale !== "en" &&
+			!href.startsWith(`/${currentLocale}`) &&
+			href.startsWith("/")
+		) {
+			return `/${currentLocale}${href}`;
+		}
+		return href;
+	};
 
 	// Get URL parameters for searching
 	const url = new URL(c.req.url);
@@ -118,9 +220,17 @@ export default createRoute(async (c) => {
 
 	return c.render(
 		<>
-			<title>{config.blog?.title ?? "Blog - Artefact"}</title>
+			<title>
+				{currentLocale === "zh"
+					? "博客 - Artefact"
+					: (config.blog?.title ?? "Blog - Artefact")}
+			</title>
 
-			<BlogHeader headerLinks={config.headerLinks} />
+			<BlogHeader
+				headerLinks={config.headerLinks}
+				currentPath={currentPath}
+				currentLocale={currentLocale}
+			/>
 
 			<div
 				class={css({
@@ -165,7 +275,7 @@ export default createRoute(async (c) => {
 												})}
 											>
 												<a
-													href={`/blog/${post.slug}`}
+													href={localizeLink(`/blog/${post.slug}`)}
 													class={css({
 														position: "absolute",
 														inset: "0",
@@ -214,7 +324,7 @@ export default createRoute(async (c) => {
 															size="sm"
 															class={css({ mb: "3", pointerEvents: "auto" })}
 														>
-															Latest
+															{currentLocale === "zh" ? "最新" : "Latest"}
 														</Badge>
 													)}
 													<Heading
@@ -227,7 +337,7 @@ export default createRoute(async (c) => {
 														})}
 													>
 														<a
-															href={`/blog/${post.slug}`}
+															href={localizeLink(`/blog/${post.slug}`)}
 															class={css({
 																color: "white",
 																textDecoration: "none",
@@ -247,7 +357,7 @@ export default createRoute(async (c) => {
 														})}
 													>
 														<a
-															href={`/blog/${post.slug}`}
+															href={localizeLink(`/blog/${post.slug}`)}
 															class={css({
 																color: "inherit",
 																textDecoration: "none",
@@ -263,7 +373,9 @@ export default createRoute(async (c) => {
 													>
 														{post.author && (
 															<Anchor
-																href={`/blog/by-author/${post.author}`}
+																href={localizeLink(
+																	`/blog/by-author/${post.author}`,
+																)}
 																class={css({
 																	display: "inline-flex",
 																	alignItems: "center",
@@ -292,11 +404,14 @@ export default createRoute(async (c) => {
 														)}
 														<Text size="sm" class={css({ color: "white.a10" })}>
 															{post.author ? "· " : ""}
-															{new Date(post.date).toLocaleDateString("en-US", {
-																month: "short",
-																day: "numeric",
-																year: "numeric",
-															})}
+															{new Date(post.date).toLocaleDateString(
+																currentLocale === "zh" ? "zh-CN" : "en-US",
+																{
+																	month: "short",
+																	day: "numeric",
+																	year: "numeric",
+																},
+															)}
 															{post.readTime ? ` · ${post.readTime}` : ""}
 														</Text>
 													</Stack>
@@ -362,10 +477,12 @@ export default createRoute(async (c) => {
 						<div class={css({ flex: "1", minWidth: "260px" })}>
 							<Search
 								src="/api/posts/search.json"
-								action="/blog"
+								action={localizeLink("/blog")}
 								initialQuery={searchQuery}
-								placeholder="Search articles..."
-								itemLabel="articles"
+								placeholder={
+									currentLocale === "zh" ? "搜索文章..." : "Search articles..."
+								}
+								itemLabel={currentLocale === "zh" ? "文章" : "articles"}
 								total={blogPosts.length}
 								filterAttribute="data-post-slug"
 								emptyStateId="blog-search-empty"
@@ -393,11 +510,15 @@ export default createRoute(async (c) => {
 									})}
 								>
 									<FilterIcon width="18" height="18" />
-									Browse tags
+									{currentLocale === "zh" ? "浏览标签" : "Browse tags"}
 								</Button>
 							}
-							title="Browse by Tag"
-							description="Jump to a tag archive"
+							title={currentLocale === "zh" ? "浏览标签" : "Browse by Tag"}
+							description={
+								currentLocale === "zh"
+									? "快速跳转到标签存档"
+									: "Jump to a tag archive"
+							}
 							body={
 								<div>
 									{/* Tag Filter Section */}
@@ -411,40 +532,46 @@ export default createRoute(async (c) => {
 												color: "fg",
 											})}
 										>
-											Filter by Tag
+											{currentLocale === "zh" ? "按标签过滤" : "Filter by Tag"}
 										</Text>
 										<Stack direction="column" gap="1">
-											{["All", ...tags].map((tag) => {
-												const href =
-													tag === "All" ? "/blog" : `/blog/by-tag/${tag}`;
+											{[currentLocale === "zh" ? "全部" : "All", ...tags].map(
+												(tag) => {
+													const realTag =
+														tag === "全部" || tag === "All" ? "All" : tag;
+													const href =
+														realTag === "All"
+															? localizeLink("/blog")
+															: localizeLink(`/blog/by-tag/${realTag}`);
 
-												return (
-													<a
-														href={href}
-														class={css({
-															width: "full",
-															display: "flex",
-															justifyContent: "space-between",
-															alignItems: "center",
-															px: "4",
-															py: "2.5",
-															borderRadius: "md",
-															textDecoration: "none",
-															fontSize: "sm",
-															fontWeight: "normal",
-															transition: "all 0.2s",
-															bg: "transparent",
-															color: "fg.muted",
-															_hover: {
-																bg: "gray.subtle.bg",
-																color: "fg",
-															},
-														})}
-													>
-														<span>{tag}</span>
-													</a>
-												);
-											})}
+													return (
+														<a
+															href={href}
+															class={css({
+																width: "full",
+																display: "flex",
+																justifyContent: "space-between",
+																alignItems: "center",
+																px: "4",
+																py: "2.5",
+																borderRadius: "md",
+																textDecoration: "none",
+																fontSize: "sm",
+																fontWeight: "normal",
+																transition: "all 0.2s",
+																bg: "transparent",
+																color: "fg.muted",
+																_hover: {
+																	bg: "gray.subtle.bg",
+																	color: "fg",
+																},
+															})}
+														>
+															<span>{tag}</span>
+														</a>
+													);
+												},
+											)}
 										</Stack>
 									</div>
 								</div>
@@ -485,7 +612,7 @@ export default createRoute(async (c) => {
 						/>
 					</Stack>
 					<Heading as="h3" size="xl" class={css({ mb: "3" })}>
-						No articles found
+						{currentLocale === "zh" ? "未找到相关文章" : "No articles found"}
 					</Heading>
 					<Text
 						class={css({
@@ -495,7 +622,9 @@ export default createRoute(async (c) => {
 							lineHeight: "relaxed",
 						})}
 					>
-						Try adjusting your search or filter to find what you're looking for.
+						{currentLocale === "zh"
+							? "请调整搜索词或过滤器，以找到您需要的内容。"
+							: "Try adjusting your search or filter to find what you're looking for."}
 					</Text>
 				</div>
 
@@ -572,7 +701,7 @@ export default createRoute(async (c) => {
 								}
 								title={
 									<a
-										href={`/blog/${post.slug}`}
+										href={localizeLink(`/blog/${post.slug}`)}
 										class={css({
 											color: "fg",
 											textDecoration: "none",
@@ -602,7 +731,7 @@ export default createRoute(async (c) => {
 										<Stack gap="2.5" align="center">
 											{/* Author Avatar */}
 											<Anchor
-												href={`/blog/by-author/${post.author}`}
+												href={localizeLink(`/blog/by-author/${post.author}`)}
 												class={css({
 													display: "inline-flex",
 													alignItems: "center",
@@ -618,7 +747,7 @@ export default createRoute(async (c) => {
 											</Anchor>
 											<div>
 												<Anchor
-													href={`/blog/by-author/${post.author}`}
+													href={localizeLink(`/blog/by-author/${post.author}`)}
 													class={css({
 														textDecoration: "none",
 														color: "fg",
@@ -643,11 +772,14 @@ export default createRoute(async (c) => {
 													class={css({ mt: "0.5" })}
 												>
 													<Text size="xs" class={css({ color: "fg.muted" })}>
-														{new Date(post.date).toLocaleDateString("en-US", {
-															month: "short",
-															day: "numeric",
-															year: "numeric",
-														})}
+														{new Date(post.date).toLocaleDateString(
+															currentLocale === "zh" ? "zh-CN" : "en-US",
+															{
+																month: "short",
+																day: "numeric",
+																year: "numeric",
+															},
+														)}
 													</Text>
 													<Text size="xs" class={css({ color: "fg.muted" })}>
 														· {post.readTime}
@@ -658,7 +790,7 @@ export default createRoute(async (c) => {
 
 										{/* Read More Button */}
 										<a
-											href={`/blog/${post.slug}`}
+											href={localizeLink(`/blog/${post.slug}`)}
 											class={css({
 												textDecoration: "none",
 												display: "inline-flex",
@@ -678,7 +810,7 @@ export default createRoute(async (c) => {
 													},
 												})}
 											>
-												Read more
+												{currentLocale === "zh" ? "阅读更多" : "Read more"}
 												<ArrowRightIcon width="14" height="14" />
 											</Button>
 										</a>
@@ -696,7 +828,7 @@ export default createRoute(async (c) => {
 											})}
 										>
 											<Badge variant="solid" colorPalette="orange" size="sm">
-												Draft
+												{currentLocale === "zh" ? "草稿" : "Draft"}
 											</Badge>
 										</div>
 									)}
@@ -707,7 +839,7 @@ export default createRoute(async (c) => {
 											{post.tags.slice(0, 3).map((tag) => (
 												<Anchor
 													key={tag}
-													href={`/blog/by-tag/${tag}`}
+													href={localizeLink(`/blog/by-tag/${tag}`)}
 													variant="plain"
 													class={css({
 														textDecoration: "none",

@@ -1,0 +1,94 @@
+---
+title: Splitter Divisor
+hydration: 1
+category: Layout
+---
+
+import { Splitter } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introducción
+
+Un componente de diseño que divide el contenido en paneles redimensionables separados por controladores de arrastre.
+
+# Uso
+
+## Splitter básico
+
+<DemoPreview>
+  <div style={{ width: "100%", height: "180px" }}>
+    <Splitter
+      orientation="horizontal"
+      panels={[
+        { id: "left", content: <div style={{ padding: "1rem" }}>Sidebar</div> },
+        { id: "right", content: <div style={{ padding: "1rem" }}>Content</div> },
+      ]}
+    />
+  </div>
+</DemoPreview>
+
+```tsx
+import { Splitter } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Splitter
+      orientation="horizontal"
+      panels={[
+        { id: "left", content: <aside>Sidebar</aside> },
+        { id: "right", content: <main>Content</main> },
+      ]}
+    />
+  );
+}
+```
+
+## Constructor de páginas CMS
+
+Este componente está disponible como un bloque `splitter` en el [Constructor de páginas](/docs/PageBuilder) (`content/pages/*.json`). **Siempre se renderiza de forma estática** (`interactive={false}`, sin redimensionado por arrastre) — el `content` de un panel es JSX anidado arbitrario, que no puede cruzar el límite de serialización de propiedades del island de la misma forma que `children`:
+
+```json
+{
+  "type": "splitter",
+  "orientation": "horizontal",
+  "panels": [
+    { "id": "left", "content": [{ "type": "text", "content": "Left panel" }] },
+    { "id": "right", "content": [{ "type": "text", "content": "Right panel" }] }
+  ]
+}
+```
+
+# Propiedades
+
+## Splitter
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `panels` | `PanelConfig[]` | Los paneles a renderizar (obligatorio). |
+
+| `orientation` | \`"horizontal" \ | "vertical"\` | Dirección de diseño de los paneles. |
+
+| `interactive` | `boolean` | Habilita el redimensionado por arrastre en el cliente. |
+
+| `defaultSize` | \`\{ id: string \ | number; size: number \}[]\` | Tamaños iniciales (modo interactivo). |
+| `size` | \`\{ id: string \ | number; size: number \}[]\` | Tamaños controlados (modo interactivo). |
+| `onSizeChange` | \`(sizes: \{ id: string \ | number; size: number \}[]) => void\` | Callback cuando cambian los tamaños. |
+
+| `resizeTriggerClass` | `string` | Clases CSS personalizadas para los controladores de redimensionado. |
+| `class` | `string` | Clases CSS personalizadas para el elemento raíz. |
+
+| `style` | \`Record\<string, string \ | number\>\` | Estilos en línea para el elemento raíz. |
+
+| `id` | `string` | Id personalizado para el elemento raíz. |
+
+### PanelConfig
+
+| Property | Type | Description |
+| --- | --- | --- |
+
+| `id` | \`string \ | number\` | Identificador único del panel. |
+| `content` | \`JSX.Element \ | string\` | Contenido renderizado dentro del panel. |
+
+| `class` | `string` | Clases CSS personalizadas para el panel. |
+
+| `style` | \`Record\<string, string \ | number\>\` | Estilos en línea para el panel. |

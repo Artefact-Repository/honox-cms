@@ -1,0 +1,82 @@
+---
+title: Avatar 头像
+category: Data Display
+hydration: 2
+---
+
+import { Avatar, Stack } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+显示用户的头像图片；当没有图片或图片加载失败时，回退到用户姓名首字母或通用的用户图标。
+
+# 水合
+
+**二级 —— 智能自动探测。** `Avatar` 渲染为静态 HTML，除非提供了 `src`，否则不附带任何客户端 JS。
+
+| `interactive` prop | 结果 |
+| --- | --- |
+| omitted, no `src` | 静态 —— 无客户端 JS |
+| omitted, `src` present | 作为岛屿水合 |
+| `true` | 作为岛屿水合 |
+| `false` | 静态 —— 无客户端 JS（图片立即渲染，无加载失败回退） |
+
+# 用法
+
+<DemoPreview>
+  <Stack direction="horizontal" gap="4">
+    <Avatar name="Artefact UI" size="sm" variant="solid" colorPalette="blue" />
+    <Avatar
+      src="https://i.pravatar.cc/80"
+      name="Jane Doe"
+      size="md"
+      shape="rounded"
+    />
+    <Avatar size="lg" />
+  </Stack>
+</DemoPreview>
+
+```tsx
+import { Avatar } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Avatar
+      src="https://i.pravatar.cc/80"
+      name="Jane Doe"
+      size="md"
+      shape="rounded"
+    />
+  );
+}
+```
+
+# 属性
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `src` | `string` | 图片 URL。提供此属性即为二级水合信号。 |
+| `alt` | `string` | 图片的替代文本。 |
+| `name` | `string` | 没有图片时，用于推导首字母（名 + 姓）。 |
+| `fallback` | `JSX.Element` | 自定义回退内容，覆盖推导出的首字母/图标。 |
+
+| `status` | \`"idle" \ | "loading" \ | "loaded" \ | "error"\` | 图片加载状态。由岛屿自动管理；仅在静态渲染时手动设置。 |
+
+| `size` | \`"full" \ | "2xs" \ | "xs" \ | "sm" \ | "md" \ | "lg" \ | "xl" \ | "2xl"\` | 视觉尺寸。默认 `"md"`。 |
+
+| `variant` | \`"solid" \ | "surface" \ | "subtle" \ | "outline"\` | 视觉样式。默认 `"subtle"`。 |
+
+| `shape` | \`"square" \ | "rounded" \ | "full"\` | 圆角形状。默认 `"full"`。 |
+
+| `interactive` | `boolean` | 覆盖水合决策（见上）。 |
+| `class` | `string` | 根元素的自定义 CSS 类。 |
+
+## 子组件
+
+对于自定义组合，`Avatar.Root` / `Avatar.Image` / `Avatar.Fallback` 与原生组件一同从基础包导出 —— 即默认 `src`/`name`/`fallback` API 内部所渲染的相同部分。
+
+# 无障碍
+
+- 回退内容渲染为 `<span>`；请为图片提供有意义的 `alt`（纯装饰性头像可省略），因为回退内容本身除其可见的首字母/图标外，不携带独立的无障碍名称。
+- `data-state`（`idle`/`loading`/`loaded`/`error`）设置在根元素、图片以及回退内容上，用于基于状态设置样式。

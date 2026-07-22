@@ -1,0 +1,94 @@
+---
+title: Splitter 分割面板
+hydration: 1
+category: Layout
+---
+
+import { Splitter } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+一种将内容分割为可由拖拽手柄调整大小的面板的布局组件。
+
+# 用法
+
+## 基础分割器
+
+<DemoPreview>
+  <div style={{ width: "100%", height: "180px" }}>
+    <Splitter
+      orientation="horizontal"
+      panels={[
+        { id: "left", content: <div style={{ padding: "1rem" }}>Sidebar</div> },
+        { id: "right", content: <div style={{ padding: "1rem" }}>Content</div> },
+      ]}
+    />
+  </div>
+</DemoPreview>
+
+```tsx
+import { Splitter } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Splitter
+      orientation="horizontal"
+      panels={[
+        { id: "left", content: <aside>Sidebar</aside> },
+        { id: "right", content: <main>Content</main> },
+      ]}
+    />
+  );
+}
+```
+
+## CMS 页面构建器
+
+该组件可作为 `splitter` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用。**始终渲染为静态**（`interactive={false}`，不可拖拽调整大小）——面板的 `content` 是任意嵌套的 JSX，它无法像 `children` 那样跨越岛屿的属性序列化边界：
+
+```json
+{
+  "type": "splitter",
+  "orientation": "horizontal",
+  "panels": [
+    { "id": "left", "content": [{ "type": "text", "content": "Left panel" }] },
+    { "id": "right", "content": [{ "type": "text", "content": "Right panel" }] }
+  ]
+}
+```
+
+# 属性
+
+## Splitter
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `panels` | `PanelConfig[]` | 需要渲染的面板（必填）。 |
+
+| `orientation` | \`"horizontal" \ | "vertical"\` | 面板的布局方向。 |
+
+| `interactive` | `boolean` | 启用客户端拖拽调整大小。 |
+
+| `defaultSize` | \`\{ id: string \ | number; size: number \}[]\` | 初始尺寸（交互模式）。 |
+| `size` | \`\{ id: string \ | number; size: number \}[]\` | 受控尺寸（交互模式）。 |
+| `onSizeChange` | \`(sizes: \{ id: string \ | number; size: number \}[]) => void\` | 尺寸变化时的回调。 |
+
+| `resizeTriggerClass` | `string` | 调整大小手柄的自定义 CSS 类。 |
+| `class` | `string` | 根元素的自定义 CSS 类。 |
+
+| `style` | \`Record\<string, string \ | number\>\` | 根元素的内联样式。 |
+
+| `id` | `string` | 根元素的自定义 id。 |
+
+### PanelConfig
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+
+| `id` | \`string \ | number\` | 面板的唯一标识符。 |
+| `content` | \`JSX.Element \ | string\` | 面板内渲染的内容。 |
+
+| `class` | `string` | 面板的自定义 CSS 类。 |
+
+| `style` | \`Record\<string, string \ | number\>\` | 面板的内联样式。 |

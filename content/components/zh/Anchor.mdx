@@ -1,0 +1,89 @@
+---
+title: Anchor 链接
+hydration: 3
+category: Navigation
+---
+
+import { Anchor, Stack } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+一个用于内部和外部导航链接的样式化 `<a>` 元素，对 `target="_blank"` 提供了安全的默认值。
+
+# 用法
+
+<DemoPreview>
+  <Stack direction="horizontal" gap="4">
+    <Anchor href="/docs">Docs</Anchor>
+    <Anchor href="/blog" variant="plain">
+      Blog
+    </Anchor>
+    <Anchor href="https://github.com" target="_blank" colorPalette="purple">
+      GitHub ↗
+    </Anchor>
+  </Stack>
+</DemoPreview>
+
+```tsx
+import { Anchor } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Stack direction="horizontal" gap="4">
+      <Anchor href="/docs">Docs</Anchor>
+      <Anchor href="/blog" variant="plain">
+        Blog
+      </Anchor>
+      <Anchor href="https://github.com" target="_blank" colorPalette="purple">
+        GitHub ↗
+      </Anchor>
+    </Stack>
+  );
+}
+```
+
+## 路由组合
+
+传入 `asChild`，将 anchor 的样式与安全 target 处理合并到单个子元素上，而不是渲染 `<a>` —— 适用于包裹路由器自身的 `<Link />`：
+
+```tsx
+import { Anchor } from "../components/ui";
+
+<Anchor asChild variant="plain">
+  <MyRouterLink to="/dashboard">Dashboard</MyRouterLink>
+</Anchor>;
+```
+
+## CMS 页面构建器
+
+该组件在 [页面构建器](/docs/PageBuilder) (`content/pages/*.json`) 中作为 `link` 区块提供：
+
+```json
+{
+  "type": "link",
+  "text": "View Pricing",
+  "href": "/pricing",
+  "variant": "underline",
+  "colorPalette": "blue"
+}
+```
+
+`text` 会成为 anchor 的子内容；其余字段直接传递给 `Anchor`。
+
+# 属性
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `href` | `string` | 链接目标地址。 |
+| `target` | `string` | 标准 anchor target，例如 `"_blank"`。 |
+| `rel` | `string` | 标准 anchor rel。当 `target="_blank"` 且未另行设置 `rel` 时，自动填充为 `"noopener noreferrer"`。 |
+| `as` | `ElementType` | 渲染为 `<a>` 之外的其他元素/组件。 |
+| `asChild` | `boolean` | 将 anchor 的样式与安全 target 处理合并到单个子元素上，而不是渲染外层包裹元素。 |
+| `variant` | `"underline" \| "plain"` | 视觉样式。默认 `"underline"`。 |
+| `colorPalette` | `"blue" \| "green" \| "red" \| "orange" \| "gray" \| "cyan" \| "amber" \| "purple"` | 色彩主题。默认 `"blue"`。 |
+| `class` | `string` | 自定义 CSS 类。 |
+
+# 无障碍
+
+`Anchor` 渲染原生 `<a>`（或者在 `as` 下渲染为你选择的任意元素），因此默认即可通过键盘聚焦和激活，无需额外的 ARIA 接线。当通过 `target="_blank"` 链接到新标签页时，始终会应用显式的 `rel`，以防止被打开的页面访问 `window.opener`。

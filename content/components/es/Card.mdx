@@ -1,0 +1,102 @@
+---
+title: Card Tarjeta
+hydration: 2
+category: Data Display
+---
+
+import { Card, Button } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introducción
+
+Un contenedor flexible para agrupar contenido relacionado, con slots opcionales de encabezado, cuerpo, pie de página, imagen y avatar.
+
+# Uso
+
+## Card básica
+
+<DemoPreview>
+  <Card
+    variant="elevated"
+    title="Project title"
+    description="A short description of the project."
+    body="Main content of the card goes here."
+    footer={<Button>View</Button>}
+  />
+</DemoPreview>
+
+```tsx
+import { Card, Button } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Card
+      variant="elevated"
+      title="Project title"
+      description="A short description of the project."
+      body="Main content of the card goes here."
+      footer={<Button>View</Button>}
+    />
+  );
+}
+```
+
+## Card con imagen
+
+```tsx
+import { Card } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Card
+      image="/cover.png"
+      imagePosition="top"
+      title="Card with image"
+      body="Content beneath the image."
+    />
+  );
+}
+```
+
+## Constructor de Páginas CMS
+
+Este componente está disponible como un bloque `card` en el [Constructor de Páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "card",
+  "title": "Project title",
+  "description": "A short description of the project.",
+  "body": "Main content of the card goes here.",
+  "variant": "elevated"
+}
+```
+
+# Propiedades
+
+## Card
+
+| Prop | Type | Description |
+| --- | --- | --- |
+
+| `title` | \`string \ | JSX.Element\` | El título de la card. |
+| `description` | \`string \ | JSX.Element\` | La descripción de la card. |
+| `body` | \`string \ | JSX.Element\` | El contenido principal del cuerpo. |
+| `footer` | \`string \ | JSX.Element\` | Contenido del pie de página. |
+
+| `avatar` | `JSX.Element` | Elemento mostrado en el encabezado (por ejemplo, un avatar). |
+| `headerAction` | `JSX.Element` | Elemento mostrado al final del encabezado (por ejemplo, un menú). |
+
+| `image` | \`string \ | JSX.Element\` | Fuente de imagen o elemento. |
+
+| `imagePosition` | \`"top" \ | "bottom" \ | "left" \ | "right"\` | Dónde se coloca la imagen. Por defecto: `"top"`. |
+
+| `headerClass` | `string` | Clases CSS personalizadas para el encabezado. |
+| `bodyClass` | `string` | Clases CSS personalizadas para el cuerpo. |
+| `footerClass` | `string` | Clases CSS personalizadas para el pie de página. |
+| `imageClass` | `string` | Clases CSS personalizadas para la imagen. |
+
+| `variant` | \`"elevated" \ | "outline" \ | "subtle"\` | El estilo visual de la card. |
+
+| `interactive` | `boolean` | Habilita la hidratación del lado del cliente. |
+| `class` | `string` | Clases CSS personalizadas para el elemento raíz. |

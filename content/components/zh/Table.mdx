@@ -1,0 +1,112 @@
+---
+title: Table 表格
+hydration: 2
+category: Data Display
+---
+
+import { Table } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+用于展示表格数据的灵活组件。
+
+# 用法
+
+<DemoPreview>
+  <div style={{ width: "100%" }}>
+    <Table
+      variant="plain"
+      caption="Product Inventory"
+      columns={[
+        { header: "Name", key: "name" },
+        { header: "Category", key: "category" },
+        { header: "Price", key: "price", align: "end" },
+      ]}
+      rows={[
+        { name: "Laptop", category: "Electronics", price: "$999.00" },
+        { name: "Coffee Mug", category: "Home & Kitchen", price: "$15.00" },
+      ]}
+    />
+  </div>
+</DemoPreview>
+
+```tsx
+import { Table } from "../components/ui";
+
+export default function MyPage() {
+  const columns = [
+    { header: "Name", key: "name" },
+    { header: "Category", key: "category" },
+    { header: "Price", key: "price", align: "end" },
+  ];
+
+  const rows = [
+    { name: "Laptop", category: "Electronics", price: "$999.00" },
+    { name: "Coffee Mug", category: "Home & Kitchen", price: "$15.00" },
+  ];
+
+  return (
+    <Table
+      variant="plain"
+      caption="Product Inventory"
+      columns={columns}
+      rows={rows}
+      footer={
+        <tr>
+          <td colSpan={2}>Total</td>
+          <td style={{ textAlign: "end" }}>$1,014.00</td>
+        </tr>
+      }
+    />
+  );
+}
+```
+
+## CMS 页面构建器
+
+该组件可作为 `table` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用。由于行数据无法拥有固定的 CMS 结构，`rows` 是一个 JSON 编码的字符串字段，在渲染时解析：
+
+```json
+{
+  "type": "table",
+  "columns": [
+    { "header": "Room", "key": "room" },
+    { "header": "Price", "key": "price", "align": "end" }
+  ],
+  "rows": "[{\"room\": \"Cabin Loft\", \"price\": \"$180/night\"}, {\"room\": \"Cabin Suite\", \"price\": \"$240/night\"}]",
+  "variant": "plain",
+  "striped": true
+}
+```
+
+# 属性
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `columns` | `TableColumn[]` | 表格列的配置。 |
+| `rows` | `any[]` | 要在表格中显示的数据。 |
+
+| `caption` | \`string \ | JSX.Element\` | 显示在顶部或底部的可选标题。 |
+
+| `footer` | `JSX.Element` | 可选的页脚内容。 |
+
+| `variant` | \`"plain" \ | "surface"\` | 表格的视觉样式。 |
+
+| `striped` | `boolean` | 是否对行显示斑马纹。 |
+| `interactive` | `boolean` | 行是否显示悬停状态。 |
+| `columnBorder` | `boolean` | 是否在列之间显示边框。 |
+| `stickyHeader` | `boolean` | 滚动时表头是否保持可见。 |
+| `class` | `string` | 根元素的自定义 CSS 类。 |
+
+### TableColumn
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+
+| `header` | \`string \ | JSX.Element\` | 表头文本或元素。 |
+
+| `key` | `string` | 行数据对象中的键。 |
+| `render` | `(row, index) => JSX.Element` | 单元格的自定义渲染函数。 |
+
+| `align` | \`"start" \ | "center" \ | "end"\` | 列的文本对齐方式。 |

@@ -3,15 +3,23 @@ import { markdownToHtml, parseFrontmatter } from "../utils/markdown";
 import { buildHaystack, type SearchIndexEntry } from "../utils/search";
 import { type DocsConfig, loadDocsConfig } from "./configs";
 
-// Docs content lives under content/<collection>/*.{md,mdx} — any folder
-// becomes a collection automatically (see DocsConfig in ./configs for labeling).
+// Docs content lives under content/<collection>/*.{md,mdx} for the default
+// locale (en), and content/<collection>/<locale>/*.{md,mdx} for translations
+// — matching the CMS's `structure: multiple_folders` (public/admin/config.yml)
+// with `omit_default_locale_from_file_path: true`. Any folder becomes a
+// collection automatically (see DocsConfig in ./configs for labeling).
 // Plain .md is parsed with the same hand-rolled pipeline as blog posts; .mdx
 // is compiled to a real component (via @mdx-js/rollup, configured in
 // vite.config.ts) so pages can embed live, actually-rendered examples.
-// content/posts and content/notes are excluded: both have their own
-// loader/route (app/lib/posts.ts, app/lib/notes.ts).
+// content/posts and content/notes are excluded (any locale depth): both have
+// their own loader/route (app/lib/posts.ts, app/lib/notes.ts).
 const markdownModules = import.meta.glob(
-	["/content/*/*.md", "!/content/posts/**", "!/content/notes/**"],
+	[
+		"/content/*/*.md",
+		"/content/*/*/*.md",
+		"!/content/posts/**",
+		"!/content/notes/**",
+	],
 	{ query: "?raw", import: "default" },
 ) as Record<string, () => Promise<string>>;
 
@@ -24,10 +32,14 @@ type MdxModule = () => Promise<{
 	default: FC;
 	frontmatter?: MdxFrontmatter;
 }>;
-const mdxModules = import.meta.glob("/content/*/*.mdx") as Record<
-	string,
-	MdxModule
->;
+const mdxModules = import.meta.glob([
+	"/content/*/*.mdx",
+	"/content/*/*/*.mdx",
+]) as Record<string, MdxModule>;
+
+// Translated-content locale codes — must track public/admin/config.yml's
+// i18n.locales (minus the default) and the app/routes/<locale> dirs.
+const LOCALES = ["zh", "es"] as const;
 
 export interface DocSummary {
 	slug: string;
@@ -59,13 +71,32 @@ function sectionLabel(folder: string, config: DocsConfig): string {
 	return entry?.label ?? capitalize(folder);
 }
 
-/** Splits a `/content/<folder>/<slug>.<ext>` module path into its parts. */
-function parseContentPath(path: string): { folder: string; slug: string } {
-	const match = path.match(/^\/content\/([^/]+)\/(.+)\.(?:md|mdx)$/);
+/**
+ * Splits a content module path into its parts. Matches both the default
+ * locale, `/content/<folder>/<slug>.<ext>` (locale "en"), and a translation,
+ * `/content/<folder>/<locale>/<slug>.<ext>` (locale from LOCALES).
+ */
+function parseContentPath(path: string): {
+	folder: string;
+	slug: string;
+	locale: string;
+} {
+	const match = path.match(
+		/^\/content\/([^/]+)\/(?:([^/]+)\/)?(.+)\.(?:md|mdx)$/,
+	);
 	if (!match) {
 		throw new Error(`Unexpected docs content path: ${path}`);
 	}
-	return { folder: match[1], slug: match[2] };
+	const [, folder, second, slug] = match as unknown as [
+		string,
+		string,
+		string | undefined,
+		string,
+	];
+	if (second && (LOCALES as readonly string[]).includes(second)) {
+		return { folder, slug, locale: second };
+	}
+	return { folder, slug, locale: "en" };
 }
 
 async function summarizeMarkdownDoc(
@@ -101,14 +132,53 @@ async function summarizeMdxDoc(
 	};
 }
 
-export async function loadDocs(): Promise<DocSummary[]> {
-	const config = await loadDocsConfig();
+export async function loadDocs(locale = "en"): Promise<DocSummary[]> {
+	const config = await loadDocsConfig(locale);
+
+	// Collect unique keys for mdx and markdown modules
+	// Map from `${folder}:${slug}` to the best available path. Pass 1: exact
+	// locale match. Pass 2 (non-en only): fill in English for anything not
+	// yet translated, so an untranslated doc still renders instead of 404ing.
+	const mdxPaths = new Map<string, string>();
+	for (const path of Object.keys(mdxModules)) {
+		const { folder, slug, locale: pathLocale } = parseContentPath(path);
+		if (pathLocale === locale) {
+			mdxPaths.set(`${folder}:${slug}`, path);
+		}
+	}
+	if (locale !== "en") {
+		for (const path of Object.keys(mdxModules)) {
+			const { folder, slug, locale: pathLocale } = parseContentPath(path);
+			const key = `${folder}:${slug}`;
+			if (pathLocale === "en" && !mdxPaths.has(key)) {
+				mdxPaths.set(key, path);
+			}
+		}
+	}
+
+	const markdownPaths = new Map<string, string>();
+	for (const path of Object.keys(markdownModules)) {
+		const { folder, slug, locale: pathLocale } = parseContentPath(path);
+		if (pathLocale === locale) {
+			markdownPaths.set(`${folder}:${slug}`, path);
+		}
+	}
+	if (locale !== "en") {
+		for (const path of Object.keys(markdownModules)) {
+			const { folder, slug, locale: pathLocale } = parseContentPath(path);
+			const key = `${folder}:${slug}`;
+			if (pathLocale === "en" && !markdownPaths.has(key)) {
+				markdownPaths.set(key, path);
+			}
+		}
+	}
+
 	const docs = await Promise.all([
-		...Object.entries(markdownModules).map(([path, loader]) =>
-			summarizeMarkdownDoc(path, loader, config),
+		...Array.from(markdownPaths.values()).map((path) =>
+			summarizeMarkdownDoc(path, markdownModules[path]!, config),
 		),
-		...Object.entries(mdxModules).map(([path, loader]) =>
-			summarizeMdxDoc(path, loader, config),
+		...Array.from(mdxPaths.values()).map((path) =>
+			summarizeMdxDoc(path, mdxModules[path]!, config),
 		),
 	]);
 
@@ -121,11 +191,13 @@ export async function loadDocs(): Promise<DocSummary[]> {
  * Markdown bodies are real text (stripped to a haystack like blog posts);
  * MDX bodies are compiled JSX, so those are scoped to name/category.
  */
-export async function loadDocsSearchIndex(): Promise<SearchIndexEntry[]> {
-	const docs = await loadDocs();
+export async function loadDocsSearchIndex(
+	locale = "en",
+): Promise<SearchIndexEntry[]> {
+	const docs = await loadDocs(locale);
 	return docs.map((doc) => ({
 		key: doc.slug,
-		href: `/docs/${doc.slug}`,
+		href: locale !== "en" ? `/${locale}/docs/${doc.slug}` : `/docs/${doc.slug}`,
 		title: doc.title,
 		tags: [doc.section, doc.category].filter((tag): tag is string =>
 			Boolean(tag),
@@ -143,12 +215,32 @@ export async function loadDocsSearchIndex(): Promise<SearchIndexEntry[]> {
  */
 export async function loadDocBySlug(
 	slug: string,
+	locale = "en",
 ): Promise<DocDetail | undefined> {
-	const config = await loadDocsConfig();
+	const config = await loadDocsConfig(locale);
 
-	for (const [path, loader] of Object.entries(mdxModules)) {
-		const parsed = parseContentPath(path);
-		if (parsed.slug !== slug) continue;
+	// First search MDX modules
+	let mdxPath: string | undefined;
+	if (locale !== "en") {
+		mdxPath =
+			Object.keys(mdxModules).find((path) => {
+				const parsed = parseContentPath(path);
+				return parsed.slug === slug && parsed.locale === locale;
+			}) ||
+			Object.keys(mdxModules).find((path) => {
+				const parsed = parseContentPath(path);
+				return parsed.slug === slug && parsed.locale === "en";
+			});
+	} else {
+		mdxPath = Object.keys(mdxModules).find((path) => {
+			const parsed = parseContentPath(path);
+			return parsed.slug === slug && parsed.locale === "en";
+		});
+	}
+
+	if (mdxPath) {
+		const loader = mdxModules[mdxPath]!;
+		const parsed = parseContentPath(mdxPath);
 		const mod = await loader();
 		return {
 			slug,
@@ -161,9 +253,28 @@ export async function loadDocBySlug(
 		};
 	}
 
-	for (const [path, loader] of Object.entries(markdownModules)) {
-		const parsed = parseContentPath(path);
-		if (parsed.slug !== slug) continue;
+	// Then search markdown modules
+	let markdownPath: string | undefined;
+	if (locale !== "en") {
+		markdownPath =
+			Object.keys(markdownModules).find((path) => {
+				const parsed = parseContentPath(path);
+				return parsed.slug === slug && parsed.locale === locale;
+			}) ||
+			Object.keys(markdownModules).find((path) => {
+				const parsed = parseContentPath(path);
+				return parsed.slug === slug && parsed.locale === "en";
+			});
+	} else {
+		markdownPath = Object.keys(markdownModules).find((path) => {
+			const parsed = parseContentPath(path);
+			return parsed.slug === slug && parsed.locale === "en";
+		});
+	}
+
+	if (markdownPath) {
+		const loader = markdownModules[markdownPath]!;
+		const parsed = parseContentPath(markdownPath);
 		const raw = await loader();
 		const { data, content } = parseFrontmatter(raw);
 		return {

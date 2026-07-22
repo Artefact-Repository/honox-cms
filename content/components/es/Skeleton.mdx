@@ -1,0 +1,79 @@
+---
+title: Skeleton Esqueleto
+hydration: 3
+category: Feedback
+---
+
+import { Skeleton } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introducción
+
+Un marcador de posición utilizado para indicar que el contenido se está cargando, con una variedad de opciones de animación y forma.
+
+# Uso
+
+## Skeleton básico
+
+<DemoPreview>
+  <div style={{ display: "flex", flexDirection: "column", gap: "1rem", width: "100%", maxWidth: "320px" }}>
+    <Skeleton shape="circle" size="12" />
+    <Skeleton height="6" width="40" />
+    <Skeleton shape="text" noOfLines={3} />
+  </div>
+</DemoPreview>
+
+```tsx
+import { Skeleton, SkeletonCircle, SkeletonText } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <div>
+      <SkeletonCircle size="12" />
+      <Skeleton height="6" width="40" />
+      <SkeletonText noOfLines={3} />
+    </div>
+  );
+}
+```
+
+## Constructor de páginas CMS
+
+Este componente está disponible como un bloque `skeleton` en el [Constructor de páginas](/docs/PageBuilder) (`content/pages/*.json`). Las opciones `shape` del CMS son `box`/`circle`/`text`, que se asignan a la propiedad real `shape` (`box` recae en la forma predeterminada):
+
+```json
+{
+  "type": "skeleton",
+  "shape": "text",
+  "noOfLines": 3
+}
+```
+
+# Propiedades
+
+## Skeleton
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `loading` | `boolean` | Si se debe mostrar el skeleton. Valor predeterminado: `true`. |
+| `circle` | `boolean` | Renderiza el skeleton como un círculo. |
+
+| `variant` | \`"pulse" \ | "shine" \ | "none"\` | El estilo de animación. |
+
+| `class` | `string` | Clases CSS personalizadas para el elemento raíz. |
+
+Todos los demás atributos nativos de `<div>` (por ejemplo, `style`, `id`, `width`, `height`) se reenvían al elemento subyacente.
+
+## SkeletonCircle
+
+Las mismas propiedades que `Skeleton`, preconfigurado con `circle`.
+
+## SkeletonText
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `noOfLines` | `number` | Número de líneas a mostrar. Valor predeterminado: `3`. |
+
+| `gap` | \`string \ | number\` | Espacio entre líneas. Valor predeterminado: `"2"`. |
+
+Más todas las propiedades de `Skeleton`.

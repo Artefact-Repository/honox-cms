@@ -1,0 +1,82 @@
+{
+  "collections": [
+    {
+      "folder": "docs",
+      "label": "Guides",
+      "cmsCollection": ""
+    },
+    {
+      "folder": "components",
+      "label": "Components",
+      "cmsCollection": ""
+    }
+  ],
+  "groups": [
+    {
+      "label": "Guías",
+      "section": "Guides"
+    },
+    {
+      "label": "Diseño",
+      "section": "",
+      "category": "Layout"
+    },
+    {
+      "label": "Tipografía",
+      "section": "",
+      "category": "Typography"
+    },
+    {
+      "label": "Navegación",
+      "section": "",
+      "category": "Navigation"
+    },
+    {
+      "label": "Retroalimentación",
+      "section": "",
+      "category": "Feedback"
+    },
+    {
+      "label": "Presentación de Datos",
+      "section": "",
+      "category": "Data Display"
+    },
+    {
+      "label": "Formularios",
+      "section": "",
+      "category": "Forms"
+    },
+    {
+      "label": "Superposiciones",
+      "section": "",
+      "category": "Overlays"
+    }
+  ],
+  "fallbackLabel": "Otro",
+  "links": [
+    {
+      "label": "GitHub",
+      "href": "https://github.com/Chen-Software/honox-cms"
+    }
+  ],
+  "headerLinks": [
+    {
+      "label": "Blog",
+      "href": "/blog"
+    },
+    {
+      "label": "Documentación",
+      "href": "/docs"
+    },
+    {
+      "label": "Notas",
+      "href": "/notes"
+    }
+  ],
+  "blog": {
+    "title": "Blog - Artefact",
+    "description": "Perspectivas, actualizaciones e historias de nuestro equipo.",
+    "newsletterHeading": "Mantente Actualizado",
+    "newsletterDescription": "Recibe los últimos artículos y perspectivas directamente en tu bandeja de entrada. Sin spam, solo contenido de calidad."
+  }
+}

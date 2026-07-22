@@ -1,0 +1,67 @@
+---
+title: RadioGroup 单选框组
+hydration: 2
+category: Forms
+---
+
+import { RadioGroup } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+一组可勾选的按钮，任意时刻只能选中其中一个。
+
+## 用法
+
+<DemoPreview>
+  <RadioGroup
+    label="Choose an option"
+    items={[
+      { label: "Option A", value: "a" },
+      { label: "Option B", value: "b" },
+      { label: "Option C", value: "c" },
+    ]}
+  />
+</DemoPreview>
+
+### CMS 页面构建器
+
+该组件可作为 `radioGroup` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用：
+
+```json
+{
+  "type": "radioGroup",
+  "label": "Choose an option",
+  "items": [
+    { "label": "Option A", "value": "a" },
+    { "label": "Option B", "value": "b" }
+  ]
+}
+```
+
+## 属性
+
+| 属性 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `label` | `string` | - | 组标签。 |
+| `items` | `RadioGroupItem[]` | - | 包含 `label` 与 `value` 的项数组。 |
+
+| `orientation` | \`'horizontal' \ | 'vertical'\` | `'vertical'` | 布局方向。 |
+
+## CMS 配置
+
+```yaml
+- label: RadioGroup
+  name: radio-group
+  widget: object
+  fields:
+    - { label: Label, name: label, widget: string, required: false }
+    - label: Items
+      name: items
+      widget: list
+      fields:
+        - { label: Label, name: label, widget: string }
+        - { label: Value, name: value, widget: string }
+```
+
+## 水合
+
+第 2 级：在提供 `value`、`defaultValue` 或 `onValueChange` 时进行水合。

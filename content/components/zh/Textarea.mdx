@@ -1,0 +1,139 @@
+---
+title: Textarea 文本域
+hydration: 2
+category: Forms
+---
+
+import { Textarea } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+一个与 `Field` 上下文集成的多行文本输入组件。它可以单独使用，也可以作为 `Field` 组件的一部分。
+
+# 用法
+
+## 配合 Field 集成的独立使用
+
+`Textarea` 在提供 `label`、`helperText` 等时会自动包裹在 `Field` 中。
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <Textarea
+      label="Bio"
+      placeholder="Write here..."
+      rows={4}
+      minLength={10}
+      interactive
+    />
+  </div>
+</DemoPreview>
+
+```tsx
+import { Textarea } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Textarea
+      label="Bio"
+      placeholder="Write here..."
+      rows={4}
+      minLength={10}
+      interactive
+    />
+  );
+}
+```
+
+## 变体
+
+```tsx
+import { Stack } from "../design-system/jsx";
+import { Textarea } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Stack gap="4">
+      <Textarea variant="outline" placeholder="Outline" />
+      <Textarea variant="surface" placeholder="Surface" />
+      <Textarea variant="subtle" placeholder="Subtle" />
+      <Textarea variant="flushed" placeholder="Flushed" />
+    </Stack>
+  );
+}
+```
+
+## 尺寸
+
+```tsx
+import { Stack } from "../design-system/jsx";
+import { Textarea } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Stack gap="4">
+      <Textarea size="xs" placeholder="Extra Small" />
+      <Textarea size="sm" placeholder="Small" />
+      <Textarea size="md" placeholder="Medium" />
+      <Textarea size="lg" placeholder="Large" />
+      <Textarea size="xl" placeholder="Extra Large" />
+    </Stack>
+  );
+}
+```
+
+## 在 Field 组件内部
+
+你也可以将其用于 `Field` 组件内部，以实现更复杂的布局。
+
+```tsx
+import { Field, Textarea } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Field label="Comments">
+      <Textarea placeholder="Leave a comment..." interactive />
+    </Field>
+  );
+}
+```
+
+## CMS 页面构建器
+
+该组件可作为 `textarea` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用：
+
+```json
+{
+  "type": "textarea",
+  "label": "Bio",
+  "helperText": "Tell us about yourself.",
+  "rows": 4
+}
+```
+
+# 属性
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `class` | `string` | 自定义 CSS 类。 |
+
+| `variant` | \`"outline" \ | "surface" \ | "subtle" \ | "flushed"\` | 文本域的视觉样式。 |
+
+| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg" \ | "xl"\` | 文本域的尺寸。 |
+
+| `resize` | \`"none" \ | "both" \ | "horizontal" \ | "vertical"\` | 文本域是否可调整大小。 |
+
+| `label` | `string` | 字段的标签（当作为独立 Field 使用时）。 |
+| `helperText` | `string` | 字段的辅助文本。 |
+| `errorText` | `string` | 字段的错误文本。 |
+| `value` | `string` | 当前值。 |
+| `defaultValue` | `string` | 初始值。 |
+| `onValueChange` | `(val: string) => void` | 值发生变化时触发的回调。 |
+| `onInput` | `(e: any) => void` | 输入变化时的事件处理器。 |
+| `rows` | `number` | 可见的文本行数。 |
+| `placeholder` | `string` | 提示文本。 |
+| `minLength` | `number` | 最小长度校验。 |
+
+| `validator` | \`(val: string) => boolean \ | string\` | 自定义校验逻辑。 |
+
+| `interactive` | `boolean` | 强制作为岛屿水合。 |

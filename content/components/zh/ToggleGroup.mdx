@@ -1,0 +1,134 @@
+---
+title: ToggleGroup 切换组
+hydration: 2
+category: Forms
+---
+
+import { ToggleGroup, Stack } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+一组用于单选或多选（互斥或包容）的切换按钮 —— 例如文本格式化控件（粗体/斜体/下划线）或视图切换器。
+
+# 水合
+
+**第二级 —— 智能自动检测。** `ToggleGroup` 默认渲染为静态 HTML，且不包含任何客户端 JS，除非存在行为信号。传入 `interactive={true}` 强制水合，或 `interactive={false}` 强制静态渲染。
+
+当存在以下**任一**信号（或设置了 `interactive={true}`）时，它会作为岛屿进行水合：
+
+- `value`（受控选择）
+- `defaultValue`（非受控初始选择）
+- `onValueChange`
+
+| `interactive` 属性 | 结果 |
+| --- | --- |
+| 未设置，**无** 信号 | 静态 —— 不加载客户端 JS |
+| 未设置，存在信号 | 作为岛屿水合 |
+| `true` | 作为岛屿水合 |
+| `false` | 静态 —— 不加载客户端 JS |
+
+# 用法
+
+<DemoPreview>
+  <Stack direction="horizontal" gap="6">
+    <ToggleGroup
+      multiple
+      defaultValue={["bold"]}
+      items={[
+        { label: "B", value: "bold" },
+        { label: "I", value: "italic" },
+        { label: "U", value: "underline" },
+      ]}
+      interactive
+    />
+    <ToggleGroup
+      defaultValue={["list"]}
+      items={[
+        { label: "Grid", value: "grid" },
+        { label: "List", value: "list" },
+      ]}
+      interactive
+    />
+  </Stack>
+</DemoPreview>
+
+```tsx
+import { ToggleGroup } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <ToggleGroup
+      multiple
+      defaultValue={["bold"]}
+      items={[
+        { label: "B", value: "bold" },
+        { label: "I", value: "italic" },
+        { label: "U", value: "underline" },
+      ]}
+    />
+  );
+}
+```
+
+## 自定义组合
+
+传入 `children` 而非 `items`，以完全控制每个按钮的内容：
+
+```tsx
+import { ToggleGroup } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <ToggleGroup defaultValue={["list"]}>
+      <ToggleGroup.Item value="grid">Grid</ToggleGroup.Item>
+      <ToggleGroup.Item value="list">List</ToggleGroup.Item>
+    </ToggleGroup>
+  );
+}
+```
+
+# 属性
+
+## 根组件
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `value` | `string[]` | 当前按下的取值（受控）。 |
+| `defaultValue` | `string[]` | 初始按下的取值（非受控）。 |
+| `onValueChange` | `(value: string[]) => void` | 选择发生变化时调用。 |
+| `multiple` | `boolean` | 允许同时按下多个项。默认 `false`（单选，可再次切换关闭）。 |
+| `disabled` | `boolean` | 禁用所有项。 |
+| `orientation` | `"horizontal" \| "vertical"` | 布局流向，以及方向键移动的轴向。默认 `"horizontal"`。 |
+| `id` | `string` | 根元素的 id。 |
+| `variant` | `"outline" \| "ghost"` | 视觉样式。默认 `"outline"`。 |
+| `size` | `"sm" \| "md" \| "lg"` | 视觉尺寸。默认 `"md"`。 |
+| `interactive` | `boolean` | 覆盖水合决策（见上文）。 |
+| `class` | `string` | 根元素的自定义 CSS 类。 |
+
+## 默认组合
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `items` | `ToggleGroupItem[]` | 当省略 `children` 时要渲染的按钮。 |
+
+## ToggleGroupItem
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `value` | `string` | 项的唯一取值。 |
+| `label` | `string \| JSX.Element` | 按钮的显示内容。 |
+| `disabled` | `boolean` | 禁用此按钮。 |
+
+## 子组件
+
+| 部分 | 说明 |
+| --- | --- |
+| `ToggleGroup.Item` | 一个切换按钮。需要 `value` 属性；在 `multiple` 模式下渲染 `role="checkbox"`，否则渲染 `role="radio"`。 |
+
+# 无障碍
+
+- 根元素具有 `role="group"`。
+- 项在 `multiple` 模式下渲染 `role="checkbox"` + `aria-pressed`，否则渲染 `role="radio"` + `aria-checked`。
+- 方向键（Right/Down 向前移动，Left/Up 向后移动）在可用项之间漫游焦点；Home/End 跳到第一个/最后一个可用项 —— 与 `orientation` 对应。
+- `data-state`（`on`/`off`）和 `data-disabled` 会镜像到每个项上，用于样式设置。

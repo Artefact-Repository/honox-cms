@@ -1,0 +1,206 @@
+---
+title: Layout Diseño
+hydration: 3
+category: Layout
+---
+
+import { Layout, Heading, Text, Stack } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introducción
+
+Anida un `<Layout>` dentro del `content` u otros hijos anidados de otro `<Layout>` para construir
+estructuras compuestas, por ejemplo: un Layout externo con un encabezado/pie de página y un
+Layout interno que aloja un riel de navegación lateral.
+
+# Uso
+
+## Encabezado + Contenido + Pie de página
+
+Sin `sider`, las partes se apilan en una sola columna.
+
+<DemoPreview>
+  <div style={{ width: "100%", border: "1px solid var(--colors-border)", borderRadius: "12px", overflow: "hidden" }}>
+    <Layout
+      header={
+        <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--colors-border)", background: "var(--colors-bg-subtle)" }}>
+          <Heading as="h4" size="sm">Header</Heading>
+        </div>
+      }
+      content={<div style={{ padding: "16px" }}><Text size="sm">Content</Text></div>}
+      footer={
+        <div style={{ padding: "12px 16px", borderTop: "1px solid var(--colors-border)", background: "var(--colors-bg-subtle)" }}>
+          <Text size="xs">Footer</Text>
+        </div>
+      }
+    />
+  </div>
+</DemoPreview>
+
+```tsx
+import { Layout } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Layout
+      header={<SiteHeader />}
+      content={<Article />}
+      footer={<SiteFooter />}
+    />
+  );
+}
+```
+
+## Encabezado + Barra lateral + Contenido
+
+Pasar `sider` lo envuelve junto con `content` en una fila. `siderWidth` selecciona el ancho del
+riel (`sm` 14rem, `md` 16rem por defecto, `lg` 18rem); `siderHideBelow` oculta el riel por debajo
+de un punto de quiebre para pantallas pequeñas.
+
+<DemoPreview>
+  <div style={{ width: "100%", border: "1px solid var(--colors-border)", borderRadius: "12px", overflow: "hidden" }}>
+    <Layout
+      siderWidth="sm"
+      header={
+        <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--colors-border)", background: "var(--colors-bg-subtle)" }}>
+          <Heading as="h4" size="sm">Dashboard</Heading>
+        </div>
+      }
+      sider={
+        <div style={{ padding: "16px", borderRight: "1px solid var(--colors-border)", background: "var(--colors-bg-subtle)" }}>
+          <Stack direction="vertical" gap="2">
+            <Text size="sm">Overview</Text>
+            <Text size="sm">Reports</Text>
+            <Text size="sm">Settings</Text>
+          </Stack>
+        </div>
+      }
+      content={<div style={{ padding: "16px" }}><Text size="sm">Content next to the sider</Text></div>}
+    />
+  </div>
+</DemoPreview>
+
+```tsx
+import { Layout } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Layout
+      header={<SiteHeader />}
+      sider={<Sidenav />}
+      siderWidth="sm"
+      siderHideBelow="md"
+      content={<Article />}
+    />
+  );
+}
+```
+
+## Encabezado y barra lateral fijos
+
+`stickyHeader` fija el encabezado en la parte superior del desplazamiento de la página.
+`stickySider` fija la barra lateral debajo de él y desplaza su propio contenido desbordante —
+útil para una navegación larga junto a un contenido corto, o viceversa. `fullHeight` ocupa todo
+el viewport para la estructura de página más externa.
+
+```tsx
+import { Layout } from "../components/ui";
+
+export default function DocsPage() {
+  return (
+    <Layout
+      fullHeight
+      stickyHeader
+      stickySider
+      header={<SiteHeader />}
+      sider={<DocsSidenav />}
+      siderHideBelow="md"
+      content={<Article />}
+    />
+  );
+}
+```
+
+## Layout anidado
+
+Anida un `<Layout>` dentro de `content` cuando el encabezado/pie de página abarcan todo el ancho
+pero solo una parte del cuerpo necesita un riel lateral:
+
+```tsx
+import { Layout } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Layout
+      header={<SiteHeader />}
+      content={
+        <Layout sider={<Sidenav />} content={<Article />} />
+      }
+      footer={<SiteFooter />}
+    />
+  );
+}
+```
+
+## Constructor de páginas del CMS
+
+Este componente está disponible como un bloque `layout` en el
+[Constructor de páginas](/docs/PageBuilder) (`content/pages/*.json`). `header`,
+`sider`, `content` y `footer` son cada uno una lista de bloques de componentes — cualquier tipo de
+bloque funciona, incluyendo otro `layout` para estructuras anidadas:
+
+```json
+{
+  "type": "layout",
+  "siderWidth": "sm",
+  "siderHideBelow": "md",
+  "header": [
+    { "type": "heading", "text": "Dashboard", "as": "h3", "size": "lg" }
+  ],
+  "sider": [
+    {
+      "type": "stack",
+      "direction": "vertical",
+      "gap": "2",
+      "children": [
+        { "type": "link", "text": "Overview", "href": "#" },
+        { "type": "link", "text": "Reports", "href": "#" }
+      ]
+    }
+  ],
+  "content": [
+    { "type": "text", "content": "Pick a page from the rail on the left." }
+  ],
+  "footer": [
+    { "type": "text", "size": "sm", "content": "© 2026 Acme" }
+  ]
+}
+```
+
+Dejar la lista de una parte vacía (u omitirla) omite por completo el elemento envolvente de esa
+parte — un campo opcional sin modificar como `siderWidth`/`siderHideBelow` llega como `""` desde
+el CMS y se trata como no establecido, recurriendo al valor por defecto del componente.
+
+# Propiedades
+
+## Layout
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `header` | \`string \| JSX.Element\` | Renderizado dentro de un `<header>` semántico encima del cuerpo. (Solo API abreviada) |
+| `sider` | \`string \| JSX.Element\` | Renderizado dentro de un riel `<aside>` semántico. Su presencia cambia el cuerpo a una fila de barra lateral + contenido. (Solo API abreviada) |
+| `content` | \`string \| JSX.Element\` | Renderizado dentro de un `<main>` semántico. `children` se añade después de él. (Solo API abreviada) |
+| `footer` | \`string \| JSX.Element\` | Renderizado dentro de un `<footer>` semántico debajo del cuerpo. (Solo API abreviada) |
+| `fullHeight` | `boolean` | Ocupa la altura del viewport — para la estructura de página más externa. |
+| `stickyHeader` | `boolean` | Fija el encabezado en la parte superior del desplazamiento de la página. |
+| `stickySider` | `boolean` | Fija la barra lateral debajo de un encabezado fijo; se desplaza internamente. |
+| `siderWidth` | \`"sm" \| "md" \| "lg"\` | Ancho del riel lateral: sm (14rem), md (16rem, por defecto), lg (18rem). |
+| `siderHideBelow` | \`"sm" \| "md" \| "lg"\` | Oculta la barra lateral por debajo de este punto de quiebre. Combínalo con un control de despliegue en el flujo. |
+| `hasSider` | `boolean` | Fuerza manualmente la dirección del layout a fila. (API compuesta) |
+| `headerClass` | `string` | Clase extra para la parte `<header>`. (Solo API abreviada) |
+| `siderClass` | `string` | Clase extra para la parte `<aside>`. (Solo API abreviada) |
+| `contentClass` | `string` | Clase extra para la parte `<main>`. (Solo API abreviada) |
+| `footerClass` | `string` | Clase extra para la parte `<footer>`. (Solo API abreviada) |
+| `bodyClass` | `string` | Clase extra para el contenedor de fila alrededor de barra lateral + contenido (solo se renderiza cuando se establece `sider`). |
+| `children` | `any` | Hijos a renderizar dentro de la estructura del layout. |
+| `class` | `string` | Clases CSS personalizadas para el elemento raíz. |

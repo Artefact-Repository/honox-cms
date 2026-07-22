@@ -1,0 +1,74 @@
+---
+title: HoverCard 悬浮卡片
+hydration: 1
+category: Overlays
+---
+
+import { HoverCard } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+一种在用户悬停于触发器上时出现的浮层，适用于显示补充信息。
+
+# 用法
+
+## 基础 HoverCard
+
+<DemoPreview>
+  <HoverCard
+    trigger={<a href="#">Hover me</a>}
+    title="Supplementary information"
+    description="Shown on hover, positioned automatically."
+    showArrow
+  />
+</DemoPreview>
+
+```tsx
+import { HoverCard } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <HoverCard.Root>
+      <HoverCard.Trigger>
+        <a href="#">Hover me</a>
+      </HoverCard.Trigger>
+      <HoverCard.Positioner>
+        <HoverCard.Content>
+          Supplementary information shown on hover.
+        </HoverCard.Content>
+      </HoverCard.Positioner>
+    </HoverCard.Root>
+  );
+}
+```
+
+## CMS 页面构建器
+
+该组件在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中作为 `hoverCard` 区块提供：
+
+```json
+{
+  "type": "hoverCard",
+  "triggerText": "Hover me",
+  "showArrow": true,
+  "title": "Supplementary information",
+  "description": "Shown on hover."
+}
+```
+
+# 属性
+
+## HoverCard
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `interactive` | `boolean` | 启用客户端水合。默认：`true`。 |
+| `open` | `boolean` | 受控的展开状态。 |
+| `openDelay` | `number` | 悬停后打开前的延迟（毫秒）。 |
+| `closeDelay` | `number` | 离开后关闭前的延迟（毫秒）。 |
+| `class` | `string` | 根元素的自定义 CSS 类名。 |
+
+# 子组件
+
+`HoverCard.Root`、`HoverCard.Trigger`、`HoverCard.Positioner`、`HoverCard.Content`、`HoverCard.Arrow`、`HoverCard.ArrowTip`

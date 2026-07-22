@@ -1,0 +1,85 @@
+---
+title: Popover 气泡卡片
+hydration: 1
+category: Overlays
+---
+
+import { Popover, Button } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+一个交互式元素，在锚点之上的一层中显示额外内容。
+
+# 用法
+
+<DemoPreview>
+  <Popover
+    placement="right"
+    trigger={<Button>Open Popover</Button>}
+    title="Title"
+    description="Description"
+    body="Popover Body"
+  />
+</DemoPreview>
+
+```tsx
+import { Popover } from "../components/ui/popover";
+import { Button } from "../components/ui/button";
+
+<Popover
+  placement="right"
+  trigger={<Button>Open Popover</Button>}
+  title="Title"
+  description="Description"
+  body="Popover Body"
+/>;
+```
+
+## CMS 页面构建器
+
+该组件可作为 `popover` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用：
+
+```json
+{
+  "type": "popover",
+  "triggerText": "Open Popover",
+  "title": "Title",
+  "description": "Description",
+  "body": "Popover Body"
+}
+```
+
+# 属性
+
+## Root
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `children` | `any` | Popover 子组件。 |
+| `open` | `boolean` | Popover 是否打开（受控）。 |
+| `defaultOpen` | `boolean` | 初始打开状态（非受控）。默认 `false`。 |
+| `onOpenChange` | `(details: { open: boolean }) => void` | Popover 打开或关闭时调用。 |
+
+| `placement` | \`"top" \ | "bottom" \ | "left" \ | "right"\` | 内容在触发元素的哪一侧打开。默认 `"bottom"`。若视口空间不足，会自动翻转到相反一侧。 |
+
+| `interactive` | `boolean` | 强制作为岛屿水合。默认 `true`。 |
+| `id` | `string` | Popover 的唯一标识符。 |
+| `closeOnEscape` | `boolean` | 按下 Escape 时关闭。默认 `true`。 |
+| `closeOnInteractOutside` | `boolean` | 在外部发生指针交互，或焦点离开 Popover 时关闭。默认 `true`。 |
+| `onClose` | `() => void` | Popover 关闭时触发的回调。 |
+| `onToggle` | `() => void` | Popover 切换时触发的回调。 |
+
+## Trigger
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `asChild` | `boolean` | 是否将属性合并到直接子元素上。 |
+
+# 限制
+
+交互式岛屿会相对于其触发元素定位并调整 Popover 的大小：当请求的 placement 会溢出视口时，它会翻转到相反一侧（例如 `bottom` → `top`），并对交叉轴进行裁剪，使内容永远不会渲染到屏幕之外。它不会像 Floating UI 那样跟踪滚动容器或 resize 观察器 —— 重新定位仅在 Popover 打开时窗口 `resize` 时重新运行，并且（由于定位器通过 `position: absolute` 锚定到触发元素自身的包裹元素）滚动页面时会随触发元素一起移动。
+
+支持将一个 Popover 的触发元素嵌套到另一个 Popover 的内容中（点击委托按每个 Popover 实例划分作用域），但不支持将 Popover 嵌套到 Tooltip 的触发元素中，反之亦然 —— 这两个组件不会跨组件类型协调 `data-part` 的所有权。
+
+`_closed` 退出动画（`scale-fade-out`）会在 Popover 真正从布局中移除之前播放 —— 关闭不会使其立即隐藏。

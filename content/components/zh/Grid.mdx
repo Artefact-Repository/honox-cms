@@ -1,0 +1,133 @@
+---
+title: Grid 网格
+hydration: 3
+category: Layout
+---
+
+import { Grid } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+一个响应式的 CSS Grid 布局原语。既可以用显式的列/行数量来排列子元素，也可以让它们基于最小子元素宽度自动适配——两种都支持响应式（按断点）取值。
+
+# 用法
+
+## 固定列数
+
+<DemoPreview>
+  <Grid columns={3} gap="4" style={{ width: "100%" }}>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-blue-3)", borderRadius: "8px" }}>1</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-blue-3)", borderRadius: "8px" }}>2</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-blue-3)", borderRadius: "8px" }}>3</div>
+  </Grid>
+</DemoPreview>
+
+```tsx
+import { Grid } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Grid columns={3} gap="4">
+      <div>1</div>
+      <div>2</div>
+      <div>3</div>
+    </Grid>
+  );
+}
+```
+
+## 按最小子元素宽度自动适配
+
+无需断点——随着容器尺寸变化，列会自动增减。
+
+<DemoPreview>
+  <Grid minChildWidth="120px" gap="4" style={{ width: "100%" }}>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>A</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>B</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>C</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>D</div>
+  </Grid>
+</DemoPreview>
+
+```tsx
+import { Grid } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Grid minChildWidth="120px" gap="4">
+      <div>A</div>
+      <div>B</div>
+      <div>C</div>
+      <div>D</div>
+    </Grid>
+  );
+}
+```
+
+## 响应式列数
+
+```tsx
+import { Grid } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Grid columns={{ base: 1, md: 2, lg: 3 }} gap="4">
+      <div>1</div>
+      <div>2</div>
+      <div>3</div>
+    </Grid>
+  );
+}
+```
+
+## 独立的列间距与行间距
+
+```tsx
+import { Grid } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Grid columns={2} columnGap="6" rowGap="2">
+      <div>1</div>
+      <div>2</div>
+      <div>3</div>
+      <div>4</div>
+    </Grid>
+  );
+}
+```
+
+## CMS 页面构建器
+
+该组件在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中作为 `grid` 区块提供：
+
+```json
+{
+  "type": "grid",
+  "columns": 3,
+  "gap": "4",
+  "children": [
+    { "type": "text", "content": "1" },
+    { "type": "text", "content": "2" },
+    { "type": "text", "content": "3" }
+  ]
+}
+```
+
+# 属性
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `children` | `any` | 网格内部要渲染的内容。 |
+| `class` | `string` | 自定义 CSS 类名。 |
+
+| `columns` | \`Responsive\<number \ | string\>\` | 列数（`repeat(columns, minmax(0, 1fr))`）。若同时设置了 `minChildWidth`，则本属性优先。 |
+| `rows` | \`Responsive\<number \ | string\>\` | 行数（`repeat(rows, minmax(0, 1fr))`）。 |
+| `minChildWidth` | \`Responsive\<number \ | string\>\` | 自动适配尽可能多的列，每列至少此宽（`repeat(auto-fit, minmax(width, 1fr))`）。设置了 `columns` 时忽略。 |
+
+| `gap` | \`string \ | number \ | Responsive\<...\>\` | 单元格之间的间距。除非设置了 `columnGap`/`rowGap`，否则默认 `"8px"`。 |
+| `columnGap` | \`string \ | number \ | Responsive\<...\>\` | 仅列之间的间距。 |
+| `rowGap` | \`string \ | number \ | Responsive\<...\>\` | 仅行之间的间距。 |
+
+`Responsive<T>` 接受纯值或按断点的对象，例如 `{ base: 1, md: 2, lg: 3 }`，使用与设计系统其余部分相同的断点（`base`、`sm`、`md`、`lg`、`xl`、`2xl`）。

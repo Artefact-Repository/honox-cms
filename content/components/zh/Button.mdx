@@ -1,0 +1,146 @@
+---
+title: Button 按钮
+hydration: 2
+category: Forms
+---
+
+import { Button, ButtonGroup } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+一个可点击的组件，用于触发操作和用户交互。包含用于图标和按钮组的变体。
+
+# 用法
+
+## 基础按钮
+
+<DemoPreview>
+  <Button variant="solid" colorPalette="blue">Click me</Button>
+  <Button variant="outline" colorPalette="blue">Click me</Button>
+  <Button variant="subtle" colorPalette="blue">Click me</Button>
+  <Button variant="surface" colorPalette="blue">Click me</Button>
+  <Button variant="plain" colorPalette="blue">Click me</Button>
+</DemoPreview>
+
+```tsx
+import { Button } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Button variant="solid" colorPalette="blue">
+      Click me
+    </Button>
+  );
+}
+```
+
+## 加载状态
+
+<DemoPreview>
+  <Button loading loadingText="Saving...">Save</Button>
+</DemoPreview>
+
+```tsx
+import { Button } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Button loading loadingText="Saving...">
+      Save
+    </Button>
+  );
+}
+```
+
+## IconButton
+
+为图标优化的按钮。
+
+```tsx
+import { IconButton } from "../components/ui";
+import { SearchIcon } from "./icons";
+
+export default function MyPage() {
+  return (
+    <IconButton aria-label="Search">
+      <SearchIcon />
+    </IconButton>
+  );
+}
+```
+
+## CloseButton
+
+一个用于关闭元素的预样式按钮。
+
+```tsx
+import { CloseButton } from "../components/ui";
+
+export default function MyPage() {
+  return <CloseButton onClick={() => console.log("closed")} interactive />;
+}
+```
+
+## ButtonGroup
+
+<DemoPreview>
+  <ButtonGroup attached>
+    <Button>First</Button>
+    <Button>Second</Button>
+  </ButtonGroup>
+</DemoPreview>
+
+```tsx
+import { Button, ButtonGroup } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <ButtonGroup attached>
+      <Button>First</Button>
+      <Button>Second</Button>
+    </ButtonGroup>
+  );
+}
+```
+
+## CMS 页面构建器
+
+该组件在 [页面构建器](/docs/PageBuilder) (`content/pages/*.json`) 中作为 `button` 区块提供：
+
+```json
+{
+  "type": "button",
+  "text": "Click me",
+  "variant": "solid",
+  "colorPalette": "blue"
+}
+```
+
+# 属性
+
+## Button
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `children` | `any` | 组件内部渲染的内容。 |
+| `class` | `string` | 自定义 CSS 类。 |
+
+| `variant` | \`"solid" \ | "surface" \ | "subtle" \ | "outline" \ | "plain"\` | 按钮的视觉样式。 |
+
+| `size` | \`"2xs" \ | "xs" \ | "sm" \ | "md" \ | "lg" \ | "xl" \ | "2xl"\` | 按钮的尺寸。 |
+
+| `loading` | `boolean` | 如果为 `true`，按钮将显示加载 spinner。 |
+| `loadingText` | `string` | 加载时显示的文本。 |
+
+| `type` | \`"button" \ | "submit" \ | "reset"\` | HTML 按钮类型。 |
+
+| `colorPalette` | `string` | 按钮的色彩主题。 |
+| `interactive` | `boolean` | 是否启用客户端水合。 |
+
+## ButtonGroup
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `children` | `any` | 要分组的按钮。 |
+| `attached` | `boolean` | 是否将按钮连接在一起。 |

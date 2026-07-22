@@ -55,13 +55,25 @@ export interface DocsConfig {
 
 const EMPTY_DOCS_CONFIG: DocsConfig = { groups: [] };
 
-const docsConfigModule = import.meta.glob("/content/configs.json", {
-	import: "default",
-}) as Record<string, () => Promise<DocsConfig>>;
+// Singleton i18n uses the `{{locale}}` file-path placeholder (see the
+// `configs` entry in public/admin/config.yml), not the `structure` option —
+// that only applies to folder-based entry collections. Resolves to
+// content/configs.json (en, default) and content/configs.zh.json /
+// content/configs.es.json (translations).
+const docsConfigModule = import.meta.glob(
+	["/content/configs.json", "/content/configs.*.json"],
+	{ import: "default" },
+) as Record<string, () => Promise<DocsConfig>>;
 
-/** Loads the DocsConfig singleton that drives the docs sidenav's grouping. */
-export async function loadDocsConfig(): Promise<DocsConfig> {
-	const loader = docsConfigModule["/content/configs.json"];
+/** Loads the DocsConfig singleton that drives the docs sidenav's grouping.
+ * Falls back to the English default if the requested locale has no
+ * translated configs.<locale>.json yet. */
+export async function loadDocsConfig(locale = "en"): Promise<DocsConfig> {
+	const path =
+		locale === "en"
+			? "/content/configs.json"
+			: `/content/configs.${locale}.json`;
+	const loader = docsConfigModule[path] ?? docsConfigModule["/content/configs.json"];
 	if (!loader) return EMPTY_DOCS_CONFIG;
 	return loader();
 }

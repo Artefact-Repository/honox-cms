@@ -1,0 +1,52 @@
+---
+title: Code Código
+hydration: 3
+category: Typography
+---
+
+import { Code, Stack } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introducción
+
+Un elemento `<code>` en línea para fragmentos cortos de código o texto monoespaciado dentro de una línea de texto.
+
+# Uso
+
+<DemoPreview>
+  <Stack direction="horizontal" gap="4" align="center">
+    <Code>npm install</Code>
+    <Code variant="solid" colorPalette="blue">
+      const x = 5;
+    </Code>
+    <Code variant="outline" size="lg">
+      GET /api/users
+    </Code>
+  </Stack>
+</DemoPreview>
+
+```tsx
+import { Code } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <p>
+      Run <Code>npm install</Code> to install dependencies.
+    </p>
+  );
+}
+```
+
+# Propiedades
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `children` | `Child` | El contenido del código. |
+| `variant` | `"solid" \| "surface" \| "subtle" \| "outline" \| "plain"` | Estilo visual. Por defecto `"subtle"`. |
+| `size` | `"sm" \| "md" \| "lg" \| "xl"` | Tamaño de fuente/padding. Por defecto `"md"`. |
+| `colorPalette` | `"blue" \| "green" \| "red" \| "purple" \| "orange" \| "cyan" \| "yellow" \| "pink" \| "teal" \| "indigo" \| "gray" \| "success" \| "error" \| "warning"` | El tema de color. |
+| `class` | `string` | Clases CSS personalizadas. |
+
+# Accesibilidad
+
+`Code` renderiza un elemento `<code>` nativo, por lo que los lectores de pantalla lo anuncian como contenido de código sin necesidad de cableado ARIA adicional. Para bloques de código de varias líneas, envuélvelo tú mismo en un `<pre>` — `Code` solo estiliza el caso en línea.

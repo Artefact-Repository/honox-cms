@@ -1,0 +1,87 @@
+---
+title: Progress 进度条
+hydration: 3
+category: Feedback
+---
+
+import { Progress } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+一个以线性条或圆形指示器展示操作完成进度的组件。
+
+# 用法
+
+## 线性进度
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <Progress value={72} showValueText />
+  </div>
+</DemoPreview>
+
+```tsx
+import { Progress } from "../components/ui";
+
+export default function MyPage() {
+  return <Progress value={72} showValueText />;
+}
+```
+
+## 圆形进度
+
+<DemoPreview>
+  <Progress type="circular" value={40} showValueText />
+</DemoPreview>
+
+```tsx
+import { Progress } from "../components/ui";
+
+export default function MyPage() {
+  return <Progress type="circular" value={40} showValueText />;
+}
+```
+
+## CMS 页面构建器
+
+该组件可作为 `progress` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用：
+
+```json
+{
+  "type": "progress",
+  "value": 72,
+  "showValueText": true
+}
+```
+
+# 属性
+
+## Progress
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+
+| `value` | \`number \ | null\` | 当前值。 |
+
+| `min` | `number` | 最小值。默认：`0`。 |
+| `max` | `number` | 最大值。默认：`100`。 |
+| `label` | `Child` | 显示在指示器上方的标签。 |
+| `showValueText` | `boolean` | 是否显示数值文本。默认：`false`。 |
+| `valueText` | `Child` | 用于显示的自定义数值文本。 |
+
+| `type` | \`"linear" \ | "circular"\` | 进度的视觉样式。默认：`"linear"`。 |
+| `variant` | \`"solid" \ | "subtle"\` | 视觉变体。 |
+
+| `shape` | \`"square" \ | "rounded" \ | "full"\` | 指示器的形状。 |
+
+| `striped` | `boolean` | 是否显示条纹填充（线性）。 |
+| `animated` | `boolean` | 填充是否带动画。 |
+
+| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg" \ | "xl"\` | 指示器的尺寸。 |
+
+| `class` | `string` | 根元素的自定义 CSS 类。 |
+
+# 子组件
+
+`Progress.Root`, `Progress.Track`, `Progress.Range`, `Progress.Circle`, `Progress.CircleTrack`, `Progress.CircleRange`, `Progress.Label`, `Progress.ValueText`, `Progress.View`

@@ -1,0 +1,48 @@
+---
+title: Spinner 加载中
+hydration: 3
+category: Feedback
+---
+
+import { Spinner } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+用于指示加载状态的组件。
+
+# 用法
+
+<DemoPreview>
+  <Spinner size="md" label="Loading..." />
+</DemoPreview>
+
+```tsx
+import { Spinner } from "../components/ui";
+
+export default function MyPage() {
+  return <Spinner size="md" label="Loading..." />;
+}
+```
+
+## CMS 页面构建器
+
+该组件可作为 `spinner` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用：
+
+```json
+{
+  "type": "spinner",
+  "size": "lg",
+  "label": "Loading"
+}
+```
+
+# 属性
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `class` | `string` | 自定义 CSS 类。 |
+
+| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg" \ | "xl" \ | "2xl" \ | "inherit"\` | 加载指示器的尺寸。 |
+
+| `label` | `string` | 供屏幕阅读器使用的无障碍标签。 |

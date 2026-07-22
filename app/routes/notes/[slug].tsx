@@ -29,7 +29,15 @@ export default createRoute(
 
 	async (c) => {
 		const slug = c.req.param("slug");
-		const note = await loadNoteBySlug(slug);
+		const currentPath = c.req.path;
+		let currentLocale = "en";
+		if (currentPath.startsWith("/zh")) {
+			currentLocale = "zh";
+		} else if (currentPath.startsWith("/es")) {
+			currentLocale = "es";
+		}
+
+		const note = await loadNoteBySlug(slug, currentLocale);
 
 		if (!note) {
 			return c.notFound();
@@ -37,9 +45,22 @@ export default createRoute(
 
 		const accentPalette = note.color === "default" ? "gray" : note.color;
 
+		const localizeLink = (href: string) => {
+			if (
+				currentLocale !== "en" &&
+				!href.startsWith(`/${currentLocale}`) &&
+				href.startsWith("/")
+			) {
+				return `/${currentLocale}${href}`;
+			}
+			return href;
+		};
+
 		return c.render(
 			<div class={css({ minHeight: "100vh", bg: "bg.subtle" })}>
-				<title>{note.title} - Notes</title>
+				<title>
+					{note.title} - {currentLocale === "zh" ? "笔记" : "Notes"}
+				</title>
 
 				<section
 					class={css({
@@ -56,7 +77,7 @@ export default createRoute(
 						class={css({ mb: "8" })}
 					>
 						<a
-							href="/notes"
+							href={localizeLink("/notes")}
 							class={css({
 								display: "inline-flex",
 								alignItems: "center",
@@ -76,7 +97,7 @@ export default createRoute(
 							})}
 						>
 							<ArrowLeftIcon width="20" height="20" />
-							Back to Notes
+							{currentLocale === "zh" ? "返回笔记" : "Back to Notes"}
 						</a>
 
 						<a
@@ -100,7 +121,7 @@ export default createRoute(
 							})}
 						>
 							<EditIcon width="18" height="18" />
-							Edit Note
+							{currentLocale === "zh" ? "编辑笔记" : "Edit Note"}
 						</a>
 					</Stack>
 
@@ -161,12 +182,15 @@ export default createRoute(
 
 						{note.updated && (
 							<Text size="sm" class={css({ color: "fg.muted", mb: "6" })}>
-								Last updated{" "}
-								{new Date(note.updated).toLocaleDateString("en-US", {
-									month: "long",
-									day: "numeric",
-									year: "numeric",
-								})}
+								{currentLocale === "zh" ? "最后更新时间 " : "Last updated "}
+								{new Date(note.updated).toLocaleDateString(
+									currentLocale === "zh" ? "zh-CN" : "en-US",
+									{
+										month: "long",
+										day: "numeric",
+										year: "numeric",
+									},
+								)}
 							</Text>
 						)}
 

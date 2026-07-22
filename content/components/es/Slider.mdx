@@ -1,0 +1,119 @@
+---
+title: Slider Control Deslizante
+hydration: 2
+category: Forms
+---
+
+import { Slider } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introducción
+
+Un control que permite al usuario seleccionar un valor (o un rango de valores) de una escala continua.
+
+# Uso
+
+## Slider básico
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "280px" }}>
+    <Slider
+      label="Volume"
+      defaultValue={30}
+      min={0}
+      max={100}
+      showValueText
+      interactive
+    />
+  </div>
+</DemoPreview>
+
+```tsx
+import { Slider } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Slider
+      label="Volume"
+      defaultValue={30}
+      min={0}
+      max={100}
+      showValueText
+      interactive
+    />
+  );
+}
+```
+
+## Con marcas
+
+```tsx
+import { Slider } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Slider
+      defaultValue={50}
+      marks={[
+        { value: 0, label: "0" },
+        { value: 50, label: "50" },
+        { value: 100, label: "100" },
+      ]}
+      interactive
+    />
+  );
+}
+```
+
+## Constructor de páginas CMS
+
+Este componente está disponible como un bloque `slider` en el [Constructor de páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "slider",
+  "label": "Volume",
+  "defaultValue": 30,
+  "min": 0,
+  "max": 100,
+  "showValueText": true
+}
+```
+
+# Propiedades
+
+| Prop | Type | Description |
+| --- | --- | --- |
+
+| `value` | \`number \ | number[]\` | El valor o valores actuales (controlado). |
+| `defaultValue` | \`number \ | number[]\` | El valor o valores iniciales (no controlado). |
+
+| `min` | `number` | El valor mínimo. |
+| `max` | `number` | El valor máximo. |
+| `step` | `number` | El incremento del paso. |
+| `onChange` | `(details: { value: number[] }) => void` | Callback activado cuando el valor cambia. |
+| `onDraggingChange` | `(details: { dragging: boolean }) => void` | Callback activado cuando cambia el estado de arrastre. |
+
+| `label` | \`string \ | JSX.Element\` | Etiqueta mostrada encima del slider. |
+
+| `showValueText` | `boolean` | Si se debe mostrar el texto del valor actual. |
+| `formatValue` | `(value: number) => string` | Formateador personalizado para el texto del valor. |
+
+| `marks` | \`\{ value: number; label: string \ | JSX.Element \}[]\` | Marcas de graduación a mostrar a lo largo de la pista. |
+| `orientation` | \`"horizontal" \ | "vertical"\` | La orientación del slider. |
+
+| `height` | `string` | Altura (obligatoria para la orientación vertical). |
+| `disabled` | `boolean` | Si el slider está deshabilitado. |
+| `readOnly` | `boolean` | Si el slider es de solo lectura. |
+| `interactive` | `boolean` | Habilita la interactividad del lado del cliente. |
+
+| `size` | \`"sm" \ | "md" \ | "lg"\` | El tamaño del slider. |
+
+| `colorPalette` | `string` | El tema de color del slider. |
+| `class` | `string` | Clases CSS personalizadas para el elemento raíz. |
+| `trackClass` | `string` | Clases CSS personalizadas para la pista. |
+| `rangeClass` | `string` | Clases CSS personalizadas para el rango. |
+| `thumbClass` | `string` | Clases CSS personalizadas para el control deslizante. |
+| `labelClass` | `string` | Clases CSS personalizadas para la etiqueta. |
+| `valueTextClass` | `string` | Clases CSS personalizadas para el texto del valor. |
+| `markClass` | `string` | Clases CSS personalizadas para las marcas. |

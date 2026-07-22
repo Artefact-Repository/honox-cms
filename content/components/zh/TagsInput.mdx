@@ -1,0 +1,52 @@
+---
+title: TagsInput 标签输入框
+hydration: 2
+category: Forms
+---
+
+import { TagsInput } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+允许用户以列表形式输入多个标签的组件。
+
+## 用法
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <TagsInput label="Skills" defaultValue={["React", "Hono"]} />
+  </div>
+</DemoPreview>
+
+### CMS 页面构建器
+
+该组件可作为 `tagsInput` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用：
+
+```json
+{
+  "type": "tagsInput",
+  "label": "Amenities",
+  "defaultValue": ["WiFi", "Fireplace", "Hot Tub"]
+}
+```
+
+## 属性
+
+| 属性 | 类型 | 默认 | 说明 |
+| --- | --- | --- | --- |
+| `value` | `string[]` | - | 当前标签。 |
+| `defaultValue` | `string[]` | - | 初始标签。 |
+
+## CMS 配置
+
+```yaml
+- label: TagsInput
+  name: tagsInput
+  widget: object
+  fields:
+    - { label: Label, name: label, widget: string, required: false }
+    - { label: Default Tags, name: defaultValue, widget: list, required: false }
+```
+
+## 水合
+
+第二级：当存在 `value`、`defaultValue`、`onValueChange` 或输入状态时进行水合。

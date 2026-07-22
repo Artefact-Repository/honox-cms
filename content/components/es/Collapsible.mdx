@@ -1,0 +1,101 @@
+---
+title: Collapsible Panel Plegable
+hydration: 1
+category: Overlays
+---
+
+import { Collapsible } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introducción
+
+Un componente interactivo que puede expandirse o colapsarse para mostrar u ocultar contenido.
+
+# Uso
+
+## Collapsible básico
+
+<DemoPreview>
+  <Collapsible
+    trigger="Show more"
+    content={<p>Additional details go here.</p>}
+    defaultOpen
+  />
+</DemoPreview>
+
+```tsx
+import { Collapsible } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Collapsible
+      trigger="Show more"
+      content={<p>Additional details go here.</p>}
+      defaultOpen
+    />
+  );
+}
+```
+
+## Con indicador y estado controlado
+
+```tsx
+import { Collapsible } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Collapsible
+      trigger="Details"
+      content={<p>Content revealed on toggle.</p>}
+      indicatorPlacement="start"
+      onOpenChange={(open) => console.log("open:", open)}
+    />
+  );
+}
+```
+
+## Constructor de Páginas CMS
+
+Este componente está disponible como un bloque `collapsible` en el [Constructor de Páginas](/docs/PageBuilder) (`content/pages/*.json`). `trigger` es una lista de bloques anidada (el CMS siempre envía un arreglo, incluso para un único elemento disparador):
+
+```json
+{
+  "type": "collapsible",
+  "trigger": [{ "type": "button", "text": "Show more" }],
+  "showIndicator": true,
+  "children": [
+    { "type": "text", "content": "Additional details go here." }
+  ]
+}
+```
+
+# Propiedades
+
+| Prop | Type | Description |
+| --- | --- | --- |
+
+| `trigger` | \`JSX.Element \ | string\` | El elemento disparador o cadena. Una cadena se envuelve en un botón. |
+
+| `content` | `JSX.Element` | El contenido que se mostrará u ocultará. |
+| `indicator` | `JSX.Element` | Elemento indicador opcional (por ejemplo, un chevron). |
+
+| `indicatorPlacement` | \`"start" \ | "end"\` | Dónde colocar el indicador en relación con el disparador. Por defecto: `"end"`. |
+
+| `open` | `boolean` | Si el collapsible está abierto (controlado). |
+| `defaultOpen` | `boolean` | Si el collapsible está abierto por defecto (no controlado). |
+| `onOpenChange` | `(open: boolean) => void` | Callback para cuando cambia el estado de apertura. |
+| `disabled` | `boolean` | Si el collapsible está deshabilitado. |
+| `interactive` | `boolean` | Habilita la interactividad del lado del cliente. Collapsible es **Nivel 1 (auto-interactivo)**: siempre se hidrata como isla a menos que pases `interactive={false}`. |
+| `class` | `string` | Nombre de clase del elemento raíz. |
+| `triggerClass` | `string` | Nombre de clase del elemento disparador. |
+| `contentClass` | `string` | Nombre de clase del elemento de contenido. |
+| `indicatorClass` | `string` | Nombre de clase del elemento indicador. |
+| `id` | `string` | ID para el collapsible. |
+
+# Hidratación
+
+Collapsible se clasifica como **Nivel 1 (auto-interactivo)**.
+
+- Siempre se renderiza como una isla del cliente hidratada (necesita JS para expandir/colapsar y para ejecutar `onOpenChange`).
+- La única forma de excluirse de la hidratación es pasar `interactive={false}`, en cuyo caso renderiza el marcado estático `*-primitive` sin el comportamiento de alternancia.
+- Esto se implementa mediante el predicado compartido `shouldHydrate(interactive, true)` en `app/components/ui/island-utils.ts`, la única fuente de verdad para todas las decisiones de hidratación.

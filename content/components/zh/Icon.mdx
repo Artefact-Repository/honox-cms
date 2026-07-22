@@ -1,0 +1,104 @@
+---
+title: Icon 图标
+hydration: 3
+category: Data Display
+---
+
+import { Icon } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+一个轻量级、可感知尺寸与颜色的 SVG 图标封装组件。它应用一致的尺寸（`2xs`–`xl`），并继承 `currentcolor`，使图标默认与周围文字/图标颜色保持一致，且无需依赖任何图标库。
+
+`Icon` 通过两种方式组合，由其 `children` 自动决定：
+
+- **Wrap（包裹）** —— 如果 `children` 是裸 SVG 内容（`<path>`、`<circle>`、`<g>` 等）、文本，或多个元素，`Icon` 会在其外层渲染自己的 `<svg>`。
+- **Merge（`asChild`，默认 `true`）** —— 如果 `children` 是单个非裸 SVG 内容的元素（例如手写的 `<svg>…</svg>`），`Icon` 会将其 class（以及传入的其他属性）直接合并到该元素上，而不是用第二层 `<svg>` 包裹它。传入 `asChild={false}` 可强制包裹，即使在此情况下也是如此。
+
+# 用法
+
+## 裸 SVG 路径（无需图标库）
+
+<DemoPreview>
+  <Icon size="lg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    <path d="M12 2 2 7l10 5 10-5-10-5z" />
+  </Icon>
+</DemoPreview>
+
+```tsx
+import { Icon } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Icon size="lg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path d="M12 2 2 7l10 5 10-5-10-5z" />
+    </Icon>
+  );
+}
+```
+
+## 与手写的 `<svg>` 组合（`asChild`，默认）
+
+```tsx
+import { Icon } from "../components/ui";
+
+function HeartSvg(props: { class?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <path d="M12 21s-6.7-4.35-9.3-8.1C.8 9.7 2 6 5.4 6c1.9 0 3.2 1 4.6 2.6C11.4 7 12.7 6 14.6 6 18 6 19.2 9.7 17.3 12.9 14.7 16.65 12 21 12 21z" />
+    </svg>
+  );
+}
+
+export default function MyPage() {
+  return (
+    <span style={{ color: "red" }}>
+      <Icon size="sm">
+        <HeartSvg />
+      </Icon>
+    </span>
+  );
+}
+```
+
+该 `icon` class（及尺寸）会被合并到 `HeartSvg` 返回的 `<svg>` 上，因此渲染后的标记中不会有多余的包裹元素。由于图标配方设置了 `color: currentcolor`，只要其路径使用 `fill="currentColor"` 或 `stroke="currentColor"`，图标就会采用周围文字的颜色（此处为 `red`）。
+
+## 带标签的（非装饰性）图标
+
+```tsx
+<Icon aria-label="Search" viewBox="0 0 24 24">
+  <path d="M10 2a8 8 0 105.3 14.03l4.34 4.34 1.42-1.42-4.34-4.34A8 8 0 0010 2z" />
+</Icon>
+```
+
+## CMS 页面构建器
+
+该组件可作为 `icon` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用 —— `svg` 保存原始的 SVG 内部标记：
+
+```json
+{
+  "type": "icon",
+  "svg": "<path d=\"M12 2 2 7l10 5 10-5-10-5z\" />",
+  "viewBox": "0 0 24 24",
+  "size": "lg"
+}
+```
+
+# 属性
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `children` | `Child` | SVG 内容（`<path>` 等），或用于渲染/合并的单个类 SVG 元素。 |
+| `class` | `string` | 自定义 CSS 类。 |
+
+| `size` | \`"2xs" \ | "xs" \ | "sm" \ | "md" \ | "lg" \ | "xl"\` | 图标的尺寸。默认 `"md"`。 |
+
+| `asChild` | `boolean` | 将属性合并到单个子元素上，而不是用新的 `<svg>` 包裹它。默认 `true`。 |
+| `viewBox` | `string` | 透传到渲染/合并后的 `<svg>`。 |
+| `xmlns` | `string` | 透传到生成的 `<svg>` 包裹元素。默认为 SVG 命名空间。 |
+| `fill` | `string` | 透传到渲染/合并后的 `<svg>`。 |
+| `stroke` | `string` | 透传到渲染/合并后的 `<svg>`。 |
+| `aria-label` | `string` | 无障碍标签。提供后，`aria-hidden` 会被省略。 |
+
+| `aria-hidden` | \`boolean \ | "true" \ | "false"\` | 未提供 `aria-label` 时默认为 `"true"`（图标默认是装饰性的）。 |

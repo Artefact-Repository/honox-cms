@@ -1,0 +1,179 @@
+---
+title: FileUpload 文件上传
+hydration: 2
+category: Forms
+---
+
+import { FileUpload } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+用于选择一个或多个文件的拖放区与文件选择器，支持拖拽、客户端校验（类型/大小/数量）以及实时预览列表——所有这些都构建于原生 `<input type="file">` 之上的、等价于 Ark UI 的各部件，因此即使禁用 JavaScript 表单仍可工作。
+
+# 用法
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "360px" }}>
+    <FileUpload
+      label="Upload Images"
+      name="images"
+      accept="image/*"
+      maxFiles={2}
+      dropzoneText="Drag and drop or browse files"
+      interactive
+    />
+  </div>
+</DemoPreview>
+
+```tsx
+import { FileUpload } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <FileUpload
+      label="Upload Images"
+      name="images"
+      accept="image/*"
+      maxFiles={2}
+      dropzoneText="Drag and drop or browse files"
+    />
+  );
+}
+```
+
+## 自定义组合
+
+默认组合（`label` + `dropzoneText` + `triggerText` 属性）覆盖了常见场景。传入显式的 `children` 以完全控制布局——可替换使用下面任意一部分部件：
+
+```tsx
+import { FileUpload } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <FileUpload name="attachments" maxFiles={5} accept="image/*,.pdf">
+      <FileUpload.Label>Attachments</FileUpload.Label>
+      <FileUpload.Dropzone>
+        <span>Drop files here, or</span>
+        <FileUpload.Trigger>browse</FileUpload.Trigger>
+      </FileUpload.Dropzone>
+      <FileUpload.List showSize clearable />
+      <FileUpload.ClearTrigger>Clear all</FileUpload.ClearTrigger>
+      <FileUpload.HiddenInput />
+    </FileUpload>
+  );
+}
+```
+
+## CMS 页面构建器
+
+该组件在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中作为 `file-upload`（别名 `fileUpload`）区块提供：
+
+```json
+{
+  "type": "file-upload",
+  "label": "Resume",
+  "name": "resume",
+  "accept": ".pdf,.docx",
+  "maxFiles": 1,
+  "maxFileSize": 5242880,
+  "dropzoneText": "Drag your file(s) here",
+  "triggerText": "Open file picker",
+  "showSize": true,
+  "clearable": true
+}
+```
+
+`maxFiles` 和 `maxFileSize` 会被渲染器从字符串强制转换为数字；所有其他字段都直接透传给 `FileUpload`。它在页面构建器中始终以 `interactive` 渲染。
+
+# 属性
+
+## Root
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `accept` | `string \| string[] \| Record<string, string[]>` | 接受的文件类型——MIME 字符串、列表，或 MIME→扩展名记录。会被规范化为原生 `accept` 属性。 |
+| `allowDrop` | `boolean` | 是否允许在拖放区内拖拽。默认 `true`。 |
+| `capture` | `"user" \| "environment"` | 捕获媒体时使用的默认摄像头。 |
+| `directory` | `boolean` | 是否接受目录（`webkitdirectory`）。 |
+| `disabled` | `boolean` | 禁用拖放区、触发器与隐藏输入框。 |
+| `invalid` | `boolean` | 标记字段无效（在每个部件上设置 `data-invalid`）。 |
+| `required` | `boolean` | 标记底层输入为必填。 |
+| `maxFiles` | `number` | 最大文件数量。默认 `1`。选择 `> 1` 时将岛屿从替换模式切换为追加模式。 |
+| `maxFileSize` | `number` | 最大文件大小（字节）。默认 `Infinity`。 |
+| `minFileSize` | `number` | 最小文件大小（字节）。默认 `0`。 |
+| `name` | `string` | 底层文件输入的 name，用于原生表单提交。 |
+| `locale` | `string` | 用于文件大小格式化的 BCP-47 区域设置。默认 `"en-US"`。 |
+| `translations` | `Partial<FileUploadTranslations>` | 对拖放区/预览/删除/清除 ARIA 字符串的覆盖。 |
+| `size` | `"sm" \| "md" \| "lg"` | 视觉尺寸变体。默认 `"md"`。 |
+| `acceptedFiles` | `File[]` | 已接受的受控文件列表（仅岛屿）。 |
+| `defaultAcceptedFiles` | `File[]` | 初始已接受文件列表，非受控（仅岛屿）。 |
+| `preventDocumentDrop` | `boolean` | 阻止浏览器导航到拖放在拖放区外的文件。默认 `true`（仅岛屿）。 |
+| `validate` | `(file: File, details: FileValidateDetails) => FileError[] \| null` | 自定义校验，在内置的类型/大小/数量检查之后运行（仅岛屿）。 |
+| `transformFiles` | `(files: File[]) => Promise<File[]>` | 在提交前转换新接受的的文件（例如压缩）（仅岛屿）。 |
+| `onFileAccept` | `(details: FileAcceptDetails) => void` | 以最近一次选择或拖放所接受的的文件调用。 |
+| `onFileReject` | `(details: FileRejectDetails) => void` | 以任何被拒绝的文件及其错误码调用。 |
+| `onFileChange` | `(details: FileChangeDetails) => void` | 每次选择后，连同完整的已接受/已拒绝集合调用。 |
+| `interactive` | `boolean` | 强制（或抑制）以水合形式作为岛屿渲染。 |
+
+## 默认组合
+
+这些属性仅在省略 `children` 时生效——此时 `FileUpload` 会为你渲染 `Label` + `Dropzone` + `Trigger` + `List` + `HiddenInput`。
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `label` | `string` | 渲染在拖放区上方的标签。 |
+| `dropzoneText` | `string` | 拖放区辅助文本。默认 `"Drag your file(s) here"`。 |
+| `triggerText` | `string` | 触发按钮文本。默认 `"Open file picker"`。 |
+| `showSize` | `boolean` | 在列表中显示每个文件的格式化大小。默认 `true`。 |
+| `clearable` | `boolean` | 在列表中显示每个文件的删除触发器。默认 `true`。 |
+
+## 子组件
+
+`FileUpload` 是一个复合组件——下面的每个部件都从 `FileUpload.Root` 的上下文读取，因此它们只能嵌套在其内部（或对于项级部件，嵌套在 `FileUpload.Item` 内部）才生效。
+
+| 部件 | 说明 |
+| --- | --- |
+| `FileUpload.Label` | 通过 `for` 绑定到隐藏输入的 `<label>`。 |
+| `FileUpload.Dropzone` | 拖放目标；渲染 `role="button"` 并支持键盘（Enter/Space 打开选择器）。 |
+| `FileUpload.Trigger` | 打开文件选择器。渲染为 `<label for>`（而非 `<button>`），因此无需 JavaScript 也能工作。 |
+| `FileUpload.HiddenInput` | 实际持有选择供表单提交的、视觉隐藏的原生 `<input type="file">`。 |
+| `FileUpload.ItemGroup` | 包裹已接受文件 `Item` 的 `<ul>`。 |
+| `FileUpload.Item` | 一个已接受的文件。需要 `file` 属性；向其子元素提供文件上下文。 |
+| `FileUpload.ItemName` | 文件的名称，或以 `children` 覆盖。 |
+| `FileUpload.ItemSizeText` | 文件的格式化大小（通过 `formatBytes`），或以 `children` 覆盖。 |
+| `FileUpload.ItemPreview` | 仅当文件的 MIME 类型匹配其 `type` 正则属性（默认 `".*"`）时才显示的包裹元素。 |
+| `FileUpload.ItemPreviewImage` | 仅客户端的 `<img>` 预览，通过 `URL.createObjectURL`；在 SSR 期间或非图像文件时不渲染任何内容。 |
+| `FileUpload.ItemDeleteTrigger` | 从已接受文件列表中移除该项。 |
+| `FileUpload.ClearTrigger` | 清除每一个已接受的文件。列表为空时自动隐藏。 |
+| `FileUpload.Items` | 复合：将已接受的文件映射为带图像/文件图标预览、`name`、可选大小与可选删除触发器的 `Item`。接受 `showSize` / `clearable` / `files`。 |
+| `FileUpload.List` | 复合：`ItemGroup` 包裹 `Items`。同样的 `showSize` / `clearable` / `files` 属性。 |
+| `FileUpload.FileText` | 显示第一个所选文件的名称、多选时的 `"N files"` 计数，或什么都未选时的 `fallback` 字符串。 |
+
+```tsx
+import { FileUpload, formatBytes } from "../components/ui";
+```
+
+`formatBytes(bytes, locale?)` 以及 `FileAccept` / `FileError` / `FileRejection` / `FileChangeDetails` / `FileUploadTranslations` 类型也被导出，供构建完全自定义组合的消费者使用。
+
+# 校验
+
+每个所选文件按顺序检查，并在第一条失败的规侧时被拒绝；`validate` 在最后运行，即所有内置检查通过之后：
+
+| `FileError` 代码 | 触发条件 |
+| --- | --- |
+| `FILE_INVALID_TYPE` | 不匹配 `accept`。 |
+| `FILE_TOO_LARGE` | `file.size > maxFileSize`。 |
+| `FILE_TOO_SMALL` | `file.size < minFileSize`。 |
+| `FILE_EXISTS` | 同名/同大小/同类型已被接受（仅多文件模式）。 |
+| `TOO_MANY_FILES` | 接受该文件将超出 `maxFiles`。 |
+| `FILE_INVALID` | 为自定义 `validate` 结果保留。 |
+
+当 `maxFiles={1}`（默认）时，新接受的的文件会**替换**当前选择。当 `maxFiles > 1` 时，新文件会**追加**到现有选择中，直到达到上限。
+
+# 无障碍
+
+- `Dropzone` 渲染 `role="button"`，带有来自 `translations.dropzone` 的 `aria-label`，禁用时带有 `aria-disabled`，并可用键盘操作（`tabIndex={0}`，Enter/Space 打开文件选择器）。
+- `Label` 和 `Trigger` 是绑定到隐藏输入 id 的真实 `<label for>` 元素，因此即使在水量合之前，点击其中任意一个都会打开原生文件选择器。
+- `ItemDeleteTrigger` 和 `ClearTrigger` 的 `aria-label` 取自 `translations.deleteFile(file)` / `translations.clearFiles`，可通过 `translations` 属性覆盖。
+- `data-disabled` / `data-invalid` / `data-required` / `data-readonly` / `data-dragging` 会被镜像到每个部件上，用于样式与辅助技术状态。

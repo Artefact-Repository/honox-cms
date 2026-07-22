@@ -1,0 +1,53 @@
+---
+title: Heading Encabezado
+hydration: 3
+category: Typography
+---
+
+import { Heading } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introducción
+
+Un componente polimórfico para mostrar títulos y encabezados con estilo consistente.
+
+# Uso
+
+<DemoPreview>
+  <Heading as="h1" size="3xl">Page Title</Heading>
+</DemoPreview>
+
+```tsx
+import { Heading } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Heading as="h1" size="3xl">
+      Page Title
+    </Heading>
+  );
+}
+```
+
+## Constructor de páginas CMS
+
+Este componente está disponible como un bloque `heading` en el [Constructor de páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "heading",
+  "text": "Page Title",
+  "as": "h1",
+  "size": "3xl"
+}
+```
+
+# Propiedades
+
+| Prop | Tipo | Descripción |
+| --- | --- | --- |
+| `children` | `any` | El texto o contenido. |
+| `class` | `string` | Clases CSS personalizadas. |
+| `as` | `string` | El elemento HTML a renderizar (por ejemplo, "h1", "h2"). Por defecto "h2". |
+| `size` | `string` | La variante de tamaño de fuente. |
+| `interactive` | `boolean` | Si se habilita la hidratación del lado del cliente. |

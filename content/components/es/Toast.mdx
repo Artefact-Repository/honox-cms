@@ -1,0 +1,150 @@
+---
+title: Toast Notificación
+hydration: 1
+category: Feedback
+---
+
+import { Toast, Button } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introducción
+
+Una notificación transitoria utilizada para proporcionar retroalimentación sobre una acción. Los toasts se crean de forma imperativa a través de la API `toaster`. Monta un único `<Toast.Toaster />` para renderizarlos.
+
+Comportamiento incorporado:
+
+- **Acento coloreado por tipo** — `success` / `error` / `warning` / `info` / `loading` tienen cada uno un acento de borde izquierdo distinto y un icono indicador teñido.
+- **Animación de entrada/salida** — los toasts se deslizan y aparecen con fundido al montarse, y reproducen una animación de salida a juego antes de eliminarse del DOM, siendo sensibles a la dirección según se ancle arriba o abajo.
+- **Pausa al pasar el cursor/enfocar** — mover el puntero sobre (o navegar con Tab hacia) cualquier toast en el viewport pausa todos los temporizadores de descarte automático activos; al salir del viewport, se reanudan con su tiempo restante intacto.
+- **Deslizar para descartar** — arrastrar con puntero/táctil más allá de un umbral descarta un toast, en la dirección apropiada para el `placement` del toaster (por ejemplo, deslizar a la derecha para `bottom-end`, a la izquierda para `bottom-start`, hacia arriba para `top`).
+- **Descarte por teclado** — un toast enfocado se cierra al pulsar <kbd>Escape</kbd>, independientemente de si muestra un botón de cierre visible.
+- **Accesible por defecto** — cada toast tiene `role="status"` (`role="alert"` para `type: "error"`) con un `aria-live` correspondiente, por lo que los lectores de pantalla lo anuncian sin necesidad de un anunciador oculto independiente.
+
+> Una versión en vivo y ejecutable de cada ejemplo a continuación está en `app/routes/index.tsx` — la sección **Toast Component Examples**. Los ejemplos de la documentación se mantienen sincronizados con ese archivo.
+
+# Uso
+
+<DemoPreview>
+  <Toast.Toaster />
+  <Button
+    variant="outline"
+    onclick="window.dispatchEvent(new CustomEvent('park-ui:toast:create', { detail: { id: Math.random().toString(36).substring(2, 9), title: 'Success', description: 'Action completed successfully', closable: true, type: 'success' } }))"
+  >
+    Show Success Toast
+  </Button>
+</DemoPreview>
+
+## Montar el Toaster
+
+Coloca `<Toast.Toaster />` una vez cerca de la raíz de tu aplicación (esto coincide con `app/routes/index.tsx`):
+
+```tsx
+import { Toast } from "../components/ui";
+
+export default function App() {
+  return (
+    <>
+      {/* ...your application... */}
+      <Toast.Toaster />
+    </>
+  );
+}
+```
+
+## Mostrar un toast (componentes cliente / islands)
+
+Desde un componente cliente o island hidratado, llama a `Toast.toaster.*`:
+
+```tsx
+import { Toast, Button } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Button
+      onClick={() =>
+        Toast.toaster.success("Saved!", { description: "Your changes are live." })
+      }
+    >
+      Save
+    </Button>
+  );
+}
+```
+
+## Mostrar un toast (seguro para SSG)
+
+La demo de la página principal activa toasts despachando directamente el CustomEvent subyacente `park-ui:toast:create`. Esto funciona **sin hidratación del cliente**, razón por la cual se usa el atributo estático `onclick` en lugar de un manejador JSX `onClick`. El siguiente bloque está reproducido de `app/routes/index.tsx`:
+
+```tsx
+<Toast.Toaster />
+<div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
+  <Button
+    variant="outline"
+    onclick="window.dispatchEvent(new CustomEvent('park-ui:toast:create', { detail: { id: Math.random().toString(36).substring(2, 9), title: 'Success', description: 'Action completed successfully', closable: true, type: 'success' } }))"
+  >
+    Show Success Toast
+  </Button>
+  <Button
+    variant="outline"
+    onclick="window.dispatchEvent(new CustomEvent('park-ui:toast:create', { detail: { id: Math.random().toString(36).substring(2, 9), title: 'Error', description: 'An error occurred', closable: true, type: 'error' } }))"
+  >
+    Show Error Toast
+  </Button>
+  <Button
+    variant="outline"
+    onclick="window.dispatchEvent(new CustomEvent('park-ui:toast:create', { detail: { id: Math.random().toString(36).substring(2, 9), title: 'Loading', description: 'Please wait...', type: 'loading' } }))"
+  >
+    Show Loading Toast
+  </Button>
+</div>
+```
+
+> Nota: El contenido del Toast se crea de forma **imperativa** — `title` y `description` solo aceptan cadenas, por lo que el cuerpo de un toast no puede escribirse como JSX. El `Toaster` lo renderiza internamente a partir de los primitivos privados.
+
+# API
+
+`Toast.toaster` (o cualquier instancia devuelta por `createToaster`) proporciona los siguientes métodos auxiliares:
+
+| Method | Signature |
+| --- | --- |
+| `create` | `(options: Omit<ToastOptions, "id">) => string` |
+| `success` | `(title: string, options?: Partial<ToastOptions>) => string` |
+| `error` | `(title: string, options?: Partial<ToastOptions>) => string` |
+| `warning` | `(title: string, options?: Partial<ToastOptions>) => string` |
+| `info` | `(title: string, options?: Partial<ToastOptions>) => string` |
+| `loading` | `(title: string, options?: Partial<ToastOptions>) => string` |
+| `promise` | `(promise: Promise<T>, options: PromiseOptions<T>) => Promise<T>` — shows a `loading` toast, then swaps it to `success`/`error` when the promise settles. |
+| `update` | `(id: string, options: Partial<ToastOptions>) => void` |
+| `dismiss` | `(id?: string) => void` — dismisses one toast, or all toasts if `id` is omitted. |
+| `pause` | `() => void` — freezes every active auto-dismiss timer, preserving remaining time. |
+| `resume` | `() => void` — continues timers frozen by `pause`. |
+| `subscribe` | `(callback: (toasts: ToastOptions[]) => void) => () => void` |
+| `getToasts` / `getCount` | Snapshot accessors. |
+
+`Toast.Toaster` (junto con el `toaster`/`createToaster` a nivel de módulo) llama automáticamente a `pause`/`resume` en respuesta al hover del puntero y al foco dentro del viewport del toaster — normalmente no necesitas llamarlos tú mismo.
+
+## createToaster(config)
+
+| Property | Type | Default | Description |
+| --- | --- | --- | --- |
+
+| `placement` | \`"top-start" \ | "top" \ | "top-end" \ | "bottom-start" \ | "bottom" \ | "bottom-end"\` | `"bottom-end"` | Esquina/borde de la pantalla al que se ancla el viewport. También determina la dirección predeterminada de deslizamiento para descartar y la dirección de deslizamiento de entrada/salida. |
+
+| `overlap` | `boolean` | `false` | Reservado para diseño apilado/superpuesto. |
+| `max` | `number` | `24` | Número máximo de toasts que se mantienen a la vez; el más antiguo se elimina primero. |
+| `duration` | `number` | `5000` | Duración predeterminada de descarte automático en ms para los toasts que no especifican la suya propia. |
+| `gap` | `number` | `16` | Reservado para el espaciado entre toasts apilados. |
+| `removeDelay` | `number` | `200` | Límite superior (ms) que el Toaster espera la animación de salida de un toast antes de forzar su eliminación, por si `animationend` nunca se dispara (por ejemplo, con movimiento reducido). |
+
+## ToastOptions
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `title` | `string` | El título del toast. |
+| `description` | `string` | La descripción del toast. |
+
+| `type` | \`"info" \ | "success" \ | "warning" \ | "error" \ | "loading"\` | Intención/estilo del toast — determina el color de acento, el icono indicador y el role/`aria-live` accesible (`error` → `role="alert"`/`assertive`, todo lo demás → `role="status"`/`polite`). |
+
+| `duration` | `number` | Duración de descarte automático en milisegundos. `0` o `Infinity` desactiva el descarte automático. |
+| `closable` | `boolean` | Si se renderiza un botón de cierre visible. El toast aún puede descartarse mediante <kbd>Escape</kbd> o deslizamiento independientemente de este indicador. |
+| `action` | `{ label: string; onClick: () => void }` | Botón de acción opcional. |

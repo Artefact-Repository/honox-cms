@@ -1,0 +1,62 @@
+---
+title: Switch 开关
+hydration: 2
+category: Forms
+---
+
+import { Switch } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+一种允许用户在选中和未选中状态之间切换的控件。
+
+# 用法
+
+<DemoPreview>
+  <Switch defaultChecked interactive>Enable Notifications</Switch>
+</DemoPreview>
+
+```tsx
+import { Switch } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Switch
+      defaultChecked={true}
+      onCheckedChange={(details) => console.log(details.checked)}
+      interactive
+    >
+      Enable Notifications
+    </Switch>
+  );
+}
+```
+
+## CMS 页面构建器
+
+该组件可作为 `switch` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用：
+
+```json
+{
+  "type": "switch",
+  "label": "Dark Mode",
+  "checked": true,
+  "colorPalette": "blue"
+}
+```
+
+# 属性
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `children` | `any` | 渲染在开关旁边的标签内容。 |
+| `class` | `string` | 自定义 CSS 类。 |
+| `checked` | `boolean` | 开关是否被选中（受控）。 |
+| `defaultChecked` | `boolean` | 初始选中状态（非受控）。 |
+| `disabled` | `boolean` | 开关是否被禁用。 |
+| `onCheckedChange` | `(details: { checked: boolean }) => void` | 选中状态变化时触发的回调。 |
+
+| `size` | \`"sm" \ | "md" \ | "lg"\` | 开关的尺寸。 |
+
+| `interactive` | `boolean` | 强制作为岛屿进行水合。 |

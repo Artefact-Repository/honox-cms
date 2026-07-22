@@ -1,0 +1,135 @@
+---
+title: Fieldset Conjunto de Campos
+hydration: 3
+category: Layout
+---
+
+import { Fieldset, Field } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+## Introducción
+
+Agrupa controles de formulario relacionados bajo un `<fieldset>` nativo, con una
+leyenda accesible, texto de ayuda y texto de error. A diferencia de `Field`, no tiene
+validador propio —es un primitive de agrupación estático, renderizado en el servidor,
+por lo que nunca se hidrata como isla de cliente. Proporciona su estado
+`disabled`/`invalid`/`required` como contexto a los `Field` anidados, igual que el
+Fieldset de Ark UI— consulta [Propagación de contexto](#context-propagation-to-nested-fields).
+
+## Uso
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <Fieldset legend="User Profile" helperText="Manage your info." required>
+      <Field label="Name" placeholder="Jane Doe" />
+    </Fieldset>
+  </div>
+</DemoPreview>
+
+```tsx
+import { Fieldset, Field } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Fieldset
+      legend="User Profile"
+      helperText="Manage your info."
+      required
+      errorText="Something went wrong."
+    >
+      <Field>...</Field>
+    </Fieldset>
+  );
+}
+```
+
+Pasar `errorText` es suficiente para poner el fieldset en su estado inválido —
+no es necesario pasar también `invalid`. Pasa `invalid={false}` explícitamente si
+quieres suprimir el estilo de error mientras conservas el texto.
+
+### Propagación de contexto a los Field anidados
+
+`Fieldset` expone su estado `disabled`/`invalid`/`required` como contexto.
+Cada `Field` anidado lo lee como valor de reserva para el suyo propio —de modo que un
+`disabled` o `required` a nivel de grupo no necesita repetirse en cada campo:
+
+```tsx
+<Fieldset legend="Shipping address" disabled required>
+  <Field label="Street" />   {/* renders disabled + required */}
+  <Field label="Apt #" required={false} />  {/* opts back out of required */}
+</Fieldset>
+```
+
+El propio prop de un `Field` siempre gana sobre el heredado. Para `invalid` en
+concreto, la herencia solo se aplica cuando el `Field` no tiene validación propia
+(sin `validator`, `minLength`, ni un prop `invalid` explícito) —un `Field`
+que valida su propio valor nunca es silenciosamente sobrescrito por el grupo.
+
+Esta propagación es de un solo nivel: solo `Field` (y cualquier cosa construida sobre él,
+como `Textarea`) consulta el contexto de `Fieldset`. Un `Switch` o `Checkbox` desnudo
+colocado directamente dentro de un `Fieldset` —sin un `Field` que lo envuelva— no
+recogerá el estilo del grupo, aunque el `<fieldset disabled>` nativo sigue bloqueando
+la interacción con él de todos modos.
+
+### Composición
+
+`children` es siempre el grupo de controles de formulario reales —`Fieldset` los envuelve
+en un contenedor de espaciado por ti. `legend` / `helperText` / `errorText` aceptan
+cualquier `Child`, no solo cadenas, así que el contenido enriquecido (un icono, una insignia)
+pertenece ahí en lugar de en `children`:
+
+```tsx
+<Fieldset legend={<>Profile <Badge>New</Badge></>}>
+  <Field>...</Field>
+  <Textarea>...</Textarea>
+</Fieldset>
+```
+
+No coloques `FieldsetLegend` (ni `FieldsetHelperText` / `FieldsetErrorText`)
+dentro de `children` —`Fieldset` envuelve `children` en un `<div>`, y los navegadores
+solo usan un `<legend>` para calcular el nombre accesible del fieldset cuando es un
+hijo directo de `<fieldset>`, no cuando está anidado dentro de un envoltorio. Los
+subcomponentes exportados (`FieldsetLegend`, `FieldsetHelperText`,
+`FieldsetErrorText`, `FieldsetContent`, `FieldsetControl`,
+`FieldsetRequiredIndicator`) existen para reutilizarse en marcado totalmente escrito a mano,
+no como una forma alternativa de componer dentro del propio `Fieldset`.
+
+### Constructor de páginas CMS
+
+Este componente está disponible como un bloque `fieldset` en el [Constructor de páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "fieldset",
+  "legend": "User Profile",
+  "helperText": "Manage your info.",
+  "required": true,
+  "children": [
+    { "type": "field", "label": "Name" }
+  ]
+}
+```
+
+## Propiedades
+
+| Prop | Tipo | Descripción |
+| --- | --- | --- |
+| `children` | `any` | Controles de formulario a renderizar dentro del fieldset. |
+| `class` | `string` | Clases CSS personalizadas. |
+| `id` | `string` | Identificador único. Se genera automáticamente si se omite. |
+| `disabled` | `boolean` | Deshabilita el fieldset. El `<fieldset disabled>` nativo deshabilita automáticamente todos los controles descendientes, y los `Field` anidados también lo recogen como contexto —consulta [Propagación de contexto](#context-propagation-to-nested-fields). |
+| `invalid` | `boolean` | Si el fieldset está en un estado inválido. Por defecto `true` siempre que se establece `errorText`, por lo que normalmente no necesitas pasarlo explícitamente. |
+| `required` | `boolean` | Marca el grupo como obligatorio y añade un indicador de obligatoriedad a la leyenda. |
+| `legend` | `Child` | El texto de la leyenda del fieldset. Siempre se renderiza como hijo directo de `<fieldset>` —consulta [Composición](#composition). |
+| `helperText` | `Child` | Texto de ayuda mostrado debajo de la leyenda. |
+| `errorText` | `Child` | Texto de error mostrado cuando el fieldset es inválido. |
+
+## Vínculos CMS
+
+`legend`, `helperText`, `errorText`, `disabled`, `invalid` y `required`
+se exponen como campos editables en `public/admin/config.yml`, además de una
+lista `children` para anidar otros bloques —los mismos props de conveniencia
+documentados arriba. `id`/`class` y los subcomponentes de composición
+(`FieldsetContent`, `FieldsetControl`, `FieldsetRequiredIndicator`, etc.) no se
+exponen: son una API a nivel de JSX para desarrolladores que escriben páginas a mano,
+no algo que un bloque de CMS controlado por JSON pueda expresar.

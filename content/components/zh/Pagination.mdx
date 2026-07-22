@@ -1,0 +1,61 @@
+---
+title: Pagination 分页
+hydration: 2
+category: Data Display
+---
+
+import { Pagination } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+一个用于在多页内容之间导航的组件。
+
+## 用法
+
+<DemoPreview>
+  <Pagination count={100} pageSize={10} />
+</DemoPreview>
+
+### CMS 页面构建器
+
+该组件可作为 `pagination` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用：
+
+```json
+{
+  "type": "pagination",
+  "count": 100,
+  "pageSize": 10
+}
+```
+
+## 属性
+
+| 属性 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `count` | `number` | - | 条目总数。 |
+| `pageSize` | `number` | `10` | 每页条数。 |
+| `defaultPage` | `number` | `1` | 初始显示的页码。 |
+
+| `type` | \`'button' \ | 'link'\` | `'button'` | 使用按钮还是链接进行导航。 |
+
+| `interactive` | `boolean` | `true` | 是否启用客户端交互。 |
+
+## CMS 配置
+
+```yaml
+- label: Pagination
+  name: pagination
+  widget: object
+  fields:
+    - { label: Count, name: count, widget: number }
+    - { label: Page Size, name: pageSize, widget: number, default: 10 }
+    - { label: Default Page, name: defaultPage, widget: number, default: 1 }
+    - label: Type
+      name: type
+      widget: select
+      options: [button, link]
+      default: button
+```
+
+## 水合
+
+第 2 级：在提供 `onPageChange` 时，或不在使用 `getPageUrl` 的链接模式下时，进行水合。

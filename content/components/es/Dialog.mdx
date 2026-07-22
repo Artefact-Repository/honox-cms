@@ -1,0 +1,114 @@
+---
+title: Dialog Diálogo
+hydration: 1
+category: Overlays
+---
+
+import { Dialog, Button } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introducción
+
+Una ventana modal superpuesta sobre la página que requiere interacción del usuario antes de continuar.
+
+# Hidratación
+
+**Nivel 1 — auto-interactivo por defecto.** Un `Dialog` no tiene un respaldo estático significativo —la apertura, la trampa de foco y el manejo de ESC requieren todos JavaScript del lado del cliente— por lo que se hidrata como isla por defecto. Pasa `interactive={false}` para renderizar una carcasa de diálogo estática e inerte que no envía JS de cliente.
+
+| Prop `interactive` | Resultado |
+| --- | --- |
+| omitido | Se hidrata como isla (por defecto) |
+| `true` | Se hidrata como isla |
+| `false` | Estático — sin JS de cliente |
+
+Todas las decisiones de interactividad en la librería pasan por el helper compartido `shouldHydrate()` en `app/components/ui/island-utils.ts`.
+
+# Accesibilidad
+
+Cumple con el [patrón de diseño WAI-ARIA Dialog (Modal)](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/). Cuando está hidratado (`interactive` por defecto es `true`), el diálogo ofrece el siguiente comportamiento:
+
+- **El foco se mueve dentro del diálogo al abrir** — a `initialFocusEl()`, si no al primer elemento enfocable, si no al contenido en sí.
+- **El foco queda atrapado mientras está abierto** — `Tab` / `Shift+Tab` ciclan solo dentro del contenido del diálogo. Los diálogos anidados se gestionan: solo el diálogo más superior atrapa y posee `Escape`.
+- **`Escape` cierra** el diálogo (a menos que `closeOnEscape={false}`).
+- **El fondo es inerte** — todo fuera del diálogo (incluido un diálogo padre detrás de uno anidado) recibe `inert` y se elimina del orden de tabulación, mientras que el subárbol del diálogo permanece interactivo.
+- **El scroll del body se bloquea** mientras al menos un diálogo está abierto, y se restaura cuando se cierra el último.
+- **El foco vuelve al disparador al cerrar** (o a `finalFocusEl()` si se proporciona).
+- **Nombre accesible** — derivado de `title` (`aria-labelledby`) o un `aria-label` explícito. Se emite un `console.warn` del lado del cliente si ninguno de los dos está presente.
+- **`role="alertdialog"`** — pasa `role="alertdialog"` para confirmaciones destructivas, y apunta `initialFocusEl` a la acción de cancelar/segura para que reciba el foco primero. Con `closeOnInteractOutside={false}` el diálogo solo se puede cerrar mediante un botón o `Escape`.
+
+# Uso
+
+## Diálogo básico
+
+<DemoPreview>
+  <Dialog
+    trigger={<Button>Open Dialog</Button>}
+    title="Confirm action"
+    description="Are you sure you want to continue?"
+    body="This action cannot be undone."
+    cancel={<Button variant="outline">Cancel</Button>}
+    confirm={<Button>Confirm</Button>}
+  />
+</DemoPreview>
+
+```tsx
+import { Dialog, Button } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Dialog
+      trigger={<Button>Open Dialog</Button>}
+      title="Confirm action"
+      description="Are you sure you want to continue?"
+      body="This action cannot be undone."
+      cancel={<Button variant="outline">Cancel</Button>}
+      confirm={<Button>Confirm</Button>}
+    />
+  );
+}
+```
+
+## Constructor de páginas CMS
+
+Este componente está disponible como un bloque `dialog` en el [Constructor de páginas](/docs/PageBuilder) (`content/pages/*.json`). `trigger` es una lista de bloques anidada (el CMS siempre envía un array):
+
+```json
+{
+  "type": "dialog",
+  "title": "Confirm action",
+  "description": "Are you sure you want to continue?",
+  "confirmText": "Confirm",
+  "cancelText": "Cancel",
+  "trigger": [{ "type": "button", "text": "Open Dialog" }]
+}
+```
+
+# Propiedades
+
+## Dialog
+
+| Prop | Tipo | Descripción |
+| --- | --- | --- |
+| `trigger` | `JSX.Element` | Elemento que abre el diálogo al activarse. |
+
+| `title` | \`string \ | JSX.Element\` | El título del diálogo. |
+| `description` | \`string \ | JSX.Element\` | La descripción del diálogo. |
+| `body` | \`string \ | JSX.Element\` | El contenido principal. |
+| `footer` | \`string \ | JSX.Element\` | Contenido personalizado del pie. |
+
+| `cancel` | `JSX.Element` | Elemento renderizado como disparador de cierre (cancelar). |
+| `confirm` | `JSX.Element` | Elemento renderizado como disparador de acción. |
+| `closable` | `boolean` | Si se muestra el botón de cierre. Por defecto: `true`. |
+| `interactive` | `boolean` | Habilita la hidratación del lado del cliente para comportamiento interactivo. |
+| `class` | `string` | Clases CSS personalizadas para el elemento raíz. |
+
+| `role` | \`"dialog" \ | "alertdialog"\` | Variante del diálogo. Usa `"alertdialog"` para confirmaciones destructivas. Por defecto: `"dialog"`. |
+
+| `aria-label` | `string` | Nombre accesible cuando no se proporciona `title`. |
+| `closeOnEscape` | `boolean` | Cierra al pulsar `Escape`. Por defecto: `true`. |
+| `closeOnInteractOutside` | `boolean` | Cierra al hacer clic en el fondo. Por defecto: `true`. |
+
+| `initialFocusEl` | \`() => HTMLElement \ | null\` | Elemento a enfocar al abrir. Por defecto el primer elemento enfocable. |
+| `finalFocusEl` | \`() => HTMLElement \ | null\` | Elemento a enfocar al cerrar. Por defecto el disparador. |
+
+Los props adicionales (por ejemplo, `open`, `defaultOpen`, `onOpenChange`, `id`) se reenvían al primitive de diálogo subyacente.

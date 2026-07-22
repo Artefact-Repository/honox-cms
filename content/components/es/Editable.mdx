@@ -1,0 +1,140 @@
+---
+title: Editable Texto Editable
+hydration: 2
+category: Forms
+---
+
+import { Editable, Stack } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introducción
+
+Un campo de texto en línea que se muestra como texto plano hasta que se activa (mediante
+foco, clic o doble clic), y entonces cambia a un input editable con
+controles de enviar/cancelar.
+
+# Uso
+
+<DemoPreview>
+  <Stack direction="vertical" gap="4" style={{ width: "100%", maxWidth: "320px" }}>
+    <Editable label="Project name" defaultValue="Artefact UI Suite" interactive />
+    <Editable label="Description" placeholder="Add a description…" interactive />
+  </Stack>
+</DemoPreview>
+
+```tsx
+import { Editable } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Editable label="Project name" defaultValue="Artefact UI Suite" />
+  );
+}
+```
+
+## Composición personalizada
+
+Pasa `children` para tener control total sobre el layout de vista previa/input/controles:
+
+```tsx
+import { Editable } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Editable defaultValue="Untitled" activationMode="dblclick">
+      <Editable.Label>Title</Editable.Label>
+      <Editable.Area>
+        <Editable.Preview />
+        <Editable.Input />
+      </Editable.Area>
+      <Editable.Control>
+        <Editable.EditTrigger>Edit</Editable.EditTrigger>
+        <Editable.SubmitTrigger>Save</Editable.SubmitTrigger>
+        <Editable.CancelTrigger>Cancel</Editable.CancelTrigger>
+      </Editable.Control>
+    </Editable>
+  );
+}
+```
+
+## Constructor de páginas CMS
+
+Este componente está disponible como un bloque `editable` en el
+[Constructor de páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "editable",
+  "label": "Project name",
+  "defaultValue": "Artefact UI Suite",
+  "placeholder": "Untitled",
+  "size": "md",
+  "activationMode": "focus",
+  "submitMode": "both"
+}
+```
+
+Siempre se renderiza como `interactive` en el Constructor de páginas.
+
+# Propiedades
+
+## Root
+
+| Prop | Tipo | Descripción |
+| --- | --- | --- |
+| `value` | `string` | El valor actual (controlado). |
+| `defaultValue` | `string` | El valor inicial (no controlado). |
+| `edit` | `boolean` | Si el modo de edición está activo (controlado). |
+| `defaultEdit` | `boolean` | El estado inicial del modo de edición (no controlado). |
+| `activationMode` | `"focus" \| "dblclick" \| "click" \| "none"` | Cómo entra la vista previa en modo de edición. Por defecto `"focus"`. |
+| `submitMode` | `"enter" \| "blur" \| "both" \| "none"` | Qué interacciones confirman el valor. Por defecto `"both"`. |
+| `selectOnFocus` | `boolean` | Si el texto del input se selecciona al enfocarse. Por defecto `true`. |
+| `autoResize` | `boolean` | Mantiene la vista previa visible (ajustada al contenido) mientras se edita, en lugar de ocultarla. |
+| `disabled` | `boolean` | Deshabilita toda la interacción. |
+| `readOnly` | `boolean` | Impide entrar en modo de edición mientras sigue permitiendo el foco. |
+| `required` | `boolean` | Marca el input subyacente como obligatorio. |
+| `invalid` | `boolean` | Marca el campo como inválido. |
+| `placeholder` | `string \| { edit: string; preview: string }` | Texto de marcador de posición, opcionalmente distinto entre el input y la vista previa. |
+| `maxLength` | `number` | Longitud máxima del input. |
+| `name` | `string` | Nombre del input subyacente, para el envío nativo de formulario. |
+| `form` | `string` | Asocia el input con un `<form>` mediante id. |
+| `translations` | `Partial<EditableTranslations>` | Sobrescrituras para las cadenas ARIA de editar/enviar/cancelar/input. |
+| `size` | `"2xs" \| "xs" \| "sm" \| "md" \| "lg"` | Tamaño visual. Por defecto `"md"`. |
+| `onValueChange` | `(details: { value: string }) => void` | Se llama cuando cambia el valor del input. |
+| `onValueCommit` | `(details: { value: string }) => void` | Se llama cuando se envía el valor. |
+| `onValueRevert` | `(details: { value: string }) => void` | Se llama cuando se cancela la edición. |
+| `onEditChange` | `(details: { edit: boolean }) => void` | Se llama cuando se alterna el modo de edición. |
+| `interactive` | `boolean` | Fuerza (o suprime) la hidratación como isla. |
+| `class` | `string` | Clases CSS personalizadas para el elemento raíz. |
+
+## Composición por defecto
+
+| Prop | Tipo | Descripción |
+| --- | --- | --- |
+| `label` | `JSX.Element \| string` | Etiqueta renderizada encima del campo. |
+| `children` | `JSX.Element` | Contenido adicional añadido tras la vista previa/input/controles por defecto. |
+
+## Subcomponentes
+
+| Parte | Descripción |
+| --- | --- |
+| `Editable.Label` | `<label>` vinculado al input; hacer clic en él enfoca la vista previa. |
+| `Editable.Area` | Envuelve `Preview` e `Input` en el mismo slot de layout. |
+| `Editable.Preview` | La visualización de solo lectura mostrada cuando no se está editando; `role="button"`, activable con teclado según `activationMode`. |
+| `Editable.Input` | El `<input>` mostrado durante la edición; gestiona Escape para cancelar y Enter/pérdida de foco para enviar según `submitMode`. |
+| `Editable.Control` | Envuelve los disparadores de editar/enviar/cancelar. |
+| `Editable.EditTrigger` | Entra en modo de edición. Oculto mientras ya se está editando. |
+| `Editable.SubmitTrigger` | Confirma el valor y sale del modo de edición. Oculto mientras no se está editando. |
+| `Editable.CancelTrigger` | Descarta los cambios y sale del modo de edición. Oculto mientras no se está editando. |
+| `Editable.Context` | Acceso mediante render-prop al contexto editable: `<Editable.Context>{(ctx) => ...}</Editable.Context>`. |
+
+# Accesibilidad
+
+- `Preview` es operable con teclado (`tabIndex={0}`, Enter/Space) siempre que
+  `activationMode` sea `"click"` o `"dblclick"`; con el modo `"focus"`,
+  simplemente tabular hasta él abre el modo de edición.
+- `EditTrigger` / `SubmitTrigger` / `CancelTrigger` obtienen sus `aria-label` de
+  `translations`, y se ocultan (no solo visualmente, mediante el atributo
+  `hidden`) cuando no son aplicables al modo actual.
+- `Input` lleva `aria-invalid` cuando se establece `invalid`, y `aria-label`
+  desde `translations.input`.

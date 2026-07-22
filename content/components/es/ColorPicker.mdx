@@ -1,0 +1,161 @@
+---
+title: ColorPicker Selector de Color
+hydration: 2
+category: Forms
+---
+
+import { ColorPicker } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introducción
+
+Un selector de color con un área de saturación/brillo, deslizadores de tono y alfa, campos de canal editables (HEX / RGBA / HSLA), muestras predefinidas y un disparador de muestra opcional que abre el panel en una ventana emergente. Sigue la anatomía del selector de color de Ark UI / Park UI —cada parte lleva `data-scope="colorPicker"` y un `data-part` correspondiente— pero está implementado íntegramente sobre Hono JSX y Panda CSS, **sin React ni dependencia de `@ark-ui/react`**.
+
+El componente está dividido de la misma manera que el resto de la librería:
+
+- `app/components/ui/color-picker-primitive.tsx` — matemática de color, contexto y cada parte anatómica, todo renderizable en el servidor.
+- `app/islands/color-picker.tsx` — envoltorio de isla ligero alrededor de `InteractiveColorPicker`, que posee el estado y adjunta los manejadores de puntero/teclado.
+- `app/theme/recipes/color-picker.ts` — la receta de slots de Panda CSS.
+
+Los colores se mantienen internamente como **HSVA** (`{ h: 0–360, s: 0–100, v: 0–100, a: 0–1 }`), el modelo natural para un área de saturación/brillo, y se convierten en los límites.
+
+# Novedades de esta revisión
+
+- **La salida HSLA ahora es HSL real.** `hsvaToHslaString` previamente insertaba los valores brutos de saturación/valor de HSV en una cadena `hsla()`, produciendo un color distinto al seleccionado (por ejemplo, el rojo puro se renderizaba como `hsla(0, 100%, 100%, 1)` —blanco—). Ahora convierte HSV → HSL correctamente (`hsla(0, 100%, 50%, 1)`).
+- **La fila de entrada HSLA edita canales HSL reales.** Los campos de saturación/luminosidad solían mostrar valores HSV bajo etiquetas HSL; ahora las ediciones y los valores mostrados coinciden, y un canal `l` dedicado mapea las ediciones de luminosidad de vuelta al modelo HSV.
+- **La entrada hexadecimal inválida se rechaza en lugar de confirmarse.** Escribir texto inválido en el campo hexadecimal antes recaía en blanco y lo emitía como un cambio de valor. El campo ahora valida `#RGB`, `#RGBA`, `#RRGGBB` y `#RRGGBBAA` (con o sin el `#` inicial) e ignora cualquier otra cosa.
+- **El selector de formato está etiquetado** para tecnología de asistencia.
+
+# Compatibilidad con teclado
+
+El área y ambos deslizadores son enfocables (`Tab`) y operables con teclado:
+
+| Tecla | Área | Deslizador de tono | Deslizador de alfa |
+| --- | --- | --- | --- |
+| <kbd>←</kbd> / <kbd>→</kbd> | Saturación ±1 | Tono ±1° | Alfa ±1% |
+| <kbd>↑</kbd> / <kbd>↓</kbd> | Brillo ±1 | — | — |
+| <kbd>Shift</kbd> + flechas | ±10 pasos | ±10° | ±10% |
+| <kbd>Home</kbd> / <kbd>End</kbd> | Esquina mín. / máx. | 0° / 360° | 0% / 100% |
+
+Con `trigger`, <kbd>Esc</kbd> y los clics fuera del componente cierran la ventana emergente.
+
+# Accesibilidad
+
+- El área y los deslizadores de canal exponen `role="slider"` con `aria-valuemin`/`aria-valuemax`/`aria-valuenow` (el área además informa ambos canales mediante `aria-valuetext`).
+- Los campos de canal, el selector de formato, las muestras predefinidas y el disparador del cuentagotas llevan todos `aria-label`; la muestra predefinida activa se anuncia mediante `aria-pressed`.
+- `disabled` y `readOnly` eliminan las paradas de tabulación interactivas y deshabilitan los botones de muestra; el estado se refleja en `data-disabled` / `data-readonly` en cada parte.
+- El botón del cuentagotas se renderiza deshabilitado cuando la API `EyeDropper` no está disponible, de modo que nunca es un control muerto.
+
+# Slots de estilo
+
+La receta de slots de Panda CSS (`app/theme/recipes/color-picker.ts`) estiliza las partes listadas en Anatomía. Los estados se controlan mediante atributos de datos (`data-disabled`, `data-readonly`, `data-state="checked"` en la muestra activa, `data-channel` en las partes de deslizador), de modo que las skins personalizadas pueden apuntarles sin tocar la receta. La variante `size` escala el área, las muestras y el espaciado.
+
+# Uso
+
+<DemoPreview>
+  <ColorPicker label="Brand colour" defaultValue="#3b82f6" />
+</DemoPreview>
+
+```tsx
+import { ColorPicker } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <>
+      {/* Inline picker, static SSR (no signal, no island) */}
+      <ColorPicker interactive={false} />
+
+      {/* Interactive inline picker */}
+      <ColorPicker
+        label="Brand colour"
+        defaultValue="#3b82f6"
+        onValueChange={({ value }) => console.log(value)}
+      />
+
+      {/* Swatch trigger + popover, custom presets */}
+      <ColorPicker
+        trigger
+        label="Accent"
+        defaultValue="#22c55e"
+        presets={["#ef4444", "#f97316", "#22c55e", "#3b82f6"]}
+        closeOnSelect
+      />
+
+      {/* Inside a native form — submits as `theme` (hex) */}
+      <form method="post" action="/settings">
+        <ColorPicker name="theme" defaultValue="#7c3aed" />
+        <button type="submit">Save</button>
+      </form>
+    </>
+  );
+}
+```
+
+## Constructor de páginas CMS
+
+Este componente está disponible como un bloque `colorPicker` en el [Constructor de páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "colorPicker",
+  "label": "Brand colour",
+  "defaultValue": "#3b82f6"
+}
+```
+
+# Propiedades
+
+`<ColorPicker />` (el envoltorio con estilo) acepta:
+
+| Prop | Tipo | Descripción |
+| --- | --- | --- |
+
+| `value` | \`string \ | HSVA\` | Color actual (controlado). Las cadenas aceptan hexadecimal (`#rgb`, `#rgba`, `#rrggbb`, `#rrggbbaa`), `rgb()`/`rgba()`, y `hsl()`/`hsla()`. |
+| `defaultValue` | \`string \ | HSVA\` | Color inicial (no controlado). Por defecto `#7c3aed`. |
+
+| `format` | \`"hex" \ | "rgba" \ | "hsla"\` | Formato de entrada activo (controlado). |
+| `defaultFormat` | \`"hex" \ | "rgba" \ | "hsla"\` | Formato de entrada inicial (no controlado). Por defecto `"hex"`. |
+
+| `onValueChange` | `(details: { value: string; hsva: HSVA }) => void` | Se llama en cada cambio de color; `value` es la cadena hexadecimal (con sufijo de alfa cuando es translúcido). |
+| `onFormatChange` | `(details: { format: ColorFormat }) => void` | Se llama cuando cambia el selector de formato. |
+| `trigger` | `boolean` | Renderiza un disparador de muestra que abre el panel en una ventana emergente en lugar de en línea. |
+| `open` / `defaultOpen` | `boolean` | Estado de la ventana emergente (controlado / no controlado); solo tiene sentido junto con `trigger`. |
+| `onOpenChange` | `(details: { open: boolean }) => void` | Se llama cuando la ventana emergente se abre o se cierra. |
+| `closeOnSelect` | `boolean` | Cierra la ventana emergente tras elegir una muestra predefinida. Por defecto `false`. |
+| `presets` | `string[]` | Colores de muestra predefinidos. Por defecto una paleta seleccionada de 14 colores; pasa `[]` para ocultarla. |
+| `name` | `string` | Renderiza un input oculto que lleva el valor hexadecimal para el envío nativo de `<form>`. |
+
+| `label` | \`string \ | JSX.Element\` | Etiqueta opcional renderizada encima del selector. |
+
+| `showArea` / `showSliders` / `showInputs` / `showSwatches` | `boolean` | Alterna secciones individuales del panel. Todas por defecto `true`. |
+| `disabled` | `boolean` | Deshabilita toda la interacción. |
+| `readOnly` | `boolean` | El valor es visible pero no se puede cambiar. |
+
+| `size` | \`"sm" \ | "md" \ | "lg"\` | Variante de tamaño de la receta (altura del área, tamaño de muestra, espaciado). Por defecto `"md"`. |
+
+| `interactive` | `boolean` | Fuerza (o suprime) la hidratación como isla. |
+
+## Hidratación
+
+El envoltorio se hidrata automáticamente cuando hay una señal de comportamiento presente —cualquier callback, un `value`/`defaultValue`, `open`/`defaultOpen`, o `trigger`— y renderiza HTML estático en caso contrario. `interactive={false}` siempre lo excluye; `interactive` (o `interactive={true}`) siempre lo incluye. La decisión pasa por el helper compartido `shouldHydrate()`, como cada isla de la librería.
+
+## Utilidades de color
+
+Exportadas desde el primitive para su reutilización y pruebas:
+
+| Helper | Descripción |
+| --- | --- |
+| `parseColor(input)` | Analiza cadenas hex/rgb(a)/hsl(a), objetos tipo HSVA o tipo RGB en un `HSVA` acotado. Recae en blanco. |
+| `hsvToRgb(h, s, v)` / `rgbToHsv(r, g, b)` | Conversión HSV ↔ RGB. |
+| `hsvToHsl(h, s, v)` / `hslToHsv(h, s, l)` | Conversión HSV ↔ HSL (s/v/l como 0–100). |
+| `hexToRgb(hex)` | Analiza hexadecimal de 3/4/6/8 dígitos en `{ r, g, b, a }`, o `null` si está mal formado. |
+| `hsvaToHex(c, includeAlpha?)` | Cadena hexadecimal; añade el byte alfa solo cuando se solicita y es translúcido. |
+| `hsvaToRgbaString(c)` / `hsvaToHslaString(c)` | Cadenas CSS `rgba()` / `hsla()`. |
+
+# Notas de producción
+
+- **Sin nuevas dependencias.** Toda la matemática de color (conversiones HSV/HSL/RGB/hex, análisis) se implementa localmente y se prueba con pruebas unitarias; nada se toma de `@rc-component`, `@ark-ui`, o React.
+- **Seguro para SSR.** Cada parte renderiza marcado significativo en el servidor —la variante estática es una vista previa fiel y no interactiva del mismo DOM exacto que hidrata la isla.
+- **Controlado o no controlado.** `value`/`format`/`open` admiten ambos modos, cada uno con su correspondiente `default*` habitual.
+- **Precisión.** Asigna objetos `HSVA` (desde `details.hsva` de `onValueChange`) en lugar de cadenas reanalizadas en escenarios controlados, para evitar desviaciones de redondeo de ida y vuelta entre formatos.
+- **Listo para formularios.** El prop `name` renderiza un input oculto con el valor hexadecimal actual, mantenido sincronizado en cada cambio.

@@ -34,7 +34,48 @@ const ACCENT_BORDER_CLASS: Record<NoteColor, string> = {
 // Site header — same shape/data as the blog and docs headers (all three read
 // the "configs" CMS singleton's `headerLinks`), kept as a local, un-DRY copy
 // rather than a shared component (see app/routes/blog/index.tsx).
-function NotesHeader({ headerLinks }: { headerLinks?: DocsNavLinkConfig[] }) {
+function getLocaleToggleUrl(
+	currentPath: string,
+	targetLocale: "en" | "zh" | "es",
+): string {
+	let cleanPath = currentPath;
+	if (cleanPath.startsWith("/zh")) {
+		cleanPath = cleanPath.slice(3);
+	} else if (cleanPath.startsWith("/es")) {
+		cleanPath = cleanPath.slice(3);
+	}
+	if (cleanPath === "") {
+		cleanPath = "/";
+	}
+
+	if (targetLocale === "en") {
+		return cleanPath;
+	}
+	return cleanPath === "/"
+		? `/${targetLocale}`
+		: `/${targetLocale}${cleanPath}`;
+}
+
+function NotesHeader({
+	headerLinks,
+	currentPath,
+	currentLocale,
+}: {
+	headerLinks?: DocsNavLinkConfig[];
+	currentPath: string;
+	currentLocale: string;
+}) {
+	const localizeLink = (href: string) => {
+		if (
+			currentLocale !== "en" &&
+			!href.startsWith(`/${currentLocale}`) &&
+			href.startsWith("/")
+		) {
+			return `/${currentLocale}${href}`;
+		}
+		return href;
+	};
+
 	return (
 		<header
 			class={css({
@@ -60,7 +101,7 @@ function NotesHeader({ headerLinks }: { headerLinks?: DocsNavLinkConfig[] }) {
 				})}
 			>
 				<Anchor
-					href="/"
+					href={localizeLink("/")}
 					variant="plain"
 					class={css({ textDecoration: "none", flexShrink: "0" })}
 				>
@@ -86,11 +127,15 @@ function NotesHeader({ headerLinks }: { headerLinks?: DocsNavLinkConfig[] }) {
 					{headerLinks?.map((link) => (
 						<Anchor
 							key={link.href}
-							href={link.href}
+							href={localizeLink(link.href)}
 							variant="plain"
 							class={css({ textStyle: "sm", fontWeight: "medium" })}
 						>
-							{link.label}
+							{currentLocale === "zh" && link.label === "Blog"
+								? "博客"
+								: currentLocale === "zh" && link.label === "Docs"
+									? "文档"
+									: link.label}
 						</Anchor>
 					))}
 					<Anchor
@@ -98,8 +143,47 @@ function NotesHeader({ headerLinks }: { headerLinks?: DocsNavLinkConfig[] }) {
 						variant="plain"
 						class={css({ textStyle: "sm", fontWeight: "medium" })}
 					>
-						Admin
+						{currentLocale === "zh" ? "内容管理" : "Admin"}
 					</Anchor>
+					{currentLocale !== "en" && (
+						<Anchor
+							href={getLocaleToggleUrl(currentPath, "en")}
+							variant="plain"
+							class={css({
+								textStyle: "sm",
+								fontWeight: "medium",
+								color: "blue.11",
+							})}
+						>
+							English
+						</Anchor>
+					)}
+					{currentLocale !== "zh" && (
+						<Anchor
+							href={getLocaleToggleUrl(currentPath, "zh")}
+							variant="plain"
+							class={css({
+								textStyle: "sm",
+								fontWeight: "medium",
+								color: "blue.11",
+							})}
+						>
+							中文
+						</Anchor>
+					)}
+					{currentLocale !== "es" && (
+						<Anchor
+							href={getLocaleToggleUrl(currentPath, "es")}
+							variant="plain"
+							class={css({
+								textStyle: "sm",
+								fontWeight: "medium",
+								color: "blue.11",
+							})}
+						>
+							Español
+						</Anchor>
+					)}
 				</nav>
 			</div>
 		</header>
@@ -260,10 +344,28 @@ function NoteGrid({ notes }: { notes: Note[] }) {
 }
 
 export default createRoute(async (c) => {
+	const currentPath = c.req.path;
+	let currentLocale = "en";
+	if (currentPath.startsWith("/zh")) {
+		currentLocale = "zh";
+	} else if (currentPath.startsWith("/es")) {
+		currentLocale = "es";
+	}
 	const [{ notes: allNotes, searchEntries, tags }, config] = await Promise.all([
-		loadNotes(),
+		loadNotes(currentLocale),
 		loadDocsConfig(),
 	]);
+
+	const localizeLink = (href: string) => {
+		if (
+			currentLocale !== "en" &&
+			!href.startsWith(`/${currentLocale}`) &&
+			href.startsWith("/")
+		) {
+			return `/${currentLocale}${href}`;
+		}
+		return href;
+	};
 
 	const url = new URL(c.req.url);
 	const searchQuery = url.searchParams.get("q") || "";
@@ -296,9 +398,15 @@ export default createRoute(async (c) => {
 
 	return c.render(
 		<>
-			<title>Notes - Artefact</title>
+			<title>
+				{currentLocale === "zh" ? "笔记 - Artefact" : "Notes - Artefact"}
+			</title>
 
-			<NotesHeader headerLinks={config.headerLinks} />
+			<NotesHeader
+				headerLinks={config.headerLinks}
+				currentPath={currentPath}
+				currentLocale={currentLocale}
+			/>
 
 			<div
 				class={css({

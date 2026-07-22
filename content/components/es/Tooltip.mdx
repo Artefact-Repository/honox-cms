@@ -1,0 +1,80 @@
+---
+title: Tooltip Descripción Emergente
+hydration: 1
+category: Overlays
+---
+
+import { Tooltip, Button } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introducción
+
+Un componente para mostrar información contextual al pasar el cursor o al enfocar.
+
+# Uso
+
+## Envoltorio de alto nivel
+
+<DemoPreview>
+  <Tooltip content="This is the tooltip content" placement="bottom" showArrow asChild>
+    <Button>Hover me</Button>
+  </Tooltip>
+</DemoPreview>
+
+```tsx
+import { Tooltip } from "../components/ui/tooltip";
+import { Button } from "../components/ui/button";
+
+export default function MyPage() {
+  return (
+    <Tooltip content="This is the tooltip content" placement="bottom" showArrow asChild>
+      <Button>Hover me</Button>
+    </Tooltip>
+  );
+}
+```
+
+Prefiere `asChild` cuando el trigger ya es un elemento enfocable (un `Button`, un enlace, …): fusiona el `aria-describedby` del tooltip, los listeners de hover/focus y los atributos `data-*` directamente en ese elemento. Sin `asChild`, el trigger se envuelve en un `<div tabindex="0">` adicional — útil para envolver contenido inerte (texto plano, un icono) que no es en sí mismo enfocable, pero añade un segundo punto de tabulación redundante cuando el hijo ya es interactivo.
+
+## Constructor de páginas CMS
+
+Este componente está disponible como un bloque `tooltip` en el [Constructor de páginas](/docs/PageBuilder) (`content/pages/*.json`). El trigger del CMS es una simple cadena `triggerText`, envuelta automáticamente en un `Button` outline con `asChild` (el mismo patrón que usan `Popover`/`HoverCard`):
+
+```json
+{
+  "type": "tooltip",
+  "content": "Free cancellation up to 24 hours before check-in.",
+  "triggerText": "Cancellation Policy",
+  "placement": "top",
+  "showArrow": true
+}
+```
+
+# Propiedades
+
+## Tooltip (envoltorio de alto nivel)
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `children` | `any` | El elemento que activa el tooltip. |
+| `content` | `any` | El contenido a mostrar dentro del tooltip. |
+| `showArrow` | `boolean` | Si se debe mostrar una flecha apuntando al trigger. |
+
+| `placement` | \`"top" \ | "bottom" \ | "left" \ | "right"\` | El lado del trigger en el que se abre el contenido. Predeterminado `"top"`. Se invierte automáticamente al lado opuesto si no hay suficiente espacio en el viewport. |
+
+| `open` | `boolean` | Si el tooltip está abierto (controlado). |
+| `defaultOpen` | `boolean` | Estado inicial abierto (no controlado). Predeterminado `false`. |
+| `onOpenChange` | `(details: { open: boolean }) => void` | Se llama cuando el tooltip se abre o se cierra. |
+| `openDelay` | `number` | Retraso (ms) antes de mostrarse al pasar el cursor. Predeterminado `100`. |
+| `closeDelay` | `number` | Retraso (ms) antes de ocultarse al retirar el cursor. Predeterminado `100`. |
+| `closeOnEscape` | `boolean` | Se cierra al pulsar Escape. Predeterminado `true`. |
+| `disabled` | `boolean` | Si el tooltip está deshabilitado. |
+| `interactive` | `boolean` | Fuerza la hidratación como island. Predeterminado `true`. |
+| `id` | `string` | Identificador único del tooltip. |
+| `asChild` | `boolean` | Si se deben fusionar las propiedades en el elemento hijo inmediato en lugar de envolverlo en un `div`. |
+
+Pasar el cursor sobre el trigger o enfocarlo abre el tooltip; mover el puntero sobre el propio contenido del tooltip (por ejemplo, un enlace dentro de él) lo mantiene abierto, según [WCAG 1.4.13](https://www.w3.org/WAI/WCAG21/Understanding/content-on-hover-or-focus.html). Enfocar el trigger (navegación por teclado) lo abre inmediatamente, y perder el foco lo cierra inmediatamente — `openDelay`/`closeDelay` solo se aplican al pasar el cursor.
+
+# Limitaciones
+
+El island interactivo posiciona y dimensiona el tooltip en relación con su trigger: se invierte al lado opuesto (por ejemplo, `top` → `bottom`) cuando la posición solicitada desbordaría el viewport, y limita el eje transversal para que el contenido nunca se renderice fuera de la pantalla. No rastrea contenedores de desplazamiento ni observadores de redimensionamiento como lo hace Floating UI — el reposicionamiento solo se vuelve a ejecutar cuando se abre el tooltip y en el `resize` de la ventana.

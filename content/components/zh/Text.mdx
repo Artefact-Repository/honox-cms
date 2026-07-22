@@ -1,0 +1,53 @@
+---
+title: Text 文本
+hydration: 3
+category: Typography
+---
+
+import { Text } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+用于以一致的排版显示正文、段落或行内元素的多态组件。
+
+# 用法
+
+<DemoPreview>
+  <Text size="lg">This is a paragraph.</Text>
+</DemoPreview>
+
+```tsx
+import { Text } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Text size="lg" class="muted">
+      This is a paragraph.
+    </Text>
+  );
+}
+```
+
+## CMS 页面构建器
+
+该组件可作为 `text` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用：
+
+```json
+{
+  "type": "text",
+  "content": "This is a paragraph.",
+  "size": "lg"
+}
+```
+
+# 属性
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `children` | `any` | 文本或内容。 |
+| `class` | `string` | 自定义 CSS 类。 |
+| `as` | `string` | 要渲染的 HTML 元素（如 "p"、"span"）。默认为 "p"。 |
+| `size` | `string` | 字体大小变体。 |
+| `variant` | `string` | 排版样式变体（如 "heading"、"label"）。 |
+| `interactive` | `boolean` | 是否启用客户端水合。 |

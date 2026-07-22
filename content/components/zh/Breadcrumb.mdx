@@ -1,0 +1,100 @@
+---
+title: Breadcrumb 面包屑
+hydration: 3
+category: Navigation
+---
+
+import { Breadcrumb } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+一种导航辅助元素，通过链接列表展示当前页面在层级结构中的位置。
+
+# 用法
+
+## 基础面包屑
+
+<DemoPreview>
+  <Breadcrumb
+    items={[
+      { label: "Home", href: "/" },
+      { label: "Components", href: "/components" },
+      { label: "Breadcrumb" },
+    ]}
+  />
+</DemoPreview>
+
+```tsx
+import { Breadcrumb } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Breadcrumb
+      items={[
+        { label: "Home", href: "/" },
+        { label: "Components", href: "/components" },
+        { label: "Breadcrumb" },
+      ]}
+    />
+  );
+}
+```
+
+## 自定义分隔符
+
+```tsx
+import { Breadcrumb } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Breadcrumb
+      separator="/"
+      items={[
+        { label: "Home", href: "/" },
+        { label: "Breadcrumb" },
+      ]}
+    />
+  );
+}
+```
+
+## CMS 页面构建器
+
+该组件在 [页面构建器](/docs/PageBuilder) (`content/pages/*.json`) 中作为 `breadcrumb` 区块提供：
+
+```json
+{
+  "type": "breadcrumb",
+  "items": [
+    { "label": "Home", "href": "/" },
+    { "label": "Docs", "href": "/docs" },
+    { "label": "Breadcrumb" }
+  ],
+  "variant": "underline",
+  "size": "md"
+}
+```
+
+# 属性
+
+## Breadcrumb
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `items` | `BreadcrumbItem[]` | 要渲染的面包屑项。 |
+| `separator` | `Child` | 各项之间的自定义分隔符。默认：chevron-right 图标。 |
+
+| `variant` | \`"underline" \ | "plain"\` | 面包屑的视觉样式。 |
+
+| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg"\` | 面包屑的尺寸。 |
+
+| `class` | `string` | 根元素的自定义 CSS 类。 |
+
+### BreadcrumbItem
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `label` | `Child` | 显示文本或 JSX 节点。 |
+| `href` | `string` | 如果存在，则渲染为链接；否则渲染为纯文本（当前页面）。 |
+| `current` | `boolean` | 标记当前页面。最后一项默认 `true`。 |

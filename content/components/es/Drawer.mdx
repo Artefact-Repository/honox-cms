@@ -1,0 +1,80 @@
+---
+title: Drawer Panel Lateral
+hydration: 1
+category: Overlays
+---
+
+import { Drawer, Button } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introducción
+
+Un panel que se desliza desde el borde de la pantalla para presentar contenido o acciones sin abandonar la página actual.
+
+# Uso
+
+## Cajón básico
+
+<DemoPreview>
+  <Drawer
+    trigger={<Button>Open Drawer</Button>}
+    title="Settings"
+    description="Adjust your preferences."
+    body="Drawer body content goes here."
+    cancel={<Button variant="outline">Close</Button>}
+    confirm={<Button>Save</Button>}
+  />
+</DemoPreview>
+
+```tsx
+import { Drawer, Button } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Drawer
+      trigger={<Button>Open Drawer</Button>}
+      title="Settings"
+      description="Adjust your preferences."
+      body="Drawer body content goes here."
+      cancel={<Button variant="outline">Close</Button>}
+      confirm={<Button>Save</Button>}
+    />
+  );
+}
+```
+
+## Constructor de páginas CMS
+
+Este componente está disponible como un bloque `drawer` en el [Constructor de páginas](/docs/PageBuilder) (`content/pages/*.json`). `trigger` es una lista de bloques anidada (el CMS siempre envía un array):
+
+```json
+{
+  "type": "drawer",
+  "title": "Settings",
+  "description": "Adjust your preferences.",
+  "confirmText": "Save",
+  "cancelText": "Close",
+  "trigger": [{ "type": "button", "text": "Open Drawer" }]
+}
+```
+
+# Propiedades
+
+## Drawer
+
+| Prop | Tipo | Descripción |
+| --- | --- | --- |
+| `trigger` | `JSX.Element` | Elemento que abre el cajón al activarse. |
+
+| `title` | \`string \ | JSX.Element\` | El título del cajón. |
+| `description` | \`string \ | JSX.Element\` | La descripción del cajón. |
+| `body` | \`string \ | JSX.Element\` | El contenido principal. |
+| `footer` | \`string \ | JSX.Element\` | Contenido personalizado del pie. |
+
+| `cancel` | `JSX.Element` | Elemento renderizado como disparador de cierre (cancelar). |
+| `confirm` | `JSX.Element` | Elemento renderizado como disparador de acción. |
+| `closable` | `boolean` | Si se muestra el botón de cierre. Por defecto: `true`. |
+| `interactive` | `boolean` | Habilita la hidratación del lado del cliente para comportamiento interactivo. |
+| `class` | `string` | Clases CSS personalizadas para el elemento raíz. |
+
+Los props adicionales (por ejemplo, `open`, `defaultOpen`, `onOpenChange`, `id`) se reenvían al primitive de cajón subyacente.

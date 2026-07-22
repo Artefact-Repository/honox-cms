@@ -1,0 +1,137 @@
+---
+title: Grid Cuadrícula
+hydration: 3
+category: Layout
+---
+
+import { Grid } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# Introducción
+
+Un primitive de layout responsivo con CSS Grid. Organiza los hijos con un número
+explícito de columnas/filas, o deja que se autoajusten según un ancho mínimo de hijo
+—ambos admiten valores responsivos (por punto de ruptura).
+
+# Uso
+
+## Columnas fijas
+
+<DemoPreview>
+  <Grid columns={3} gap="4" style={{ width: "100%" }}>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-blue-3)", borderRadius: "8px" }}>1</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-blue-3)", borderRadius: "8px" }}>2</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-blue-3)", borderRadius: "8px" }}>3</div>
+  </Grid>
+</DemoPreview>
+
+```tsx
+import { Grid } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Grid columns={3} gap="4">
+      <div>1</div>
+      <div>2</div>
+      <div>3</div>
+    </Grid>
+  );
+}
+```
+
+## Autoajuste por ancho mínimo de hijo
+
+No se necesitan puntos de ruptura —las columnas se añaden o eliminan automáticamente a medida que el contenedor cambia de tamaño.
+
+<DemoPreview>
+  <Grid minChildWidth="120px" gap="4" style={{ width: "100%" }}>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>A</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>B</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>C</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>D</div>
+  </Grid>
+</DemoPreview>
+
+```tsx
+import { Grid } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Grid minChildWidth="120px" gap="4">
+      <div>A</div>
+      <div>B</div>
+      <div>C</div>
+      <div>D</div>
+    </Grid>
+  );
+}
+```
+
+## Número de columnas responsivo
+
+```tsx
+import { Grid } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Grid columns={{ base: 1, md: 2, lg: 3 }} gap="4">
+      <div>1</div>
+      <div>2</div>
+      <div>3</div>
+    </Grid>
+  );
+}
+```
+
+## Espaciados de columna y fila independientes
+
+```tsx
+import { Grid } from "../components/ui";
+
+export default function MyPage() {
+  return (
+    <Grid columns={2} columnGap="6" rowGap="2">
+      <div>1</div>
+      <div>2</div>
+      <div>3</div>
+      <div>4</div>
+    </Grid>
+  );
+}
+```
+
+## Constructor de páginas CMS
+
+Este componente está disponible como un bloque `grid` en el [Constructor de páginas](/docs/PageBuilder) (`content/pages/*.json`):
+
+```json
+{
+  "type": "grid",
+  "columns": 3,
+  "gap": "4",
+  "children": [
+    { "type": "text", "content": "1" },
+    { "type": "text", "content": "2" },
+    { "type": "text", "content": "3" }
+  ]
+}
+```
+
+# Propiedades
+
+| Prop | Tipo | Descripción |
+| --- | --- | --- |
+| `children` | `any` | Contenido a renderizar dentro de la cuadrícula. |
+| `class` | `string` | Clases CSS personalizadas. |
+
+| `columns` | \`Responsive\<number \ | string\>\` | Número de columnas (`repeat(columns, minmax(0, 1fr))`). Tiene prioridad sobre `minChildWidth` si ambos están establecidos. |
+| `rows` | \`Responsive\<number \ | string\>\` | Número de filas (`repeat(rows, minmax(0, 1fr))`). |
+| `minChildWidth` | \`Responsive\<number \ | string\>\` | Autoajusta tantas columnas como quepan, cada una con al menos este ancho (`repeat(auto-fit, minmax(width, 1fr))`). Se ignora cuando se establece `columns`. |
+
+| `gap` | \`string \ | number \ | Responsive\<...\>\` | Espaciado entre celdas. Por defecto `"8px"` a menos que se establezca `columnGap`/`rowGap`. |
+| `columnGap` | \`string \ | number \ | Responsive\<...\>\` | Espaciado solo entre columnas. |
+| `rowGap` | \`string \ | number \ | Responsive\<...\>\` | Espaciado solo entre filas. |
+
+`Responsive<T>` acepta un valor plano o un objeto por punto de ruptura,
+por ejemplo `{ base: 1, md: 2, lg: 3 }`, usando los mismos puntos de ruptura que el resto
+del sistema de diseño (`base`, `sm`, `md`, `lg`, `xl`, `2xl`).

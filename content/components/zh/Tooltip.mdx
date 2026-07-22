@@ -1,0 +1,80 @@
+---
+title: Tooltip 文字提示
+hydration: 1
+category: Overlays
+---
+
+import { Tooltip, Button } from "../../../app/components/ui";
+import { DemoPreview } from "../../../app/components/demo-preview";
+
+# 简介
+
+用于在悬停或聚焦时显示上下文信息的组件。
+
+# 用法
+
+## 高层封装
+
+<DemoPreview>
+  <Tooltip content="This is the tooltip content" placement="bottom" showArrow asChild>
+    <Button>Hover me</Button>
+  </Tooltip>
+</DemoPreview>
+
+```tsx
+import { Tooltip } from "../components/ui/tooltip";
+import { Button } from "../components/ui/button";
+
+export default function MyPage() {
+  return (
+    <Tooltip content="This is the tooltip content" placement="bottom" showArrow asChild>
+      <Button>Hover me</Button>
+    </Tooltip>
+  );
+}
+```
+
+当触发器本身已是可聚焦元素（如 `Button`、链接……）时，优先使用 `asChild`：它会将 tooltip 的 `aria-describedby`、悬停/聚焦监听器和 `data-*` 属性直接合并到该元素上。不使用 `asChild` 时，触发器会被包裹在一个额外的 `<div tabindex="0">` 中 —— 适合包裹本身不可聚焦的无生命内容（纯文本、图标），但当子元素本身可交互时，会额外增加一个多余的 Tab 停靠点。
+
+## CMS 页面构建器
+
+该组件可作为 `tooltip` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用。CMS 触发器是一个普通字符串 `triggerText`，会自动包裹在带 `asChild` 的 outline `Button` 中（与 `Popover`/`HoverCard` 使用的模式相同）：
+
+```json
+{
+  "type": "tooltip",
+  "content": "Free cancellation up to 24 hours before check-in.",
+  "triggerText": "Cancellation Policy",
+  "placement": "top",
+  "showArrow": true
+}
+```
+
+# 属性
+
+## Tooltip（高层封装）
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `children` | `any` | 触发 tooltip 的元素。 |
+| `content` | `any` | 在 tooltip 中显示的内容。 |
+| `showArrow` | `boolean` | 是否显示指向触发器的箭头。 |
+
+| `placement` | \`"top" \ | "bottom" \ | "left" \ | "right"\` | 内容在触发器的哪一侧打开。默认 `"top"`。若视口空间不足，会自动翻转到相反一侧。 |
+
+| `open` | `boolean` | Tooltip 是否打开（受控）。 |
+| `defaultOpen` | `boolean` | 初始打开状态（非受控）。默认 `false`。 |
+| `onOpenChange` | `(details: { open: boolean }) => void` | Tooltip 打开或关闭时调用。 |
+| `openDelay` | `number` | 悬停后显示的延迟（毫秒）。默认 `100`。 |
+| `closeDelay` | `number` | 鼠标移出后隐藏的延迟（毫秒）。默认 `100`。 |
+| `closeOnEscape` | `boolean` | 按下 Escape 时关闭。默认 `true`。 |
+| `disabled` | `boolean` | Tooltip 是否禁用。 |
+| `interactive` | `boolean` | 强制作为岛屿水合。默认为 `true`。 |
+| `id` | `string` | Tooltip 的唯一标识符。 |
+| `asChild` | `boolean` | 是否将属性合并到直接子元素上，而非包裹在一个 `div` 中。 |
+
+将指针悬停到触发器上或聚焦触发器会打开 tooltip；将指针移到 tooltip 自身的内容上（例如其中的链接）会保持其打开，符合 [WCAG 1.4.13](https://www.w3.org/WAI/WCAG21/Understanding/content-on-hover-or-focus.html)。聚焦触发器（键盘导航）会立即打开，失焦会立即关闭 —— `openDelay`/`closeDelay` 仅适用于悬停。
+
+# 限制
+
+交互式岛屿会根据其触发器定位并调整 tooltip 的大小：当请求的 placement 会溢出视口时，它会翻转到相反的一侧（如 `top` → `bottom`），并夹紧交叉轴以防止内容渲染到屏幕外。它不像 Floating UI 那样跟踪滚动容器或 resize 监听器 —— 重新定位仅在 tooltip 打开时以及窗口 `resize` 时重新运行。

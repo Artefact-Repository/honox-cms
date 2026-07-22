@@ -1,0 +1,82 @@
+{
+  "collections": [
+    {
+      "folder": "docs",
+      "label": "Guides",
+      "cmsCollection": ""
+    },
+    {
+      "folder": "components",
+      "label": "Components",
+      "cmsCollection": ""
+    }
+  ],
+  "groups": [
+    {
+      "label": "指南",
+      "section": "Guides"
+    },
+    {
+      "label": "布局",
+      "section": "",
+      "category": "Layout"
+    },
+    {
+      "label": "排版",
+      "section": "",
+      "category": "Typography"
+    },
+    {
+      "label": "导航",
+      "section": "",
+      "category": "Navigation"
+    },
+    {
+      "label": "反馈",
+      "section": "",
+      "category": "Feedback"
+    },
+    {
+      "label": "数据展示",
+      "section": "",
+      "category": "Data Display"
+    },
+    {
+      "label": "表单",
+      "section": "",
+      "category": "Forms"
+    },
+    {
+      "label": "浮层",
+      "section": "",
+      "category": "Overlays"
+    }
+  ],
+  "fallbackLabel": "其他",
+  "links": [
+    {
+      "label": "GitHub",
+      "href": "https://github.com/Chen-Software/honox-cms"
+    }
+  ],
+  "headerLinks": [
+    {
+      "label": "博客",
+      "href": "/blog"
+    },
+    {
+      "label": "文档",
+      "href": "/docs"
+    },
+    {
+      "label": "笔记",
+      "href": "/notes"
+    }
+  ],
+  "blog": {
+    "title": "博客 - Artefact",
+    "description": "来自我们团队的洞察、更新与故事。",
+    "newsletterHeading": "保持更新",
+    "newsletterDescription": "将最新的文章和洞察直接发送到您的邮箱。没有垃圾邮件，只有优质内容。"
+  }
+}

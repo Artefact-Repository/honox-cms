@@ -3,10 +3,14 @@
 # Sveltia CMS Configuration
 # Documentation: https://sveltiacms.app/en/docs/config-basics
 
-# Internationalization (i18n)
+# Internationalisation (i18n)
+# structure: multiple_folders matches the actual content layout — translated
+# files live under content/<collection>/<locale>/... (e.g.
+# content/docs/zh/Hydration.md) alongside the default-locale files at
+# content/docs/Hydration.md (per omit_default_locale_from_file_path below).
 i18n:
-  structure: multiple_files
-  locales: [en, zh]
+  structure: multiple_folders
+  locales: [en, zh, es]
   default_locale: en
   omit_default_locale_from_file_path: true
 
@@ -1715,13 +1719,20 @@ collections:
 singletons:
   - name: configs
     label: Configs
-    file: content/configs.json
+    i18n: true
+    # {{locale}} placeholder — required for i18n on file collections/singletons
+    # (the top-level i18n.structure option only applies to folder-based entry
+    # collections). Resolves to content/configs.json for the default locale
+    # (en, omitted per omit_default_locale_from_file_path) and
+    # content/configs.zh.json / content/configs.es.json for translations.
+    file: content/configs.{{locale}}.json
     fields:
       - label: Collections
         name: collections
         widget: list
         required: false
-        hint: "Maps each content/<folder> collection (e.g. docs, components) to a sidenav label and, if it differs from the folder name, a CMS collection slug for the doc's Edit link. A folder with no entry here falls back to its capitalized name for both."
+        i18n: duplicate
+        hint: "Maps each content/<folder> collection (e.g. docs, components) to a sidenav label and, if it differs from the folder name, a CMS collection slug for the doc's Edit link. A folder with no entry here falls back to its capitalised name for both."
         fields:
           - label: Folder
             name: folder
@@ -1740,39 +1751,45 @@ singletons:
       - label: Groups
         name: groups
         widget: list
-        hint: "Controls the docs sidenav: order = top-to-bottom group order. Each group collects every doc matching its Section and/or Category (both must match if both are set)."
+        i18n: true
+        hint: "Controls the docs sidenav: order = top-to-bottom group order. Each group collects every doc matching its Section and/or Category (both must match if both are set). Section/Category are matching keys and must stay in English (identical across locales) — only Label is translated per locale."
         fields:
-          - { label: Label, name: label, widget: string }
+          - { label: Label, name: label, widget: string, i18n: true }
           - label: Section
             name: section
             widget: string
             required: false
-            hint: "Claim every doc from a whole collection by its section label (see Collections above), e.g. Guides."
+            i18n: duplicate
+            hint: "Claim every doc from a whole collection by its section label (see Collections above), e.g. Guides. Matching key — keep in English, identical across locales."
           - label: Category
             name: category
             widget: select
             options: *component_categories
             required: false
-            hint: "Claim docs by their Category field (Components collection only)."
+            i18n: duplicate
+            hint: "Claim docs by their Category field (Components collection only). Matching key — keep in English, identical across locales (the Category field itself is i18n: duplicate, so it's always English regardless of doc locale)."
       - label: Fallback Group Label
         name: fallbackLabel
         widget: string
         default: Other
         required: false
+        i18n: true
         hint: "Label for any doc that doesn't match a group above."
       - label: Links
         name: links
         widget: list
         required: false
+        i18n: true
         hint: "Plain links shown at the bottom of the sidenav, e.g. the GitHub repo."
         fields:
-          - { label: Label, name: label, widget: string }
-          - { label: URL, name: href, widget: string }
+          - { label: Label, name: label, widget: string, i18n: true }
+          - { label: URL, name: href, widget: string, i18n: duplicate }
       - label: Header Links
         name: headerLinks
         widget: list
         required: false
+        i18n: true
         hint: "Plain links shown in the header nav on both the docs and blog sections, e.g. Blog and Docs."
         fields:
-          - { label: Label, name: label, widget: string }
-          - { label: URL, name: href, widget: string }
+          - { label: Label, name: label, widget: string, i18n: true }
+          - { label: URL, name: href, widget: string, i18n: duplicate }
