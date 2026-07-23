@@ -74,6 +74,10 @@
     {
       "label": "Dokumentation",
       "href": "/docs"
+    },
+    {
+      "label": "Product Landing",
+      "href": "/pages/product-landing"
     }
   ],
   "blog": {
@@ -93,5 +97,17 @@
     "edit": "Bearbeiten",
     "admin": "Verwaltung",
     "menu": "Menü"
+  },
+  "home": {
+    "brandName": "Artefact UI",
+    "titleFallback": "Artefact — Modernes UI-Kit",
+    "adminLabel": "Sveltia CMS",
+    "exploreLabel": "Explore Hub",
+    "footerCopyright": "© 2025 Artefact UI Suite. All rights reserved.",
+    "footerLinks": [
+      { "label": "HonoX Docs", "href": "https://honox.dev", "colorPalette": "blue" },
+      { "label": "PandaCSS Docs", "href": "https://panda-css.com", "colorPalette": "purple" },
+      { "label": "Park UI", "href": "https://park-ui.com", "colorPalette": "green" }
+    ]
   }
 }

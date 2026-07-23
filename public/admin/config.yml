@@ -2036,3 +2036,58 @@ singletons:
             default: Menu
             i18n: true
             hint: "Label for the mobile disclosure that expands into the sidenav."
+      - label: Home
+        name: home
+        widget: object
+        required: false
+        i18n: true
+        hint: "Home page (/) chrome copy: brand name, <title> fallback, and footer content. Every field is fully translated per locale."
+        fields:
+          - label: Brand Name
+            name: brandName
+            widget: string
+            required: false
+            default: Artefact UI
+            i18n: true
+            hint: "Shown in the header next to the logo."
+          - label: Title Fallback
+            name: titleFallback
+            widget: string
+            required: false
+            default: "Artefact — Modern UI Suite"
+            i18n: true
+            hint: "Used for the <title> tag only if content/pages/index.json has no title set for this locale."
+          - label: Admin Link Label
+            name: adminLabel
+            widget: string
+            required: false
+            default: Sveltia CMS
+            i18n: true
+            hint: "Header nav link to /admin."
+          - label: Explore Button Label
+            name: exploreLabel
+            widget: string
+            required: false
+            default: Explore Hub
+            i18n: true
+          - label: Footer Copyright
+            name: footerCopyright
+            widget: string
+            required: false
+            default: "© 2025 Artefact UI Suite. All rights reserved."
+            i18n: true
+          - label: Footer Links
+            name: footerLinks
+            widget: list
+            required: false
+            i18n: true
+            hint: "Plain links shown at the bottom of the footer, e.g. HonoX Docs."
+            fields:
+              - { label: Label, name: label, widget: string, i18n: true }
+              - { label: URL, name: href, widget: string, i18n: duplicate }
+              - label: Color Palette
+                name: colorPalette
+                widget: string
+                required: false
+                i18n: duplicate
+                hint: "Anchor colorPalette token, e.g. blue, purple, green. Defaults to slate if omitted."

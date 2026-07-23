@@ -3,6 +3,7 @@ import { createRoute } from "honox/factory";
 import { PageRenderer } from "../components/page-renderer";
 import { Anchor, Avatar, Button, Heading, Stack, Text } from "../components/ui";
 import { LanguageSwitcher } from "../components/language-switcher";
+import { loadDocsConfig } from "../lib/configs";
 import { detectLocale, localiseHref } from "../lib/i18n";
 import { loadPage } from "../lib/pages";
 
@@ -12,11 +13,17 @@ export default createRoute(async (c) => {
 
 	const localiseLink = (href: string) => localiseHref(href, currentLocale);
 
-	const data = (await loadPage("index", currentLocale)) ?? { content: [] };
+	const [data, config] = await Promise.all([
+		loadPage("index", currentLocale).then((page) => page ?? { content: [] }),
+		loadDocsConfig(currentLocale),
+	]);
+	const home = config.home ?? {};
 
 	return c.render(
 		<div class={css({ bg: "bg.canvas", minH: "screen", color: "fg.default" })}>
-			<title>{data.title ?? "Artefact — Modern UI Suite"}</title>
+			<title>
+				{data.title ?? home.titleFallback ?? "Artefact — Modern UI Suite"}
+			</title>
 
 			{/* Beautiful Header */}
 			<header
@@ -49,7 +56,7 @@ export default createRoute(async (c) => {
 				>
 					<Stack direction="horizontal" gap="3" align="center">
 						<Avatar
-							name="Artefact UI"
+							name={home.brandName ?? "Artefact UI"}
 							size="sm"
 							variant="solid"
 							colorPalette="blue"
@@ -62,7 +69,7 @@ export default createRoute(async (c) => {
 								tracking: "tight",
 							})}
 						>
-							Artefact UI
+							{home.brandName ?? "Artefact UI"}
 						</Heading>
 					</Stack>
 
@@ -73,39 +80,19 @@ export default createRoute(async (c) => {
 							alignItems: "center",
 						})}
 					>
-						<Anchor
-							href={localiseLink("/blog")}
-							variant="plain"
-							class={css({
-								display: { base: "none", md: "block" },
-								textStyle: "sm",
-								fontWeight: "medium",
-							})}
-						>
-							{currentLocale === "zh" ? "博客" : "Blog"}
-						</Anchor>
-						<Anchor
-							href={localiseLink("/docs")}
-							variant="plain"
-							class={css({
-								display: { base: "none", md: "block" },
-								textStyle: "sm",
-								fontWeight: "medium",
-							})}
-						>
-							{currentLocale === "zh" ? "文档" : "Docs"}
-						</Anchor>
-						<Anchor
-							href={localiseLink("/pages/product-landing")}
-							variant="plain"
-							class={css({
-								display: { base: "none", md: "block" },
-								textStyle: "sm",
-								fontWeight: "medium",
-							})}
-						>
-							{currentLocale === "zh" ? "产品着陆页" : "Pulse Landing Page"}
-						</Anchor>
+						{(config.headerLinks ?? []).map((link) => (
+							<Anchor
+								href={localiseLink(link.href)}
+								variant="plain"
+								class={css({
+									display: { base: "none", md: "block" },
+									textStyle: "sm",
+									fontWeight: "medium",
+								})}
+							>
+								{link.label}
+							</Anchor>
+						))}
 						<Anchor
 							href="/admin"
 							variant="plain"
@@ -115,7 +102,7 @@ export default createRoute(async (c) => {
 								fontWeight: "medium",
 							})}
 						>
-							{currentLocale === "zh" ? "内容管理" : "Sveltia CMS"}
+							{home.adminLabel ?? "Sveltia CMS"}
 						</Anchor>
 						<LanguageSwitcher
 							currentPath={currentPath}
@@ -128,7 +115,7 @@ export default createRoute(async (c) => {
 							interactive
 							onclick="window.scrollTo({top: document.getElementById('hub').offsetTop - 80, behavior: 'smooth'})"
 						>
-							{currentLocale === "zh" ? "探索中心" : "Explore Hub"}
+							{home.exploreLabel ?? "Explore Hub"}
 						</Button>
 					</nav>
 				</div>
@@ -172,44 +159,29 @@ export default createRoute(async (c) => {
 				>
 					<Stack direction="horizontal" gap="3" align="center">
 						<Avatar
-							name="Artefact UI"
+							name={home.brandName ?? "Artefact UI"}
 							size="xs"
 							variant="solid"
 							colorPalette="blue"
 						/>
 						<Text size="sm" class={css({ fontWeight: "semibold" })}>
-							© 2025 Artefact UI Suite. All rights reserved.
+							{home.footerCopyright ??
+								"© 2025 Artefact UI Suite. All rights reserved."}
 						</Text>
 					</Stack>
 
 					<Stack direction="horizontal" gap="6">
-						<Anchor
-							href="https://honox.dev"
-							target="_blank"
-							variant="underline"
-							colorPalette="blue"
-							class={css({ textStyle: "sm" })}
-						>
-							HonoX Docs
-						</Anchor>
-						<Anchor
-							href="https://panda-css.com"
-							target="_blank"
-							variant="underline"
-							colorPalette="purple"
-							class={css({ textStyle: "sm" })}
-						>
-							PandaCSS Docs
-						</Anchor>
-						<Anchor
-							href="https://park-ui.com"
-							target="_blank"
-							variant="underline"
-							colorPalette="green"
-							class={css({ textStyle: "sm" })}
-						>
-							Park UI
-						</Anchor>
+						{(home.footerLinks ?? []).map((link) => (
+							<Anchor
+								href={link.href}
+								target="_blank"
+								variant="underline"
+								colorPalette={(link.colorPalette ?? "gray") as any}
+								class={css({ textStyle: "sm" })}
+							>
+								{link.label}
+							</Anchor>
+						))}
 					</Stack>
 				</div>
 			</footer>

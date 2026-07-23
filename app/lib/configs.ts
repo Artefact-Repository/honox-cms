@@ -55,6 +55,26 @@ export interface DocsUiConfig {
 	menu?: string;
 }
 
+/** A plain link rendered in the home page footer (e.g. HonoX Docs). */
+export interface HomeFooterLinkConfig {
+	label: string;
+	href: string;
+	/** Anchor colorPalette prop; falls back to "slate" when omitted. */
+	colorPalette?: string;
+}
+
+/** Home page chrome copy: brand name, <title> fallback, and footer content —
+ * not part of any collection's content, so it lives on the configs singleton
+ * instead. Every field is fully translated per locale. */
+export interface HomeSiteConfig {
+	brandName?: string;
+	titleFallback?: string;
+	adminLabel?: string;
+	exploreLabel?: string;
+	footerCopyright?: string;
+	footerLinks?: HomeFooterLinkConfig[];
+}
+
 /** Shape of the `DocsConfig` singleton (content/configs.json) — drives
  * collection labeling plus the docs sidenav's grouping/ordering, so none of
  * it is hardcoded to any one collection. */
@@ -80,6 +100,8 @@ export interface DocsConfig {
 	hydrationTiers?: HydrationTierConfig[];
 	/** Docs search box + header Edit/Admin button copy. */
 	docsUi?: DocsUiConfig;
+	/** Home page brand/chrome copy and footer links. */
+	home?: HomeSiteConfig;
 }
 
 const EMPTY_DOCS_CONFIG: DocsConfig = { groups: [] };
