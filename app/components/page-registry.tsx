@@ -1,6 +1,6 @@
 import { css } from "design-system/css";
 import { ChevronDownIcon } from "../icons/chevron-down";
-import { localiseHref } from "../lib/i18n";
+import { localeToggleUrl, localiseHref } from "../lib/i18n";
 import { extractLayoutStyle } from "./block-style";
 import { type ComponentBlock, propsOf } from "./block-types";
 import {
@@ -256,11 +256,24 @@ const registry: Record<string, BlockRenderer> = {
 		// which stores one canonical relative href shared across every locale
 		// file rather than a pre-localised one per file. Ordinary page-builder
 		// anchors never pass this, so they're unaffected.
-		const { text, href, locale, ...rest } = propsOf(b);
-		const resolvedHref =
-			typeof href === "string" && typeof locale === "string"
-				? localiseHref(href, locale)
-				: href;
+		//
+		// `toggleLocale` is the language-switcher case: instead of a fixed
+		// `href`, it names the locale this link should switch *to* — the
+		// actual target is computed from the current request's path (also an
+		// extraProp, see `renderBlocks` call sites) so the switch preserves
+		// whatever page you're on, e.g. `/docs/foo` -> `/docs/de/foo`.
+		const { text, href, locale, currentPath, toggleLocale, ...rest } =
+			propsOf(b);
+		let resolvedHref = href;
+		if (
+			typeof toggleLocale === "string" &&
+			typeof currentPath === "string" &&
+			typeof locale === "string"
+		) {
+			resolvedHref = localeToggleUrl(currentPath, locale, toggleLocale);
+		} else if (typeof href === "string" && typeof locale === "string") {
+			resolvedHref = localiseHref(href, locale);
+		}
 		return (
 			<Anchor href={resolvedHref} {...rest}>
 				{text}

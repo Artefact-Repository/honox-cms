@@ -1,8 +1,8 @@
 import { css } from "design-system/css";
 import { createRoute } from "honox/factory";
 import { PageRenderer } from "../components/page-renderer";
+import { renderBlocks } from "../components/page-registry";
 import { Anchor, Avatar, Stack, Text } from "../components/ui";
-import { LanguageSwitcher } from "../components/language-switcher";
 import { loadDocsConfig } from "../lib/configs";
 import { detectLocale } from "../lib/i18n";
 import { loadPage } from "../lib/pages";
@@ -62,10 +62,17 @@ export default createRoute(async (c) => {
 						})}
 					>
 						<PageRenderer content={data.headerNav ?? []} />
-						<LanguageSwitcher
-							currentPath={currentPath}
-							currentLocale={currentLocale}
-						/>
+						{/* Appearance popover + language switcher live once in
+						`config.headerItems` and are reused here — everything
+						else in that list (Blog/Docs/Product links) is already
+						covered by `data.headerNav` above. */}
+						{renderBlocks(
+							config.headerItems?.filter(
+								(item) =>
+									item.type === "popover" || item.type === "languageSwitcher",
+							),
+							{ locale: currentLocale, currentPath },
+						)}
 						<PageRenderer content={data.headerActions ?? []} />
 					</nav>
 				</div>

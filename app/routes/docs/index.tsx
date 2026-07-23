@@ -2,7 +2,6 @@ import { css, cx } from "design-system/css";
 import { button } from "design-system/recipes";
 import { createRoute } from "honox/factory";
 import type { ComponentBlock } from "../../components/block-types";
-import { LanguageSwitcher } from "../../components/language-switcher";
 import { PageRenderer } from "../../components/page-renderer";
 import { renderBlocks } from "../../components/page-registry";
 import {
@@ -263,6 +262,7 @@ function HeaderActions({
 		<>
 			{renderBlocks(headerItems, {
 				locale: currentLocale,
+				currentPath,
 				class: css({ textStyle, fontWeight: "medium" }),
 			})}
 			{editUrl ? (
@@ -286,10 +286,6 @@ function HeaderActions({
 					{currentLocale === "zh" ? "内容管理" : "Admin"}
 				</Anchor>
 			)}
-			<LanguageSwitcher
-				currentPath={currentPath}
-				currentLocale={currentLocale}
-			/>
 			{githubLink && (
 				<Anchor
 					href={githubLink.href}

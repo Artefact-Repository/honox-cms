@@ -1,7 +1,13 @@
 export const conditions = {
 	extend: {
-		light: "@media (prefers-color-scheme: light)",
-		dark: "@media (prefers-color-scheme: dark)",
+		// Manual override via `document.documentElement.dataset.theme`, set by
+		// the boot script in `_renderer.tsx` (falls back to
+		// `prefers-color-scheme` there before first paint) and by
+		// `SettingsPopover`. Kept as plain attribute selectors — not a
+		// `prefers-color-scheme` media query — so an explicit choice always
+		// wins regardless of the OS setting.
+		light: "[data-theme=light] &",
+		dark: "[data-theme=dark] &",
 		invalid: "&:is(:user-invalid, [data-invalid], [aria-invalid=true])",
 		hover: "&:not(:disabled):hover",
 		active: "&:not(:disabled):active",

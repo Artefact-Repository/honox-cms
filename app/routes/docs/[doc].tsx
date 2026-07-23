@@ -3,7 +3,6 @@ import { button } from "design-system/recipes";
 import { ssgParams } from "hono/ssg";
 import { createRoute } from "honox/factory";
 import type { ComponentBlock } from "../../components/block-types";
-import { LanguageSwitcher } from "../../components/language-switcher";
 import { renderBlocks } from "../../components/page-registry";
 import {
 	Anchor,
@@ -276,6 +275,7 @@ function HeaderActions({
 		<>
 			{renderBlocks(headerItems, {
 				locale: currentLocale,
+				currentPath,
 				class: css({ textStyle, fontWeight: "medium" }),
 			})}
 			{editUrl ? (
@@ -299,10 +299,6 @@ function HeaderActions({
 					{ui.admin}
 				</Anchor>
 			)}
-			<LanguageSwitcher
-				currentPath={currentPath}
-				currentLocale={currentLocale}
-			/>
 			{githubLink && (
 				<Anchor
 					href={githubLink.href}

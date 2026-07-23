@@ -81,13 +81,6 @@
       "type": "link",
       "text": "Product",
       "href": "/product-landing"
-    },
-    {
-      "type": "button",
-      "text": "↑ Topo",
-      "variant": "outline",
-      "size": "sm",
-      "onclick": "window.scrollTo({ top: 0, behavior: 'smooth' })"
     }
   ],
   "blog": {

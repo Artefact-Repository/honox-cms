@@ -2,7 +2,6 @@ import { css, cx } from "design-system/css";
 import { button } from "design-system/recipes";
 import { ssgParams } from "hono/ssg";
 import { createRoute } from "honox/factory";
-import { LanguageSwitcher } from "../../../components/language-switcher";
 import { renderBlocks } from "../../../components/page-registry";
 import {
 	Anchor,
@@ -108,7 +107,10 @@ export default createRoute(
 								alignItems: "center",
 							})}
 						>
-							{renderBlocks(config.headerItems, { locale: currentLocale })}
+							{renderBlocks(config.headerItems, {
+								locale: currentLocale,
+								currentPath: c.req.path,
+							})}
 							<Anchor
 								href="/admin"
 								class={cx(
@@ -118,10 +120,6 @@ export default createRoute(
 							>
 								{docsUi.admin}
 							</Anchor>
-							<LanguageSwitcher
-								currentPath={c.req.path}
-								currentLocale={currentLocale}
-							/>
 						</nav>
 					</div>
 				</header>
