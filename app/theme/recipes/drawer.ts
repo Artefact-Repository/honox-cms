@@ -91,7 +91,7 @@ export const drawer = defineSlotRecipe({
 			justifyContent: "flex-end",
 			flex: "0",
 			gap: "3",
-			pt: "0",
+			pt: { base: "3", md: "4" },
 			pb: { base: "4", md: "6" },
 			px: { base: "4", md: "6" },
 			textAlign: "start",
@@ -160,9 +160,9 @@ export const drawer = defineSlotRecipe({
 				},
 				content: {
 					// Side drawers span the full viewport height (not just cap at it),
-					// so `body`'s `flex: 1` fills the remaining space and `footer`
-					// stays pinned to the bottom of the overlay instead of trailing
-					// directly under short body content.
+					// so the absolutely-positioned footer below has a full-height
+					// `content` (its nearest positioned ancestor, via `position:
+					// relative` in base) to pin itself to the bottom of.
 					h: "100dvh",
 					_open: {
 						animationName: {
@@ -176,6 +176,26 @@ export const drawer = defineSlotRecipe({
 							_rtl: "slide-to-right-full, fade-out",
 						},
 					},
+				},
+				// `children` (the Drawer's raw JSX children, as opposed to the
+				// `body` prop) renders as a direct sibling of Header/Body/Footer
+				// with no `flex: 1` of its own, so a normal-flow footer trails
+				// right under short content instead of the overlay's bottom edge.
+				// Taking the footer out of flow and anchoring it directly sidesteps
+				// that regardless of which of `body`/`children` is used.
+				footer: {
+					position: "absolute",
+					insetInlineStart: "0",
+					insetInlineEnd: "0",
+					bottom: "0",
+					bg: "gray.surface.bg",
+					borderTopWidth: "1px",
+					borderColor: "border",
+				},
+				body: {
+					// Reserve room so scrolled-to-bottom content isn't hidden behind
+					// the now-absolutely-positioned footer.
+					pb: "20",
 				},
 			},
 			end: {
@@ -197,6 +217,18 @@ export const drawer = defineSlotRecipe({
 							_rtl: "slide-to-left-full, fade-out",
 						},
 					},
+				},
+				footer: {
+					position: "absolute",
+					insetInlineStart: "0",
+					insetInlineEnd: "0",
+					bottom: "0",
+					bg: "gray.surface.bg",
+					borderTopWidth: "1px",
+					borderColor: "border",
+				},
+				body: {
+					pb: "20",
 				},
 			},
 			top: {
