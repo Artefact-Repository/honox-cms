@@ -29,7 +29,10 @@ function parsePostPath(path: string): { slug: string; locale: string } {
 		string | undefined,
 		string,
 	];
-	if (maybeLocale && (TRANSLATED_LOCALES as readonly string[]).includes(maybeLocale)) {
+	if (
+		maybeLocale &&
+		(TRANSLATED_LOCALES as readonly string[]).includes(maybeLocale)
+	) {
 		return { slug, locale: maybeLocale };
 	}
 	return { slug, locale: "en" };
@@ -50,7 +53,10 @@ function resolvePostPath(slug: string, locale: string): string | undefined {
 /** True when `slug` has an actual translation file for `locale` (as opposed
  * to `resolvePostPath` having to fall back to the default-locale file). */
 function hasTranslation(slug: string, locale: string): boolean {
-	return locale !== "en" && postFiles[`/content/posts/${locale}/${slug}.md`] !== undefined;
+	return (
+		locale !== "en" &&
+		postFiles[`/content/posts/${locale}/${slug}.md`] !== undefined
+	);
 }
 
 export interface BlogPost {

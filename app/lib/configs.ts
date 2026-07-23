@@ -1,3 +1,5 @@
+import type { ComponentBlock } from "../components/block-types";
+
 /**
  * Typed shape of the `configs` singleton at `content/configs.json`, plus the
  * loader that reads it. The singleton drives the docs sidenav's grouping and
@@ -101,9 +103,16 @@ export interface DocsConfig {
 	docOrder?: string[];
 	/** External links shown at the bottom of the sidenav, e.g. the GitHub repo. */
 	links?: DocsNavLinkConfig[];
-	/** Plain links shown in the header nav (e.g. Blog, Home), before the
-	 * per-doc Edit link and the GitHub icon. */
-	headerLinks?: DocsNavLinkConfig[];
+	/** Header nav items — a restricted "leaf" block list (Button/Badge/Link/
+	 * Icon, no containers), rendered via page-registry's `renderBlocks` so
+	 * the CMS can offer richer items than a plain link (e.g. a badge, an
+	 * icon, or a button with a custom onClick), not just {label, href}.
+	 * Any `link` block's `href` is one canonical relative path shared across
+	 * every locale file (i18n: duplicate in config.yml) — renderBlocks must
+	 * be called with `{ locale }` as its second argument so page-registry's
+	 * `anchor` renderer localises it at render time; see `by-tag/[tag].tsx`
+	 * for the call-site pattern. */
+	headerItems?: ComponentBlock[];
 	/** Site copy for the /blog section. */
 	blog?: BlogSiteConfig;
 	/** Translated badge labels for a doc's numeric `hydration` tier. Falls back

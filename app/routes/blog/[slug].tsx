@@ -3,6 +3,7 @@ import { button } from "design-system/recipes";
 import { ssgParams } from "hono/ssg";
 import { createRoute } from "honox/factory";
 import { LanguageSwitcher } from "../../components/language-switcher";
+import { renderBlocks } from "../../components/page-registry";
 import {
 	Anchor,
 	Avatar,
@@ -120,16 +121,7 @@ export default createRoute(
 									alignItems: "center",
 								})}
 							>
-								{config.headerLinks?.map((link) => (
-									<Anchor
-										key={link.href}
-										href={localiseLink(link.href)}
-										variant="plain"
-										class={css({ textStyle: "sm", fontWeight: "medium" })}
-									>
-										{link.label}
-									</Anchor>
-								))}
+								{renderBlocks(config.headerItems, { locale: currentLocale })}
 								<Anchor
 									href={`/admin/#/collections/posts/entries/${slug}`}
 									class={cx(

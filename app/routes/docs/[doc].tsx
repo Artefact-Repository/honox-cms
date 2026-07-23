@@ -2,7 +2,9 @@ import { css, cx } from "design-system/css";
 import { button } from "design-system/recipes";
 import { ssgParams } from "hono/ssg";
 import { createRoute } from "honox/factory";
+import type { ComponentBlock } from "../../components/block-types";
 import { LanguageSwitcher } from "../../components/language-switcher";
+import { renderBlocks } from "../../components/page-registry";
 import {
 	Anchor,
 	Badge,
@@ -243,7 +245,7 @@ function DocsSidenav({
 
 interface HeaderActionsProps {
 	links?: DocsNavLinkConfig[];
-	headerLinks?: DocsNavLinkConfig[];
+	headerItems?: ComponentBlock[];
 	editUrl?: string;
 	docsUi?: DocsUiConfig;
 	currentPath: string;
@@ -255,11 +257,11 @@ interface HeaderActionsProps {
 
 // The actions shared between the desktop header row (`nav`, hidden below
 // `md`) and Layout's built-in mobile disclosure (`mobileNav`, which takes
-// over below `md` via `siderHideBelow`) — headerLinks, edit/admin, language
+// over below `md` via `siderHideBelow`) — headerItems, edit/admin, language
 // switcher, GitHub. Rendered from a single function so both stay in sync.
 function HeaderActions({
 	links,
-	headerLinks,
+	headerItems,
 	editUrl,
 	docsUi,
 	currentPath,
@@ -267,22 +269,15 @@ function HeaderActions({
 	compact,
 }: HeaderActionsProps) {
 	const githubLink = links?.find(isGithubLink);
-	const localiseLink = (href: string) => localiseHref(href, currentLocale);
 	const ui = { ...DEFAULT_DOCS_UI, ...docsUi };
 	const textStyle = compact ? "xs" : "sm";
 
 	return (
 		<>
-			{headerLinks?.map((link) => (
-				<Anchor
-					key={link.href}
-					href={localiseLink(link.href)}
-					variant="plain"
-					class={css({ textStyle, fontWeight: "medium" })}
-				>
-					{link.label}
-				</Anchor>
-			))}
+			{renderBlocks(headerItems, {
+				locale: currentLocale,
+				class: css({ textStyle, fontWeight: "medium" }),
+			})}
 			{editUrl ? (
 				<Anchor
 					href={editUrl}
@@ -326,7 +321,7 @@ function HeaderActions({
 interface DocsHeaderProps {
 	editUrl?: string;
 	links?: DocsNavLinkConfig[];
-	headerLinks?: DocsNavLinkConfig[];
+	headerItems?: ComponentBlock[];
 	docsUi?: DocsUiConfig;
 	currentPath: string;
 	currentLocale: string;
@@ -338,7 +333,7 @@ interface DocsHeaderProps {
 function DocsHeader({
 	editUrl,
 	links,
-	headerLinks,
+	headerItems,
 	docsUi,
 	currentPath,
 	currentLocale,
@@ -404,7 +399,7 @@ function DocsHeader({
 			>
 				<HeaderActions
 					links={links}
-					headerLinks={headerLinks}
+					headerItems={headerItems}
 					editUrl={editUrl}
 					docsUi={docsUi}
 					currentPath={currentPath}
@@ -516,7 +511,7 @@ export default createRoute(
 					<DocsHeader
 						editUrl={docEditUrl(doc, config)}
 						links={config.links}
-						headerLinks={config.headerLinks}
+						headerItems={config.headerItems}
 						docsUi={config.docsUi}
 						currentPath={currentPath}
 						currentLocale={currentLocale}
@@ -535,7 +530,7 @@ export default createRoute(
 					<HeaderActions
 						editUrl={docEditUrl(doc, config)}
 						links={config.links}
-						headerLinks={config.headerLinks}
+						headerItems={config.headerItems}
 						docsUi={config.docsUi}
 						currentPath={currentPath}
 						currentLocale={currentLocale}

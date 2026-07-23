@@ -2000,15 +2000,79 @@ singletons:
         fields:
           - { label: Label, name: label, widget: string, i18n: true }
           - { label: URL, name: href, widget: string, i18n: duplicate }
-      - label: Header Links
-        name: headerLinks
+      - label: Header Items
+        name: headerItems
         widget: list
         required: false
         i18n: true
-        hint: "Plain links shown in the header nav on both the docs and blog sections, e.g. Blog and Docs."
-        fields:
-          - { label: Label, name: label, widget: string, i18n: true }
-          - { label: URL, name: href, widget: string, i18n: duplicate }
+        hint: "Items shown in the header nav on both the docs and blog sections — links, badges, icons, or buttons. A Link's URL is one canonical relative path shared across every locale (translated at render time), not a separate value per locale."
+        types: &header_item_types
+          - label: Link
+            name: link
+            widget: object
+            fields:
+              - { label: Text, name: text, widget: string, i18n: true }
+              - { label: Href, name: href, widget: string, i18n: duplicate }
+              - label: Variant
+                name: variant
+                widget: select
+                options: [underline, plain]
+                default: plain
+                i18n: duplicate
+              - label: Color Palette
+                name: colorPalette
+                widget: select
+                options: [blue, green, red, purple, orange, amber, cyan, slate]
+                required: false
+                i18n: duplicate
+          - label: Button
+            name: button
+            widget: object
+            fields:
+              - { label: Text, name: text, widget: string, i18n: true }
+              - label: Variant
+                name: variant
+                widget: select
+                options: [solid, outline, subtle, surface, plain]
+                default: outline
+                i18n: duplicate
+              - label: Color Palette
+                name: colorPalette
+                widget: select
+                options: [blue, green, red, purple, orange, amber, cyan, slate]
+                required: false
+                i18n: duplicate
+              - label: Size
+                name: size
+                widget: select
+                options: [xs, sm, md, lg]
+                default: sm
+                i18n: duplicate
+              - { label: "Custom onClick (advanced)", name: onclick, widget: string, required: false, i18n: duplicate, hint: "Raw inline JS, e.g. for smooth-scroll or dispatching a CustomEvent. Runs without client hydration — see the Toast demo." }
+          - label: Badge
+            name: badge
+            widget: object
+            fields:
+              - { label: Text, name: text, widget: string, i18n: true }
+              - label: Variant
+                name: variant
+                widget: select
+                options: [solid, subtle, outline, surface]
+                default: subtle
+                i18n: duplicate
+              - label: Color Palette
+                name: colorPalette
+                widget: select
+                options: [blue, green, red, purple, orange, amber, cyan, slate]
+                required: false
+                i18n: duplicate
+          - label: Icon
+            name: icon
+            widget: object
+            fields:
+              - { label: SVG Markup, name: svg, widget: text, i18n: duplicate, hint: "Raw inner SVG markup, e.g. <path d=\"M12 2 2 7l10 5 10-5-10-5z\" />" }
+              - { label: View Box, name: viewBox, widget: string, default: "0 0 24 24", i18n: duplicate }
+              - { label: Accessible Label, name: ariaLabel, widget: string, required: false, i18n: true, hint: "Leave blank for a decorative icon" }
       - label: Hydration Tier Labels
         name: hydrationTiers
         widget: list

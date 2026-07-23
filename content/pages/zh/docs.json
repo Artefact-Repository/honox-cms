@@ -1,0 +1,7 @@
+{
+  "title": "文档 - Artefact",
+  "content": [
+    { "type": "heading", "as": "h1", "text": "官方文档", "size": "2xl", "style": "margin-bottom:0.75rem" },
+    { "type": "text", "content": "Artefact UI 组件套件的使用指南与参考文档。请从侧边栏中选择页面，或直接在下方浏览。", "style": "color:#71717a;max-width:42rem;margin-bottom:2.5rem" }
+  ]
+}

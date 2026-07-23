@@ -159,7 +159,7 @@ utils/
   markdown.ts        # Frontmatter parser + MD→HTML
 content/posts/       # Blog post markdown files
 content/posts/<locale>/ # Translated posts, e.g. content/posts/zh/getting-started-with-honox.md
-content/pages/       # Page builder JSON layouts (index.json is the homepage, blog.json is /blog's header)
+content/pages/       # Page builder JSON layouts (index.json is the homepage; blog.json/docs.json are just title+intro content for /blog and /docs, not their header — see docs/PageBuilder.md)
 content/pages/<locale>/ # Translated page layouts, e.g. content/pages/zh/index.json
 public/admin/        # Sveltia CMS static files
   config.yml          # CMS configuration

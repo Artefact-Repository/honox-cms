@@ -1,5 +1,6 @@
 import { css } from "design-system/css";
 import { ChevronDownIcon } from "../icons/chevron-down";
+import { localiseHref } from "../lib/i18n";
 import { extractLayoutStyle } from "./block-style";
 import { type ComponentBlock, propsOf } from "./block-types";
 import {
@@ -249,14 +250,35 @@ const registry: Record<string, BlockRenderer> = {
 	},
 
 	anchor: (b) => {
-		const { text, ...rest } = propsOf(b);
-		return <Anchor {...rest}>{text}</Anchor>;
+		// `locale`, when passed as an extra prop (see renderBlocks' second
+		// argument), localises `href` for chrome rendered outside per-locale
+		// page-builder content — e.g. content/configs.json's `headerLinks`,
+		// which stores one canonical relative href shared across every locale
+		// file rather than a pre-localised one per file. Ordinary page-builder
+		// anchors never pass this, so they're unaffected.
+		const { text, href, locale, ...rest } = propsOf(b);
+		const resolvedHref =
+			typeof href === "string" && typeof locale === "string"
+				? localiseHref(href, locale)
+				: href;
+		return (
+			<Anchor href={resolvedHref} {...rest}>
+				{text}
+			</Anchor>
+		);
 	},
 
 	card: (b) => {
 		const { children } = b;
-		const { title, description, body, image, imagePosition, overflow, ...rest } =
-			propsOf(b);
+		const {
+			title,
+			description,
+			body,
+			image,
+			imagePosition,
+			overflow,
+			...rest
+		} = propsOf(b);
 		// boxShadow (plus margin/padding/maxWidth/... if ever set on a card)
 		// goes through the same validated `--cms-*` token pipeline as
 		// Stack/Grid/Layout — see block-style.ts. Default it to the recipe's

@@ -900,8 +900,13 @@ export function Positioner(
 		style?: Record<string, string | number>;
 	}>,
 ) {
-	const { children, class: classProp, placement = "bottom", style, ...rest } =
-		props;
+	const {
+		children,
+		class: classProp,
+		placement = "bottom",
+		style,
+		...rest
+	} = props;
 	const ctx = useColorPickerContext();
 	return (
 		<div

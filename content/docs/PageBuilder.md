@@ -6,7 +6,7 @@ title: CMS Page Builder
 
 The [Sveltia CMS](https://sveltiacms.app/en/docs/intro) based dynamic Page Builder allows non-technical editors to create complex, recursively nested pages entirely through the CMS user interface (`/admin/`).
 
-Page layouts are saved as JSON files in `content/pages/*.json` and are compiled on demand or statically pre-generated (via Hono SSG) at `/pages/[slug]`. The homepage (`/`) is itself a Page Builder page — `app/routes/index.tsx` renders `content/pages/index.json` through the same `<PageRenderer />` pipeline. Even the header is page-builder content: `headerBrand`, `headerNav`, and `headerActions` are ordinary block arrays on that same JSON file, rendered through `<PageRenderer>` inside a hardcoded `<header>` shell (the border/blur/sticky styling stays in code; only the brand lockup, nav links, and header buttons are CMS-editable). `content/pages/blog.json` carries the identical three fields for `/blog`'s header. Only the footer (and, for `/blog`, the post carousel/search/newsletter widgets) stay outside the Page Builder, since those need live post data or bespoke styling the generic block system doesn't support.
+Page layouts are saved as JSON files in `content/pages/*.json` and are compiled on demand or statically pre-generated (via Hono SSG) at `/pages/[slug]`. The homepage (`/`) is itself a Page Builder page — `app/routes/index.tsx` renders `content/pages/index.json` through the same `<PageRenderer />` pipeline. Even the header is page-builder content there: `headerBrand`, `headerNav`, and `headerActions` are ordinary block arrays on that same JSON file, rendered through `<PageRenderer>` inside a hardcoded `<header>` shell (the border/blur/sticky styling stays in code; only the brand lockup, nav links, and header buttons are CMS-editable). `content/pages/blog.json` and `content/pages/docs.json` instead carry just `title` and an intro `content` block array for `/blog` and `/docs` — their header/nav chrome (brand, nav links, Edit/Admin, language switcher) is written directly in `app/routes/blog/*.tsx` / `app/routes/docs/*.tsx` and sourced from the `configs` singleton's `headerItems` (see "The `headerItems` block list" below), not from page-builder content, since those pages don't need a *different* header per page the way arbitrary CMS pages might. Only the footer (and, for `/blog`, the post carousel/search/newsletter widgets) stay outside the Page Builder, since those need live post data or bespoke styling the generic block system doesn't support.
 
 ***
 
@@ -107,6 +107,14 @@ A handful of fields exist purely so a non-technical editor can reproduce behavio
 * **Card → "Box Shadow"**: same validated token pipeline as Stack/Grid/Layout's Box Shadow field (`none`/`2xs`/`xs`/`sm`/`md`/`lg`/`xl`/`2xl`) — Card already defaults to a subtle `sm` shadow, so this is only needed to raise or remove it on a specific card.
 * **Dialog / Drawer → "Footer"**: a list of extra blocks (typically Buttons) rendered in the footer alongside the dedicated Confirm/Cancel buttons — e.g. a "Reload Table" button with a Custom onClick that dispatches a refresh event, or an "Email Us Instead" button that navigates to a `mailto:` link.
 
+### 4. The `headerItems` Block List
+
+The `configs` singleton's `headerItems` field (edited under **Configs → Header Items** in the CMS) reuses the exact same registry as page-builder content, just with a smaller set of block types — Link, Button, Badge, Icon — and a different call site: `app/routes/blog/*.tsx` and `app/routes/docs/*.tsx` call `renderBlocks(config.headerItems, { locale: currentLocale })` directly (via `app/components/page-registry.tsx`'s exported `renderBlocks`), instead of going through `<PageRenderer>`.
+
+That second argument matters. A page-builder JSON file is already split one-per-locale (`content/pages/<locale>/<slug>.json`), so a `link` block's `href` is simply whatever's correct for that file. `headerItems` isn't split that way — it's one field on a singleton, with `href` marked `i18n: duplicate` in `config.yml` so the *same* relative path (e.g. `/blog`) is shared across every locale's `configs.<locale>.json`. Passing `{ locale }` as `renderBlocks`' extra props tells the `anchor` renderer (the one `link` resolves to via `TYPE_ALIASES`) to run that shared href through `localiseHref()` before rendering — turning `/blog` into `/blog/zh` on a Chinese page, for instance. Ordinary page-builder anchors never pass this prop, so they're unaffected; only `headerItems` opts in.
+
+This is also how the header nav can hold more than plain links: a Button block's "Custom onClick" (see Escape Hatches above) works here too, so an editor can add e.g. a "↑ Top" button that smooth-scrolls with no code change — see `content/configs.json`'s `headerItems` for a working example.
+
 ***
 
 ## Content Build Pipelines
@@ -115,7 +123,7 @@ Page Builder layouts are one of three content types under `content/`, each disco
 
 ### 1. JSON page layouts (`content/pages/*.json`)
 
-* Loaded through `app/lib/pages.ts` (`loadPage`, `listPageSlugs`), used by both `app/routes/index.tsx` (the homepage) and `app/routes/pages/[slug].tsx`.
+* Loaded through `app/lib/pages.ts` (`loadPage`, `listPageSlugs`), used by `app/routes/index.tsx` (the homepage), `app/routes/pages/[slug].tsx`, and — for just their `title`/intro `content`, not header chrome — `app/routes/blog/index.tsx` and `app/routes/docs/index.tsx`.
 * Each file is parsed as plain JSON — no markdown involved — and its `content` array is handed directly to `<PageRenderer />` (see Architecture above), which recursively compiles it into the matching UI components.
 * This is the only pipeline of the three with no separate parse/compile step: the JSON _is_ the render tree.
 * **i18n:** translations live under `content/pages/<locale>/<slug>.json` (e.g. `content/pages/zh/index.json`), same `multiple_folders` convention as docs/components. `loadPage(slug, locale)` falls back to the default-locale file when no translation exists, so a page only needs a translated file for the locales it actually has content for.

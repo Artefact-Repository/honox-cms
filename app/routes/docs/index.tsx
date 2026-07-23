@@ -1,7 +1,10 @@
 import { css, cx } from "design-system/css";
 import { button } from "design-system/recipes";
 import { createRoute } from "honox/factory";
+import type { ComponentBlock } from "../../components/block-types";
 import { LanguageSwitcher } from "../../components/language-switcher";
+import { PageRenderer } from "../../components/page-renderer";
+import { renderBlocks } from "../../components/page-registry";
 import {
 	Anchor,
 	Card,
@@ -23,6 +26,7 @@ import {
 } from "../../lib/configs";
 import { type DocSummary, loadDocs } from "../../lib/docs";
 import { detectLocale, localiseHref } from "../../lib/i18n";
+import { loadPage } from "../../lib/pages";
 
 // ---------------------------------------------------------------------------
 // Inlined docs nav shell.
@@ -231,7 +235,7 @@ function DocsSidenav({
 
 interface HeaderActionsProps {
 	links?: DocsNavLinkConfig[];
-	headerLinks?: DocsNavLinkConfig[];
+	headerItems?: ComponentBlock[];
 	editUrl?: string;
 	currentPath: string;
 	currentLocale: string;
@@ -242,36 +246,25 @@ interface HeaderActionsProps {
 
 // The actions shared between the desktop header row (`nav`, hidden below
 // `md`) and Layout's built-in mobile disclosure (`mobileNav`, which takes
-// over below `md` via `siderHideBelow`) — headerLinks, edit/admin, language
+// over below `md` via `siderHideBelow`) — headerItems, edit/admin, language
 // switcher, GitHub. Rendered from a single function so both stay in sync.
 function HeaderActions({
 	links,
-	headerLinks,
+	headerItems,
 	editUrl,
 	currentPath,
 	currentLocale,
 	compact,
 }: HeaderActionsProps) {
 	const githubLink = links?.find(isGithubLink);
-	const localiseLink = (href: string) => localiseHref(href, currentLocale);
 	const textStyle = compact ? "xs" : "sm";
 
 	return (
 		<>
-			{headerLinks?.map((link) => (
-				<Anchor
-					key={link.href}
-					href={localiseLink(link.href)}
-					variant="plain"
-					class={css({ textStyle, fontWeight: "medium" })}
-				>
-					{currentLocale === "zh" && link.label === "Blog"
-						? "博客"
-						: currentLocale === "zh" && link.label === "Docs"
-							? "文档"
-							: link.label}
-				</Anchor>
-			))}
+			{renderBlocks(headerItems, {
+				locale: currentLocale,
+				class: css({ textStyle, fontWeight: "medium" }),
+			})}
 			{editUrl ? (
 				<Anchor
 					href={editUrl}
@@ -315,7 +308,7 @@ function HeaderActions({
 interface DocsHeaderProps {
 	editUrl?: string;
 	links?: DocsNavLinkConfig[];
-	headerLinks?: DocsNavLinkConfig[];
+	headerItems?: ComponentBlock[];
 	docsUi?: DocsUiConfig;
 	currentPath: string;
 	currentLocale: string;
@@ -327,7 +320,7 @@ interface DocsHeaderProps {
 function DocsHeader({
 	editUrl,
 	links,
-	headerLinks,
+	headerItems,
 	docsUi,
 	currentPath,
 	currentLocale,
@@ -393,7 +386,7 @@ function DocsHeader({
 			>
 				<HeaderActions
 					links={links}
-					headerLinks={headerLinks}
+					headerItems={headerItems}
 					editUrl={editUrl}
 					currentPath={currentPath}
 					currentLocale={currentLocale}
@@ -446,9 +439,10 @@ const docsShellProps = {
 export default createRoute(async (c) => {
 	const currentPath = c.req.path;
 	const currentLocale = detectLocale(currentPath);
-	const [docs, config] = await Promise.all([
+	const [docs, config, data] = await Promise.all([
 		loadDocs(currentLocale),
 		loadDocsConfig(currentLocale),
+		loadPage("docs", currentLocale).then((page) => page ?? { content: [] }),
 	]);
 	const groups = buildDocGroups(docs, config);
 	const ui = { ...DEFAULT_DOCS_UI, ...config.docsUi };
@@ -461,7 +455,7 @@ export default createRoute(async (c) => {
 			header={
 				<DocsHeader
 					links={config.links}
-					headerLinks={config.headerLinks}
+					headerItems={config.headerItems}
 					docsUi={config.docsUi}
 					currentPath={currentPath}
 					currentLocale={currentLocale}
@@ -478,7 +472,7 @@ export default createRoute(async (c) => {
 			mobileNavActions={
 				<HeaderActions
 					links={config.links}
-					headerLinks={config.headerLinks}
+					headerItems={config.headerItems}
 					currentPath={currentPath}
 					currentLocale={currentLocale}
 					compact
@@ -486,18 +480,9 @@ export default createRoute(async (c) => {
 			}
 			content={
 				<>
-					<title>
-						{currentLocale === "zh" ? "文档 - Artefact" : "Docs - Artefact"}
-					</title>
+					<title>{data.title ?? "Docs - Artefact"}</title>
 
-					<Heading as="h1" size="2xl" class={css({ mb: "3" })}>
-						{currentLocale === "zh" ? "官方文档" : "Documentation"}
-					</Heading>
-					<Text class={css({ color: "fg.muted", mb: "10", maxWidth: "2xl" })}>
-						{currentLocale === "zh"
-							? "Artefact UI 组件套件的使用指南与参考文档。请从侧边栏中选择页面，或直接在下方浏览。"
-							: "Guides and component reference for the Artefact UI suite. Pick a page from the sidenav, or jump in below."}
-					</Text>
+					<PageRenderer content={data.content ?? []} />
 
 					<div
 						class={css({

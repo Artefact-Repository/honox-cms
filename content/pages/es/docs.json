@@ -1,0 +1,7 @@
+{
+  "title": "Documentación - Artefact",
+  "content": [
+    { "type": "heading", "as": "h1", "text": "Documentación", "size": "2xl", "style": "margin-bottom:0.75rem" },
+    { "type": "text", "content": "Guías y referencia de componentes para la suite Artefact UI. Elige una página en la barra lateral, o explora a continuación.", "style": "color:#71717a;max-width:42rem;margin-bottom:2.5rem" }
+  ]
+}

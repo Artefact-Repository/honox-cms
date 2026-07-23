@@ -146,41 +146,72 @@ export default function MyPage() {
 
 This component is available as a `layout` block in the
 [Page Builder](/docs/PageBuilder) (`content/pages/*.json`). `header`,
-`sider`, `content`, and `footer` are each a list of component blocks — any
-block type works, including another `layout` for nested shells:
+`sider`, `content`, and `footer` are each a list of component blocks — but
+which block types are offered depends on how deep the `layout` itself sits,
+same as any other container in the CMS's \~4-level nesting cap:
 
-```json
-{
-  "type": "layout",
-  "siderWidth": "sm",
-  "siderHideBelow": "md",
-  "header": [
-    { "type": "heading", "text": "Dashboard", "as": "h3", "size": "lg" }
-  ],
-  "sider": [
-    {
-      "type": "stack",
-      "direction": "vertical",
-      "gap": "2",
-      "children": [
-        { "type": "link", "text": "Overview", "href": "#" },
-        { "type": "link", "text": "Reports", "href": "#" }
-      ]
-    }
-  ],
-  "content": [
-    { "type": "text", "content": "Pick a page from the rail on the left." }
-  ],
-  "footer": [
-    { "type": "text", "size": "sm", "content": "© 2026 Acme" }
-  ]
-}
-```
+- **Root-level** — a `layout` placed directly in a page's top-level
+  `content` — accepts any block type in these four parts, including
+  containers (Stack, Card, …) and another nested `layout`:
+
+  ```json
+  {
+    "type": "layout",
+    "siderWidth": "sm",
+    "siderHideBelow": "md",
+    "header": [
+      { "type": "heading", "text": "Dashboard", "as": "h3", "size": "lg" }
+    ],
+    "sider": [
+      {
+        "type": "stack",
+        "direction": "vertical",
+        "gap": "2",
+        "children": [
+          { "type": "link", "text": "Overview", "href": "#" },
+          { "type": "link", "text": "Reports", "href": "#" }
+        ]
+      }
+    ],
+    "content": [
+      { "type": "text", "content": "Pick a page from the rail on the left." }
+    ],
+    "footer": [
+      { "type": "text", "size": "sm", "content": "© 2026 Acme" }
+    ]
+  }
+  ```
+
+- **Nested one level deeper** — a `layout` placed inside another
+  container's children (e.g. a Stack or Card) — restricts `header`/`sider`/
+  `content`/`footer` to leaf components only (Button, Badge, Text, Link,
+  Icon, …): the CMS editing UI's nesting cap bottoms out there, so it can't
+  offer another container inside them:
+
+  ```json
+  {
+    "type": "stack",
+    "children": [
+      {
+        "type": "layout",
+        "header": [
+          { "type": "heading", "text": "Card sub-panel", "as": "h4", "size": "sm" }
+        ],
+        "content": [
+          { "type": "text", "content": "Leaf blocks only at this depth." }
+        ]
+      }
+    ]
+  }
+  ```
 
 Leaving a part's list empty (or omitting it) skips that part's wrapper
 element entirely — an untouched optional field like `siderWidth`/`siderHideBelow`
 arrives as `""` from the CMS and is treated as unset, falling back to the
-component default.
+component default. This depth limit is a constraint of the CMS _editing UI_
+only — `app/components/page-registry.tsx`'s renderer itself has no depth
+limit, so a hand-edited JSON file can nest a `layout` (or anything else)
+arbitrarily deep and it will still render correctly.
 
 # Props
 

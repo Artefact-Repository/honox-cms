@@ -66,18 +66,28 @@
       "href": "https://github.com/Chen-Software/honox-cms"
     }
   ],
-  "headerLinks": [
+  "headerItems": [
     {
-      "label": "Blog",
+      "type": "link",
+      "text": "Blog",
       "href": "/blog"
     },
     {
-      "label": "Documentation",
+      "type": "link",
+      "text": "Documentation",
       "href": "/docs"
     },
     {
-      "label": "Product",
+      "type": "link",
+      "text": "Product",
       "href": "/product-landing"
+    },
+    {
+      "type": "button",
+      "text": "↑ Haut",
+      "variant": "outline",
+      "size": "sm",
+      "onclick": "window.scrollTo({ top: 0, behavior: 'smooth' })"
     }
   ],
   "blog": {
