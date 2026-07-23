@@ -73,22 +73,8 @@ export const switchRecipe = defineSlotRecipe({
 	defaultVariants: {
 		variant: "solid",
 		size: "md",
-		colorPalette: "gray",
 	},
 	variants: {
-		colorPalette: {
-			gray: { root: { colorPalette: "gray" } },
-			blue: { root: { colorPalette: "blue" } },
-			green: { root: { colorPalette: "green" } },
-			red: { root: { colorPalette: "red" } },
-			orange: { root: { colorPalette: "orange" } },
-			purple: { root: { colorPalette: "purple" } },
-			cyan: { root: { colorPalette: "cyan" } },
-			amber: { root: { colorPalette: "amber" } },
-			success: { root: { colorPalette: "green" } },
-			error: { root: { colorPalette: "red" } },
-			warning: { root: { colorPalette: "orange" } },
-		},
 		variant: {
 			solid: {
 				control: {

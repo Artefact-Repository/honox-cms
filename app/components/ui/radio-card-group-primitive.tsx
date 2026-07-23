@@ -10,6 +10,8 @@ import {
 	useContext,
 	useId,
 } from "hono/jsx";
+import type { ColorPalette } from "./color-palette";
+import { colorPaletteClass } from "./color-palette";
 
 type RadioCardGroupStyles = ReturnType<typeof radioCardGroup>;
 
@@ -53,6 +55,7 @@ interface RootProps extends RadioCardGroupVariantProps, PropsWithChildren {
 	readOnly?: boolean;
 	rootRef?: { current: HTMLDivElement | null };
 	class?: string;
+	colorPalette?: ColorPalette;
 }
 
 function Root(props: RootProps) {
@@ -68,6 +71,7 @@ function Root(props: RootProps) {
 		readOnly,
 		rootRef,
 		class: className,
+		colorPalette,
 		...rest
 	} = localProps;
 
@@ -91,7 +95,11 @@ function Root(props: RootProps) {
 				id={id}
 				ref={rootRef as any}
 				role="radiogroup"
-				class={cx(styles.root, className)}
+				class={cx(
+					styles.root,
+					colorPaletteClass(colorPalette as string | undefined),
+					className,
+				)}
 				data-disabled={disabled ? "" : undefined}
 				data-readonly={readOnly ? "" : undefined}
 				data-scope="radio-card-group"

@@ -2,11 +2,14 @@ import { cx } from "design-system/css";
 import type { SwitchRecipeVariantProps } from "design-system/recipes";
 import { switchRecipe } from "design-system/recipes";
 import type { Child } from "hono/jsx";
+import type { ColorPalette } from "./color-palette";
+import { colorPaletteClass } from "./color-palette";
 import { useFieldContext } from "./field-primitive";
 
 export interface SwitchProps extends SwitchRecipeVariantProps {
 	children?: Child;
 	class?: string;
+	colorPalette?: ColorPalette;
 	checked?: boolean;
 	disabled?: boolean;
 	invalid?: boolean;
@@ -34,6 +37,7 @@ export function Switch(props: SwitchProps) {
 		value = "on",
 		onCheckedChange,
 		id: idProp = field?.id,
+		colorPalette,
 		...restProps
 	} = localProps;
 
@@ -48,7 +52,11 @@ export function Switch(props: SwitchProps) {
 
 	return (
 		<label
-			class={cx(styles.root, classProp)}
+			class={cx(
+				styles.root,
+				colorPaletteClass(colorPalette as string | undefined),
+				classProp as string | undefined,
+			)}
 			data-disabled={disabledProp ? "" : undefined}
 			data-invalid={invalidProp ? "" : undefined}
 			data-readonly={readOnlyProp ? "" : undefined}

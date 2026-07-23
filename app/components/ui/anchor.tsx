@@ -3,8 +3,11 @@ import type { AnchorVariantProps } from "design-system/recipes";
 import { anchor } from "design-system/recipes";
 import type { Child, ElementType } from "hono/jsx";
 import { cloneElement } from "hono/jsx";
+import type { ColorPalette } from "./color-palette";
+import { colorPaletteClass } from "./color-palette";
 
 export interface AnchorProps extends AnchorVariantProps {
+	colorPalette?: ColorPalette;
 	/** Render as a different element/component (e.g. "span", or a router Link). */
 	as?: ElementType;
 	/**
@@ -24,6 +27,7 @@ export function Anchor(props: AnchorProps) {
 		asChild,
 		children,
 		class: classProp,
+		colorPalette = "blue",
 		href,
 		target,
 		rel,
@@ -41,7 +45,11 @@ export function Anchor(props: AnchorProps) {
 		...(target === "_blank" || rel !== undefined ? { rel: resolvedRel } : {}),
 	};
 
-	const className = cx(anchor(variantProps), classProp);
+	const className = cx(
+		anchor(variantProps),
+		colorPaletteClass(colorPalette as string | undefined),
+		classProp,
+	);
 
 	if (asChild && typeof children === "object" && children !== null) {
 		const child = children as JSX.Element;

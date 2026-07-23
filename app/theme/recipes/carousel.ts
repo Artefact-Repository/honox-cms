@@ -138,7 +138,6 @@ export const carousel = defineSlotRecipe({
 	},
 	defaultVariants: {
 		size: "md",
-		colorPalette: "green",
 	},
 	variants: {
 		size: {
@@ -166,22 +165,6 @@ export const carousel = defineSlotRecipe({
 				prevTrigger: { boxSize: "10" },
 				autoplayTrigger: { boxSize: "10" },
 			},
-		},
-		colorPalette: {
-			gray: { colorPalette: "gray" },
-			blue: { colorPalette: "blue" },
-			cyan: { colorPalette: "cyan" },
-			green: { colorPalette: "green" },
-			orange: { colorPalette: "orange" },
-			purple: { colorPalette: "purple" },
-			red: { colorPalette: "red" },
-			teal: { colorPalette: "teal" },
-			indigo: { colorPalette: "indigo" },
-			pink: { colorPalette: "pink" },
-			yellow: { colorPalette: "yellow" },
-			success: { colorPalette: "green" },
-			error: { colorPalette: "red" },
-			warning: { colorPalette: "orange" },
 		},
 		// Overlays `control` on top of the item group (bottom-center for
 		// horizontal, right-center for vertical) instead of stacking below it —

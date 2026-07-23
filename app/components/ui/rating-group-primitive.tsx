@@ -1,6 +1,8 @@
 import { cx } from "design-system/css";
 import type { RatingGroupVariantProps } from "design-system/recipes";
 import { ratingGroup } from "design-system/recipes";
+import type { ColorPalette } from "./color-palette";
+import { colorPaletteClass } from "./color-palette";
 import {
 	createContext,
 	type JSX,
@@ -49,6 +51,7 @@ const useRatingGroupContext = () => {
 };
 
 export interface RootProps extends RatingGroupVariantProps, PropsWithChildren {
+	colorPalette?: ColorPalette;
 	value?: number;
 	defaultValue?: number;
 	count?: number;
@@ -102,6 +105,7 @@ function Root(props: RootProps) {
 		dir,
 		id: idProp,
 		class: className,
+		colorPalette = "amber",
 		label,
 		icon,
 		onValueChange: _onValueChange,
@@ -131,7 +135,11 @@ function Root(props: RootProps) {
 			<div
 				id={id}
 				dir={dir}
-				class={cx(styles.root, className)}
+				class={cx(
+					styles.root,
+					colorPaletteClass(colorPalette as string | undefined),
+					className,
+				)}
 				data-disabled={disabled ? "" : undefined}
 				data-readonly={readOnly ? "" : undefined}
 				data-invalid={invalid ? "" : undefined}

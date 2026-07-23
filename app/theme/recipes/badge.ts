@@ -15,22 +15,8 @@ export const badge = defineRecipe({
 	defaultVariants: {
 		variant: "subtle",
 		size: "md",
-		colorPalette: "gray",
 	},
 	variants: {
-		colorPalette: {
-			success: { colorPalette: "green" },
-			error: { colorPalette: "red" },
-			warning: { colorPalette: "orange" },
-			blue: { colorPalette: "blue" },
-			green: { colorPalette: "green" },
-			red: { colorPalette: "red" },
-			orange: { colorPalette: "orange" },
-			gray: { colorPalette: "gray" },
-			cyan: { colorPalette: "cyan" },
-			amber: { colorPalette: "amber" },
-			purple: { colorPalette: "purple" },
-		},
 		variant: {
 			solid: {
 				bg: "colorPalette.solid.bg",

@@ -2,6 +2,8 @@ import { cx } from "design-system/css";
 import type { CheckboxVariantProps } from "design-system/recipes";
 import { checkbox } from "design-system/recipes";
 import type { Child } from "hono/jsx";
+import type { ColorPalette } from "./color-palette";
+import { colorPaletteClass } from "./color-palette";
 import { useFieldContext } from "./field-primitive";
 
 export interface CheckboxProps extends CheckboxVariantProps {
@@ -16,6 +18,7 @@ export interface CheckboxProps extends CheckboxVariantProps {
 	id?: string;
 	name?: string;
 	value?: string;
+	colorPalette?: ColorPalette;
 	ref?: any;
 	[key: string]: unknown;
 }
@@ -35,6 +38,7 @@ export function Checkbox(props: CheckboxProps) {
 		id = field?.id,
 		name,
 		value = "on",
+		colorPalette,
 		ref,
 		...restProps
 	} = localProps;
@@ -62,7 +66,11 @@ export function Checkbox(props: CheckboxProps) {
 
 	return (
 		<label
-			class={cx(styles.root, classProp)}
+			class={cx(
+				styles.root,
+				colorPaletteClass(colorPalette as string | undefined),
+				classProp as string | undefined,
+			)}
 			for={id}
 			data-disabled={disabled ? "" : undefined}
 			data-invalid={invalid ? "" : undefined}

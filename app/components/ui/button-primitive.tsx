@@ -3,10 +3,14 @@ import type { ButtonVariantProps } from "design-system/recipes";
 import { button } from "design-system/recipes";
 import type { Child, PropsWithChildren } from "hono/jsx";
 import { createContext, useContext } from "hono/jsx";
+import type { ColorPalette } from "./color-palette";
+import { colorPaletteClass } from "./color-palette";
 import { Group, type GroupProps } from "./group";
 import { Loader } from "./loader";
 
-const ButtonContext = createContext<ButtonVariantProps>({});
+const ButtonContext = createContext<
+	ButtonVariantProps & { colorPalette?: ColorPalette }
+>({});
 
 interface ButtonLoadingProps {
 	loading?: boolean;
@@ -23,6 +27,7 @@ interface ButtonProps
 			type?: "button" | "submit" | "reset";
 			disabled?: boolean;
 			interactive?: boolean;
+			colorPalette?: ColorPalette;
 			[key: string]: unknown;
 		}> {}
 
@@ -40,13 +45,18 @@ function Button(props: ButtonProps) {
 		type = "button",
 		disabled,
 		interactive,
+		colorPalette = "gray",
 		...rest
 	} = localProps;
 
 	return (
 		<button
 			type={type}
-			class={cx(button(variantProps), classProp)}
+			class={cx(
+				button(variantProps),
+				colorPaletteClass(colorPalette as string | undefined),
+				classProp,
+			)}
 			disabled={loading || disabled}
 			aria-busy={loading}
 			aria-disabled={loading || disabled}
@@ -68,14 +78,16 @@ function Button(props: ButtonProps) {
 	);
 }
 
-interface ButtonGroupProps extends GroupProps, ButtonVariantProps {}
+interface ButtonGroupProps extends GroupProps, ButtonVariantProps {
+	colorPalette?: ColorPalette;
+}
 
 function ButtonGroup(props: ButtonGroupProps) {
 	const [variantProps, localProps] = button.splitVariantProps(props);
-	const { children, ...rest } = localProps;
+	const { children, colorPalette, ...rest } = localProps;
 
 	return (
-		<ButtonContext.Provider value={variantProps}>
+		<ButtonContext.Provider value={{ ...variantProps, colorPalette }}>
 			<Group {...(rest as Record<string, unknown>)}>{children}</Group>
 		</ButtonContext.Provider>
 	);

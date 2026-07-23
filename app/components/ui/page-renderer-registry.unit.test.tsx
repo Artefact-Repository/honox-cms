@@ -163,7 +163,7 @@ test("carousel block renders slides with captions/links and coerces numeric prop
 	expect(html).toContain('src="/media/two.jpg"');
 	expect(html).toContain("First slide");
 	expect(html).toContain('href="/one"');
-	expect(html).toContain("carousel__root--colorPalette_purple");
+	expect(html).toContain("color-palette_purple");
 	// slidesPerPage=1 → --slides-per-page:1 in the root's inline style.
 	expect(html).toContain("--slides-per-page:1");
 
@@ -217,7 +217,7 @@ test("radioCardGroup block renders hydrated variant-styled cards and scrubs empt
 		/>
 	).toString();
 	expect(aliased).toContain('data-scope="radio-card-group"');
-	expect(aliased).toContain("radio-card-group__root--colorPalette_purple");
+	expect(aliased).toContain("color-palette_purple");
 });
 
 test("registry exposes a renderer for every canonical block type", () => {

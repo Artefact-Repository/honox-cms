@@ -94,20 +94,9 @@ export const ratingGroup = defineSlotRecipe({
 			},
 			xl: { control: { gap: "2" }, itemIndicator: { width: "6", height: "6" } },
 		},
-		colorPalette: {
-			amber: { root: { colorPalette: "amber" } },
-			blue: { root: { colorPalette: "blue" } },
-			green: { root: { colorPalette: "green" } },
-			red: { root: { colorPalette: "red" } },
-			orange: { root: { colorPalette: "orange" } },
-			purple: { root: { colorPalette: "purple" } },
-			cyan: { root: { colorPalette: "cyan" } },
-			gray: { root: { colorPalette: "gray" } },
-		},
 	},
 
 	defaultVariants: {
 		size: "md",
-		colorPalette: "amber",
 	},
 });

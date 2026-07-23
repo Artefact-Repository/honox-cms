@@ -349,19 +349,4 @@ export const datePicker = defineSlotRecipe({
 			textStyle: "sm",
 		},
 	},
-	defaultVariants: {
-		colorPalette: "blue",
-	},
-	variants: {
-		colorPalette: {
-			blue: { root: { colorPalette: "blue" } },
-			green: { root: { colorPalette: "green" } },
-			red: { root: { colorPalette: "red" } },
-			orange: { root: { colorPalette: "orange" } },
-			gray: { root: { colorPalette: "gray" } },
-			cyan: { root: { colorPalette: "cyan" } },
-			amber: { root: { colorPalette: "amber" } },
-			purple: { root: { colorPalette: "purple" } },
-		},
-	},
 });

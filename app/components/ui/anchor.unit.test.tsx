@@ -6,7 +6,7 @@ describe("Anchor component", () => {
 		const html = (<Anchor href="/home">Home</Anchor>).toString();
 		expect(html).toContain("<a");
 		expect(html).toContain("anchor--variant_underline");
-		expect(html).toContain("anchor--colorPalette_blue");
+		expect(html).toContain("color-palette_blue");
 		expect(html).toContain('href="/home"');
 		expect(html).toContain("Home");
 	});
@@ -18,7 +18,7 @@ describe("Anchor component", () => {
 			</Anchor>
 		).toString();
 		expect(html).toContain("anchor--variant_plain");
-		expect(html).toContain("anchor--colorPalette_green");
+		expect(html).toContain("color-palette_green");
 	});
 
 	it("adds rel=noopener noreferrer to external (target=_blank) links by default", () => {

@@ -14,6 +14,8 @@ import { ChevronLeftIcon } from "../../icons/chevron-left";
 import { ChevronRightIcon } from "../../icons/chevron-right";
 import { PauseIcon } from "../../icons/pause";
 import { PlayIcon } from "../../icons/play";
+import type { ColorPalette } from "./color-palette";
+import { colorPaletteClass } from "./color-palette";
 
 type CarouselStyles = ReturnType<typeof carousel>;
 
@@ -188,6 +190,7 @@ export interface RootProps extends CarouselVariantProps, PropsWithChildren {
 	/** Driven by the interactive island; ignored when set by hand. */
 	onPause?: () => void;
 	rootRef?: unknown;
+	colorPalette?: ColorPalette;
 	[key: string]: unknown;
 }
 
@@ -196,6 +199,7 @@ export function Root(props: RootProps) {
 	const {
 		children,
 		class: classProp,
+		colorPalette = "green",
 		id: idProp,
 		slideCount,
 		page: pageProp,
@@ -283,7 +287,12 @@ export function Root(props: RootProps) {
 				id={ids.root}
 				role="region"
 				aria-roledescription="carousel"
-				class={cx(styles.root, classProp, classNames?.root)}
+				class={cx(
+					styles.root,
+					colorPaletteClass(colorPalette as string | undefined),
+					classProp,
+					classNames?.root,
+				)}
 				data-scope="carousel"
 				data-part="root"
 				data-orientation={orientation}

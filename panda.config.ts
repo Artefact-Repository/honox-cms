@@ -18,6 +18,33 @@ export default defineConfig({
 	outdir: "design-system",
 
 	staticCss: {
+		// Forces generation of the plain `colorPalette` utility class (sets the
+		// `--colors-color-palette-*` scope vars) for every real palette name, so
+		// components can apply it themselves via `css({ colorPalette })` instead
+		// of each recipe re-declaring its own `colorPalette` variant. Needed
+		// because values come from CMS content at runtime, never literal JSX, so
+		// Panda's static extractor can't discover them on its own — see the
+		// `recipes` comment below for the same limitation. Aliases like
+		// "success"/"error"/"warning" are normalized to a real palette name in
+		// `app/components/ui/color-palette.ts` before reaching `css()`, so they
+		// don't need entries here.
+		css: [
+			{
+				properties: {
+					colorPalette: [
+						"gray",
+						"blue",
+						"green",
+						"red",
+						"orange",
+						"purple",
+						"cyan",
+						"amber",
+					],
+				},
+			},
+		],
+
 		// Every recipe here must keep `["*"]`: none of them (aside from alert,
 		// button, skeleton, input) declare a `jsx: [...]` mapping in their recipe
 		// definition, so Panda's static extractor cannot associate `<Foo size="sm">`

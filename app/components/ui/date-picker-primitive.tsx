@@ -12,6 +12,8 @@ import { CalendarIcon } from "../../icons/calendar";
 import { ChevronLeftIcon } from "../../icons/chevron-left";
 import { ChevronRightIcon } from "../../icons/chevron-right";
 import { CloseIcon } from "../../icons/close";
+import type { ColorPalette } from "./color-palette";
+import { colorPaletteClass } from "./color-palette";
 
 export class CalendarDate {
 	constructor(
@@ -162,6 +164,7 @@ export const useDatePickerContext = () => {
 export interface DatePickerRootProps
 	extends DatePickerVariantProps,
 		PropsWithChildren {
+	colorPalette?: ColorPalette;
 	id?: string;
 	open?: boolean;
 	focused?: boolean;
@@ -336,6 +339,7 @@ export function DatePickerRoot(props: DatePickerRootProps) {
 		onValueChange,
 		onOpenChange,
 		class: classProp,
+		colorPalette = "blue",
 		style,
 		...rest
 	} = localProps;
@@ -520,7 +524,11 @@ export function DatePickerRoot(props: DatePickerRootProps) {
 				data-disabled={disabled ? "" : undefined}
 				data-readonly={readOnly ? "" : undefined}
 				data-empty={value.length === 0 ? "" : undefined}
-				class={cx(styles.root, classProp)}
+				class={cx(
+					styles.root,
+					colorPaletteClass(colorPalette as string | undefined),
+					classProp,
+				)}
 				style={{ position: "relative", ...style }}
 				{...rest}
 			>

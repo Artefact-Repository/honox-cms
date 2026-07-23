@@ -33,19 +33,8 @@ export const button = defineRecipe({
 	defaultVariants: {
 		variant: "solid",
 		size: "md",
-		colorPalette: "gray",
 	},
 	variants: {
-		colorPalette: {
-			blue: { colorPalette: "blue" },
-			green: { colorPalette: "green" },
-			red: { colorPalette: "red" },
-			orange: { colorPalette: "orange" },
-			gray: { colorPalette: "gray" },
-			cyan: { colorPalette: "cyan" },
-			amber: { colorPalette: "amber" },
-			purple: { colorPalette: "purple" },
-		},
 		variant: {
 			solid: {
 				bg: "colorPalette.solid.bg",

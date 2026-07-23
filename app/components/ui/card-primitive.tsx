@@ -3,6 +3,8 @@ import type { CardVariantProps } from "design-system/recipes";
 import { card } from "design-system/recipes";
 import type { JSX, PropsWithChildren } from "hono/jsx";
 import { createContext, useContext } from "hono/jsx";
+import type { ColorPalette } from "./color-palette";
+import { colorPaletteClass } from "./color-palette";
 
 type CardStyles = ReturnType<typeof card>;
 
@@ -18,16 +20,25 @@ const useCardContext = () => {
 
 interface RootProps extends CardVariantProps, PropsWithChildren {
 	class?: string;
+	colorPalette?: ColorPalette;
 }
 
 function Root(props: RootProps) {
 	const [variantProps, localProps] = card.splitVariantProps(props);
-	const { children, class: classProp, ...restProps } = localProps;
+	const { children, class: classProp, colorPalette, ...restProps } =
+		localProps;
 	const styles = card(variantProps);
 
 	return (
 		<CardContext.Provider value={styles}>
-			<div class={cx(styles.root, classProp)} {...restProps}>
+			<div
+				class={cx(
+					styles.root,
+					colorPaletteClass(colorPalette as string | undefined),
+					classProp,
+				)}
+				{...restProps}
+			>
 				{children}
 			</div>
 		</CardContext.Provider>

@@ -9,6 +9,8 @@ import {
 	useContext,
 	useId,
 } from "hono/jsx";
+import type { ColorPalette } from "./color-palette";
+import { colorPaletteClass } from "./color-palette";
 
 type ClipboardStyles = ReturnType<typeof clipboard>;
 
@@ -56,6 +58,7 @@ export interface RootProps extends ClipboardVariantProps, PropsWithChildren {
 	/** Driven by the interactive island; ignored when set by hand. */
 	onSetValue?: (value: string) => void;
 	rootRef?: unknown;
+	colorPalette?: ColorPalette;
 	[key: string]: unknown;
 }
 
@@ -64,6 +67,7 @@ export function Root(props: RootProps) {
 	const {
 		children,
 		class: classProp,
+		colorPalette = "green",
 		id: idProp,
 		value: valueProp,
 		defaultValue,
@@ -102,7 +106,11 @@ export function Root(props: RootProps) {
 			<div
 				ref={rootRef as never}
 				id={id}
-				class={cx(styles.root, classProp)}
+				class={cx(
+					styles.root,
+					colorPaletteClass(colorPalette as string | undefined),
+					classProp,
+				)}
 				data-scope="clipboard"
 				data-part="root"
 				data-copied={copied ? "" : undefined}

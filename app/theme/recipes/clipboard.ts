@@ -73,7 +73,6 @@ export const clipboard = defineSlotRecipe({
 	},
 	defaultVariants: {
 		size: "md",
-		colorPalette: "green",
 	},
 	variants: {
 		size: {
@@ -89,22 +88,6 @@ export const clipboard = defineSlotRecipe({
 				control: { "--input-height": "sizes.11" },
 				input: { ...input.variants.size.lg },
 			},
-		},
-		colorPalette: {
-			gray: { colorPalette: "gray" },
-			blue: { colorPalette: "blue" },
-			cyan: { colorPalette: "cyan" },
-			green: { colorPalette: "green" },
-			orange: { colorPalette: "orange" },
-			purple: { colorPalette: "purple" },
-			red: { colorPalette: "red" },
-			teal: { colorPalette: "teal" },
-			indigo: { colorPalette: "indigo" },
-			pink: { colorPalette: "pink" },
-			yellow: { colorPalette: "yellow" },
-			success: { colorPalette: "green" },
-			error: { colorPalette: "red" },
-			warning: { colorPalette: "orange" },
 		},
 	},
 });

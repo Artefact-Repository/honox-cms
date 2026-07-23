@@ -4,6 +4,8 @@ import { avatar } from "design-system/recipes";
 import type { JSX, PropsWithChildren } from "hono/jsx";
 import { createContext, useContext } from "hono/jsx";
 import { UserIcon as UserIconImport } from "../../icons/user";
+import type { ColorPalette } from "./color-palette";
+import { colorPaletteClass } from "./color-palette";
 
 type AvatarStyles = ReturnType<typeof avatar>;
 type AvatarStatus = "idle" | "loading" | "loaded" | "error";
@@ -26,6 +28,7 @@ const useAvatarContext = () => {
 interface RootProps extends AvatarVariantProps, PropsWithChildren {
 	class?: string;
 	status?: AvatarStatus;
+	colorPalette?: ColorPalette;
 }
 
 function Root(props: RootProps) {
@@ -34,6 +37,7 @@ function Root(props: RootProps) {
 		children,
 		class: classProp,
 		status = "idle",
+		colorPalette,
 		...restProps
 	} = localProps;
 	const styles = avatar(variantProps);
@@ -41,7 +45,11 @@ function Root(props: RootProps) {
 	return (
 		<AvatarContext.Provider value={{ styles, status }}>
 			<div
-				class={cx(styles.root, classProp)}
+				class={cx(
+					styles.root,
+					colorPaletteClass(colorPalette as string | undefined),
+					classProp,
+				)}
 				data-scope="avatar"
 				data-part="root"
 				data-state={status}

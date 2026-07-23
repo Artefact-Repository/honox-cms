@@ -22,19 +22,8 @@ export const anchor = defineRecipe({
 	},
 	defaultVariants: {
 		variant: "underline",
-		colorPalette: "blue",
 	},
 	variants: {
-		colorPalette: {
-			blue: { colorPalette: "blue" },
-			green: { colorPalette: "green" },
-			red: { colorPalette: "red" },
-			orange: { colorPalette: "orange" },
-			gray: { colorPalette: "gray" },
-			cyan: { colorPalette: "cyan" },
-			amber: { colorPalette: "amber" },
-			purple: { colorPalette: "purple" },
-		},
 		variant: {
 			underline: {
 				textDecorationColor: "colorPalette.surface.fg/60",
