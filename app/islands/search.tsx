@@ -181,6 +181,18 @@ const DEFAULT_TRANSLATIONS: Record<
 	},
 };
 
+// Every collection's locale-scoped search index lives at
+// <collection>/[lang]/search.json.ts (e.g. app/routes/api/posts/[lang]/
+// search.json.ts, app/routes/api/docs/[lang]/search.json.ts) — a dynamic
+// segment can't be combined with a literal prefix/suffix in honox's file
+// router, so `:lang` gets its own directory segment after the collection
+// rather than a `search.[lang].json` filename. This maps a collection's
+// default (English) `src` to its locale-specific counterpart.
+function localiseSearchSrc(url: string, locale: string): string {
+	if (locale === "en" || !url.endsWith("/search.json")) return url;
+	return url.replace(/\/search\.json$/, `/${locale}/search.json`);
+}
+
 export interface SearchBaseProps {
 	/** Language locale code (defaults to "en") */
 	locale?: string;
@@ -235,10 +247,7 @@ export function InteractiveSearch(props: SearchBaseProps) {
 
 	const defaultSrc = "/api/posts/search.json";
 	const baseSrc = src ?? defaultSrc;
-	const resolvedSrc =
-		locale !== "en" && baseSrc.endsWith("/search.json")
-			? baseSrc.replace(/\/search\.json$/, `/${locale}/search.json`)
-			: baseSrc;
+	const resolvedSrc = localiseSearchSrc(baseSrc, locale);
 
 	const t = DEFAULT_TRANSLATIONS[locale] ?? DEFAULT_TRANSLATIONS.en;
 
