@@ -67,8 +67,7 @@
           "text": "Watch the 2-minute overview →",
           "colorPalette": "blue",
           "href": "https://www.youtube.com/@pulse",
-          "target": "_blank",
-          "rel": ""
+          "target": "_blank"
         }
       ]
     },
@@ -129,9 +128,7 @@
               "size": "sm"
             }
           ],
-          "columns": "{\"base\": 2, \"sm\": 3, \"md\": 5}",
-          "rows": "",
-          "minChildWidth": ""
+          "columns": "{\"base\": 2, \"sm\": 3, \"md\": 5}"
         }
       ]
     },
@@ -163,7 +160,6 @@
           "title": "Real-Time Dashboards",
           "description": "Live metrics, zero refresh",
           "body": "Track every KPI as it happens with sub-second latency streaming straight from your data warehouse.",
-          "image": "",
           "imagePosition": "top",
           "variant": "elevated"
         },
@@ -283,7 +279,6 @@
           "title": "Starter",
           "description": "$0 / month",
           "body": "Up to 3 team members. 1 project. Community support.",
-          "image": "",
           "imagePosition": "top"
         },
         {
@@ -306,7 +301,6 @@
           "title": "Pro",
           "description": "$49 / month",
           "body": "Unlimited team members and projects. Priority support. Smart alerts included.",
-          "image": "",
           "imagePosition": "top",
           "variant": "elevated"
         },

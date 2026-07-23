@@ -1,0 +1,392 @@
+{
+  "title": "Wisp — AI Notes That Write Themselves",
+  "content": [
+    {
+      "type": "stack",
+      "direction": "vertical",
+      "align": "center",
+      "gap": "4",
+      "padding": "4rem 1.5rem 3rem",
+      "children": [
+        {
+          "type": "badge",
+          "variant": "subtle",
+          "colorPalette": "purple",
+          "size": "lg",
+          "text": "✨ New · Wisp 1.0"
+        },
+        {
+          "type": "heading",
+          "as": "h1",
+          "size": "6xl",
+          "text": "Meetings that write their own notes",
+          "style": "text-align:center;max-width:44rem"
+        },
+        {
+          "type": "text",
+          "size": "lg",
+          "content": "Wisp joins your calls, transcribes in real time, and turns every meeting into clear notes and action items — automatically. Nobody has to take notes again.",
+          "style": "text-align:center;max-width:38rem"
+        },
+        {
+          "type": "stack",
+          "direction": "horizontal",
+          "gap": "4",
+          "children": [
+            {
+              "type": "button",
+              "text": "Start Free",
+              "variant": "solid",
+              "colorPalette": "purple",
+              "size": "lg"
+            },
+            {
+              "type": "button",
+              "text": "See How It Works",
+              "variant": "outline",
+              "size": "lg",
+              "onclick": "window.scrollTo({top: document.getElementById('how-it-works').offsetTop - 80, behavior: 'smooth'})"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "size": "sm",
+          "content": "Free for up to 5 meetings a month · No credit card required"
+        }
+      ]
+    },
+
+    {
+      "type": "stack",
+      "direction": "vertical",
+      "align": "center",
+      "gap": "4",
+      "backgroundColor": "#faf5ff",
+      "padding": "2.5rem 2rem",
+      "borderRadius": "1.25rem",
+      "margin": "1rem 0 3rem",
+      "children": [
+        {
+          "type": "text",
+          "size": "sm",
+          "content": "Trusted by product teams at",
+          "style": "text-align:center;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em"
+        },
+        {
+          "type": "grid",
+          "gap": "4",
+          "columns": "{\"base\": 2, \"sm\": 3, \"md\": 5}",
+          "children": [
+            { "type": "badge", "variant": "outline", "text": "Northwind", "colorPalette": "slate", "size": "sm" },
+            { "type": "badge", "variant": "outline", "text": "Contoso", "colorPalette": "slate", "size": "sm" },
+            { "type": "badge", "variant": "outline", "text": "Fabrikam", "colorPalette": "slate", "size": "sm" },
+            { "type": "badge", "variant": "outline", "text": "Tailspin", "colorPalette": "slate", "size": "sm" },
+            { "type": "badge", "variant": "outline", "text": "Adatum", "colorPalette": "slate", "size": "sm" }
+          ]
+        }
+      ]
+    },
+
+    { "type": "heading", "as": "h2", "text": "Everything happens automatically", "size": "3xl", "style": "text-align:center" },
+    { "type": "text", "size": "lg", "content": "Join a call once. Wisp handles the rest.", "style": "text-align:center;max-width:36rem;margin:0 auto" },
+    {
+      "type": "stack",
+      "direction": "vertical",
+      "padding": "1.5rem",
+      "borderRadius": "1rem",
+      "children": [
+        {
+          "type": "tabs",
+          "variant": "enclosed",
+          "size": "md",
+          "items": [
+            {
+              "value": "transcription",
+              "label": "🎙️ Live Transcription",
+              "content": [
+                {
+                  "type": "grid",
+                  "columns": "{\"base\": 1, \"md\": 2}",
+                  "gap": "6",
+                  "children": [
+                    {
+                      "type": "card",
+                      "title": "Word-for-word, in real time",
+                      "description": "99% accurate transcription with speaker labels, live as the call happens — in 30+ languages.",
+                      "children": [
+                        { "type": "badge", "text": "Speaker ID", "colorPalette": "purple", "variant": "subtle" }
+                      ]
+                    },
+                    {
+                      "type": "card",
+                      "title": "Searchable forever",
+                      "description": "Every call is indexed the moment it ends. Find the exact moment someone said \"budget\" across your last 200 meetings.",
+                      "children": [
+                        { "type": "badge", "text": "Full-text search", "colorPalette": "cyan", "variant": "subtle" }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "value": "actions",
+              "label": "✅ Smart Action Items",
+              "content": [
+                {
+                  "type": "grid",
+                  "columns": "{\"base\": 1, \"md\": 2}",
+                  "gap": "6",
+                  "children": [
+                    {
+                      "type": "card",
+                      "title": "Detected, not dictated",
+                      "description": "Wisp picks out commitments and owners from natural conversation — no \"hey Wisp, add a task\" required.",
+                      "children": [
+                        { "type": "badge", "text": "Zero setup", "colorPalette": "green", "variant": "subtle" }
+                      ]
+                    },
+                    {
+                      "type": "card",
+                      "title": "Synced to your tools",
+                      "description": "Action items land directly in Linear, Asana, or Slack — assigned to the right person automatically.",
+                      "children": [
+                        { "type": "badge", "text": "Auto-assigned", "colorPalette": "orange", "variant": "subtle" }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "value": "integrations",
+              "label": "🔌 Integrations",
+              "content": [
+                {
+                  "type": "card",
+                  "title": "Works where you already meet",
+                  "description": "One-click install for Zoom, Google Meet, and Microsoft Teams. Notes and clips post automatically to Slack.",
+                  "image": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80",
+                  "imagePosition": "right",
+                  "children": [
+                    { "type": "stack", "direction": "horizontal", "gap": "2", "wrap": "wrap", "children": [
+                      { "type": "badge", "text": "Zoom", "colorPalette": "blue", "variant": "outline" },
+                      { "type": "badge", "text": "Google Meet", "colorPalette": "green", "variant": "outline" },
+                      { "type": "badge", "text": "Microsoft Teams", "colorPalette": "purple", "variant": "outline" },
+                      { "type": "badge", "text": "Slack", "colorPalette": "amber", "variant": "outline" },
+                      { "type": "badge", "text": "Linear", "colorPalette": "slate", "variant": "outline" },
+                      { "type": "badge", "text": "Asana", "colorPalette": "red", "variant": "outline" }
+                    ]}
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+
+    { "type": "heading", "as": "h2", "text": "How it works", "size": "3xl", "style": "text-align:center", "id": "how-it-works" },
+    { "type": "text", "size": "lg", "content": "Three steps. Zero note-taking.", "style": "text-align:center;max-width:36rem;margin:0 auto" },
+    {
+      "type": "grid",
+      "columns": "{\"base\": 1, \"md\": 3}",
+      "gap": "6",
+      "children": [
+        {
+          "type": "card",
+          "children": [
+            { "type": "badge", "text": "1", "colorPalette": "purple", "variant": "solid" },
+            { "type": "heading", "as": "h3", "text": "Invite Wisp to the call", "size": "lg" },
+            { "type": "text", "size": "sm", "content": "Add wisp@wisp.app to any invite, or connect your calendar once and every meeting is covered." }
+          ]
+        },
+        {
+          "type": "card",
+          "children": [
+            { "type": "badge", "text": "2", "colorPalette": "purple", "variant": "solid" },
+            { "type": "heading", "as": "h3", "text": "Talk like normal", "size": "lg" },
+            { "type": "text", "size": "sm", "content": "Wisp listens quietly in the background — no bot voice, no interruptions, nothing to configure mid-call." }
+          ]
+        },
+        {
+          "type": "card",
+          "children": [
+            { "type": "badge", "text": "3", "colorPalette": "purple", "variant": "solid" },
+            { "type": "heading", "as": "h3", "text": "Get notes before you're back at your desk", "size": "lg" },
+            { "type": "text", "size": "sm", "content": "A clean summary, full transcript, and action items land in your inbox within a minute of hanging up." }
+          ]
+        }
+      ]
+    },
+
+    {
+      "type": "stack",
+      "direction": "vertical",
+      "gap": "4",
+      "backgroundColor": "#f8fafc",
+      "padding": "2.5rem",
+      "borderRadius": "1.25rem",
+      "maxWidth": "42rem",
+      "margin": "3rem auto",
+      "children": [
+        {
+          "type": "stack",
+          "direction": "horizontal",
+          "align": "center",
+          "gap": "3",
+          "children": [
+            { "type": "avatar", "name": "Priya Anand", "size": "md", "variant": "solid", "colorPalette": "purple" },
+            {
+              "type": "stack",
+              "direction": "vertical",
+              "gap": "0",
+              "children": [
+                { "type": "text", "size": "sm", "content": "Priya Anand", "style": "font-weight:bold" },
+                { "type": "text", "size": "xs", "content": "Head of Product, Northwind" }
+              ]
+            }
+          ]
+        },
+        { "type": "ratingGroup", "readOnly": true, "defaultValue": 5, "colorPalette": "amber", "size": "sm" },
+        {
+          "type": "heading",
+          "as": "p",
+          "size": "xl",
+          "text": "“We used to lose half of every planning meeting to someone typing notes. Now everyone's actually in the room, and the follow-ups still happen.”"
+        }
+      ]
+    },
+
+    { "type": "heading", "as": "h2", "text": "Simple pricing that scales with you", "size": "3xl", "style": "text-align:center" },
+    { "type": "text", "size": "lg", "content": "Start free. Upgrade when your team grows.", "style": "text-align:center;max-width:36rem;margin:0 auto" },
+    {
+      "type": "grid",
+      "columns": "{\"base\": 1, \"md\": 3}",
+      "gap": "6",
+      "children": [
+        {
+          "type": "card",
+          "title": "Personal",
+          "description": "$0 / month",
+          "body": "5 meetings a month. Transcripts & summaries. 1 integration.",
+          "children": [
+            { "type": "button", "text": "Get Started", "variant": "outline", "colorPalette": "purple", "size": "md" }
+          ]
+        },
+        {
+          "type": "card",
+          "title": "Team",
+          "description": "$18 / seat / month",
+          "body": "Unlimited meetings. Smart action items. Every integration. Shared meeting library.",
+          "variant": "elevated",
+          "children": [
+            { "type": "badge", "text": "Most Popular", "variant": "solid", "colorPalette": "purple" },
+            { "type": "button", "text": "Choose Team", "variant": "solid", "colorPalette": "purple", "size": "md" }
+          ]
+        },
+        {
+          "type": "card",
+          "title": "Enterprise",
+          "description": "Let's talk",
+          "body": "SSO & SCIM. Data residency controls. Dedicated onboarding. Custom retention policy.",
+          "children": [
+            { "type": "button", "text": "Contact Sales", "variant": "outline", "colorPalette": "purple", "size": "md" }
+          ]
+        }
+      ]
+    },
+
+    { "type": "heading", "as": "h2", "text": "Questions, answered", "size": "3xl", "style": "text-align:center" },
+    {
+      "type": "stack",
+      "direction": "vertical",
+      "gap": "4",
+      "maxWidth": "42rem",
+      "margin": "0 auto",
+      "children": [
+        {
+          "type": "collapsible",
+          "trigger": [{ "type": "text", "size": "md", "content": "Can Wisp join a call I forgot to schedule?" }],
+          "showIndicator": true,
+          "indicatorPlacement": "end",
+          "children": [
+            { "type": "text", "size": "md", "content": "Yes — invite wisp@wisp.app to any call at any time, or start it manually from the desktop app." }
+          ]
+        },
+        {
+          "type": "collapsible",
+          "trigger": [{ "type": "text", "size": "md", "content": "Where is the recording and transcript stored?" }],
+          "showIndicator": true,
+          "indicatorPlacement": "end",
+          "children": [
+            { "type": "text", "size": "md", "content": "Encrypted at rest in your workspace's region. Enterprise plans can pin storage to a specific data residency zone." }
+          ]
+        },
+        {
+          "type": "collapsible",
+          "trigger": [{ "type": "text", "size": "md", "content": "Does everyone on the call need a Wisp account?" }],
+          "showIndicator": true,
+          "indicatorPlacement": "end",
+          "children": [
+            { "type": "text", "size": "md", "content": "No. Only the person who adds Wisp to the call needs an account — everyone else just meets as usual." }
+          ]
+        },
+        {
+          "type": "collapsible",
+          "trigger": [{ "type": "text", "size": "md", "content": "Can I cancel anytime?" }],
+          "showIndicator": true,
+          "indicatorPlacement": "end",
+          "children": [
+            { "type": "text", "size": "md", "content": "Anytime, from account settings — no contracts, no cancellation fees, no phone call required." }
+          ]
+        }
+      ]
+    },
+
+    {
+      "type": "stack",
+      "direction": "vertical",
+      "align": "center",
+      "gap": "4",
+      "backgroundColor": "#faf5ff",
+      "padding": "4rem 2rem",
+      "borderRadius": "1.25rem",
+      "margin": "3rem 0 1rem",
+      "children": [
+        { "type": "heading", "as": "h2", "text": "Stop taking notes in your next meeting", "size": "3xl", "style": "text-align:center" },
+        { "type": "text", "size": "lg", "content": "Join thousands of teams who show up and just talk.", "style": "text-align:center" },
+        {
+          "type": "stack",
+          "direction": "horizontal",
+          "gap": "4",
+          "children": [
+            { "type": "button", "text": "Start Free", "variant": "solid", "colorPalette": "purple", "size": "lg" },
+            {
+              "type": "dialog",
+              "trigger": [{ "type": "button", "variant": "outline", "colorPalette": "purple", "size": "lg", "text": "Book a Demo" }],
+              "title": "Book a demo",
+              "description": "Tell us where to reach you and we'll follow up within one business day.",
+              "confirmText": "Request Demo",
+              "cancelText": "Cancel",
+              "footer": [
+                { "type": "button", "variant": "plain", "text": "Email Us Instead", "onclick": "window.location.href = 'mailto:hello@wisp.app'" }
+              ],
+              "children": [
+                {
+                  "type": "field",
+                  "label": "Work email",
+                  "placeholder": "you@company.com",
+                  "validator": "(value) => /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(value) || \"Enter a valid work email\""
+                }
+              ]
+            },
+            { "type": "toast" }
+          ]
+        },
+        { "type": "link", "variant": "plain", "text": "Read customer stories", "colorPalette": "purple", "href": "/customers" }
+      ]
+    }
+  ]
+}
