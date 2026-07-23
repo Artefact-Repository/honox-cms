@@ -1,4 +1,5 @@
-import { css } from "design-system/css";
+import { css, cx } from "design-system/css";
+import { button } from "design-system/recipes";
 import { ssgParams } from "hono/ssg";
 import { createRoute } from "honox/factory";
 import {
@@ -10,12 +11,14 @@ import {
 	Stack,
 	Text,
 } from "../../components/ui";
+import { LanguageSwitcher } from "../../components/language-switcher";
 import { ArrowLeftIcon } from "../../icons/arrow-left";
 import { CalendarIcon } from "../../icons/calendar";
 import { ChevronRightIcon } from "../../icons/chevron-right";
 import { ClockIcon } from "../../icons/clock";
 import { EditIcon } from "../../icons/edit";
 import { ShareIcon } from "../../icons/share";
+import { DEFAULT_DOCS_UI, loadDocsConfig } from "../../lib/configs";
 import { detectLocale, isLocale, localiseHref } from "../../lib/i18n";
 import { loadPostBySlug, loadPosts } from "../../lib/posts";
 import { markdownContentClass } from "../../utils/markdown-content-style";
@@ -29,15 +32,23 @@ export default createRoute(
 
 	// Actual route handler
 	async function handler(c) {
-		const slug = c.req.param("slug");
-		if (isLocale(slug)) {
+		const slugParam = c.req.param("slug");
+		if (isLocale(slugParam)) {
 			const next = arguments[1];
 			return next();
 		}
+		// isLocale's `value is string` guard narrows the untaken (fall-through)
+		// branch to `undefined` when `slugParam`'s static type is `string |
+		// undefined` — even though at runtime it's always a real slug here (this
+		// is a dynamic-segment route param, never actually missing). Re-widen it.
+		const slug = slugParam as unknown as string;
 		const currentPath = c.req.path;
 		const currentLocale = detectLocale(currentPath);
 
-		const post = await loadPostBySlug(slug, currentLocale);
+		const [post, config] = await Promise.all([
+			loadPostBySlug(slug, currentLocale),
+			loadDocsConfig(currentLocale),
+		]);
 
 		if (!post) {
 			return c.notFound();
@@ -49,6 +60,7 @@ export default createRoute(
 			const postUrl = `${c.req.url}`;
 
 			const localiseLink = (href: string) => localiseHref(href, currentLocale);
+			const docsUi = { ...DEFAULT_DOCS_UI, ...config.docsUi };
 
 			return c.render(
 				<div
@@ -62,6 +74,83 @@ export default createRoute(
 						{currentLocale === "zh" ? "博客" : "Blog"}
 					</title>
 
+					{/* Header — brand + configs.json headerLinks + language switcher,
+					    matching the sticky header on / and /blog. */}
+					<header
+						class={css({
+							borderBottomWidth: "1px",
+							borderColor: { _light: "white.a4", _dark: "black.a4" },
+							bg: { _light: "white.a7", _dark: "black.a7" },
+							backdropFilter: "blur(20px) saturate(180%)",
+							position: "sticky",
+							top: "0",
+							zIndex: "10",
+						})}
+					>
+						<div
+							class={css({
+								maxWidth: "7xl",
+								mx: "auto",
+								px: { base: "4", md: "6", lg: "8" },
+								py: "4",
+								display: "flex",
+								alignItems: "center",
+								justifyContent: "space-between",
+								gap: "4",
+							})}
+						>
+							<Anchor
+								href={localiseLink("/")}
+								variant="plain"
+								class={css({ textDecoration: "none", flexShrink: "0" })}
+							>
+								<Heading
+									as="span"
+									class={css({
+										fontSize: "lg",
+										fontWeight: "bold",
+										tracking: "tight",
+									})}
+								>
+									{config.home?.brandName ?? "Artefact UI"}
+								</Heading>
+							</Anchor>
+
+							<nav
+								class={css({
+									display: "flex",
+									gap: { base: "3", md: "6" },
+									alignItems: "center",
+								})}
+							>
+								{config.headerLinks?.map((link) => (
+									<Anchor
+										key={link.href}
+										href={localiseLink(link.href)}
+										variant="plain"
+										class={css({ textStyle: "sm", fontWeight: "medium" })}
+									>
+										{link.label}
+									</Anchor>
+								))}
+								<Anchor
+									href={`/admin/#/collections/posts/entries/${slug}`}
+									class={cx(
+										button({ variant: "outline", size: "sm" }),
+										css({ textStyle: "sm", fontWeight: "medium" }),
+									)}
+								>
+									<EditIcon width="16" height="16" />
+									{docsUi.edit}
+								</Anchor>
+								<LanguageSwitcher
+									currentPath={currentPath}
+									currentLocale={currentLocale}
+								/>
+							</nav>
+						</div>
+					</header>
+
 					{/* Article Content */}
 					<section
 						class={css({
@@ -71,62 +160,32 @@ export default createRoute(
 							py: { base: "8", md: "12" },
 						})}
 					>
-						<Stack
-							direction="horizontal"
-							justify="space-between"
-							align="center"
-							class={css({ mb: "8" })}
+						{/* Back Button */}
+						<a
+							href={localiseLink("/blog")}
+							class={css({
+								display: "inline-flex",
+								alignItems: "center",
+								gap: "2",
+								mb: "6",
+								color: "fg.muted",
+								textDecoration: "none",
+								fontSize: "sm",
+								px: "3",
+								py: "1.5",
+								mx: "-3",
+								borderRadius: "lg",
+								transition: "all 0.2s",
+								_hover: {
+									bg: "bg.subtle",
+									color: "fg",
+									transform: "translateX(-4px)",
+								},
+							})}
 						>
-							{/* Back Button */}
-							<a
-								href={localiseLink("/blog")}
-								class={css({
-									display: "inline-flex",
-									alignItems: "center",
-									gap: "2",
-									color: "fg.muted",
-									textDecoration: "none",
-									fontSize: "sm",
-									px: "4",
-									py: "2",
-									borderRadius: "lg",
-									transition: "all 0.2s",
-									_hover: {
-										bg: "bg.subtle",
-										color: "fg",
-										transform: "translateX(-4px)",
-									},
-								})}
-							>
-								<ArrowLeftIcon width="20" height="20" />
-								{currentLocale === "zh" ? "返回博客" : "Back to Blog"}
-							</a>
-
-							{/* Edit Button */}
-							<a
-								href={`/admin/#/collections/posts/entries/${slug}`}
-								class={css({
-									display: "inline-flex",
-									alignItems: "center",
-									gap: "2",
-									color: "fg.muted",
-									textDecoration: "none",
-									fontSize: "sm",
-									px: "4",
-									py: "2",
-									borderRadius: "lg",
-									transition: "all 0.2s",
-									_hover: {
-										bg: "bg.subtle",
-										color: "fg",
-										transform: "translateY(-1px)",
-									},
-								})}
-							>
-								<EditIcon width="18" height="18" />
-								{currentLocale === "zh" ? "编辑文章" : "Edit Post"}
-							</a>
-						</Stack>
+							<ArrowLeftIcon width="20" height="20" />
+							{currentLocale === "zh" ? "返回博客" : "Back to Blog"}
+						</a>
 
 						<div
 							class={css({
