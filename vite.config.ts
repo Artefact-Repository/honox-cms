@@ -1,4 +1,5 @@
 import {
+	copyFileSync,
 	existsSync,
 	mkdirSync,
 	readdirSync,
@@ -89,6 +90,50 @@ function fixSsgRoutingPlugin() {
 	};
 }
 
+// app/routes/[page].tsx exposes every content/pages/*.json file at its bare
+// root path (e.g. /wisp), but its handler must call `next()` — not
+// `c.notFound()` — on a miss so it defers to sibling static routes (/de,
+// /blog, /docs) instead of shadowing them (see app/routes/[page].tsx for why).
+// `next()` requires a 2-arg (c, next) handler, and @hono/vite-ssg's route
+// discovery (hono/dist/helper/ssg/utils.js `isMiddleware`) treats any
+// 2-arg handler as middleware and silently excludes it from static
+// generation — so this route never gets prerendered on its own.
+// app/routes/pages/[slug].tsx has no such conflict (nothing else registers
+// "/pages/<anything>") and DOES get prerendered correctly, so we just copy
+// its already-correct output to the bare root path for every page slug.
+function copyContentPagesToRootPlugin() {
+	return {
+		name: "copy-content-pages-to-root",
+		closeBundle: async () => {
+			const distDir = path.resolve(__dirname, "dist");
+			const pagesDir = path.resolve(__dirname, "content/pages");
+			const pagesDistDir = path.join(distDir, "pages");
+			if (!existsSync(pagesDistDir)) return;
+
+			const slugs = readdirSync(pagesDir, { withFileTypes: true })
+				.filter((entry) => entry.isFile() && entry.name.endsWith(".json"))
+				.map((entry) => entry.name.replace(/\.json$/, ""))
+				.filter((slug) => slug !== "index");
+
+			for (const slug of slugs) {
+				const source = path.join(pagesDistDir, `${slug}.html`);
+				const dest = path.join(distDir, `${slug}.html`);
+				if (!existsSync(source)) continue;
+				if (existsSync(dest)) {
+					console.warn(
+						`[copy-content-pages-to-root] ⚠ dist/${slug}.html already exists — skipping (rename the content page or the conflicting route)`,
+					);
+					continue;
+				}
+				copyFileSync(source, dest);
+				console.log(
+					`[copy-content-pages-to-root] ✓ dist/pages/${slug}.html → dist/${slug}.html`,
+				);
+			}
+		},
+	};
+}
+
 const config = defineConfig(({ mode }) =>
 	mode === "client" ? clientConfig : mainConfig(mode),
 );
@@ -136,6 +181,7 @@ const mainConfig = (_mode: string) => ({
 		}),
 		ssg({ entry: "app/server.ts" }),
 		fixSsgRoutingPlugin(),
+		copyContentPagesToRootPlugin(),
 	],
 });
 
