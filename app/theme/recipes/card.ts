@@ -40,6 +40,7 @@ export const card = defineSlotRecipe({
 			display: "flex",
 			flex: "1",
 			flexDirection: "column",
+			gap: "3",
 			pb: "6",
 			px: "6",
 		},
