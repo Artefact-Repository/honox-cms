@@ -28,6 +28,8 @@ export const popover = defineSlotRecipe({
 			display: "flex",
 			flexDirection: "column",
 			maxHeight: "var(--available-height)",
+			overflowY: "auto",
+			overscrollBehavior: "contain",
 			outline: "0",
 			position: "relative",
 			textStyle: "sm",

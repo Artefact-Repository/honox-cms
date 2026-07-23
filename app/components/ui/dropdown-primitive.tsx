@@ -21,6 +21,7 @@ import {
 } from "./overlay-position";
 
 const ARROW_OFFSET = "16px";
+const VIEWPORT_GAP = 8;
 
 type DropdownStyles = ReturnType<typeof dropdown>;
 
@@ -930,6 +931,15 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 		y = Math.max(0, Math.min(y, window.innerHeight - menuHeight));
 		positioner.style.top = `${y}px`;
 		positioner.style.left = `${x}px`;
+
+		// x/y clamping above keeps the menu's chosen corner on-screen, but a
+		// menu taller than the viewport itself would still hang off the far
+		// edge — cap it to the remaining space so `maxH: min(var(--available-height), ...)`
+		// (dropdown.ts) turns that into an internal scroll instead.
+		positioner.style.setProperty(
+			"--available-height",
+			`${Math.max(0, window.innerHeight - y - VIEWPORT_GAP)}px`,
+		);
 	};
 
 	// Pure DOM effect of opening/closing, decoupled from who asked for it (a

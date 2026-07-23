@@ -272,6 +272,28 @@ export function positionOverlay(
 			if (placement !== preferred) {
 				Object.assign(positioner.style, getPlacementStyle(placement, config));
 			}
+
+			// Flipping to the roomier side (above) still isn't a guarantee that
+			// side has *enough* room — e.g. a tall popover triggered from the
+			// vertical middle of a short viewport. Cap the main axis to whatever
+			// space actually exists there so `maxHeight: var(--available-height)`
+			// (see popover/dropdown/select/combobox recipes) turns overflow into
+			// an internal scroll instead of letting content run past the edge.
+			const availableHeight =
+				placement === "top"
+					? spaceAbove - gap
+					: placement === "bottom"
+						? spaceBelow - gap
+						: window.innerHeight - 2 * gap;
+			positioner.style.setProperty(
+				"--available-height",
+				`${Math.max(0, availableHeight)}px`,
+			);
+		} else {
+			positioner.style.setProperty(
+				"--available-height",
+				`${Math.max(0, window.innerHeight - 2 * gap)}px`,
+			);
 		}
 
 		// Clamp the cross axis so the content stays within the viewport, by
