@@ -63,6 +63,11 @@ export interface DocsConfig {
 	groups: DocsNavGroupConfig[];
 	/** Label for docs that don't match any group above. Defaults to "Other". */
 	fallbackLabel?: string;
+	/** Explicit sidenav order within each group, by doc slug (filename without
+	 * extension). Docs not listed here keep the default alphabetical order,
+	 * appended after the ones listed. Matching key — keep in English/identical
+	 * across locale files, like `section`/`category` above. */
+	docOrder?: string[];
 	/** External links shown at the bottom of the sidenav, e.g. the GitHub repo. */
 	links?: DocsNavLinkConfig[];
 	/** Plain links shown in the header nav (e.g. Blog, Home), before the

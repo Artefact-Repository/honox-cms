@@ -1755,6 +1755,12 @@ singletons:
             required: false
             i18n: duplicate
             hint: "Claim docs by their Category field (Components collection only). Matching key — keep in English, identical across locales (the Category field itself is i18n: duplicate, so it's always English regardless of doc locale)."
+      - label: Doc Order
+        name: docOrder
+        widget: list
+        required: false
+        i18n: duplicate
+        hint: "Explicit sidenav order within each group above, by doc slug (filename without extension, e.g. Introduction, Getting-Started, Architecture). Docs not listed here keep the default alphabetical order, appended after the ones listed. Matching key — keep in English, identical across locales."
       - label: Fallback Group Label
         name: fallbackLabel
         widget: string

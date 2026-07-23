@@ -52,6 +52,13 @@
       "category": "Overlays"
     }
   ],
+  "docOrder": [
+    "Introduction",
+    "Getting-Started",
+    "Architecture",
+    "Hydration",
+    "PageBuilder"
+  ],
   "fallbackLabel": "Sonstige",
   "links": [
     {

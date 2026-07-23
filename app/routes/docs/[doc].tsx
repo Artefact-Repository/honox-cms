@@ -55,16 +55,35 @@ interface DocGroup {
 	items: DocSummary[];
 }
 
+// Sorts by position in `order` (a list of slugs from the CMS singleton's
+// `docOrder`), pushing anything not listed to the end in its incoming
+// (alphabetical, per loadDocs) order. `order` is undefined/empty for
+// collections that haven't configured manual ordering yet, in which case
+// this is a no-op.
+function applyDocOrder(items: DocSummary[], order?: string[]): DocSummary[] {
+	if (!order || order.length === 0) return items;
+	const rank = new Map(order.map((slug, index) => [slug, index]));
+	return [...items].sort((a, b) => {
+		const rankA = rank.get(a.slug);
+		const rankB = rank.get(b.slug);
+		if (rankA !== undefined && rankB !== undefined) return rankA - rankB;
+		if (rankA !== undefined) return -1;
+		if (rankB !== undefined) return 1;
+		return 0;
+	});
+}
+
 // Fully data-driven: each configured group claims every doc matching its
-// `section` and/or `category` filter (both are AND'd when both are set), in
-// the order the CMS singleton lists them. Anything no group claims falls into
-// a trailing fallback group, so this stays usable for any doc collection
-// shape without editing this file.
+// `section` and/or `category` filter (both are AND'd when both are set),
+// ordered by the CMS singleton's `docOrder` (falling back to the incoming
+// alphabetical order for anything not listed there). Anything no group
+// claims falls into a trailing fallback group, so this stays usable for any
+// doc collection shape without editing this file.
 //
 // `config` is already the locale-specific configs.<locale>.json (see
 // loadDocsConfig in lib/configs.ts): group `label`/`fallbackLabel` are
-// genuinely translated per locale (i18n: true), while `section`/`category`
-// are matching keys that stay in English across every locale file
+// genuinely translated per locale (i18n: true), while `section`/`category`/
+// `docOrder` are matching keys that stay in English across every locale file
 // (i18n: duplicate) — matching the `category` frontmatter field on doc/mdx
 // content, which is also i18n: duplicate and therefore always English
 // regardless of the doc's own locale. So no runtime translation/lookup is
@@ -84,7 +103,10 @@ function buildDocGroups(docs: DocSummary[], config: DocsConfig): DocGroup[] {
 				return true;
 			});
 			for (const doc of items) claimed.add(doc.slug);
-			return { label: groupConfig.label, items };
+			return {
+				label: groupConfig.label,
+				items: applyDocOrder(items, config.docOrder),
+			};
 		})
 		.filter((group) => group.items.length > 0);
 
@@ -92,7 +114,7 @@ function buildDocGroups(docs: DocSummary[], config: DocsConfig): DocGroup[] {
 	if (unclaimed.length > 0) {
 		groups.push({
 			label: config.fallbackLabel || "Other",
-			items: unclaimed,
+			items: applyDocOrder(unclaimed, config.docOrder),
 		});
 	}
 
