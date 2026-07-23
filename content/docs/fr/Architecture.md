@@ -140,7 +140,7 @@ Pour ajouter une nouvelle locale de traduction au dépôt, suivez ce flux de tra
 
 1. **Configuration CMS :** Ajoutez le code de locale (par ex. `fr` ou `de`) à la section `i18n.locales` de `public/admin/config.yml`.
 2. **Clés de traduction :** Créez un fichier de configuration correspondant sous `content/configs.<locale>.json` avec les clés de traduction localisées.
-3. **Enregistrement du sélecteur de langue :** Enregistrez le code de locale et son nom lisible par un humain dans `ALL_LOCALES` et `LOCALE_NAMES` à l'intérieur de `app/components/language-switcher.tsx`.
+3. **Enregistrement du sélecteur de langue :** Enregistrez le code de locale et son nom lisible par un humain dans `ALL_LOCALES` et `LOCALE_NAMES` à l'intérieur de `app/lib/i18n.ts`.
 4. **Tableau du chargeur de docs :** Ajoutez le code de locale au tableau `LOCALES` à l'intérieur de `app/lib/docs.ts`.
 5. **Réexportation de route :** Réexportez les routes standard en créant un répertoire `app/routes/<locale>/` correspondant à la structure des fichiers de route racine.
 6. **Traductions :** Fournissez les traductions des docs markdown/MDX et des références de composants respectivement sous `content/docs/<locale>/*.md` et `content/components/<locale>/*.mdx`.

@@ -151,7 +151,7 @@ To add a new translation locale to the repository, follow this step-by-step work
 
 1. **CMS Configuration:** Add the locale code (e.g. `fr` or `de`) to the `i18n.locales` section of `public/admin/config.yml`.
 2. **Translation Keys:** Create a matching config file under `content/configs.<locale>.json` with the localized translation keys.
-3. **Language Switcher Registration:** Register the locale code and its human-readable name in `ALL_LOCALES` and `LOCALE_NAMES` inside `app/components/language-switcher.tsx`.
+3. **Language Switcher Registration:** Register the locale code and its human-readable name in `ALL_LOCALES` and `LOCALE_NAMES` inside `app/lib/i18n.ts`.
 4. **Docs Loader Array:** Add the locale code to the `LOCALES` array inside `app/lib/docs.ts`.
 5. **Route Re-export:** Re-export the standard routes by creating a directory `app/routes/<locale>/` matching the root route files structure. This also covers `app/lib/posts.ts`'s `parsePostPath`, which validates the locale segment in a translated post's path against `TRANSLATED_LOCALES` (`app/lib/i18n.ts`) — a locale missing from that list is silently treated as a plain (non-locale) folder and its posts get skipped.
 6. **Translations:** Provide translations for the markdown/MDX docs, component references, page layouts, and blog posts under `content/docs/<locale>/*.md`, `content/components/<locale>/*.mdx`, `content/pages/<locale>/*.json`, and `content/posts/<locale>/*.md` respectively — only for the specific docs/components/pages/posts that actually need translating, since each loader falls back to the default-locale file otherwise.

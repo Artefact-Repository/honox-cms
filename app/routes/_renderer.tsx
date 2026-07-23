@@ -14,8 +14,9 @@ export default jsxRenderer(({ children }, c) => {
 				<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 				{/* Blocking (no async/defer) and first in <head>, so the
 				`data-theme` attribute is set before the stylesheet paints —
-				avoids a flash of the wrong color scheme. Mirrors the logic in
-				`SettingsPopover`'s onclick handlers. */}
+				avoids a flash of the wrong color scheme. Mirrors the onclick
+				logic on the Light/Dark/System buttons in the "Appearance"
+				header popover (content/configs*.json's `headerItems`). */}
 				<script
 					// biome-ignore lint/security/noDangerouslySetInnerHtml: static, non-user-controlled boot script
 					dangerouslySetInnerHTML={{

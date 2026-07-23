@@ -140,7 +140,7 @@ Um dem Repository eine neue Übersetzungs-Locale hinzuzufügen, befolge diesen s
 
 1. **CMS-Konfiguration:** Füge den Locale-Code (z. B. `fr` oder `de`) zum `i18n.locales`-Abschnitt von `public/admin/config.yml` hinzu.
 2. **Übersetzungsschlüssel:** Erstelle eine passende Konfigurationsdatei unter `content/configs.<locale>.json` mit den lokalisierten Übersetzungsschlüsseln.
-3. **Language-Switcher-Registrierung:** Registriere den Locale-Code und seinen menschenlesbaren Namen in `ALL_LOCALES` und `LOCALE_NAMES` innerhalb von `app/components/language-switcher.tsx`.
+3. **Language-Switcher-Registrierung:** Registriere den Locale-Code und seinen menschenlesbaren Namen in `ALL_LOCALES` und `LOCALE_NAMES` innerhalb von `app/lib/i18n.ts`.
 4. **Docs-Loader-Array:** Füge den Locale-Code zum `LOCALES`-Array innerhalb von `app/lib/docs.ts` hinzu.
 5. **Routen-Re-Export:** Exportiere die Standard-Routen erneut, indem du ein Verzeichnis `app/routes/<locale>/` erstellst, das der Root-Routen-Dateistruktur entspricht.
 6. **Übersetzungen:** Stelle Übersetzungen für die Markdown/MDX-Docs und Komponenten-Referenzen jeweils unter `content/docs/<locale>/*.md` und `content/components/<locale>/*.mdx` bereit.

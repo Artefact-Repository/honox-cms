@@ -83,11 +83,53 @@
       "href": "/product-landing"
     },
     {
-      "type": "button",
-      "text": "↑ Arriba",
-      "variant": "outline",
-      "size": "sm",
-      "onclick": "window.scrollTo({ top: 0, behavior: 'smooth' })"
+      "type": "popover",
+      "triggerText": "⚙ Ajustes",
+      "title": "Apariencia",
+      "showArrow": false,
+      "children": [
+        {
+          "type": "stack",
+          "direction": "vertical",
+          "gap": "0.5",
+          "children": [
+            {
+              "type": "button",
+              "text": "Claro",
+              "variant": "plain",
+              "size": "sm",
+              "onclick": "localStorage.setItem('theme','light');document.documentElement.dataset.theme='light';"
+            },
+            {
+              "type": "button",
+              "text": "Oscuro",
+              "variant": "plain",
+              "size": "sm",
+              "onclick": "localStorage.setItem('theme','dark');document.documentElement.dataset.theme='dark';"
+            },
+            {
+              "type": "button",
+              "text": "Sistema",
+              "variant": "plain",
+              "size": "sm",
+              "onclick": "localStorage.setItem('theme','system');document.documentElement.dataset.theme=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "dropdown",
+      "triggerText": "🌐 ES",
+      "placement": "bottom-end",
+      "items": [
+        { "type": "item", "label": "English", "value": "en", "toggleLocale": "en" },
+        { "type": "item", "label": "中文", "value": "zh", "toggleLocale": "zh" },
+        { "type": "item", "label": "Español", "value": "es", "toggleLocale": "es" },
+        { "type": "item", "label": "Português", "value": "pt", "toggleLocale": "pt" },
+        { "type": "item", "label": "Français", "value": "fr", "toggleLocale": "fr" },
+        { "type": "item", "label": "Deutsch", "value": "de", "toggleLocale": "de" }
+      ]
     }
   ],
   "blog": {

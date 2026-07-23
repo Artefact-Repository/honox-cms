@@ -2,7 +2,7 @@ import { css } from "design-system/css";
 import { ChevronDownIcon } from "../icons/chevron-down";
 import { localeToggleUrl, localiseHref } from "../lib/i18n";
 import { extractLayoutStyle } from "./block-style";
-import { type ComponentBlock, propsOf } from "./block-types";
+import { type BlockProps, type ComponentBlock, propsOf } from "./block-types";
 import {
 	AbsoluteCenter,
 	Alert,
@@ -670,12 +670,38 @@ const registry: Record<string, BlockRenderer> = {
 	},
 
 	dropdown: (b) => {
-		const { triggerText, items, ...rest } = propsOf(b);
+		const { triggerText, items, placement, locale, currentPath, ...rest } =
+			propsOf(b);
 		const trigger = triggerText ? (
-			<Button variant="outline">{triggerText}</Button>
+			<Button variant="outline" size="sm">
+				{triggerText}
+			</Button>
 		) : undefined;
+		// An `item` entry may carry `toggleLocale` instead of a fixed `href`
+		// (the language-switcher case) — resolved here, server-side, from the
+		// request's current path so the item's target survives into
+		// `DropdownItemItem.href` (see dropdown.tsx) exactly like a normal
+		// CMS-authored link. Same mechanism as `anchor`'s `toggleLocale`.
+		const resolvedItems = (
+			items as (BlockProps & { toggleLocale?: string })[] | undefined
+		)?.map((item) =>
+			item.toggleLocale &&
+			typeof currentPath === "string" &&
+			typeof locale === "string"
+				? {
+						...item,
+						href: localeToggleUrl(currentPath, locale, item.toggleLocale),
+					}
+				: item,
+		);
 		return (
-			<Dropdown interactive trigger={trigger} items={items || []} {...rest} />
+			<Dropdown
+				interactive
+				trigger={trigger}
+				items={resolvedItems || []}
+				placement={placement}
+				{...rest}
+			/>
 		);
 	},
 

@@ -62,14 +62,13 @@ export default createRoute(async (c) => {
 						})}
 					>
 						<PageRenderer content={data.headerNav ?? []} />
-						{/* Appearance popover + language switcher live once in
+						{/* Appearance popover + language dropdown live once in
 						`config.headerItems` and are reused here — everything
 						else in that list (Blog/Docs/Product links) is already
 						covered by `data.headerNav` above. */}
 						{renderBlocks(
 							config.headerItems?.filter(
-								(item) =>
-									item.type === "popover" || item.type === "languageSwitcher",
+								(item) => item.type === "popover" || item.type === "dropdown",
 							),
 							{ locale: currentLocale, currentPath },
 						)}

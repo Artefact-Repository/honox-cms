@@ -49,6 +49,9 @@ interface DropdownItemItem extends BaseDropdownItem {
 	value: string;
 	icon?: JSX.Element;
 	indicator?: JSX.Element;
+	/** Renders the item as a link (`asChild` onto an `<a>`) instead of a
+	 * plain select-on-click menu item — e.g. a language switcher entry. */
+	href?: string;
 }
 
 interface DropdownSeparatorItem extends BaseDropdownItem {
@@ -246,6 +249,26 @@ function renderDropdownItem(
 
 		default: {
 			const menuItem = item as DropdownItemItem;
+			const content = (
+				<>
+					{menuItem.icon && <ItemIndicator>{menuItem.icon}</ItemIndicator>}
+					<ItemText>{menuItem.label}</ItemText>
+					{menuItem.indicator}
+				</>
+			);
+			if (menuItem.href) {
+				return (
+					<Item
+						key={menuItem.value}
+						value={menuItem.value}
+						disabled={menuItem.disabled}
+						class={menuItem.class}
+						asChild
+					>
+						<a href={menuItem.href}>{content}</a>
+					</Item>
+				);
+			}
 			return (
 				<Item
 					key={menuItem.value}
@@ -253,9 +276,7 @@ function renderDropdownItem(
 					disabled={menuItem.disabled}
 					class={menuItem.class}
 				>
-					{menuItem.icon && <ItemIndicator>{menuItem.icon}</ItemIndicator>}
-					<ItemText>{menuItem.label}</ItemText>
-					{menuItem.indicator}
+					{content}
 				</Item>
 			);
 		}
