@@ -930,6 +930,7 @@ collections:
                         options: [visible, hidden, auto]
                         required: false
                         hint: "Card clips its content to its rounded corners by default. Set to \"visible\" if this card contains a Popover/Dropdown/Select/DatePicker/ColorPicker/HoverCard, whose overlay would otherwise get cut off at the card's edge."
+                      - *layout_style_box_shadow
                       - label: Children
                         name: children
                         widget: list
@@ -1465,6 +1466,7 @@ collections:
                 options: [visible, hidden, auto]
                 required: false
                 hint: "Card clips its content to its rounded corners by default. Set to \"visible\" if this card contains a Popover/Dropdown/Select/DatePicker/ColorPicker/HoverCard, whose overlay would otherwise get cut off at the card's edge."
+              - *layout_style_box_shadow
               - label: Children
                 name: children
                 widget: list

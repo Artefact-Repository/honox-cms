@@ -21,6 +21,12 @@ export const card = defineSlotRecipe({
 			flexDirection: "column",
 			overflow: "hidden",
 			position: "relative",
+			// Subtle default lift so cards read as raised above the page
+			// background even in the (most common) `outline`/`subtle` variants —
+			// `elevated` overrides this with a heavier `lg` shadow below, and a
+			// CMS author can override it per-card via the Box Shadow field
+			// (see block-style.ts's `--cms-box-shadow`).
+			boxShadow: "sm",
 			transition: "all 0.2s ease-in-out",
 		},
 		header: {
