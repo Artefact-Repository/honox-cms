@@ -159,6 +159,11 @@ export const drawer = defineSlotRecipe({
 					alignItems: "stretch",
 				},
 				content: {
+					// Side drawers span the full viewport height (not just cap at it),
+					// so `body`'s `flex: 1` fills the remaining space and `footer`
+					// stays pinned to the bottom of the overlay instead of trailing
+					// directly under short body content.
+					h: "100dvh",
 					_open: {
 						animationName: {
 							base: "slide-from-left-full, fade-in",
@@ -179,6 +184,7 @@ export const drawer = defineSlotRecipe({
 					alignItems: "stretch",
 				},
 				content: {
+					h: "100dvh",
 					_open: {
 						animationName: {
 							base: "slide-from-right-full, fade-in",
