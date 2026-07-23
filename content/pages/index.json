@@ -399,7 +399,9 @@
           "children": [
             { "type": "stack", "direction": "horizontal", "align": "start", "gap": "4", "children": [
               { "type": "dialog", "trigger": [{ "type": "button", "variant": "solid", "colorPalette": "blue", "text": "Open Modal" }], "title": "Delete Workspace", "description": "Are you absolutely sure you want to delete this workspace?", "body": "This action is irreversible and all your data will be permanently wiped.", "confirmText": "Delete", "cancelText": "Cancel" },
-              { "type": "drawer", "trigger": [{ "type": "button", "variant": "outline", "text": "Open Settings Drawer" }], "title": "Project Settings", "description": "Configure workspace properties", "confirmText": "Save Changes", "cancelText": "Dismiss", "children": [
+              { "type": "drawer", "trigger": [{ "type": "button", "variant": "outline", "text": "Open Settings Drawer" }], "title": "Project Settings", "description": "Configure workspace properties", "confirmText": "Save Changes", "cancelText": "Dismiss", "footer": [
+                { "type": "button", "variant": "outline", "colorPalette": "blue", "text": "Reload Table", "onclick": "window.dispatchEvent(new CustomEvent('paginated-table:reload'))" }
+              ], "children": [
                 { "type": "text", "size": "sm", "content": "Manage your database connections, member access levels, and billing preferences directly here." },
                 { "type": "paginatedTable", "url": "/api/posts/index.json", "dataKey": "posts", "pageSize": 3, "columns": [
                   { "header": "Title", "key": "title" }, { "header": "Author", "key": "author" }, { "header": "Date", "key": "date" }

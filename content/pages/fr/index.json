@@ -951,6 +951,15 @@
                   "description": "Configurez les propriétés de l'espace de travail",
                   "confirmText": "Enregistrer les Modifications",
                   "cancelText": "Ignorer",
+                  "footer": [
+                    {
+                      "type": "button",
+                      "variant": "outline",
+                      "colorPalette": "blue",
+                      "text": "Recharger le Tableau",
+                      "onclick": "window.dispatchEvent(new CustomEvent('paginated-table:reload'))"
+                    }
+                  ],
                   "children": [
                     {
                       "type": "text",

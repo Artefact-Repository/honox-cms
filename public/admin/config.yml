@@ -962,6 +962,12 @@ collections:
                       - { label: Confirm Text, name: confirmText, widget: string, required: false }
                       - { label: Cancel Text, name: cancelText, widget: string, required: false }
                       - { label: Role, name: role, widget: select, options: [dialog, alertdialog], default: dialog }
+                      - label: Footer
+                        name: footer
+                        widget: list
+                        types: *leaf_components
+                        required: false
+                        hint: "Extra footer buttons (or other leaf blocks) rendered alongside Confirm/Cancel, e.g. a Button with a custom onClick to refresh a table."
                       - label: Children
                         name: children
                         widget: list
@@ -981,6 +987,12 @@ collections:
                         required: false
                       - { label: Confirm Text, name: confirmText, widget: string, required: false }
                       - { label: Cancel Text, name: cancelText, widget: string, required: false }
+                      - label: Footer
+                        name: footer
+                        widget: list
+                        types: *leaf_components
+                        required: false
+                        hint: "Extra footer buttons (or other leaf blocks) rendered alongside Confirm/Cancel, e.g. a Button with a custom onClick to refresh a table."
                       - label: Children
                         name: children
                         widget: list

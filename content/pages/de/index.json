@@ -951,6 +951,15 @@
                   "description": "Eigenschaften des Arbeitsbereichs konfigurieren",
                   "confirmText": "Änderungen speichern",
                   "cancelText": "Verwerfen",
+                  "footer": [
+                    {
+                      "type": "button",
+                      "variant": "outline",
+                      "colorPalette": "blue",
+                      "text": "Tabelle neu laden",
+                      "onclick": "window.dispatchEvent(new CustomEvent('paginated-table:reload'))"
+                    }
+                  ],
                   "children": [
                     {
                       "type": "text",

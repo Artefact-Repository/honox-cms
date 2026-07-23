@@ -399,7 +399,9 @@
           "children": [
             { "type": "stack", "direction": "horizontal", "align": "start", "gap": "4", "children": [
               { "type": "dialog", "trigger": [{ "type": "button", "variant": "solid", "colorPalette": "blue", "text": "打开模态框" }], "title": "删除工作区", "description": "您确定要删除此工作区吗？", "body": "此操作不可撤销，您的所有数据将被永久删除。", "confirmText": "删除", "cancelText": "取消" },
-              { "type": "drawer", "trigger": [{ "type": "button", "variant": "outline", "text": "打开设置抽屉" }], "title": "项目设置", "description": "配置工作区属性", "confirmText": "保存更改", "cancelText": "关闭", "children": [
+              { "type": "drawer", "trigger": [{ "type": "button", "variant": "outline", "text": "打开设置抽屉" }], "title": "项目设置", "description": "配置工作区属性", "confirmText": "保存更改", "cancelText": "关闭", "footer": [
+                { "type": "button", "variant": "outline", "colorPalette": "blue", "text": "重新加载表格", "onclick": "window.dispatchEvent(new CustomEvent('paginated-table:reload'))" }
+              ], "children": [
                 { "type": "text", "size": "sm", "content": "在此直接管理数据库连接、成员访问级别与账单偏好。" },
                 { "type": "paginatedTable", "url": "/api/posts/index.json", "dataKey": "posts", "pageSize": 3, "columns": [
                   { "header": "标题", "key": "title" }, { "header": "作者", "key": "author" }, { "header": "日期", "key": "date" }

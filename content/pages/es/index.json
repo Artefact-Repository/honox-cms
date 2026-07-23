@@ -951,6 +951,15 @@
                   "description": "Configura las propiedades del espacio de trabajo",
                   "confirmText": "Guardar Cambios",
                   "cancelText": "Descartar",
+                  "footer": [
+                    {
+                      "type": "button",
+                      "variant": "outline",
+                      "colorPalette": "blue",
+                      "text": "Recargar Tabla",
+                      "onclick": "window.dispatchEvent(new CustomEvent('paginated-table:reload'))"
+                    }
+                  ],
                   "children": [
                     {
                       "type": "text",

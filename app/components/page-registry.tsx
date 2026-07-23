@@ -93,6 +93,15 @@ function renderChildren(children?: ComponentBlock[]): JSX.Element[] {
 	));
 }
 
+// Dialog/Drawer `footer` is a list of blocks (typically Buttons) rendered
+// side by side — the footer recipe is already `display: flex; gap: 3`, so no
+// extra wrapper is needed beyond a fragment. Unlike `trigger` (singular),
+// every block in the list is kept, not just the first.
+function footerFromBlocks(footer: unknown): JSX.Element | undefined {
+	if (!Array.isArray(footer) || footer.length === 0) return undefined;
+	return <>{renderBlocks(footer as ComponentBlock[])}</>;
+}
+
 function tryParseJSON(val: unknown): unknown {
 	if (typeof val === "string") {
 		try {
@@ -378,6 +387,7 @@ const registry: Record<string, BlockRenderer> = {
 			cancelText,
 			role,
 			trigger: cmsTrigger,
+			footer: cmsFooter,
 			...rest
 		} = propsOf(b);
 
@@ -394,6 +404,11 @@ const registry: Record<string, BlockRenderer> = {
 			}
 		}
 
+		// A list of blocks (typically Buttons) rendered side by side in the
+		// footer, alongside (or instead of) the dedicated Confirm/Cancel text
+		// shortcuts — e.g. a "Refresh" button that dispatches a custom event.
+		const footer = footerFromBlocks(cmsFooter);
+
 		const confirm = confirmText ? <Button>{confirmText}</Button> : undefined;
 		const cancel = cancelText ? (
 			<Button variant="outline">{cancelText}</Button>
@@ -407,6 +422,7 @@ const registry: Record<string, BlockRenderer> = {
 				trigger={trigger}
 				confirm={confirm}
 				cancel={cancel}
+				footer={footer}
 				role={role}
 				{...rest}
 			>
@@ -423,6 +439,7 @@ const registry: Record<string, BlockRenderer> = {
 			confirmText,
 			cancelText,
 			trigger: cmsTrigger,
+			footer: cmsFooter,
 			...rest
 		} = propsOf(b);
 
@@ -439,6 +456,8 @@ const registry: Record<string, BlockRenderer> = {
 			}
 		}
 
+		const footer = footerFromBlocks(cmsFooter);
+
 		const confirm = confirmText ? <Button>{confirmText}</Button> : undefined;
 		const cancel = cancelText ? (
 			<Button variant="outline">{cancelText}</Button>
@@ -452,6 +471,7 @@ const registry: Record<string, BlockRenderer> = {
 				trigger={trigger}
 				confirm={confirm}
 				cancel={cancel}
+				footer={footer}
 				{...rest}
 			>
 				{renderChildren(children as ComponentBlock[])}
