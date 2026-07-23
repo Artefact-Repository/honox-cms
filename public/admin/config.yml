@@ -217,7 +217,7 @@ collections:
                                 options: [xs, sm, md, lg]
                                 default: md
                               - label: Type
-                                name: type
+                                name: buttonType
                                 widget: select
                                 options: [button, submit, reset]
                                 default: button
@@ -463,7 +463,18 @@ collections:
                           - label: Paginated Table
                             name: paginatedTable
                             widget: object
-                            fields: &paginatedtable_fields []
+                            fields: &paginatedtable_fields
+                              - { label: URL, name: url, widget: string, required: false, hint: "JSON API endpoint returning { [dataKey]: [...] }. Leave blank to use built-in demo data." }
+                              - { label: Data Key, name: dataKey, widget: string, required: false, hint: "Key in the response holding the row array, e.g. \"posts\"." }
+                              - label: Columns
+                                name: columns
+                                widget: list
+                                required: false
+                                fields:
+                                  - { label: Header, name: header, widget: string }
+                                  - { label: Key, name: key, widget: string, hint: "Row property to display in this column." }
+                              - { label: Page Size, name: pageSize, widget: number, default: 5, required: false }
+                              - { label: Initial Page, name: initialPage, widget: number, default: 1, required: false }
                           - label: Pagination
                             name: pagination
                             widget: object
@@ -483,7 +494,7 @@ collections:
                               - { label: Max, name: max, widget: number, default: 100, required: false }
                               - { label: Show Value Text, name: showValueText, widget: boolean, default: false }
                               - label: Type
-                                name: type
+                                name: progressType
                                 widget: select
                                 options: [linear, circular]
                                 default: linear
@@ -658,6 +669,58 @@ collections:
                                 widget: select
                                 options: [sm, md, lg]
                                 default: md
+                          - label: Avatar
+                            name: avatar
+                            widget: object
+                            fields: &avatar_fields
+                              - { label: Name (for initials fallback), name: name, widget: string, required: false }
+                              - { label: Image URL, name: src, widget: string, required: false }
+                              - label: Size
+                                name: size
+                                widget: select
+                                options: [xs, sm, md, lg, xl, "2xl"]
+                                default: md
+                              - label: Variant
+                                name: variant
+                                widget: select
+                                options: [solid, surface, subtle, outline]
+                                default: subtle
+                              - label: Color Palette
+                                name: colorPalette
+                                widget: select
+                                options: [blue, green, red, purple, orange, amber, cyan, slate]
+                                required: false
+                          - label: Rating Group
+                            name: ratingGroup
+                            widget: object
+                            fields: &ratinggroup_fields
+                              - { label: Label, name: label, widget: string, required: false }
+                              - { label: Default Value, name: defaultValue, widget: number, default: 3, required: false }
+                              - { label: Count, name: count, widget: number, default: 5, required: false }
+                              - { label: Allow Half, name: allowHalf, widget: boolean, default: false }
+                              - { label: Read Only, name: readOnly, widget: boolean, default: false }
+                              - { label: Disabled, name: disabled, widget: boolean, default: false }
+                              - label: Size
+                                name: size
+                                widget: select
+                                options: [sm, md, lg]
+                                default: md
+                              - label: Color Palette
+                                name: colorPalette
+                                widget: select
+                                options: [blue, green, red, purple, orange, amber, cyan, slate]
+                                required: false
+                          - label: Clipboard
+                            name: clipboard
+                            widget: object
+                            fields: &clipboard_fields
+                              - { label: Label, name: label, widget: string, required: false }
+                              - { label: Value, name: value, widget: string, hint: "The text copied to the clipboard on click." }
+                              - label: Size
+                                name: size
+                                widget: select
+                                options: [sm, md, lg]
+                                default: md
                           - label: File Upload
                             name: fileUpload
                             widget: object
@@ -691,6 +754,7 @@ collections:
                                   - { label: Caption, name: caption, widget: string, required: false }
                                   - { label: Link (Href), name: href, widget: string, required: false }
                               - { label: Slides Per Page, name: slidesPerPage, widget: number, default: 1, required: false }
+                              - { label: Spacing Between Slides, name: spacing, widget: string, required: false, hint: "e.g. \"12px\"" }
                               - { label: Loop, name: loop, widget: boolean, default: false }
                               - label: Autoplay Delay (ms)
                                 name: autoplayDelay
@@ -1175,6 +1239,18 @@ collections:
                     name: colorPicker
                     widget: object
                     fields: *colorpicker_fields
+                  - label: Avatar
+                    name: avatar
+                    widget: object
+                    fields: *avatar_fields
+                  - label: Rating Group
+                    name: ratingGroup
+                    widget: object
+                    fields: *ratinggroup_fields
+                  - label: Clipboard
+                    name: clipboard
+                    widget: object
+                    fields: *clipboard_fields
                   - label: File Upload
                     name: fileUpload
                     widget: object
@@ -1705,6 +1781,18 @@ collections:
             name: colorPicker
             widget: object
             fields: *colorpicker_fields
+          - label: Avatar
+            name: avatar
+            widget: object
+            fields: *avatar_fields
+          - label: Rating Group
+            name: ratingGroup
+            widget: object
+            fields: *ratinggroup_fields
+          - label: Clipboard
+            name: clipboard
+            widget: object
+            fields: *clipboard_fields
           - label: File Upload
             name: fileUpload
             widget: object
