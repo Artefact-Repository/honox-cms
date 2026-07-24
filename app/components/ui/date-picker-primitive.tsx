@@ -339,7 +339,7 @@ export function DatePickerRoot(props: DatePickerRootProps) {
 		onValueChange,
 		onOpenChange,
 		class: classProp,
-		colorPalette = "blue",
+		colorPalette,
 		style,
 		...rest
 	} = localProps;

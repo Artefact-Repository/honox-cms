@@ -67,7 +67,7 @@ export function Root(props: RootProps) {
 	const {
 		children,
 		class: classProp,
-		colorPalette = "green",
+		colorPalette,
 		id: idProp,
 		value: valueProp,
 		defaultValue,

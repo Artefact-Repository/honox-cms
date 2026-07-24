@@ -27,7 +27,7 @@ export function Anchor(props: AnchorProps) {
 		asChild,
 		children,
 		class: classProp,
-		colorPalette = "blue",
+		colorPalette,
 		href,
 		target,
 		rel,
