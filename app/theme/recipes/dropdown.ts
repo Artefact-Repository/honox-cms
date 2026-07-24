@@ -59,13 +59,13 @@ export const dropdown = defineSlotRecipe({
 			userSelect: "none",
 			width: "100%",
 			_hover: {
-				bg: "gray.surface.bg.hover",
+				bg: "gray.subtle.bg.hover",
 			},
 			_focus: {
-				bg: "gray.surface.bg.hover",
+				bg: "gray.subtle.bg.hover",
 			},
 			_highlighted: {
-				bg: "gray.surface.bg.hover",
+				bg: "gray.subtle.bg.hover",
 			},
 			_disabled: {
 				layerStyle: "disabled",
@@ -92,7 +92,7 @@ export const dropdown = defineSlotRecipe({
 		triggerItem: {
 			justifyContent: "space-between",
 			_expanded: {
-				bg: "gray.surface.bg.hover",
+				bg: "gray.subtle.bg.hover",
 			},
 		},
 		itemGroupLabel: {

@@ -77,10 +77,10 @@ export const select = defineSlotRecipe({
 			transition: "backgrounds",
 			transitionDuration: "fastest",
 			_hover: {
-				background: "gray.surface.bg.hover",
+				background: "gray.subtle.bg.hover",
 			},
 			_highlighted: {
-				background: "gray.surface.bg.hover",
+				background: "gray.subtle.bg.hover",
 			},
 			_selected: {
 				fontWeight: "medium",
