@@ -424,7 +424,6 @@
           "children": [
             {
               "blockType": "carousel",
-              "colorPalette": "purple",
               "loop": true,
               "slidesPerPage": 2,
               "spacing": "12px",
