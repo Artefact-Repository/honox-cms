@@ -300,6 +300,12 @@ export function positionOverlay(
 		// nudging the existing alignment transform rather than the base offset.
 		const rect = positioner.getBoundingClientRect();
 		const base = config.align === "center" ? "-50%" : "0px";
+		// Tracks how far the clamp above nudges the box, so the arrow offset
+		// below can be counter-adjusted by the same amount — otherwise the
+		// arrow (positioned independently, relative to the box) stays put
+		// while the box it's anchored to slides out from under it, and ends
+		// up pointing at empty space instead of the trigger.
+		let crossAxisShift = 0;
 		if (placement === "top" || placement === "bottom") {
 			let shift = 0;
 			const overflowRight = rect.right - (window.innerWidth - gap);
@@ -308,6 +314,7 @@ export function positionOverlay(
 			if (shift !== 0) {
 				positioner.style.transform = `translateX(calc(${base} + ${shift}px))`;
 			}
+			crossAxisShift = shift;
 		} else {
 			let shift = 0;
 			const overflowBottom = rect.bottom - (window.innerHeight - gap);
@@ -316,6 +323,7 @@ export function positionOverlay(
 			if (shift !== 0) {
 				positioner.style.transform = `translateY(calc(${base} + ${shift}px))`;
 			}
+			crossAxisShift = shift;
 		}
 
 		positioner.setAttribute("data-effective-placement", placement);
@@ -340,6 +348,22 @@ export function positionOverlay(
 				};
 			}
 			Object.assign(arrow.style, getArrowStyle(placement, arrowStyleConfig));
+			if (crossAxisShift !== 0) {
+				const isEnd = config.align === "end";
+				if (placement === "top" || placement === "bottom") {
+					if (isEnd) {
+						arrow.style.right = `calc(${arrow.style.right} + ${crossAxisShift}px)`;
+					} else {
+						arrow.style.left = `calc(${arrow.style.left} + ${-crossAxisShift}px)`;
+					}
+				} else {
+					if (isEnd) {
+						arrow.style.bottom = `calc(${arrow.style.bottom} + ${crossAxisShift}px)`;
+					} else {
+						arrow.style.top = `calc(${arrow.style.top} + ${-crossAxisShift}px)`;
+					}
+				}
+			}
 			const tip = arrow.querySelector<HTMLElement>('[data-part="arrow-tip"]');
 			if (tip) {
 				tip.style.transform = `rotate(${getArrowRotation(placement)}deg)`;
