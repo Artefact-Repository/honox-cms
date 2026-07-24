@@ -180,10 +180,10 @@ function DocsSidenav({
 										fontSize: "sm",
 										textDecoration: "none",
 										color: isActive ? "fg" : "fg.muted",
-										bg: isActive ? "blue.4" : "transparent",
+										bg: isActive ? "colorPalette.4" : "transparent",
 										fontWeight: isActive ? "semibold" : "normal",
 										_hover: {
-											bg: isActive ? "blue.4" : "bg.subtle",
+											bg: isActive ? "colorPalette.4" : "bg.subtle",
 											color: "fg",
 										},
 									})}
