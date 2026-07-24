@@ -238,7 +238,6 @@
                         {
                           "blockType": "badge",
                           "text": "Zoom",
-                          "colorPalette": "blue",
                           "variant": "outline"
                         },
                         {

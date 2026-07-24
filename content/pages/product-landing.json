@@ -44,14 +44,12 @@
               "blockType": "button",
               "text": "Start Free Trial",
               "variant": "solid",
-              "colorPalette": "blue",
               "size": "lg"
             },
             {
               "blockType": "button",
               "text": "Book a Demo",
               "variant": "outline",
-              "colorPalette": "blue",
               "size": "lg"
             }
           ]
@@ -70,7 +68,6 @@
               "content": "Watch the 2-minute overview →"
             }
           ],
-          "colorPalette": "blue",
           "href": "https://www.youtube.com/@pulse",
           "target": "_blank"
         }
@@ -190,8 +187,7 @@
             {
               "blockType": "badge",
               "text": "Collaborative",
-              "variant": "subtle",
-              "colorPalette": "blue"
+              "variant": "subtle"
             }
           ],
           "title": "Team Collaboration",
@@ -210,7 +206,6 @@
           "blockType": "button",
           "variant": "solid",
           "text": "Explore Features",
-          "colorPalette": "blue",
           "size": "md"
         },
         {
@@ -277,7 +272,6 @@
               "blockType": "button",
               "text": "Get Started",
               "variant": "outline",
-              "colorPalette": "blue",
               "size": "md"
             }
           ],
@@ -292,14 +286,12 @@
             {
               "blockType": "badge",
               "text": "Most Popular",
-              "variant": "solid",
-              "colorPalette": "blue"
+              "variant": "solid"
             },
             {
               "blockType": "button",
               "text": "Choose Pro",
               "variant": "solid",
-              "colorPalette": "blue",
               "size": "md"
             }
           ],
@@ -316,7 +308,6 @@
               "blockType": "button",
               "text": "Contact Sales",
               "variant": "outline",
-              "colorPalette": "blue",
               "size": "md"
             }
           ],
@@ -357,7 +348,6 @@
                 }
               ],
               "variant": "underline",
-              "colorPalette": "blue",
               "href": "/docs"
             },
             {
@@ -527,14 +517,12 @@
               "blockType": "button",
               "text": "Start Free Trial",
               "variant": "solid",
-              "colorPalette": "blue",
               "size": "lg"
             },
             {
               "blockType": "button",
               "text": "Talk to Sales",
               "variant": "outline",
-              "colorPalette": "blue",
               "size": "lg"
             }
           ]
@@ -548,7 +536,6 @@
               "content": "Read customer stories"
             }
           ],
-          "colorPalette": "blue",
           "href": "/customers"
         }
       ]

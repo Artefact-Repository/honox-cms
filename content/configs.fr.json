@@ -273,8 +273,7 @@
     "footerLinks": [
       {
         "label": "HonoX Docs",
-        "href": "https://honox.dev",
-        "colorPalette": "blue"
+        "href": "https://honox.dev"
       },
       {
         "label": "PandaCSS Docs",

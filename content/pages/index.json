@@ -11,8 +11,7 @@
           "blockType": "avatar",
           "name": "Artefact UI",
           "size": "sm",
-          "variant": "solid",
-          "colorPalette": "blue"
+          "variant": "solid"
         },
         {
           "blockType": "heading",
@@ -39,8 +38,7 @@
             }
           ],
           "href": "/blog",
-          "variant": "plain",
-          "colorPalette": "blue"
+          "variant": "plain"
         },
         {
           "blockType": "link",
@@ -51,8 +49,7 @@
             }
           ],
           "href": "/docs",
-          "variant": "plain",
-          "colorPalette": "blue"
+          "variant": "plain"
         },
         {
           "blockType": "link",
@@ -63,8 +60,7 @@
             }
           ],
           "href": "/product-landing",
-          "variant": "plain",
-          "colorPalette": "blue"
+          "variant": "plain"
         },
         {
           "blockType": "link",
@@ -75,8 +71,7 @@
             }
           ],
           "href": "/admin",
-          "variant": "plain",
-          "colorPalette": "blue"
+          "variant": "plain"
         }
       ]
     }
@@ -86,7 +81,6 @@
       "blockType": "button",
       "text": "Explore Hub",
       "variant": "solid",
-      "colorPalette": "blue",
       "size": "sm",
       "onclick": "window.scrollTo({top: document.getElementById('hub').offsetTop - 80, behavior: 'smooth'})"
     }
@@ -103,7 +97,6 @@
           "blockType": "badge",
           "text": "HonoX Hono/JSX Components",
           "size": "lg",
-          "colorPalette": "blue",
           "variant": "surface"
         },
         {
@@ -128,7 +121,6 @@
               "blockType": "button",
               "text": "View Showcase",
               "variant": "solid",
-              "colorPalette": "blue",
               "size": "lg",
               "onclick": "window.scrollTo({top: document.getElementById('carousel-showcase').offsetTop - 80, behavior: 'smooth'})"
             },
@@ -199,7 +191,6 @@
                         {
                           "blockType": "badge",
                           "text": "A11y Compliant",
-                          "colorPalette": "blue",
                           "variant": "subtle"
                         }
                       ]
@@ -258,7 +249,6 @@
                           "blockType": "button",
                           "text": "Get Started",
                           "variant": "outline",
-                          "colorPalette": "blue",
                           "size": "sm"
                         }
                       ]
@@ -291,7 +281,6 @@
                           "blockType": "button",
                           "text": "Upgrade to Pro",
                           "variant": "solid",
-                          "colorPalette": "blue",
                           "size": "sm"
                         }
                       ]
@@ -407,7 +396,6 @@
           "children": [
             {
               "blockType": "carousel",
-              "colorPalette": "blue",
               "loop": true,
               "pauseOnHover": true,
               "autoplayDelay": 3000,
@@ -521,8 +509,7 @@
                 {
                   "blockType": "switch",
                   "label": "Large Blue Accent",
-                  "size": "lg",
-                  "colorPalette": "blue"
+                  "size": "lg"
                 }
               ]
             }
@@ -783,8 +770,7 @@
                   "blockType": "ratingGroup",
                   "label": "Half-star precision",
                   "allowHalf": true,
-                  "defaultValue": 3.5,
-                  "colorPalette": "blue"
+                  "defaultValue": 3.5
                 },
                 {
                   "blockType": "ratingGroup",
@@ -1023,7 +1009,6 @@
                     {
                       "blockType": "button",
                       "variant": "solid",
-                      "colorPalette": "blue",
                       "text": "Open Modal"
                     }
                   ],
@@ -1058,7 +1043,6 @@
                     {
                       "blockType": "button",
                       "variant": "outline",
-                      "colorPalette": "blue",
                       "text": "Reload Table",
                       "onclick": "window.dispatchEvent(new CustomEvent('paginated-table:reload'))"
                     }
