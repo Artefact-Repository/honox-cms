@@ -1,5 +1,4 @@
-import { css, cx } from "design-system/css";
-import { button } from "design-system/recipes";
+import { css } from "design-system/css";
 import { createRoute } from "honox/factory";
 import type { ComponentBlock } from "../../components/block-types";
 import { PageRenderer } from "../../components/page-renderer";
@@ -224,7 +223,11 @@ function DocsSidenav({
 
 interface HeaderActionsProps {
 	headerItems?: ComponentBlock[];
-	editUrl?: string;
+	/** The Admin link block, pulled from `config.header`'s tree (see
+	 * `findBlock`) so the mobile disclosure shows the exact same
+	 * (already-localised) block as the desktop header, instead of a second,
+	 * separately-hardcoded one. */
+	adminBlock?: ComponentBlock;
 	currentPath: string;
 	currentLocale: string;
 	/** Smaller text/controls for the mobile disclosure panel vs. the desktop
@@ -235,11 +238,11 @@ interface HeaderActionsProps {
 // The actions shared between the desktop header row (`nav`, hidden below
 // `md`) and Layout's built-in mobile disclosure (`mobileNav`, which takes
 // over below `md` via `siderHideBelow`) — headerItems (incl. the GitHub
-// icon link, CMS-authored via `config.headerItems`), edit/admin, language
-// switcher. Rendered from a single function so both stay in sync.
+// icon link, CMS-authored via `config.headerItems`) plus the Admin link.
+// Rendered from a single function so both stay in sync.
 function HeaderActions({
 	headerItems,
-	editUrl,
+	adminBlock,
 	currentPath,
 	currentLocale,
 	compact,
@@ -253,29 +256,31 @@ function HeaderActions({
 				currentPath,
 				class: css({ textStyle, fontWeight: "medium" }),
 			})}
-			{editUrl ? (
-				<Anchor
-					href={editUrl}
-					class={cx(
-						button({ variant: "outline", size: "sm" }),
-						css({ textStyle, fontWeight: "medium" }),
-					)}
-				>
-					{currentLocale === "zh" ? "编辑" : "Edit"}
-				</Anchor>
-			) : (
-				<Anchor
-					href={"/admin"}
-					class={cx(
-						button({ variant: "outline", size: "sm" }),
-						css({ textStyle, fontWeight: "medium" }),
-					)}
-				>
-					{currentLocale === "zh" ? "内容管理" : "Admin"}
-				</Anchor>
-			)}
+			{adminBlock &&
+				renderBlocks([adminBlock], {
+					locale: currentLocale,
+					currentPath,
+					class: css({ textStyle, fontWeight: "medium" }),
+				})}
 		</>
 	);
+}
+
+/** Finds the first block matching `predicate`, recursing into `children`.
+ * Used to pull the Admin link back out of `config.header`'s tree so the
+ * mobile disclosure (`HeaderActions`) can render the exact same block
+ * instead of a second hardcoded one. */
+function findBlock(
+	blocks: ComponentBlock[] | undefined,
+	predicate: (block: ComponentBlock) => boolean,
+): ComponentBlock | undefined {
+	if (!blocks) return undefined;
+	for (const block of blocks) {
+		if (predicate(block)) return block;
+		const found = findBlock(block["children"], predicate);
+		if (found) return found;
+	}
+	return undefined;
 }
 
 /** Shared `<Layout>` props for the docs shell, so every docs route renders
@@ -328,6 +333,10 @@ export default createRoute(async (c) => {
 	]);
 	const groups = buildDocGroups(docs, config);
 	const ui = { ...DEFAULT_DOCS_UI, ...config.docsUi };
+	const adminBlock = findBlock(
+		config.header,
+		(block) => block.blockType === "link" && block["href"] === "/admin",
+	);
 
 	const localiseLink = (href: string) => localiseHref(href, currentLocale);
 
@@ -356,6 +365,7 @@ export default createRoute(async (c) => {
 			mobileNavLabel={ui.menu}
 			mobileNavActions={
 				<HeaderActions
+					adminBlock={adminBlock}
 					headerItems={config.headerItems}
 					currentPath={currentPath}
 					currentLocale={currentLocale}
