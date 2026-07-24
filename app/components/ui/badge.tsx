@@ -17,7 +17,7 @@ export function Badge(props: BadgeProps) {
 	const {
 		children,
 		class: classProp,
-		colorPalette = "gray",
+		colorPalette,
 		...restProps
 	} = localProps;
 

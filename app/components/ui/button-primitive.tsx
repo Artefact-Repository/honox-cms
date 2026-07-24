@@ -45,7 +45,7 @@ function Button(props: ButtonProps) {
 		type = "button",
 		disabled,
 		interactive,
-		colorPalette = "gray",
+		colorPalette,
 		...rest
 	} = localProps;
 
