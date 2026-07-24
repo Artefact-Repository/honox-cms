@@ -1,4 +1,4 @@
-import { css } from "design-system/css";
+import { css, cx } from "design-system/css";
 import { ChevronDownIcon } from "../icons/chevron-down";
 import { localeToggleUrl, localiseHref } from "../lib/i18n";
 import { extractLayoutStyle } from "./block-style";
@@ -62,6 +62,12 @@ import {
 
 type BlockRenderer = (block: ComponentBlock) => JSX.Element;
 
+// Static (Panda-visible) class backing the `stack` block's `hideBelowMd`
+// toggle — see the `stack` registry entry below. A real media query, unlike
+// anything routed through `block-style.ts`'s `--cms-*` custom-property
+// bridge (a custom property holds one value, not one per breakpoint).
+const hideBelowMdClass = css({ display: { base: "none", md: "flex" } });
+
 // CMS content may use either casing for a given block type; both map to the
 // same renderer. Aliases are declared once here — renderers are registered
 // only under their canonical (camelCase) key.
@@ -87,10 +93,28 @@ function resolveType(type: string): string {
 // Recursively render a list of nested blocks (used by container renderers).
 // `children` is pulled from the full block by callers — `propsOf` strips it —
 // so it never leaks as a DOM attribute.
-function renderChildren(children?: ComponentBlock[]): JSX.Element[] {
+//
+// `extraProps` is forwarded to every nested block same as `renderBlocks`'
+// own second argument — needed so `locale`/`currentPath` reach a `search` or
+// `dropdown` block nested inside a `stack` (e.g. the docs header's single
+// content-authored `header` tree). Deliberately NOT the default: most
+// container content is ordinary page-builder content with no request-scoped
+// props to thread, so every other container renderer still calls this with
+// no second argument. Only `stack` forwards its own extraProps here — see
+// its registry entry below — since it's the one container currently used to
+// nest locale-aware chrome (rather than reintroducing this generally; see
+// the "Do NOT re-add extraProps-threading" note in project memory).
+function renderChildren(
+	children?: ComponentBlock[],
+	extraProps?: Record<string, unknown>,
+): JSX.Element[] {
 	if (!children || !Array.isArray(children)) return [];
 	return children.map((block, index) => (
-		<RenderBlock key={`${block.blockType}-${index}`} block={block} />
+		<RenderBlock
+			key={`${block.blockType}-${index}`}
+			block={block}
+			{...extraProps}
+		/>
 	));
 }
 
@@ -242,11 +266,27 @@ const registry: Record<string, BlockRenderer> = {
 
 	stack: (b) => {
 		const { children } = b;
-		const props = propsOf(b);
-		const layoutStyle = extractLayoutStyle(props);
+		// `locale`/`currentPath` are request-scoped extraProps (see
+		// `renderBlocks`'/`renderChildren`'s second argument) — pulled out here
+		// so they don't leak onto the `<Stack>` DOM node, and re-forwarded to
+		// this stack's own children below so a `search`/`dropdown`/`anchor`
+		// nested inside a content-authored stack (e.g. the docs header) still
+		// gets them, same as if it were a top-level `headerItems` entry.
+		// `hideBelowMd` is a fixed boolean toggle (not a general style prop —
+		// media queries can't be expressed via the `--cms-*` custom-property
+		// bridge in `block-style.ts`, since a custom property has one value,
+		// not one per breakpoint) backed by the static `hideBelowMdClass`
+		// below, which Panda's build-time extractor can see and generate CSS
+		// for regardless of which stack blocks set the flag at runtime.
+		const { locale, currentPath, hideBelowMd, ...rest } = propsOf(b);
+		const layoutStyle = extractLayoutStyle(rest);
 		return (
-			<Stack {...props} class={layoutStyle.class} style={layoutStyle.style}>
-				{renderChildren(children as ComponentBlock[])}
+			<Stack
+				{...rest}
+				class={cx(hideBelowMd ? hideBelowMdClass : undefined, layoutStyle.class)}
+				style={layoutStyle.style}
+			>
+				{renderChildren(children as ComponentBlock[], { locale, currentPath })}
 			</Stack>
 		);
 	},

@@ -56,12 +56,12 @@ export interface HydrationTierConfig {
 	label: string;
 }
 
-/** Page-chrome copy for the docs search box and header Edit/Admin buttons —
- * not part of translated doc content, so it lives on the configs singleton
- * instead. Every field is fully translated per locale (not a matching key). */
+/** Page-chrome copy for the docs header Edit/Admin buttons and mobile menu
+ * toggle — not part of translated doc content, so it lives on the configs
+ * singleton instead. Every field is fully translated per locale (not a
+ * matching key). (The search box's placeholder/item-label copy lives on its
+ * own `headerItems` search block instead — see `headerItems` below.) */
 export interface DocsUiConfig {
-	searchPlaceholder?: string;
-	searchItemLabel?: string;
 	edit?: string;
 	admin?: string;
 	menu?: string;
@@ -103,15 +103,48 @@ export interface DocsConfig {
 	docOrder?: string[];
 	/** External links shown at the bottom of the sidenav, e.g. the GitHub repo. */
 	links?: DocsNavLinkConfig[];
-	/** Header nav items — a restricted "leaf" block list (Button/Badge/Link/
-	 * Icon, no containers), rendered via page-registry's `renderBlocks` so
-	 * the CMS can offer richer items than a plain link (e.g. a badge, an
-	 * icon, or a button with a custom onClick), not just {label, href}.
-	 * Any `link` block's `href` is one canonical relative path shared across
-	 * every locale file (i18n: duplicate in config.yml) — renderBlocks must
-	 * be called with `{ locale }` as its second argument so page-registry's
-	 * `anchor` renderer localises it at render time; see `by-tag/[tag].tsx`
-	 * for the call-site pattern. */
+	/** The docs desktop header row, top to bottom: one `stack` block —
+	 * brand lockup, search box, and nav cluster (links/dropdown/popover/
+	 * Admin link) as its three children — rendered via `<PageRenderer>` in
+	 * `app/routes/docs/*.tsx`. This is a fully self-contained tree (NOT
+	 * built from `headerItems` below), so its nav links/dropdown/popover
+	 * are hand-duplicated from `headerItems` rather than shared — a
+	 * deliberate choice (over threading `headerItems` into a placeholder
+	 * slot here) so this stays one plain, directly-editable content tree.
+	 * The nav cluster's `link` block with `href: "/admin"` is the one part
+	 * `app/routes/docs/[doc].tsx` patches at render time (see
+	 * `withDocEditLink` there) — swapped for an Edit deep-link on an
+	 * individual doc page. Its `variant`/`class` combine the plain anchor
+	 * variant with the `button` recipe's own (stable, unhashed —
+	 * `panda.config.ts` has no `hash: true`) generated class names
+	 * (`button button--variant_outline button--size_sm`), same visual
+	 * result as code calling `button({variant:"outline", size:"sm"})`.
+	 * The nav cluster also sets `hideBelowMd: true` (see page-registry.tsx's
+	 * `stack` renderer) so it collapses below `md`, matching Layout's
+	 * built-in `mobileNav` disclosure taking over at that breakpoint (that
+	 * disclosure's own content is still built from `headerItems` below, via
+	 * `HeaderActions`). Sizing that block-style.ts's validated fields don't
+	 * cover (flex-shrink/flex/margin auto) is a literal `style` string per
+	 * child — plain inline CSS, no Panda involvement, so it works for any
+	 * value without needing a build-time-visible `css()` call. */
+	header?: ComponentBlock[];
+	/** Header nav items shown on the /blog page's own (simpler, 2-slot)
+	 * header, and in the docs mobile disclosure (`HeaderActions`, via
+	 * `app/routes/docs/*.tsx`'s `mobileNavActions`) — a restricted "leaf"
+	 * block list (Button/Badge/Link/Icon, no containers), rendered via
+	 * page-registry's `renderBlocks` so the CMS can offer richer items than
+	 * a plain link (e.g. a badge, an icon, or a button with a custom
+	 * onClick), not just {label, href}. Any `link` block's `href` is one
+	 * canonical relative path shared across every locale file (i18n:
+	 * duplicate in config.yml) — renderBlocks must be called with
+	 * `{ locale }` as its second argument so page-registry's `anchor`
+	 * renderer localises it at render time; see `by-tag/[tag].tsx` for the
+	 * call-site pattern. The docs desktop header instead sources its nav
+	 * cluster from `header` above (hand-duplicated, not shared — see
+	 * there) — the `dropdown`/`popover` language-switcher/appearance items
+	 * here (also duplicated into `header`'s nav cluster) aren't exposed as
+	 * addable types in config.yml, same fixed-singleton reasoning as
+	 * `header`. */
 	headerItems?: ComponentBlock[];
 	/** Site copy for the /blog section. */
 	blog?: BlogSiteConfig;
@@ -129,8 +162,6 @@ const EMPTY_DOCS_CONFIG: DocsConfig = { groups: [] };
 /** Fallback for any `docsUi` field missing from the loaded config (e.g. a
  * locale file predating the field, or a fresh checkout with no CMS edits yet). */
 export const DEFAULT_DOCS_UI: Required<DocsUiConfig> = {
-	searchPlaceholder: "Search docs...",
-	searchItemLabel: "docs",
 	edit: "Edit",
 	admin: "Admin",
 	menu: "Menu",

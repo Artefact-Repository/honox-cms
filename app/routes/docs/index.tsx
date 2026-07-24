@@ -4,23 +4,13 @@ import { createRoute } from "honox/factory";
 import type { ComponentBlock } from "../../components/block-types";
 import { PageRenderer } from "../../components/page-renderer";
 import { renderBlocks } from "../../components/page-registry";
-import {
-	Anchor,
-	Card,
-	Heading,
-	Layout,
-	type LayoutProps,
-	Search,
-	Stack,
-	Text,
-} from "../../components/ui";
+import { Anchor, Card, Layout, type LayoutProps, Text } from "../../components/ui";
 import { ExternalLinkIcon as ExternalLinkIconImport } from "../../icons/external-link";
 import { GitHubIcon as GitHubIconImport } from "../../icons/github";
 import {
 	DEFAULT_DOCS_UI,
 	type DocsConfig,
 	type DocsNavLinkConfig,
-	type DocsUiConfig,
 	loadDocsConfig,
 } from "../../lib/configs";
 import { type DocSummary, loadDocs } from "../../lib/docs";
@@ -288,94 +278,6 @@ function HeaderActions({
 	);
 }
 
-interface DocsHeaderProps {
-	editUrl?: string;
-	headerItems?: ComponentBlock[];
-	docsUi?: DocsUiConfig;
-	currentPath: string;
-	currentLocale: string;
-}
-
-// Desktop-only header row (logo, search, nav actions). Hidden below `md` —
-// Layout's `mobileNav` (see docsShellProps) takes over there, reusing
-// `HeaderActions` and `DocsSidenav` instead of duplicating this markup.
-function DocsHeader({
-	editUrl,
-	headerItems,
-	docsUi,
-	currentPath,
-	currentLocale,
-}: DocsHeaderProps) {
-	const localiseLink = (href: string) => localiseHref(href, currentLocale);
-	const ui = { ...DEFAULT_DOCS_UI, ...docsUi };
-
-	return (
-		<div
-			class={css({
-				maxWidth: "7xl",
-				mx: "auto",
-				px: { base: "4", md: "6", lg: "8" },
-				py: "4",
-				display: "flex",
-				alignItems: "center",
-				gap: { base: "4", md: "8" },
-			})}
-		>
-			<Anchor
-				href={localiseLink("/")}
-				variant="plain"
-				class={css({ textDecoration: "none", flexShrink: "0" })}
-			>
-				<Stack direction="horizontal" gap="3" align="center">
-					<Heading
-						as="h1"
-						class={css({
-							fontSize: "lg",
-							fontWeight: "bold",
-							tracking: "tight",
-						})}
-					>
-						Artefact UI
-					</Heading>
-				</Stack>
-			</Anchor>
-
-			<div
-				class={css({
-					flex: "1",
-					maxWidth: "md",
-					mx: { base: "0", md: "auto" },
-				})}
-			>
-				<Search
-					locale={currentLocale}
-					src="/api/docs/search.json"
-					placeholder={ui.searchPlaceholder}
-					itemLabel={ui.searchItemLabel}
-					showCount={false}
-					syncUrl={false}
-				/>
-			</div>
-
-			<nav
-				class={css({
-					display: { base: "none", md: "flex" },
-					gap: "6",
-					alignItems: "center",
-					flexShrink: "0",
-				})}
-			>
-				<HeaderActions
-					headerItems={headerItems}
-					editUrl={editUrl}
-					currentPath={currentPath}
-					currentLocale={currentLocale}
-				/>
-			</nav>
-		</div>
-	);
-}
-
 /** Shared `<Layout>` props for the docs shell, so every docs route renders
  * the identical frame: viewport-filling canvas, sticky glass header, and a
  * sticky sider rail that hides below `md` (Layout's built-in `mobileNav`
@@ -432,13 +334,17 @@ export default createRoute(async (c) => {
 	return c.render(
 		<Layout
 			{...docsShellProps}
+			// Fully CMS content (`config.header` — see `DocsConfig.header`) — no
+			// hardcoded shell left. `renderBlocks` (not `<PageRenderer>`, which
+			// doesn't take a second argument) so `locale`/`currentPath` reach
+			// the search box and language dropdown nested inside it.
 			header={
-				<DocsHeader
-					headerItems={config.headerItems}
-					docsUi={config.docsUi}
-					currentPath={currentPath}
-					currentLocale={currentLocale}
-				/>
+				<>
+					{renderBlocks(config.header, {
+						locale: currentLocale,
+						currentPath,
+					})}
+				</>
 			}
 			sider={
 				<DocsSidenav

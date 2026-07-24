@@ -10,7 +10,6 @@ import {
 	Heading,
 	Layout,
 	type LayoutProps,
-	Search,
 	Stack,
 	Text,
 } from "../../components/ui";
@@ -301,93 +300,36 @@ function HeaderActions({
 	);
 }
 
-interface DocsHeaderProps {
-	editUrl?: string;
-	headerItems?: ComponentBlock[];
-	docsUi?: DocsUiConfig;
-	currentPath: string;
-	currentLocale: string;
-}
-
-// Desktop-only header row (logo, search, nav actions). Hidden below `md` —
-// Layout's `mobileNav` (see docsShellProps) takes over there, reusing
-// `HeaderActions` and `DocsSidenav` instead of duplicating this markup.
-function DocsHeader({
-	editUrl,
-	headerItems,
-	docsUi,
-	currentPath,
-	currentLocale,
-}: DocsHeaderProps) {
-	const localiseLink = (href: string) => localiseHref(href, currentLocale);
-	const ui = { ...DEFAULT_DOCS_UI, ...docsUi };
-
-	return (
-		<div
-			class={css({
-				maxWidth: "7xl",
-				mx: "auto",
-				px: { base: "4", md: "6", lg: "8" },
-				py: "4",
-				display: "flex",
-				alignItems: "center",
-				gap: { base: "4", md: "8" },
-			})}
-		>
-			<Anchor
-				href={localiseLink("/")}
-				variant="plain"
-				class={css({ textDecoration: "none", flexShrink: "0" })}
-			>
-				<Stack direction="horizontal" gap="3" align="center">
-					<Heading
-						as="h1"
-						class={css({
-							fontSize: "lg",
-							fontWeight: "bold",
-							tracking: "tight",
-						})}
-					>
-						Artefact UI
-					</Heading>
-				</Stack>
-			</Anchor>
-
-			<div
-				class={css({
-					flex: "1",
-					maxWidth: "md",
-					mx: { base: "0", md: "auto" },
-				})}
-			>
-				<Search
-					locale={currentLocale}
-					src="/api/docs/search.json"
-					placeholder={ui.searchPlaceholder}
-					itemLabel={ui.searchItemLabel}
-					showCount={false}
-					syncUrl={false}
-				/>
-			</div>
-
-			<nav
-				class={css({
-					display: { base: "none", md: "flex" },
-					gap: "6",
-					alignItems: "center",
-					flexShrink: "0",
-				})}
-			>
-				<HeaderActions
-					headerItems={headerItems}
-					editUrl={editUrl}
-					docsUi={docsUi}
-					currentPath={currentPath}
-					currentLocale={currentLocale}
-				/>
-			</nav>
-		</div>
-	);
+/** `config.header` (see `DocsConfig.header`) is a fully static, self-
+ * contained content tree — except its nav cluster's hand-authored Admin
+ * link (`href: "/admin"`), which on an individual doc page should instead
+ * be an Edit deep-link for *this* doc. The CMS can't know which doc a
+ * reader is on, so this patches that one block at render time rather than
+ * threading per-request state into page-registry.tsx. Matches on `href` (a
+ * stable, already-meaningful field), not array position, and recurses into
+ * `children` since the link sits inside a nested nav `stack`. */
+function withDocEditLink(
+	blocks: ComponentBlock[] | undefined,
+	editUrl: string,
+	editLabel: string,
+): ComponentBlock[] | undefined {
+	if (!blocks) return blocks;
+	return blocks.map((block) => {
+		if (block.blockType === "link" && block["href"] === "/admin") {
+			return {
+				...block,
+				href: editUrl,
+				children: [{ blockType: "text", content: editLabel }],
+			};
+		}
+		if (Array.isArray(block["children"])) {
+			return {
+				...block,
+				children: withDocEditLink(block["children"], editUrl, editLabel),
+			};
+		}
+		return block;
+	});
 }
 
 /** CMS Edit deep-link for a doc, honoring the Collections mapping from the
@@ -483,18 +425,24 @@ export default createRoute(
 		const groups = buildDocGroups(docs, config);
 		const DocContent = doc.Component;
 		const ui = { ...DEFAULT_DOCS_UI, ...config.docsUi };
+		const editUrl = docEditUrl(doc, config);
+		const headerBlocks = withDocEditLink(config.header, editUrl, ui.edit);
 
 		return c.render(
 			<Layout
 				{...docsShellProps}
+				// Fully CMS content (`config.header` — see `DocsConfig.header`),
+				// aside from `withDocEditLink`'s one per-doc patch above. No
+				// hardcoded shell left. `renderBlocks` (not `<PageRenderer>`,
+				// which doesn't take a second argument) so `locale`/`currentPath`
+				// reach the search box and language dropdown nested inside it.
 				header={
-					<DocsHeader
-						editUrl={docEditUrl(doc, config)}
-						headerItems={config.headerItems}
-						docsUi={config.docsUi}
-						currentPath={currentPath}
-						currentLocale={currentLocale}
-					/>
+					<>
+						{renderBlocks(headerBlocks, {
+							locale: currentLocale,
+							currentPath,
+						})}
+					</>
 				}
 				sider={
 					<DocsSidenav
@@ -507,7 +455,7 @@ export default createRoute(
 				mobileNavLabel={ui.menu}
 				mobileNavActions={
 					<HeaderActions
-						editUrl={docEditUrl(doc, config)}
+						editUrl={editUrl}
 						headerItems={config.headerItems}
 						docsUi={config.docsUi}
 						currentPath={currentPath}

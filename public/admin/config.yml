@@ -2058,12 +2058,20 @@ singletons:
         fields:
           - { label: Label, name: label, widget: string, i18n: true }
           - { label: URL, name: href, widget: string, i18n: duplicate }
+      - label: Header
+        name: header
+        widget: list
+        required: false
+        i18n: true
+        hint: "The full docs desktop header row — one Stack (brand lockup, search box, and a nav-links Stack as its three children). A fully self-contained tree, hand-duplicated from Header Items below rather than sharing it. Any Link with URL /admin is swapped for an Edit deep-link on an individual doc page (app/routes/docs/[doc].tsx), so keep exactly one such Link. Uses the same component types as Page Builder content (see Stack's own Style fields for margin/padding/etc; flex-shrink/flex-basis/media-query sizing beyond those isn't exposed here — edit the JSON directly for that)."
+        typeKey: blockType
+        types: *root_components
       - label: Header Items
         name: headerItems
         widget: list
         required: false
         i18n: true
-        hint: "Items shown in the header nav on both the docs and blog sections — links, badges, icons, or buttons. A Link's URL is one canonical relative path shared across every locale (translated at render time), not a separate value per locale."
+        hint: "Items shown in the header nav on both the docs and blog sections — links, badges, icons, or buttons (plus a fixed, hand-authored Search box, appearance popover, and language dropdown not offered as addable types here). A Link's URL is one canonical relative path shared across every locale (translated at render time), not a separate value per locale."
         typeKey: blockType
         types: &header_item_types
           - label: Link
@@ -2166,21 +2174,8 @@ singletons:
         widget: object
         required: false
         i18n: true
-        hint: "Page-chrome copy for the docs search box and header Edit/Admin buttons. Not doc content, so it lives here instead — every field is fully translated per locale."
+        hint: "Page-chrome copy for the docs header Edit/Admin buttons and mobile menu toggle. Not doc content, so it lives here instead — every field is fully translated per locale. (The search box's own placeholder/item-label copy lives on its Header Items search block instead.)"
         fields:
-          - label: Search Placeholder
-            name: searchPlaceholder
-            widget: string
-            required: false
-            default: "Search docs..."
-            i18n: true
-          - label: Search Result Item Label
-            name: searchItemLabel
-            widget: string
-            required: false
-            default: docs
-            i18n: true
-            hint: "Noun used in the search result count, e.g. docs."
           - label: Edit Button
             name: edit
             widget: string
