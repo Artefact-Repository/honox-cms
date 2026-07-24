@@ -508,7 +508,7 @@
                 },
                 {
                   "blockType": "switch",
-                  "label": "Large Blue Accent",
+                  "label": "Large Accent",
                   "size": "lg"
                 }
               ]
@@ -539,9 +539,8 @@
                 },
                 {
                   "blockType": "checkbox",
-                  "label": "Large Interactive",
+                  "label": "Large Checkbox",
                   "size": "lg",
-                  "colorPalette": "green",
                   "checked": true
                 }
               ]
