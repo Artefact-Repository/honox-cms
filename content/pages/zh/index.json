@@ -191,7 +191,8 @@
                         {
                           "blockType": "badge",
                           "text": "符合 A11y",
-                          "variant": "subtle"
+                          "variant": "subtle",
+                          "colorPalette": "blue"
                         }
                       ]
                     },

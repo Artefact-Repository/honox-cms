@@ -191,6 +191,7 @@
                         {
                           "blockType": "badge",
                           "text": "Conforme A11y",
+                          "colorPalette": "blue",
                           "variant": "subtle"
                         }
                       ]

@@ -191,6 +191,7 @@
                         {
                           "blockType": "badge",
                           "text": "Compatível com A11y",
+                          "colorPalette": "blue",
                           "variant": "subtle"
                         }
                       ]
