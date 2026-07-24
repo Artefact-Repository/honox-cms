@@ -164,8 +164,9 @@ collections:
               - &layout_style_max_width { label: Max Width, name: maxWidth, widget: string, required: false, hint: "e.g. \"64rem\", \"1200px\", \"90%\"." }
               - &layout_style_border_radius { label: Border Radius, name: borderRadius, widget: string, required: false, hint: "e.g. \"1rem\", \"12px\"." }
               - &layout_style_background_color { label: Background Color, name: backgroundColor, widget: string, required: false, hint: "Hex, rgb()/rgba(), or a CSS color name." }
-              - &layout_style_background_image { label: Background Image URL, name: backgroundImage, widget: string, required: false, hint: "Must be an https:// URL." }
-              - &layout_style_background_fit { label: Background Fit, name: backgroundFit, widget: select, options: [cover, contain, auto], required: false, hint: "Only applies when Background Image is set." }
+              - &layout_style_background_image { label: Background Image (Dark Theme), name: backgroundImage, widget: image, required: false, hint: "Upload/browse an image, or paste an https:// URL. Shown as-is if no light-theme image is set below." }
+              - &layout_style_background_image_light { label: Background Image (Light Theme), name: backgroundImageLight, widget: image, required: false, hint: "Optional lighter/brighter variant shown when the site is in light mode." }
+              - &layout_style_background_fit { label: Background Fit, name: backgroundFit, widget: select, options: [cover, contain, auto], required: false, hint: "Only applies when a Background Image is set." }
               - &layout_style_text_align { label: Text Align, name: textAlign, widget: select, options: [left, center, right, justify, start, end], required: false }
               - &layout_style_opacity { label: Opacity, name: opacity, widget: number, value_type: float, min: 0, max: 1, step: 0.1, required: false }
               - &layout_style_box_shadow { label: Box Shadow, name: boxShadow, widget: select, options: [none, "2xs", xs, sm, md, lg, xl, "2xl"], required: false }
@@ -189,6 +190,7 @@ collections:
                       - *layout_style_border_radius
                       - *layout_style_background_color
                       - *layout_style_background_image
+                      - *layout_style_background_image_light
                       - *layout_style_background_fit
                       - *layout_style_text_align
                       - *layout_style_opacity
@@ -1388,6 +1390,7 @@ collections:
                       - *layout_style_border_radius
                       - *layout_style_background_color
                       - *layout_style_background_image
+                      - *layout_style_background_image_light
                       - *layout_style_background_fit
                       - *layout_style_text_align
                       - *layout_style_opacity
@@ -1447,6 +1450,7 @@ collections:
                       - *layout_style_border_radius
                       - *layout_style_background_color
                       - *layout_style_background_image
+                      - *layout_style_background_image_light
                       - *layout_style_background_fit
                       - *layout_style_text_align
                       - *layout_style_opacity
@@ -1473,6 +1477,7 @@ collections:
               - *layout_style_border_radius
               - *layout_style_background_color
               - *layout_style_background_image
+              - *layout_style_background_image_light
               - *layout_style_background_fit
               - *layout_style_text_align
               - *layout_style_opacity
@@ -1925,6 +1930,7 @@ collections:
               - *layout_style_border_radius
               - *layout_style_background_color
               - *layout_style_background_image
+              - *layout_style_background_image_light
               - *layout_style_background_fit
               - *layout_style_text_align
               - *layout_style_opacity

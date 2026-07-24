@@ -23,7 +23,10 @@ const layoutStyleClass = css({
 	maxWidth: "var(--cms-max-width, initial)",
 	borderRadius: "var(--cms-border-radius, initial)",
 	backgroundColor: "var(--cms-bg-color, initial)",
-	backgroundImage: "var(--cms-bg-image, initial)",
+	backgroundImage: {
+		_dark: "var(--cms-bg-image, initial)",
+		_light: "var(--cms-bg-image-light, var(--cms-bg-image, initial))",
+	},
 	backgroundSize: "var(--cms-bg-fit, initial)",
 	backgroundPosition: "center",
 	backgroundRepeat: "no-repeat",
@@ -36,7 +39,9 @@ const SPACING =
 	/^(-?\d+(\.\d+)?(px|rem|em|%)|0|auto)(\s+(-?\d+(\.\d+)?(px|rem|em|%)|0|auto)){0,3}$/;
 const LENGTH = /^(-?\d+(\.\d+)?(px|rem|em|%|vw|vh)|0|none)$/;
 const COLOR = /^(#[0-9a-fA-F]{3,8}|rgba?\([\d.,%\s]+\)|[a-zA-Z]+)$/;
-const SAFE_URL = /^https:\/\/[^\s"'()]+$/;
+// https:// for externally-hosted images, or a root-relative path for ones
+// uploaded through the CMS media picker (media_folder -> public_folder: /media).
+const SAFE_URL = /^(https:\/\/|\/)[^\s"'()]+$/;
 const FIT_VALUES = new Set(["cover", "contain", "auto"]);
 const TEXT_ALIGN_VALUES = new Set([
 	"left",
@@ -81,6 +86,7 @@ const STYLE_KEYS = [
 	"borderRadius",
 	"backgroundColor",
 	"backgroundImage",
+	"backgroundImageLight",
 	"backgroundFit",
 	"textAlign",
 	"opacity",
@@ -123,8 +129,16 @@ export function extractLayoutStyle(
 	if (backgroundColor) vars.push(`--cms-bg-color: ${backgroundColor}`);
 
 	const backgroundImage = safe(props.backgroundImage, SAFE_URL);
-	if (backgroundImage) {
-		vars.push(`--cms-bg-image: url("${backgroundImage}")`);
+	if (backgroundImage) vars.push(`--cms-bg-image: url("${backgroundImage}")`);
+
+	// Optional light-theme override — falls back to `backgroundImage` above
+	// when omitted, so existing content with only one image is unaffected.
+	const backgroundImageLight = safe(props.backgroundImageLight, SAFE_URL);
+	if (backgroundImageLight) {
+		vars.push(`--cms-bg-image-light: url("${backgroundImageLight}")`);
+	}
+
+	if (backgroundImage || backgroundImageLight) {
 		const fit =
 			typeof props.backgroundFit === "string" &&
 			FIT_VALUES.has(props.backgroundFit)
