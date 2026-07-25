@@ -119,7 +119,6 @@ export default createRoute(async (c) => {
 							name={home.brandName ?? "Artefact UI"}
 							size="xs"
 							variant="solid"
-							colorPalette="blue"
 						/>
 						<Text size="sm" class={css({ fontWeight: "semibold" })}>
 							{home.footerCopyright ??
