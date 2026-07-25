@@ -506,13 +506,13 @@
                 },
                 {
                   "blockType": "switch",
-                  "label": "Medium Interactive",
+                  "label": "Medium Switch",
                   "size": "md",
                   "checked": true
                 },
                 {
                   "blockType": "switch",
-                  "label": "Large Accent",
+                  "label": "Large Switch",
                   "size": "lg"
                 }
               ]
