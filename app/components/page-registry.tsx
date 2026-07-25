@@ -68,6 +68,24 @@ type BlockRenderer = (block: ComponentBlock) => JSX.Element;
 // bridge (a custom property holds one value, not one per breakpoint).
 const hideBelowMdClass = css({ display: { base: "none", md: "flex" } });
 
+// Static class backing the `stack` block's `fullBleed` toggle — see the
+// `stack` registry entry below. Breaks the block out of a centered
+// `maxWidth` ancestor (e.g. a page's padded body wrapper) to span the full
+// viewport width, via the standard `calc(50% - 50vw)` negative-margin
+// technique — not expressible through `block-style.ts`'s `--cms-*` bridge,
+// since that composes a single static class's declarations from custom
+// properties, and `calc()` mixing `%`/`vw` isn't a value the free-text
+// Margin field's validator should be accepting anyway. `marginTop` cancels
+// exactly one page body wrapper's `py: "12"` (3rem) top padding, so this is
+// meant for a block sitting first inside that wrapper (e.g. a homepage hero) —
+// not a fully general "full bleed anywhere" utility.
+const fullBleedClass = css({
+	width: "100vw",
+	marginLeft: "calc(50% - 50vw)",
+	marginRight: "calc(50% - 50vw)",
+	marginTop: "-3rem",
+});
+
 // CMS content may use either casing for a given block type; both map to the
 // same renderer. Aliases are declared once here — renderers are registered
 // only under their canonical (camelCase) key.
@@ -272,18 +290,25 @@ const registry: Record<string, BlockRenderer> = {
 		// this stack's own children below so a `search`/`dropdown`/`anchor`
 		// nested inside a content-authored stack (e.g. the docs header) still
 		// gets them, same as if it were a top-level `headerItems` entry.
-		// `hideBelowMd` is a fixed boolean toggle (not a general style prop —
-		// media queries can't be expressed via the `--cms-*` custom-property
-		// bridge in `block-style.ts`, since a custom property has one value,
-		// not one per breakpoint) backed by the static `hideBelowMdClass`
-		// below, which Panda's build-time extractor can see and generate CSS
-		// for regardless of which stack blocks set the flag at runtime.
-		const { locale, currentPath, hideBelowMd, ...rest } = propsOf(b);
+		// `hideBelowMd`/`fullBleed` are fixed boolean toggles (not general style
+		// props — media queries and the `calc(%, vw)` breakout trick can't be
+		// expressed via the `--cms-*` custom-property bridge in `block-style.ts`,
+		// since a custom property holds one value, not one per breakpoint/not
+		// safely-validatable freeform `calc()`) backed by the static
+		// `hideBelowMdClass`/`fullBleedClass` below, which Panda's build-time
+		// extractor can see and generate CSS for regardless of which stack
+		// blocks set the flag at runtime.
+		const { locale, currentPath, hideBelowMd, fullBleed, ...rest } =
+			propsOf(b);
 		const layoutStyle = extractLayoutStyle(rest);
 		return (
 			<Stack
 				{...rest}
-				class={cx(hideBelowMd ? hideBelowMdClass : undefined, layoutStyle.class)}
+				class={cx(
+					hideBelowMd ? hideBelowMdClass : undefined,
+					fullBleed ? fullBleedClass : undefined,
+					layoutStyle.class,
+				)}
 				style={layoutStyle.style}
 			>
 				{renderChildren(children as ComponentBlock[], { locale, currentPath })}

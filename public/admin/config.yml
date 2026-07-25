@@ -170,6 +170,7 @@ collections:
               - &layout_style_text_align { label: Text Align, name: textAlign, widget: select, options: [left, center, right, justify, start, end], required: false }
               - &layout_style_opacity { label: Opacity, name: opacity, widget: number, value_type: float, min: 0, max: 1, step: 0.1, required: false }
               - &layout_style_box_shadow { label: Box Shadow, name: boxShadow, widget: select, options: [none, "2xs", xs, sm, md, lg, xl, "2xl"], required: false }
+              - { label: "Full Bleed (advanced)", name: fullBleed, widget: boolean, default: false, required: false, hint: "Breaks out of the page's centered content column to span the full viewport width and touch the header above it — for a hero banner. Only put this on a Stack sitting first in a page's Content list; elsewhere it will misalign." }
               - label: Children
                 name: children
                 widget: list

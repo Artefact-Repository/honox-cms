@@ -95,6 +95,7 @@
       "backgroundImage": "/media/hero-placeholder-dark.svg",
       "backgroundImageLight": "/media/hero-placeholder-light.svg",
       "backgroundFit": "cover",
+      "fullBleed": true,
       "children": [
         {
           "blockType": "badge",
