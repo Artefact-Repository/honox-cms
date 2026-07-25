@@ -60,7 +60,7 @@ export const progress = defineSlotRecipe({
 			},
 		},
 		circleTrack: {
-			stroke: "gray.subtle.bg",
+			stroke: "gray.subtle.bg.active",
 		},
 		circleRange: {
 			stroke: "colorPalette.solid.bg",
@@ -75,7 +75,7 @@ export const progress = defineSlotRecipe({
 		variant: {
 			solid: {
 				track: {
-					bgColor: "gray.subtle.bg",
+					bgColor: "gray.subtle.bg.active",
 				},
 				range: {
 					bgColor: "colorPalette.solid.bg",
