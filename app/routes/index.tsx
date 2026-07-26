@@ -18,7 +18,18 @@ export default createRoute(async (c) => {
 	const home = config.home ?? {};
 
 	return c.render(
-		<div class={css({ bg: "bg.canvas", minH: "screen", color: "fg.default" })}>
+		<div
+			class={css({
+				bg: "bg.canvas",
+				minH: "screen",
+				color: "fg.default",
+				// Safety net: the header row below wraps to stay in bounds, but this
+				// guards against any CMS-authored header content that's wide enough
+				// to overflow even a wrapped line (e.g. one very long unbroken link
+				// label) from pushing the whole page into horizontal scroll.
+				overflowX: "hidden",
+			})}
+		>
 			<title>
 				{data.title ?? home.titleFallback ?? "Artefact — Modern UI Suite"}
 			</title>
@@ -48,6 +59,8 @@ export default createRoute(async (c) => {
 						px: "6",
 						py: "4",
 						display: "flex",
+						flexWrap: "wrap",
+						rowGap: "3",
 						alignItems: "center",
 						justifyContent: "space-between",
 					})}
@@ -57,8 +70,20 @@ export default createRoute(async (c) => {
 					<nav
 						class={css({
 							display: "flex",
+							flexWrap: "wrap",
+							minWidth: "0",
 							gap: { base: "3", md: "6" },
 							alignItems: "center",
+							justifyContent: "flex-end",
+							// CMS-authored nav content (links stack, language dropdown,
+							// appearance popover, CTA button) is an arbitrary-width row —
+							// letting each direct child wrap/shrink in turn is what keeps
+							// this in bounds on narrow viewports instead of forcing the
+							// whole header wider than the page.
+							"& > *": {
+								flexWrap: "wrap",
+								minWidth: "0",
+							},
 						})}
 					>
 						<PageRenderer content={data.headerNav ?? []} />

@@ -66,6 +66,11 @@ export default createRoute(
 					class={css({
 						minHeight: "100vh",
 						bg: "bg.subtle",
+						// Safety net: the header row below wraps to stay in bounds, but
+						// this guards against any CMS-authored header content wide
+						// enough to overflow even a wrapped line from pushing the whole
+						// page into horizontal scroll.
+						overflowX: "hidden",
 					})}
 				>
 					<title>
@@ -91,6 +96,8 @@ export default createRoute(
 								px: { base: "4", md: "6", lg: "8" },
 								py: "4",
 								display: "flex",
+								flexWrap: "wrap",
+								rowGap: "3",
 								alignItems: "center",
 								justifyContent: "space-between",
 								gap: "4",
@@ -116,8 +123,20 @@ export default createRoute(
 							<nav
 								class={css({
 									display: "flex",
+									flexWrap: "wrap",
+									minWidth: "0",
 									gap: { base: "3", md: "6" },
 									alignItems: "center",
+									justifyContent: "flex-end",
+									// CMS-authored nav content (headerItems links/dropdown/
+									// popover plus the Edit button) is an arbitrary-width row —
+									// letting each direct child wrap/shrink in turn is what
+									// keeps this in bounds on narrow viewports instead of
+									// forcing the whole header wider than the page.
+									"& > *": {
+										flexWrap: "wrap",
+										minWidth: "0",
+									},
 								})}
 							>
 								{renderBlocks(config.headerItems, {
