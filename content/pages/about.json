@@ -57,6 +57,21 @@
                   "children": [{ "blockType": "text", "content": "About" }]
                 },
                 {
+                  "blockType": "dropdown",
+                  "triggerIcon": "<circle cx=\"12\" cy=\"12\" r=\"10\"></circle><line x1=\"2\" y1=\"12\" x2=\"22\" y2=\"12\"></line><path d=\"M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z\"></path>",
+                  "triggerAriaLabel": "Language",
+                  "triggerText": "EN",
+                  "placement": "bottom-end",
+                  "items": [
+                    { "type": "item", "label": "English", "value": "en", "toggleLocale": "en" },
+                    { "type": "item", "label": "中文", "value": "zh", "toggleLocale": "zh" },
+                    { "type": "item", "label": "Español", "value": "es", "toggleLocale": "es" },
+                    { "type": "item", "label": "Português", "value": "pt", "toggleLocale": "pt" },
+                    { "type": "item", "label": "Français", "value": "fr", "toggleLocale": "fr" },
+                    { "type": "item", "label": "Deutsch", "value": "de", "toggleLocale": "de" }
+                  ]
+                },
+                {
                   "blockType": "link",
                   "href": "/admin",
                   "variant": "plain",

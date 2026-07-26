@@ -147,6 +147,16 @@ export function localiseHref(href: string, locale: string): string {
 			: `/${collection}/${locale}`;
 	}
 
+	// Bare single-segment path outside any known collection (e.g. "/about") —
+	// a root-level content page (`content/pages/<slug>.json`, served at
+	// `/<slug>` for English by `app/routes/[page].tsx`). Its translations
+	// live under the "pages" collection instead (`/pages/<locale>/<slug>`,
+	// via `app/routes/pages/<locale>/[slug].tsx`) — same as this file's own
+	// route-structure example above (`/pages/es/about`).
+	if (segments.length === 1) {
+		return `/pages/${locale}/${segments[0]}`;
+	}
+
 	// Non-collection path (e.g. homepage "/"): prefix with locale.
 	return `/${locale}${href}`;
 }
