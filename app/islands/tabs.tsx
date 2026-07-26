@@ -15,18 +15,26 @@ export default function TabsIsland(props: TabsIslandProps) {
 		onValueChange,
 		onFocusChange,
 		children,
+		mountedValues: mountedValuesProp,
 		...rest
 	} = props;
 
 	const rootRef = useRef<HTMLDivElement>(null);
-	const [value, setValue] = useState(valueProp ?? defaultValue);
+	const initialValue = valueProp ?? defaultValue;
+	const [value, setValue] = useState<string | undefined>(initialValue);
 	const [focusedValue, setFocusedValue] = useState<string | undefined>(
 		undefined,
+	);
+	const [mountedValues, setMountedValues] = useState<string[]>(
+		mountedValuesProp ?? (initialValue !== undefined ? [initialValue] : []),
 	);
 
 	useEffect(() => {
 		if (valueProp !== undefined) {
 			setValue(valueProp);
+			setMountedValues((prev) =>
+				prev.includes(valueProp) ? prev : [...prev, valueProp],
+			);
 		}
 	}, [valueProp]);
 
@@ -134,6 +142,14 @@ export default function TabsIsland(props: TabsIslandProps) {
 					el.getAttribute("aria-disabled") !== "true",
 			);
 
+		const changeValue = (newValue: string) => {
+			setValue(newValue);
+			setMountedValues((prev) =>
+				prev.includes(newValue) ? prev : [...prev, newValue],
+			);
+			onValueChange?.({ value: newValue });
+		};
+
 		const handleClick = (e: MouseEvent) => {
 			const trigger = (e.target as HTMLElement).closest<HTMLElement>(
 				'[data-part="trigger"]',
@@ -145,8 +161,7 @@ export default function TabsIsland(props: TabsIslandProps) {
 			) {
 				const newValue = trigger.getAttribute("data-value");
 				if (newValue) {
-					setValue(newValue);
-					onValueChange?.({ value: newValue });
+					changeValue(newValue);
 				}
 			}
 		};
@@ -164,18 +179,56 @@ export default function TabsIsland(props: TabsIslandProps) {
 			if (currentIndex === -1) return;
 
 			let nextIndex = -1;
+			const isRtl =
+				root.dir === "rtl" ||
+				root.getAttribute("dir") === "rtl" ||
+				window.getComputedStyle(root).direction === "rtl";
 
 			if (orientation === "horizontal") {
 				if (e.key === "ArrowRight") {
-					nextIndex = (currentIndex + 1) % triggers.length;
+					if (isRtl) {
+						if (loopFocus) {
+							nextIndex =
+								(currentIndex - 1 + triggers.length) % triggers.length;
+						} else {
+							nextIndex = Math.max(currentIndex - 1, 0);
+						}
+					} else {
+						if (loopFocus) {
+							nextIndex = (currentIndex + 1) % triggers.length;
+						} else {
+							nextIndex = Math.min(currentIndex + 1, triggers.length - 1);
+						}
+					}
 				} else if (e.key === "ArrowLeft") {
-					nextIndex = (currentIndex - 1 + triggers.length) % triggers.length;
+					if (isRtl) {
+						if (loopFocus) {
+							nextIndex = (currentIndex + 1) % triggers.length;
+						} else {
+							nextIndex = Math.min(currentIndex + 1, triggers.length - 1);
+						}
+					} else {
+						if (loopFocus) {
+							nextIndex =
+								(currentIndex - 1 + triggers.length) % triggers.length;
+						} else {
+							nextIndex = Math.max(currentIndex - 1, 0);
+						}
+					}
 				}
 			} else {
 				if (e.key === "ArrowDown") {
-					nextIndex = (currentIndex + 1) % triggers.length;
+					if (loopFocus) {
+						nextIndex = (currentIndex + 1) % triggers.length;
+					} else {
+						nextIndex = Math.min(currentIndex + 1, triggers.length - 1);
+					}
 				} else if (e.key === "ArrowUp") {
-					nextIndex = (currentIndex - 1 + triggers.length) % triggers.length;
+					if (loopFocus) {
+						nextIndex = (currentIndex - 1 + triggers.length) % triggers.length;
+					} else {
+						nextIndex = Math.max(currentIndex - 1, 0);
+					}
 				}
 			}
 
@@ -195,8 +248,7 @@ export default function TabsIsland(props: TabsIslandProps) {
 					onFocusChange?.({ value: newValue });
 
 					if (activationMode === "automatic") {
-						setValue(newValue);
-						onValueChange?.({ value: newValue });
+						changeValue(newValue);
 					}
 				}
 			}
@@ -205,8 +257,7 @@ export default function TabsIsland(props: TabsIslandProps) {
 				e.preventDefault();
 				const newValue = activeElement.getAttribute("data-value");
 				if (newValue) {
-					setValue(newValue);
-					onValueChange?.({ value: newValue });
+					changeValue(newValue);
 				}
 			}
 		};
@@ -238,7 +289,21 @@ export default function TabsIsland(props: TabsIslandProps) {
 			root.removeEventListener("focusin", handleFocusIn);
 			root.removeEventListener("focusout", handleFocusOut);
 		};
-	}, [value, orientation, activationMode, onValueChange, onFocusChange]);
+	}, [
+		value,
+		orientation,
+		activationMode,
+		loopFocus,
+		onValueChange,
+		onFocusChange,
+	]);
+
+	const handleValueChange = (details: { value: string }) => {
+		setValue(details.value);
+		setMountedValues((prev) =>
+			prev.includes(details.value) ? prev : [...prev, details.value],
+		);
+	};
 
 	return (
 		<Root
@@ -249,8 +314,9 @@ export default function TabsIsland(props: TabsIslandProps) {
 			loopFocus={loopFocus}
 			lazyMount={lazyMount}
 			unmountOnExit={unmountOnExit}
-			onValueChange={(details) => setValue(details.value)}
+			onValueChange={handleValueChange}
 			rootRef={rootRef}
+			mountedValues={mountedValues}
 			data-hydrated="true"
 		>
 			{children}

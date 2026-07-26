@@ -47,7 +47,9 @@ test("every alias target resolves to a registered renderer", () => {
 test("anchor block renders an anchor with text, href and external rel safety", () => {
 	// Plain internal link.
 	const internal = (
-		<PageRenderer content={[{ blockType: "anchor", text: "Docs", href: "/docs" }]} />
+		<PageRenderer
+			content={[{ blockType: "anchor", text: "Docs", href: "/docs" }]}
+		/>
 	).toString();
 	expect(internal).toContain('href="/docs"');
 	expect(internal).toContain("Docs");
@@ -172,7 +174,9 @@ test("carousel block renders slides with captions/links and coerces numeric prop
 });
 
 test("carousel block with no slides renders an empty, non-throwing carousel", () => {
-	const html = (<PageRenderer content={[{ blockType: "carousel" }]} />).toString();
+	const html = (
+		<PageRenderer content={[{ blockType: "carousel" }]} />
+	).toString();
 
 	expect(html).toContain('data-scope="carousel"');
 	expect(html).not.toContain('data-part="item"');
@@ -212,7 +216,11 @@ test("radioCardGroup block renders hydrated variant-styled cards and scrubs empt
 	const aliased = (
 		<PageRenderer
 			content={[
-				{ blockType: "radio-card-group", items: ["one"], colorPalette: "purple" },
+				{
+					blockType: "radio-card-group",
+					items: ["one"],
+					colorPalette: "purple",
+				},
 			]}
 		/>
 	).toString();

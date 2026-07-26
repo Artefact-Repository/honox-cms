@@ -25,8 +25,7 @@ interface RootProps extends CardVariantProps, PropsWithChildren {
 
 function Root(props: RootProps) {
 	const [variantProps, localProps] = card.splitVariantProps(props);
-	const { children, class: classProp, colorPalette, ...restProps } =
-		localProps;
+	const { children, class: classProp, colorPalette, ...restProps } = localProps;
 	const styles = card(variantProps);
 
 	return (

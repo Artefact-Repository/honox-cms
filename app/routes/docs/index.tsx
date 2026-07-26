@@ -1,9 +1,15 @@
 import { css } from "design-system/css";
 import { createRoute } from "honox/factory";
 import type { ComponentBlock } from "../../components/block-types";
-import { PageRenderer } from "../../components/page-renderer";
 import { renderBlocks } from "../../components/page-registry";
-import { Anchor, Card, Layout, type LayoutProps, Text } from "../../components/ui";
+import { PageRenderer } from "../../components/page-renderer";
+import {
+	Anchor,
+	Card,
+	Layout,
+	type LayoutProps,
+	Text,
+} from "../../components/ui";
 import { ExternalLinkIcon as ExternalLinkIconImport } from "../../icons/external-link";
 import { GitHubIcon as GitHubIconImport } from "../../icons/github";
 import {

@@ -22,6 +22,7 @@ export interface TabsContextValue {
 	rootId: string;
 	onValueChange?: (details: { value: string }) => void;
 	onFocusChange?: (details: { value: string }) => void;
+	mountedValues?: string[];
 }
 
 export const TabsContext = createContext<TabsContextValue | null>(null);
@@ -53,6 +54,7 @@ export interface RootProps extends TabsVariantProps, PropsWithChildren {
 	onFocusChange?: (details: { value: string }) => void;
 	class?: string;
 	rootRef?: unknown;
+	mountedValues?: string[];
 	[key: string]: unknown;
 }
 
@@ -72,6 +74,7 @@ export function Root(props: RootProps) {
 		onFocusChange,
 		rootRef,
 		class: classProp,
+		mountedValues,
 		...rest
 	} = localProps;
 
@@ -90,6 +93,7 @@ export function Root(props: RootProps) {
 		rootId,
 		onValueChange,
 		onFocusChange,
+		mountedValues,
 	};
 
 	return (
@@ -190,7 +194,13 @@ export function Content(props: ContentProps) {
 	const triggerId = `${context.rootId}-trigger-${value}`;
 	const contentId = `${context.rootId}-content-${value}`;
 
-	const shouldRender = isSelected || !context.lazyMount;
+	const hasBeenSelected = context.mountedValues
+		? context.mountedValues.includes(value)
+		: isSelected;
+
+	const shouldRender = context.unmountOnExit
+		? isSelected
+		: isSelected || !context.lazyMount || hasBeenSelected;
 
 	if (!shouldRender) {
 		return null;

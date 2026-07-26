@@ -1,8 +1,6 @@
 import { cx } from "design-system/css";
 import type { RatingGroupVariantProps } from "design-system/recipes";
 import { ratingGroup } from "design-system/recipes";
-import type { ColorPalette } from "./color-palette";
-import { colorPaletteClass } from "./color-palette";
 import {
 	createContext,
 	type JSX,
@@ -10,6 +8,8 @@ import {
 	useContext,
 	useId,
 } from "hono/jsx";
+import type { ColorPalette } from "./color-palette";
+import { colorPaletteClass } from "./color-palette";
 
 type RatingGroupStyles = ReturnType<typeof ratingGroup>;
 

@@ -14,12 +14,7 @@ export interface BadgeProps
 
 export function Badge(props: BadgeProps) {
 	const [variantProps, localProps] = badge.splitVariantProps(props);
-	const {
-		children,
-		class: classProp,
-		colorPalette,
-		...restProps
-	} = localProps;
+	const { children, class: classProp, colorPalette, ...restProps } = localProps;
 
 	return (
 		<div

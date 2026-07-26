@@ -1,7 +1,7 @@
 import { css } from "design-system/css";
 import { createRoute } from "honox/factory";
-import { PageRenderer } from "../components/page-renderer";
 import { renderBlocks } from "../components/page-registry";
+import { PageRenderer } from "../components/page-renderer";
 import { Anchor, Avatar, Stack, Text } from "../components/ui";
 import { loadDocsConfig } from "../lib/configs";
 import { detectLocale } from "../lib/i18n";

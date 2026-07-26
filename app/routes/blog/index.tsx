@@ -1,8 +1,8 @@
 import { css, cx } from "design-system/css";
 import { button } from "design-system/recipes";
 import { createRoute } from "honox/factory";
-import { PageRenderer } from "../../components/page-renderer";
 import { renderBlocks } from "../../components/page-registry";
+import { PageRenderer } from "../../components/page-renderer";
 import {
 	Anchor,
 	Avatar,

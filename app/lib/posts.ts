@@ -1,11 +1,11 @@
-import { loadDocsConfig } from "./configs";
-import { TRANSLATED_LOCALES } from "./i18n";
 import {
 	markdownToHtml,
 	parseFrontmatter,
 	stripMarkdown,
 } from "../utils/markdown";
 import { buildHaystack, type SearchIndexEntry } from "../utils/search";
+import { loadDocsConfig } from "./configs";
+import { TRANSLATED_LOCALES } from "./i18n";
 
 // Default-locale posts live at content/posts/<slug>.md; translations at
 // content/posts/<locale>/<slug>.md — same `multiple_folders` convention as

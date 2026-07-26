@@ -298,8 +298,7 @@ const registry: Record<string, BlockRenderer> = {
 		// `hideBelowMdClass`/`fullBleedClass` below, which Panda's build-time
 		// extractor can see and generate CSS for regardless of which stack
 		// blocks set the flag at runtime.
-		const { locale, currentPath, hideBelowMd, fullBleed, ...rest } =
-			propsOf(b);
+		const { locale, currentPath, hideBelowMd, fullBleed, ...rest } = propsOf(b);
 		const layoutStyle = extractLayoutStyle(rest);
 		return (
 			<Stack
@@ -842,7 +841,11 @@ const registry: Record<string, BlockRenderer> = {
 			closable,
 			...rest
 		} = propsOf(b);
-		const trigger = buildTrigger({ triggerText, triggerIcon, triggerAriaLabel });
+		const trigger = buildTrigger({
+			triggerText,
+			triggerIcon,
+			triggerAriaLabel,
+		});
 		const content = renderChildren(children as ComponentBlock[]);
 		return (
 			<Popover
@@ -1184,7 +1187,11 @@ function renderBlocks(
 ): JSX.Element[] {
 	if (!content || !Array.isArray(content)) return [];
 	return content.map((block, index) => (
-		<RenderBlock key={`${block.blockType}-${index}`} block={block} {...extraProps} />
+		<RenderBlock
+			key={`${block.blockType}-${index}`}
+			block={block}
+			{...extraProps}
+		/>
 	));
 }
 
