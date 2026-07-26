@@ -157,7 +157,12 @@ export function localiseHref(href: string, locale: string): string {
 		return `/pages/${locale}/${segments[0]}`;
 	}
 
-	// Non-collection path (e.g. homepage "/"): prefix with locale.
+	// Homepage: prefix with locale, no trailing slash (`/` → `/fr`, not `/fr/`)
+	// — the language homepage route is `/<locale>`, and a trailing slash
+	// doesn't match it on every static host.
+	if (href === "/") return `/${locale}`;
+
+	// Non-collection path (e.g. "/some/nested/path"): prefix with locale.
 	return `/${locale}${href}`;
 }
 

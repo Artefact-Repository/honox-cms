@@ -17,6 +17,7 @@ import remarkGfm from "remark-gfm";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 import { defineConfig } from "vite";
 import { RESERVED_PAGE_SLUGS } from "./app/lib/reserved-page-slugs";
+import { TRANSLATED_LOCALES } from "./app/lib/i18n";
 import pandaConfig from "./panda.config";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -29,7 +30,7 @@ function fixSsgRoutingPlugin() {
 		name: "fix-ssg-routing",
 		closeBundle: async () => {
 			const distDir = path.resolve(__dirname, "dist");
-			const locales = ["zh", "es", "pt", "fr"];
+			const locales: readonly string[] = TRANSLATED_LOCALES;
 
 			function traverse(currentDir: string) {
 				const entries = readdirSync(currentDir, { withFileTypes: true });
@@ -71,12 +72,11 @@ function fixSsgRoutingPlugin() {
 				traverse(distDir);
 			}
 
-			// Locale homepages (zh/es/pt/fr) are emitted as a flat dist/<lang>.html
+			// Locale homepages (zh/es/pt/fr/de) are emitted as a flat dist/<lang>.html
 			// with NO sibling dist/<lang>/ directory, so the loop above skips them.
 			// Move each to dist/<lang>/index.html so /<lang> resolves as a directory
 			// index on any static host, not just ones that rewrite .html clean URLs.
-			const LOCALE_HOMEPAGES = ["zh", "es", "pt", "fr"];
-			for (const lang of LOCALE_HOMEPAGES) {
+			for (const lang of TRANSLATED_LOCALES) {
 				const htmlPath = path.join(distDir, `${lang}.html`);
 				if (!existsSync(htmlPath) || !statSync(htmlPath).isFile()) continue;
 				const dirPath = path.join(distDir, lang);
