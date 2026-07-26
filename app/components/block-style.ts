@@ -33,6 +33,14 @@ const layoutStyleClass = css({
 	textAlign: "var(--cms-text-align, initial)",
 	opacity: "var(--cms-opacity, initial)",
 	boxShadow: "var(--cms-box-shadow, initial)",
+	// Width defaults to 0 (invisible regardless of style/color) rather than
+	// `initial` — CSS's own initial border-width is "medium" (~3px), which
+	// would draw an unexpected border on any existing block that only ever
+	// set borderColor/borderStyle... but until now no block set any of the
+	// three, so this default only matters once authors start using them.
+	borderWidth: "var(--cms-border-width, 0)",
+	borderStyle: "var(--cms-border-style, solid)",
+	borderColor: "var(--cms-border-color, var(--colors-border))",
 });
 
 const SPACING =
@@ -65,6 +73,14 @@ const SHADOW_TOKENS: Record<string, string> = {
 	xl: "var(--shadows-xl)",
 	"2xl": "var(--shadows-2xl)",
 };
+const BORDER_STYLE_VALUES = new Set(["solid", "dashed", "dotted"]);
+// Same reasoning as SHADOW_TOKENS: a select of real, theme-aware semantic
+// border tokens rather than a raw color field, so a border set here still
+// looks right in dark mode instead of a CMS editor hardcoding a light-mode hex.
+const BORDER_COLOR_TOKENS: Record<string, string> = {
+	default: "var(--colors-border)",
+	error: "var(--colors-border-error)",
+};
 
 function safe(value: unknown, pattern: RegExp): string | undefined {
 	if (typeof value !== "string") return undefined;
@@ -84,6 +100,9 @@ const STYLE_KEYS = [
 	"padding",
 	"maxWidth",
 	"borderRadius",
+	"borderWidth",
+	"borderStyle",
+	"borderColor",
 	"backgroundColor",
 	"backgroundImage",
 	"backgroundImageLight",
@@ -124,6 +143,23 @@ export function extractLayoutStyle(
 
 	const borderRadius = safe(props.borderRadius, LENGTH);
 	if (borderRadius) vars.push(`--cms-border-radius: ${borderRadius}`);
+
+	const borderWidth = safe(props.borderWidth, LENGTH);
+	if (borderWidth) vars.push(`--cms-border-width: ${borderWidth}`);
+
+	if (
+		typeof props.borderStyle === "string" &&
+		BORDER_STYLE_VALUES.has(props.borderStyle)
+	) {
+		vars.push(`--cms-border-style: ${props.borderStyle}`);
+	}
+
+	if (
+		typeof props.borderColor === "string" &&
+		props.borderColor in BORDER_COLOR_TOKENS
+	) {
+		vars.push(`--cms-border-color: ${BORDER_COLOR_TOKENS[props.borderColor]}`);
+	}
 
 	const backgroundColor = safe(props.backgroundColor, COLOR);
 	if (backgroundColor) vars.push(`--cms-bg-color: ${backgroundColor}`);

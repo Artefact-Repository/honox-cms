@@ -248,7 +248,10 @@
           "gap": "3",
           "padding": "2rem 1.5rem",
           "borderRadius": "1rem",
-          "style": "border: 1px solid var(--colors-border); text-align:center",
+          "borderWidth": "1px",
+          "borderStyle": "solid",
+          "borderColor": "default",
+          "textAlign": "center",
           "children": [
             {
               "blockType": "avatar",
@@ -283,7 +286,10 @@
           "gap": "3",
           "padding": "2rem 1.5rem",
           "borderRadius": "1rem",
-          "style": "border: 1px solid var(--colors-border); text-align:center",
+          "borderWidth": "1px",
+          "borderStyle": "solid",
+          "borderColor": "default",
+          "textAlign": "center",
           "children": [
             {
               "blockType": "avatar",
@@ -318,7 +324,10 @@
           "gap": "3",
           "padding": "2rem 1.5rem",
           "borderRadius": "1rem",
-          "style": "border: 1px solid var(--colors-border); text-align:center",
+          "borderWidth": "1px",
+          "borderStyle": "solid",
+          "borderColor": "default",
+          "textAlign": "center",
           "children": [
             {
               "blockType": "avatar",

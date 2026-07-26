@@ -163,6 +163,9 @@ collections:
               - &layout_style_padding { label: Padding, name: padding, widget: string, required: false, hint: "CSS padding shorthand, e.g. \"1rem 2rem\". 1-4 space-separated values (px/rem/em/%/0/auto)." }
               - &layout_style_max_width { label: Max Width, name: maxWidth, widget: string, required: false, hint: "e.g. \"64rem\", \"1200px\", \"90%\"." }
               - &layout_style_border_radius { label: Border Radius, name: borderRadius, widget: string, required: false, hint: "e.g. \"1rem\", \"12px\"." }
+              - &layout_style_border_width { label: Border Width, name: borderWidth, widget: select, options: ["0", "1px", "2px", "4px"], required: false }
+              - &layout_style_border_style { label: Border Style, name: borderStyle, widget: select, options: [solid, dashed, dotted], default: solid, required: false }
+              - &layout_style_border_color { label: Border Color, name: borderColor, widget: select, options: [default, error], required: false, hint: "Theme-aware border color token — stays correct in light and dark mode (unlike a raw hex value)." }
               - &layout_style_background_color { label: Background Color, name: backgroundColor, widget: string, required: false, hint: "Hex, rgb()/rgba(), or a CSS color name." }
               - &layout_style_background_image { label: Background Image (Dark Theme), name: backgroundImage, widget: image, required: false, hint: "Upload/browse an image, or paste an https:// URL. Shown as-is if no light-theme image is set below." }
               - &layout_style_background_image_light { label: Background Image (Light Theme), name: backgroundImageLight, widget: image, required: false, hint: "Optional lighter/brighter variant shown when the site is in light mode." }
@@ -189,6 +192,9 @@ collections:
                       - *layout_style_padding
                       - *layout_style_max_width
                       - *layout_style_border_radius
+                      - *layout_style_border_width
+                      - *layout_style_border_style
+                      - *layout_style_border_color
                       - *layout_style_background_color
                       - *layout_style_background_image
                       - *layout_style_background_image_light
@@ -1389,6 +1395,9 @@ collections:
                       - *layout_style_padding
                       - *layout_style_max_width
                       - *layout_style_border_radius
+                      - *layout_style_border_width
+                      - *layout_style_border_style
+                      - *layout_style_border_color
                       - *layout_style_background_color
                       - *layout_style_background_image
                       - *layout_style_background_image_light
@@ -1449,6 +1458,9 @@ collections:
                       - *layout_style_padding
                       - *layout_style_max_width
                       - *layout_style_border_radius
+                      - *layout_style_border_width
+                      - *layout_style_border_style
+                      - *layout_style_border_color
                       - *layout_style_background_color
                       - *layout_style_background_image
                       - *layout_style_background_image_light
@@ -1476,6 +1488,9 @@ collections:
               - *layout_style_padding
               - *layout_style_max_width
               - *layout_style_border_radius
+              - *layout_style_border_width
+              - *layout_style_border_style
+              - *layout_style_border_color
               - *layout_style_background_color
               - *layout_style_background_image
               - *layout_style_background_image_light
@@ -1929,6 +1944,9 @@ collections:
               - *layout_style_padding
               - *layout_style_max_width
               - *layout_style_border_radius
+              - *layout_style_border_width
+              - *layout_style_border_style
+              - *layout_style_border_color
               - *layout_style_background_color
               - *layout_style_background_image
               - *layout_style_background_image_light
