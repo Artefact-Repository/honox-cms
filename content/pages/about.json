@@ -3,6 +3,64 @@
   "content": [
     {
       "blockType": "stack",
+      "direction": "horizontal",
+      "align": "center",
+      "justify": "between",
+      "gap": "4",
+      "padding": "1rem 1.5rem",
+      "style": "max-width:80rem;margin:0 auto",
+      "fullBleed": true,
+      "children": [
+        {
+          "blockType": "anchor",
+          "href": "/",
+          "variant": "plain",
+          "style": "flex-shrink:0;font-weight:600",
+          "children": [
+            {
+              "blockType": "text",
+              "content": "Artefact UI",
+              "size": "lg"
+            }
+          ]
+        },
+        {
+          "blockType": "stack",
+          "direction": "horizontal",
+          "align": "center",
+          "gap": "6",
+          "children": [
+            {
+              "blockType": "link",
+              "href": "/blog",
+              "variant": "plain",
+              "children": [{ "blockType": "text", "content": "Blog" }]
+            },
+            {
+              "blockType": "link",
+              "href": "/docs",
+              "variant": "plain",
+              "children": [{ "blockType": "text", "content": "Docs" }]
+            },
+            {
+              "blockType": "link",
+              "href": "/about",
+              "variant": "plain",
+              "children": [{ "blockType": "text", "content": "About" }]
+            },
+            {
+              "blockType": "link",
+              "href": "/admin",
+              "variant": "plain",
+              "class": "button button--variant_outline button--size_sm",
+              "children": [{ "blockType": "text", "content": "Admin" }]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "blockType": "stack",
       "direction": "vertical",
       "align": "center",
       "gap": "4",
