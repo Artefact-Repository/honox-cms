@@ -99,10 +99,15 @@ export const slate = defineSemanticTokens.colors({
 	plain: {
 		bg: {
 			hover: {
-				value: { _light: "{colors.gray.a3}", _dark: "{colors.gray.a3}" },
+				// `a3` reads as a visible hover in dark mode but is nearly
+				// imperceptible in light mode: the same alpha step produces a much
+				// smaller relative luminance change against a near-white background
+				// than against a near-black one. Use `a4` in light mode to match
+				// dark's perceived contrast.
+				value: { _light: "{colors.gray.a4}", _dark: "{colors.gray.a3}" },
 			},
 			active: {
-				value: { _light: "{colors.gray.a4}", _dark: "{colors.gray.a4}" },
+				value: { _light: "{colors.gray.a5}", _dark: "{colors.gray.a4}" },
 			},
 		},
 		fg: {
