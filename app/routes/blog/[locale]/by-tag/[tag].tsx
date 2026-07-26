@@ -14,13 +14,13 @@ const [, byTagHandler] = byTagRoute;
 export default createRoute(
 	// Tags are locale-independent matching keys (see app/lib/posts.ts), so
 	// every locale gets the same tag set — this just needs the full
-	// {lang, tag} cross product for SSG to pre-render each combination.
+	// {locale, tag} cross product for SSG to pre-render each combination.
 	ssgParams(async () => {
 		const { tags } = await loadPosts();
-		const params: { lang: string; tag: string }[] = [];
-		for (const lang of TRANSLATED_LOCALES) {
+		const params: { locale: string; tag: string }[] = [];
+		for (const locale of TRANSLATED_LOCALES) {
 			for (const tag of tags) {
-				params.push({ lang, tag });
+				params.push({ locale, tag });
 			}
 		}
 		return params;
