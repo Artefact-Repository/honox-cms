@@ -142,8 +142,10 @@ function Anchor(props: PopoverAnchorProps) {
 	};
 
 	if (asChild && typeof children === "object" && children !== null) {
-		const child = children as any;
-		return cloneElement(child, {
+		const child = children as {
+			props?: { class?: string; [key: string]: unknown };
+		};
+		return cloneElement(child as any, {
 			...anchorProps,
 			class: cx(styles.anchor, classProp, child.props?.class),
 		});
@@ -184,11 +186,34 @@ function Trigger(props: PopoverTriggerProps) {
 	};
 
 	if (asChild && typeof children === "object" && children !== null) {
-		const child = children as any;
-		return cloneElement(child, {
+		const child = children as {
+			type?: unknown;
+			props?: { class?: string; [key: string]: unknown };
+		};
+		const isNativeControl = child.type === "button" || child.type === "a";
+		const customTriggerProps: Record<string, unknown> = {
 			...triggerProps,
 			class: cx(styles.trigger, classProp, child.props?.class),
-		});
+		};
+
+		if (!isNativeControl) {
+			customTriggerProps.tabIndex = child.props?.tabIndex ?? 0;
+			customTriggerProps.role = child.props?.role ?? "button";
+
+			const existingKeyDown = child.props?.onKeyDown as
+				| ((e: KeyboardEvent) => void)
+				| undefined;
+			customTriggerProps.onKeyDown = (e: KeyboardEvent) => {
+				if (e.key === " " || e.key === "Enter") {
+					e.preventDefault();
+					const element = e.currentTarget as HTMLElement | null;
+					element?.click();
+				}
+				existingKeyDown?.(e);
+			};
+		}
+
+		return cloneElement(child as any, customTriggerProps);
 	}
 
 	return (
@@ -367,8 +392,10 @@ function CloseTrigger(props: PopoverCloseTriggerProps) {
 	};
 
 	if (asChild && typeof children === "object" && children !== null) {
-		const child = children as any;
-		return cloneElement(child, {
+		const child = children as {
+			props?: { class?: string; [key: string]: unknown };
+		};
+		return cloneElement(child as any, {
 			...triggerProps,
 			class: cx(styles.closeTrigger, classProp, child.props?.class),
 		});
@@ -440,8 +467,10 @@ function Indicator(props: PopoverIndicatorProps) {
 	};
 
 	if (asChild && typeof children === "object" && children !== null) {
-		const child = children as any;
-		return cloneElement(child, {
+		const child = children as {
+			props?: { class?: string; [key: string]: unknown };
+		};
+		return cloneElement(child as any, {
 			...indicatorProps,
 			class: cx(styles.indicator, classProp, child.props?.class),
 		});
@@ -454,9 +483,11 @@ function Indicator(props: PopoverIndicatorProps) {
 	);
 }
 
-function Context(props: { children: (context: any) => any }) {
+function Context(props: {
+	children: (context: PopoverContextValue | null) => unknown;
+}) {
 	const context = usePopoverContext();
-	return props.children(context);
+	return props.children(context) as any;
 }
 
 function InteractivePopoverRoot(props: InteractivePopoverProps) {
@@ -673,11 +704,18 @@ function InteractivePopoverRoot(props: InteractivePopoverProps) {
 			}
 		};
 
+		const handleScroll = () => {
+			if (isCurrentlyOpen()) {
+				positionOverlay(root, PLACEMENT_CONFIG);
+			}
+		};
+
 		root.addEventListener("click", handleClick);
 		root.addEventListener("focusout", handleFocusOut);
 		document.addEventListener("mousedown", handleDocumentPointerDown);
 		document.addEventListener("keydown", handleKeyDown);
 		window.addEventListener("resize", handleResize);
+		window.addEventListener("scroll", handleScroll, true);
 
 		return () => {
 			cancelPendingHide();
@@ -686,6 +724,7 @@ function InteractivePopoverRoot(props: InteractivePopoverProps) {
 			document.removeEventListener("mousedown", handleDocumentPointerDown);
 			document.removeEventListener("keydown", handleKeyDown);
 			window.removeEventListener("resize", handleResize);
+			window.removeEventListener("scroll", handleScroll, true);
 		};
 	}, [rootId]);
 
