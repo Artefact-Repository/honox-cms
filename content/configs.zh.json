@@ -136,10 +136,10 @@
               "children": [
                 {
                   "blockType": "text",
-                  "content": "产品"
+                  "content": "关于"
                 }
               ],
-              "href": "/product-landing"
+              "href": "/about"
             },
             {
               "blockType": "dropdown",
@@ -326,10 +326,10 @@
       "children": [
         {
           "blockType": "text",
-          "content": "产品"
+          "content": "关于"
         }
       ],
-      "href": "/product-landing"
+      "href": "/about"
     },
     {
       "blockType": "dropdown",

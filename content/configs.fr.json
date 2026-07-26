@@ -136,10 +136,10 @@
               "children": [
                 {
                   "blockType": "text",
-                  "content": "Product"
+                  "content": "About"
                 }
               ],
-              "href": "/product-landing"
+              "href": "/about"
             },
             {
               "blockType": "dropdown",
@@ -326,10 +326,10 @@
       "children": [
         {
           "blockType": "text",
-          "content": "Product"
+          "content": "About"
         }
       ],
-      "href": "/product-landing"
+      "href": "/about"
     },
     {
       "blockType": "dropdown",

@@ -1,0 +1,268 @@
+{
+  "title": "About Artefact UI",
+  "content": [
+    {
+      "blockType": "stack",
+      "direction": "vertical",
+      "align": "center",
+      "gap": "4",
+      "children": [
+        {
+          "blockType": "badge",
+          "variant": "subtle",
+          "text": "Our story",
+          "colorPalette": "purple",
+          "size": "lg"
+        },
+        {
+          "blockType": "heading",
+          "text": "Building the design system we always wanted",
+          "size": "6xl",
+          "as": "h1",
+          "style": "text-align:center;max-width:44rem"
+        },
+        {
+          "blockType": "text",
+          "size": "lg",
+          "content": "Artefact UI is a component library and CMS-driven page builder, made by a small team that got tired of rebuilding the same primitives from scratch on every project.",
+          "style": "text-align:center;max-width:38rem"
+        }
+      ]
+    },
+    {
+      "blockType": "grid",
+      "gap": "6",
+      "children": [
+        {
+          "blockType": "card",
+          "title": "120+",
+          "description": "Components shipped",
+          "body": "Accessible, themeable, and documented — from buttons to date pickers.",
+          "imagePosition": "top",
+          "variant": "elevated"
+        },
+        {
+          "blockType": "card",
+          "title": "6",
+          "description": "Languages supported",
+          "body": "English, Chinese, Spanish, Portuguese, French, and German, out of the box.",
+          "imagePosition": "top",
+          "variant": "elevated"
+        },
+        {
+          "blockType": "card",
+          "title": "2021",
+          "description": "Founded",
+          "body": "Started as an internal toolkit before we open-sourced it for everyone.",
+          "imagePosition": "top",
+          "variant": "elevated"
+        }
+      ],
+      "columns": "{\"base\": 1, \"md\": 3}"
+    },
+    {
+      "blockType": "stack",
+      "direction": "vertical",
+      "gap": "4",
+      "backgroundColor": "#f8fafc",
+      "padding": "2.5rem 2rem",
+      "borderRadius": "1.25rem",
+      "margin": "3rem 0",
+      "children": [
+        {
+          "blockType": "heading",
+          "text": "Our mission",
+          "size": "3xl",
+          "as": "h2"
+        },
+        {
+          "blockType": "text",
+          "size": "lg",
+          "content": "We believe teams move faster when design and engineering share one source of truth. Artefact UI pairs a real component library with a page builder that non-engineers can use safely — so the design system stays the single place changes happen, instead of drifting into one-off overrides."
+        }
+      ]
+    },
+    {
+      "blockType": "heading",
+      "text": "What we value",
+      "size": "3xl",
+      "as": "h2"
+    },
+    {
+      "blockType": "grid",
+      "gap": "6",
+      "children": [
+        {
+          "blockType": "card",
+          "children": [
+            {
+              "blockType": "badge",
+              "text": "Accessible",
+              "variant": "subtle",
+              "colorPalette": "green"
+            }
+          ],
+          "title": "Accessible by default",
+          "description": "Keyboard and screen-reader support ship with every component",
+          "body": "We test with real assistive technology, not just automated audits, so accessibility holds up in production.",
+          "imagePosition": "top",
+          "variant": "elevated"
+        },
+        {
+          "blockType": "card",
+          "children": [
+            {
+              "blockType": "badge",
+              "text": "Composable",
+              "variant": "subtle",
+              "colorPalette": "purple"
+            }
+          ],
+          "title": "Composable, not prescriptive",
+          "description": "Small primitives that combine instead of one giant configuration object",
+          "body": "Every component is built from the same recipe system, so customizing one doesn't mean fighting the others.",
+          "imagePosition": "top",
+          "variant": "elevated"
+        },
+        {
+          "blockType": "card",
+          "children": [
+            {
+              "blockType": "badge",
+              "text": "Transparent",
+              "variant": "subtle"
+            }
+          ],
+          "title": "Open about tradeoffs",
+          "description": "Docs explain the why, not just the API",
+          "body": "When something is a deliberate tradeoff rather than a bug, we say so — in the docs, not just the changelog.",
+          "imagePosition": "top",
+          "variant": "elevated"
+        }
+      ],
+      "columns": "{\"base\": 1, \"md\": 3}"
+    },
+    {
+      "blockType": "heading",
+      "text": "The team",
+      "size": "3xl",
+      "as": "h2"
+    },
+    {
+      "blockType": "text",
+      "size": "lg",
+      "content": "A small group maintaining the library, the docs, and the CMS integration."
+    },
+    {
+      "blockType": "grid",
+      "gap": "6",
+      "children": [
+        {
+          "blockType": "card",
+          "children": [
+            {
+              "blockType": "avatar",
+              "name": "Yumin Chen",
+              "size": "xl",
+              "variant": "solid"
+            }
+          ],
+          "title": "Yumin Chen",
+          "description": "Founder & Maintainer",
+          "body": "Leads the component library and the Panda CSS design tokens.",
+          "imagePosition": "top",
+          "variant": "elevated"
+        },
+        {
+          "blockType": "card",
+          "children": [
+            {
+              "blockType": "avatar",
+              "name": "Jordan Lee",
+              "size": "xl",
+              "variant": "solid"
+            }
+          ],
+          "title": "Jordan Lee",
+          "description": "Design Systems Engineer",
+          "body": "Owns the CMS page builder and the block registry that powers it.",
+          "imagePosition": "top",
+          "variant": "elevated"
+        },
+        {
+          "blockType": "card",
+          "children": [
+            {
+              "blockType": "avatar",
+              "name": "Priya Nair",
+              "size": "xl",
+              "variant": "solid"
+            }
+          ],
+          "title": "Priya Nair",
+          "description": "Docs & Accessibility",
+          "body": "Keeps the docs honest and every component screen-reader tested.",
+          "imagePosition": "top",
+          "variant": "elevated"
+        }
+      ],
+      "columns": "{\"base\": 1, \"md\": 3}"
+    },
+    {
+      "blockType": "stack",
+      "direction": "vertical",
+      "align": "center",
+      "gap": "4",
+      "backgroundColor": "#eff6ff",
+      "padding": "4rem 2rem",
+      "borderRadius": "1.25rem",
+      "margin": "3rem 0 1rem",
+      "children": [
+        {
+          "blockType": "heading",
+          "text": "Want to see it in action?",
+          "size": "3xl",
+          "as": "h2",
+          "style": "text-align:center"
+        },
+        {
+          "blockType": "text",
+          "size": "lg",
+          "content": "Browse the component docs or check out a live product page built with the same blocks.",
+          "style": "text-align:center"
+        },
+        {
+          "blockType": "stack",
+          "direction": "horizontal",
+          "gap": "4",
+          "children": [
+            {
+              "blockType": "link",
+              "children": [
+                {
+                  "blockType": "text",
+                  "content": "Read the docs"
+                }
+              ],
+              "href": "/docs",
+              "variant": "solid",
+              "class": "button button--variant_solid button--size_lg"
+            },
+            {
+              "blockType": "link",
+              "children": [
+                {
+                  "blockType": "text",
+                  "content": "View example page"
+                }
+              ],
+              "href": "/product-landing",
+              "variant": "outline",
+              "class": "button button--variant_outline button--size_lg"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

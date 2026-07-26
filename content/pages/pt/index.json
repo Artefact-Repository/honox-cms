@@ -56,10 +56,10 @@
           "children": [
             {
               "blockType": "text",
-              "content": "Product"
+              "content": "About"
             }
           ],
-          "href": "/pages/pt/product-landing",
+          "href": "/pages/pt/about",
           "variant": "plain"
         },
         {

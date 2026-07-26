@@ -56,10 +56,10 @@
           "children": [
             {
               "blockType": "text",
-              "content": "产品"
+              "content": "关于"
             }
           ],
-          "href": "/pages/zh/product-landing",
+          "href": "/pages/zh/about",
           "variant": "plain"
         },
         {
