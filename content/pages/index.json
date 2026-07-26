@@ -847,8 +847,7 @@
                 {
                   "blockType": "datePicker",
                   "label": "Pick a date range",
-                  "selectionMode": "range",
-                  "colorPalette": "purple"
+                  "selectionMode": "range"
                 }
               ]
             }
