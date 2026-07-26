@@ -31,31 +31,75 @@
     },
     {
       "blockType": "grid",
-      "gap": "6",
+      "gap": "8",
+      "padding": "2.5rem 0",
+      "style": "border-top: 1px solid var(--colors-border); border-bottom: 1px solid var(--colors-border)",
       "children": [
         {
-          "blockType": "card",
-          "title": "120+",
-          "description": "Components shipped",
-          "body": "Accessible, themeable, and documented — from buttons to date pickers.",
-          "imagePosition": "top",
-          "variant": "elevated"
+          "blockType": "stack",
+          "direction": "vertical",
+          "align": "center",
+          "gap": "2",
+          "children": [
+            {
+              "blockType": "heading",
+              "text": "120+",
+              "size": "6xl",
+              "as": "p",
+              "style": "text-align:center"
+            },
+            {
+              "blockType": "badge",
+              "text": "Components shipped",
+              "variant": "subtle",
+              "colorPalette": "purple",
+              "size": "md"
+            }
+          ]
         },
         {
-          "blockType": "card",
-          "title": "6",
-          "description": "Languages supported",
-          "body": "English, Chinese, Spanish, Portuguese, French, and German, out of the box.",
-          "imagePosition": "top",
-          "variant": "elevated"
+          "blockType": "stack",
+          "direction": "vertical",
+          "align": "center",
+          "gap": "2",
+          "children": [
+            {
+              "blockType": "heading",
+              "text": "6",
+              "size": "6xl",
+              "as": "p",
+              "style": "text-align:center"
+            },
+            {
+              "blockType": "badge",
+              "text": "Languages supported",
+              "variant": "subtle",
+              "colorPalette": "cyan",
+              "size": "md"
+            }
+          ]
         },
         {
-          "blockType": "card",
-          "title": "2021",
-          "description": "Founded",
-          "body": "Started as an internal toolkit before we open-sourced it for everyone.",
-          "imagePosition": "top",
-          "variant": "elevated"
+          "blockType": "stack",
+          "direction": "vertical",
+          "align": "center",
+          "gap": "2",
+          "children": [
+            {
+              "blockType": "heading",
+              "text": "2021",
+              "size": "6xl",
+              "as": "p",
+              "style": "text-align:center"
+            },
+            {
+              "blockType": "badge",
+              "text": "Founded",
+              "variant": "subtle",
+              "colorPalette": "green",
+              "size": "md"
+            }
+          ]
         }
       ],
       "columns": "{\"base\": 1, \"md\": 3}"
@@ -67,8 +111,14 @@
       "backgroundColor": "#f8fafc",
       "padding": "2.5rem 2rem",
       "borderRadius": "1.25rem",
-      "margin": "3rem 0",
       "children": [
+        {
+          "blockType": "badge",
+          "variant": "subtle",
+          "text": "Why we exist",
+          "colorPalette": "purple",
+          "size": "sm"
+        },
         {
           "blockType": "heading",
           "text": "Our mission",
@@ -83,10 +133,24 @@
       ]
     },
     {
-      "blockType": "heading",
-      "text": "What we value",
-      "size": "3xl",
-      "as": "h2"
+      "blockType": "stack",
+      "direction": "vertical",
+      "gap": "2",
+      "children": [
+        {
+          "blockType": "badge",
+          "variant": "subtle",
+          "text": "Principles",
+          "colorPalette": "purple",
+          "size": "sm"
+        },
+        {
+          "blockType": "heading",
+          "text": "What we value",
+          "size": "3xl",
+          "as": "h2"
+        }
+      ]
     },
     {
       "blockType": "grid",
@@ -118,8 +182,8 @@
               "colorPalette": "purple"
             }
           ],
-          "title": "Composable, not prescriptive",
-          "description": "Small primitives that combine instead of one giant configuration object",
+          "title": "Composable by design",
+          "description": "Small pieces that combine, not one big config",
           "body": "Every component is built from the same recipe system, so customizing one doesn't mean fighting the others.",
           "imagePosition": "top",
           "variant": "elevated"
@@ -130,7 +194,8 @@
             {
               "blockType": "badge",
               "text": "Transparent",
-              "variant": "subtle"
+              "variant": "subtle",
+              "colorPalette": "cyan"
             }
           ],
           "title": "Open about tradeoffs",
@@ -143,67 +208,138 @@
       "columns": "{\"base\": 1, \"md\": 3}"
     },
     {
-      "blockType": "heading",
-      "text": "The team",
-      "size": "3xl",
-      "as": "h2"
-    },
-    {
-      "blockType": "text",
-      "size": "lg",
-      "content": "A small group maintaining the library, the docs, and the CMS integration."
+      "blockType": "stack",
+      "direction": "vertical",
+      "gap": "2",
+      "children": [
+        {
+          "blockType": "badge",
+          "variant": "subtle",
+          "text": "Who's behind it",
+          "colorPalette": "purple",
+          "size": "sm"
+        },
+        {
+          "blockType": "heading",
+          "text": "The team",
+          "size": "3xl",
+          "as": "h2"
+        },
+        {
+          "blockType": "text",
+          "size": "lg",
+          "content": "A small group maintaining the library, the docs, and the CMS integration."
+        }
+      ]
     },
     {
       "blockType": "grid",
       "gap": "6",
       "children": [
         {
-          "blockType": "card",
+          "blockType": "stack",
+          "direction": "vertical",
+          "align": "center",
+          "gap": "3",
+          "padding": "2rem 1.5rem",
+          "borderRadius": "1rem",
+          "style": "border: 1px solid var(--colors-border); text-align:center",
           "children": [
             {
               "blockType": "avatar",
               "name": "Yumin Chen",
-              "size": "xl",
+              "size": "2xl",
               "variant": "solid"
+            },
+            {
+              "blockType": "heading",
+              "text": "Yumin Chen",
+              "size": "lg",
+              "as": "p"
+            },
+            {
+              "blockType": "text",
+              "size": "sm",
+              "content": "Founder & Maintainer",
+              "style": "color: var(--colors-fg-muted); font-weight: 600"
+            },
+            {
+              "blockType": "text",
+              "size": "sm",
+              "content": "Leads the component library and the Panda CSS design tokens.",
+              "style": "color: var(--colors-fg-muted)"
             }
-          ],
-          "title": "Yumin Chen",
-          "description": "Founder & Maintainer",
-          "body": "Leads the component library and the Panda CSS design tokens.",
-          "imagePosition": "top",
-          "variant": "elevated"
+          ]
         },
         {
-          "blockType": "card",
+          "blockType": "stack",
+          "direction": "vertical",
+          "align": "center",
+          "gap": "3",
+          "padding": "2rem 1.5rem",
+          "borderRadius": "1rem",
+          "style": "border: 1px solid var(--colors-border); text-align:center",
           "children": [
             {
               "blockType": "avatar",
               "name": "Jordan Lee",
-              "size": "xl",
+              "size": "2xl",
               "variant": "solid"
+            },
+            {
+              "blockType": "heading",
+              "text": "Jordan Lee",
+              "size": "lg",
+              "as": "p"
+            },
+            {
+              "blockType": "text",
+              "size": "sm",
+              "content": "Design Systems Engineer",
+              "style": "color: var(--colors-fg-muted); font-weight: 600"
+            },
+            {
+              "blockType": "text",
+              "size": "sm",
+              "content": "Owns the CMS page builder and the block registry that powers it.",
+              "style": "color: var(--colors-fg-muted)"
             }
-          ],
-          "title": "Jordan Lee",
-          "description": "Design Systems Engineer",
-          "body": "Owns the CMS page builder and the block registry that powers it.",
-          "imagePosition": "top",
-          "variant": "elevated"
+          ]
         },
         {
-          "blockType": "card",
+          "blockType": "stack",
+          "direction": "vertical",
+          "align": "center",
+          "gap": "3",
+          "padding": "2rem 1.5rem",
+          "borderRadius": "1rem",
+          "style": "border: 1px solid var(--colors-border); text-align:center",
           "children": [
             {
               "blockType": "avatar",
               "name": "Priya Nair",
-              "size": "xl",
+              "size": "2xl",
               "variant": "solid"
+            },
+            {
+              "blockType": "heading",
+              "text": "Priya Nair",
+              "size": "lg",
+              "as": "p"
+            },
+            {
+              "blockType": "text",
+              "size": "sm",
+              "content": "Docs & Accessibility",
+              "style": "color: var(--colors-fg-muted); font-weight: 600"
+            },
+            {
+              "blockType": "text",
+              "size": "sm",
+              "content": "Keeps the docs honest and every component screen-reader tested.",
+              "style": "color: var(--colors-fg-muted)"
             }
-          ],
-          "title": "Priya Nair",
-          "description": "Docs & Accessibility",
-          "body": "Keeps the docs honest and every component screen-reader tested.",
-          "imagePosition": "top",
-          "variant": "elevated"
+          ]
         }
       ],
       "columns": "{\"base\": 1, \"md\": 3}"
@@ -213,10 +349,9 @@
       "direction": "vertical",
       "align": "center",
       "gap": "4",
-      "backgroundColor": "#eff6ff",
+      "backgroundColor": "#f5f3ff",
       "padding": "4rem 2rem",
       "borderRadius": "1.25rem",
-      "margin": "3rem 0 1rem",
       "children": [
         {
           "blockType": "heading",
