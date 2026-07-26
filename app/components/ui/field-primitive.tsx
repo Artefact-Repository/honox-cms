@@ -1,6 +1,6 @@
 import { cx } from "design-system/css";
 import type { FieldVariantProps } from "design-system/recipes";
-import { field } from "design-system/recipes";
+import { field, input } from "design-system/recipes";
 import {
 	type Child,
 	createContext,
@@ -237,7 +237,7 @@ export function FieldRoot(props: FieldProps) {
 						onInput={(e) => {
 							handleValueChange((e.target as HTMLInputElement).value);
 						}}
-						class={cx(styles.input, restClass as string)}
+						class={cx(input(), styles.input, restClass as string)}
 						{...(otherRestProps as Record<string, unknown>)}
 					/>
 				)}
