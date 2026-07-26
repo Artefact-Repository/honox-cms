@@ -3,92 +3,97 @@
   "content": [
     {
       "blockType": "stack",
-      "direction": "horizontal",
-      "align": "center",
-      "justify": "between",
-      "gap": "4",
-      "padding": "1rem 1.5rem",
-      "style": "max-width:80rem;margin:0 auto",
-      "fullBleed": true,
-      "children": [
-        {
-          "blockType": "anchor",
-          "href": "/",
-          "variant": "plain",
-          "style": "flex-shrink:0;font-weight:600",
-          "children": [
-            {
-              "blockType": "text",
-              "content": "Artefact UI",
-              "size": "lg"
-            }
-          ]
-        },
-        {
-          "blockType": "stack",
-          "direction": "horizontal",
-          "align": "center",
-          "gap": "6",
-          "children": [
-            {
-              "blockType": "link",
-              "href": "/blog",
-              "variant": "plain",
-              "children": [{ "blockType": "text", "content": "Blog" }]
-            },
-            {
-              "blockType": "link",
-              "href": "/docs",
-              "variant": "plain",
-              "children": [{ "blockType": "text", "content": "Docs" }]
-            },
-            {
-              "blockType": "link",
-              "href": "/about",
-              "variant": "plain",
-              "children": [{ "blockType": "text", "content": "About" }]
-            },
-            {
-              "blockType": "link",
-              "href": "/admin",
-              "variant": "plain",
-              "class": "button button--variant_outline button--size_sm",
-              "children": [{ "blockType": "text", "content": "Admin" }]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "blockType": "stack",
       "direction": "vertical",
-      "align": "center",
-      "gap": "4",
-      "padding": "3rem 1.5rem",
+      "gap": "10",
+      "padding": "1rem 1.5rem 3rem",
       "backgroundImage": "/media/hero-placeholder-dark.svg",
       "backgroundImageLight": "/media/hero-placeholder-light.svg",
       "backgroundFit": "cover",
       "fullBleed": true,
       "children": [
         {
-          "blockType": "badge",
-          "variant": "subtle",
-          "text": "Our story",
-          "colorPalette": "purple",
-          "size": "lg"
+          "blockType": "stack",
+          "direction": "horizontal",
+          "align": "center",
+          "justify": "between",
+          "gap": "4",
+          "style": "max-width:80rem;margin:0 auto;width:100%",
+          "children": [
+            {
+              "blockType": "anchor",
+              "href": "/",
+              "variant": "plain",
+              "style": "flex-shrink:0;font-weight:600",
+              "children": [
+                {
+                  "blockType": "text",
+                  "content": "Artefact UI",
+                  "size": "lg"
+                }
+              ]
+            },
+            {
+              "blockType": "stack",
+              "direction": "horizontal",
+              "align": "center",
+              "gap": "6",
+              "children": [
+                {
+                  "blockType": "link",
+                  "href": "/blog",
+                  "variant": "plain",
+                  "children": [{ "blockType": "text", "content": "Blog" }]
+                },
+                {
+                  "blockType": "link",
+                  "href": "/docs",
+                  "variant": "plain",
+                  "children": [{ "blockType": "text", "content": "Docs" }]
+                },
+                {
+                  "blockType": "link",
+                  "href": "/about",
+                  "variant": "plain",
+                  "children": [{ "blockType": "text", "content": "About" }]
+                },
+                {
+                  "blockType": "link",
+                  "href": "/admin",
+                  "variant": "plain",
+                  "class": "button button--variant_outline button--size_sm",
+                  "children": [{ "blockType": "text", "content": "Admin" }]
+                }
+              ]
+            }
+          ]
         },
         {
-          "blockType": "heading",
-          "text": "Building the design system we always wanted",
-          "size": "6xl",
-          "as": "h1",
-          "style": "text-align:center;max-width:44rem"
-        },
-        {
-          "blockType": "text",
-          "size": "lg",
-          "content": "Artefact UI is a component library and CMS-driven page builder, made by a small team that got tired of rebuilding the same primitives from scratch on every project.",
-          "style": "text-align:center;max-width:38rem"
+          "blockType": "stack",
+          "direction": "vertical",
+          "align": "center",
+          "gap": "4",
+          "children": [
+            {
+              "blockType": "badge",
+              "variant": "subtle",
+              "text": "Our story",
+              "colorPalette": "purple",
+              "size": "lg"
+            },
+            {
+              "blockType": "heading",
+              "text": "Building the design system we always wanted",
+              "size": "6xl",
+              "as": "h1",
+              "style": "text-align:center;max-width:44rem"
+            },
+            {
+              "blockType": "text",
+              "size": "lg",
+              "content": "Artefact UI is a component library and CMS-driven page builder, made by a small team that got tired of rebuilding the same primitives from scratch on every project.",
+              "style": "text-align:center;max-width:38rem"
+            }
+          ]
         }
       ]
     },
