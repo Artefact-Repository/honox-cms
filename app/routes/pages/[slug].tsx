@@ -31,7 +31,11 @@ export default createRoute(
 					})}
 				>
 					<title>{data.title}</title>
-					<PageRenderer content={data.content ?? []} />
+					<PageRenderer
+						content={data.content ?? []}
+						locale={currentLocale}
+						currentPath={c.req.path}
+					/>
 				</div>,
 			);
 		} catch (error) {
