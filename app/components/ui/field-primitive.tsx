@@ -34,6 +34,7 @@ export interface FieldProps extends FieldVariantProps {
 	children?: Child;
 	class?: string;
 	id?: string;
+	type?: string;
 	disabled?: boolean;
 	invalid?: boolean;
 	readOnly?: boolean;
@@ -102,6 +103,7 @@ export function FieldRoot(props: FieldProps) {
 		children,
 		class: classProp,
 		id: idProp,
+		type,
 		disabled: disabledProp,
 		invalid: invalidProp,
 		readOnly,
@@ -227,6 +229,7 @@ export function FieldRoot(props: FieldProps) {
 				) : (
 					<input
 						id={id}
+						type={type}
 						disabled={disabled}
 						{...((readOnly ? { readOnly: "" } : {}) as Record<string, unknown>)}
 						required={required}

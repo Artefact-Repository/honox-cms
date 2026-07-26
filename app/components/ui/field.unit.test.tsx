@@ -59,3 +59,29 @@ test("Field - Flattened API validation (minLength)", () => {
 	expect(html).toContain('aria-invalid="true"');
 	expect(html).toContain('data-invalid=""');
 });
+
+test("Field - Supports type prop", () => {
+	const html = (
+		<Field
+			id="password-field"
+			label="Password"
+			type="password"
+		/>
+	).toString();
+
+	expect(html).toContain('type="password"');
+});
+
+test("Field - Correctly priorities value over defaultValue on SSR", () => {
+	const html = (
+		<Field
+			id="ssr-value-field"
+			label="Input"
+			value="controlled-val"
+			defaultValue="default-val"
+		/>
+	).toString();
+
+	expect(html).toContain('value="controlled-val"');
+	expect(html).not.toContain('value="default-val"');
+});
