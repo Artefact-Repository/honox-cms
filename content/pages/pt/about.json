@@ -1,0 +1,495 @@
+{
+  "title": "Sobre o Artefact UI",
+  "content": [
+    {
+      "blockType": "stack",
+      "direction": "vertical",
+      "gap": "10",
+      "padding": "1rem 1.5rem 3rem",
+      "backgroundImage": "/media/hero-placeholder-dark.svg",
+      "backgroundImageLight": "/media/hero-placeholder-light.svg",
+      "backgroundFit": "cover",
+      "fullBleed": true,
+      "children": [
+        {
+          "blockType": "stack",
+          "direction": "horizontal",
+          "align": "center",
+          "justify": "between",
+          "gap": "4",
+          "style": "max-width:80rem;margin:0 auto;width:100%",
+          "children": [
+            {
+              "blockType": "anchor",
+              "href": "/",
+              "variant": "plain",
+              "style": "flex-shrink:0;font-weight:600",
+              "children": [
+                {
+                  "blockType": "text",
+                  "content": "Artefact UI",
+                  "size": "lg"
+                }
+              ]
+            },
+            {
+              "blockType": "stack",
+              "direction": "horizontal",
+              "align": "center",
+              "gap": "6",
+              "children": [
+                {
+                  "blockType": "link",
+                  "href": "/blog/pt",
+                  "variant": "plain",
+                  "children": [{ "blockType": "text", "content": "Blog" }]
+                },
+                {
+                  "blockType": "link",
+                  "href": "/docs/pt",
+                  "variant": "plain",
+                  "children": [{ "blockType": "text", "content": "Docs" }]
+                },
+                {
+                  "blockType": "link",
+                  "href": "/pages/pt/about",
+                  "variant": "plain",
+                  "children": [{ "blockType": "text", "content": "Sobre" }]
+                },
+                {
+                  "blockType": "dropdown",
+                  "triggerIcon": "<circle cx=\"12\" cy=\"12\" r=\"10\"></circle><line x1=\"2\" y1=\"12\" x2=\"22\" y2=\"12\"></line><path d=\"M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z\"></path>",
+                  "triggerAriaLabel": "Idioma",
+                  "triggerText": "PT",
+                  "placement": "bottom-end",
+                  "items": [
+                    { "type": "item", "label": "English", "value": "en", "toggleLocale": "en" },
+                    { "type": "item", "label": "中文", "value": "zh", "toggleLocale": "zh" },
+                    { "type": "item", "label": "Español", "value": "es", "toggleLocale": "es" },
+                    { "type": "item", "label": "Português", "value": "pt", "toggleLocale": "pt" },
+                    { "type": "item", "label": "Français", "value": "fr", "toggleLocale": "fr" },
+                    { "type": "item", "label": "Deutsch", "value": "de", "toggleLocale": "de" }
+                  ]
+                },
+                {
+                  "blockType": "link",
+                  "href": "/admin",
+                  "variant": "plain",
+                  "class": "button button--variant_outline button--size_sm",
+                  "children": [{ "blockType": "text", "content": "Admin" }]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "blockType": "stack",
+          "direction": "vertical",
+          "align": "center",
+          "gap": "4",
+          "children": [
+            {
+              "blockType": "badge",
+              "variant": "subtle",
+              "text": "Nossa história",
+              "colorPalette": "purple",
+              "size": "lg"
+            },
+            {
+              "blockType": "heading",
+              "text": "Construindo o sistema de design que sempre quisemos",
+              "size": "6xl",
+              "as": "h1",
+              "style": "text-align:center;max-width:44rem"
+            },
+            {
+              "blockType": "text",
+              "size": "lg",
+              "content": "Artefact UI é uma biblioteca de componentes e um construtor de páginas orientado por CMS, criado por uma pequena equipe que se cansou de reconstruir as mesmas bases do zero em cada projeto.",
+              "style": "text-align:center;max-width:38rem"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "blockType": "grid",
+      "gap": "8",
+      "padding": "2.5rem 0",
+      "style": "border-top: 1px solid var(--colors-border); border-bottom: 1px solid var(--colors-border)",
+      "children": [
+        {
+          "blockType": "stack",
+          "direction": "vertical",
+          "align": "center",
+          "gap": "2",
+          "children": [
+            {
+              "blockType": "heading",
+              "text": "120+",
+              "size": "6xl",
+              "as": "p",
+              "style": "text-align:center"
+            },
+            {
+              "blockType": "badge",
+              "text": "Componentes publicados",
+              "variant": "subtle",
+              "colorPalette": "purple",
+              "size": "md"
+            }
+          ]
+        },
+        {
+          "blockType": "stack",
+          "direction": "vertical",
+          "align": "center",
+          "gap": "2",
+          "children": [
+            {
+              "blockType": "heading",
+              "text": "6",
+              "size": "6xl",
+              "as": "p",
+              "style": "text-align:center"
+            },
+            {
+              "blockType": "badge",
+              "text": "Idiomas suportados",
+              "variant": "subtle",
+              "colorPalette": "cyan",
+              "size": "md"
+            }
+          ]
+        },
+        {
+          "blockType": "stack",
+          "direction": "vertical",
+          "align": "center",
+          "gap": "2",
+          "children": [
+            {
+              "blockType": "heading",
+              "text": "2021",
+              "size": "6xl",
+              "as": "p",
+              "style": "text-align:center"
+            },
+            {
+              "blockType": "badge",
+              "text": "Fundado",
+              "variant": "subtle",
+              "colorPalette": "green",
+              "size": "md"
+            }
+          ]
+        }
+      ],
+      "columns": "{\"base\": 1, \"md\": 3}"
+    },
+    {
+      "blockType": "stack",
+      "direction": "vertical",
+      "gap": "4",
+      "backgroundColor": "#f8fafc",
+      "padding": "2.5rem 2rem",
+      "borderRadius": "1.25rem",
+      "children": [
+        {
+          "blockType": "badge",
+          "variant": "subtle",
+          "text": "Por que existimos",
+          "colorPalette": "purple",
+          "size": "sm"
+        },
+        {
+          "blockType": "heading",
+          "text": "Nossa missão",
+          "size": "3xl",
+          "as": "h2"
+        },
+        {
+          "blockType": "text",
+          "size": "lg",
+          "content": "Acreditamos que as equipes avançam mais rápido quando o design e a engenharia compartilham uma única fonte de verdade. O Artefact UI combina uma verdadeira biblioteca de componentes com um construtor de páginas que não engenheiros podem usar com segurança, para que o sistema de design permaneça o único lugar onde as mudanças acontecem, em vez de se dispersarem em substituições pontuais."
+        }
+      ]
+    },
+    {
+      "blockType": "stack",
+      "direction": "vertical",
+      "gap": "2",
+      "children": [
+        {
+          "blockType": "badge",
+          "variant": "subtle",
+          "text": "Princípios",
+          "colorPalette": "purple",
+          "size": "sm"
+        },
+        {
+          "blockType": "heading",
+          "text": "O que valorizamos",
+          "size": "3xl",
+          "as": "h2"
+        }
+      ]
+    },
+    {
+      "blockType": "grid",
+      "gap": "6",
+      "children": [
+        {
+          "blockType": "card",
+          "children": [
+            {
+              "blockType": "badge",
+              "text": "Acessível",
+              "variant": "subtle",
+              "colorPalette": "green"
+            }
+          ],
+          "title": "Acessível por padrão",
+          "description": "Suporte para teclado e leitores de tela vem incluído em cada componente",
+          "body": "Testamos com tecnologia assistiva real, não apenas auditorias automatizadas, para que a acessibilidade se mantenha em produção.",
+          "imagePosition": "top",
+          "variant": "elevated"
+        },
+        {
+          "blockType": "card",
+          "children": [
+            {
+              "blockType": "badge",
+              "text": "Componível",
+              "variant": "subtle",
+              "colorPalette": "purple"
+            }
+          ],
+          "title": "Componível por design",
+          "description": "Pequenas peças que se combinam, não uma grande configuração",
+          "body": "Cada componente é construído com o mesmo sistema de receitas, então personalizar um não significa brigar com os outros.",
+          "imagePosition": "top",
+          "variant": "elevated"
+        },
+        {
+          "blockType": "card",
+          "children": [
+            {
+              "blockType": "badge",
+              "text": "Transparente",
+              "variant": "subtle",
+              "colorPalette": "cyan"
+            }
+          ],
+          "title": "Abertos sobre concessões",
+          "description": "A documentação explica o porquê, não apenas a API",
+          "body": "Quando algo é uma concessão deliberada e não um bug, nós dizemos: na documentação, não apenas no changelog.",
+          "imagePosition": "top",
+          "variant": "elevated"
+        }
+      ],
+      "columns": "{\"base\": 1, \"md\": 3}"
+    },
+    {
+      "blockType": "stack",
+      "direction": "vertical",
+      "gap": "2",
+      "children": [
+        {
+          "blockType": "badge",
+          "variant": "subtle",
+          "text": "Quem está por trás",
+          "colorPalette": "purple",
+          "size": "sm"
+        },
+        {
+          "blockType": "heading",
+          "text": "A equipe",
+          "size": "3xl",
+          "as": "h2"
+        },
+        {
+          "blockType": "text",
+          "size": "lg",
+          "content": "Um pequeno grupo mantendo a biblioteca, a documentação e a integração com o CMS."
+        }
+      ]
+    },
+    {
+      "blockType": "grid",
+      "gap": "6",
+      "children": [
+        {
+          "blockType": "stack",
+          "direction": "vertical",
+          "align": "center",
+          "gap": "3",
+          "padding": "2rem 1.5rem",
+          "borderRadius": "1rem",
+          "borderWidth": "1px",
+          "borderStyle": "solid",
+          "borderColor": "default",
+          "textAlign": "center",
+          "children": [
+            {
+              "blockType": "avatar",
+              "name": "Yumin Chen",
+              "size": "2xl",
+              "variant": "solid"
+            },
+            {
+              "blockType": "heading",
+              "text": "Yumin Chen",
+              "size": "lg",
+              "as": "p"
+            },
+            {
+              "blockType": "text",
+              "size": "sm",
+              "content": "Fundador e Mantenedor",
+              "style": "color: var(--colors-fg-muted); font-weight: 600"
+            },
+            {
+              "blockType": "text",
+              "size": "sm",
+              "content": "Lidera a biblioteca de componentes e os tokens de design do Panda CSS.",
+              "style": "color: var(--colors-fg-muted)"
+            }
+          ]
+        },
+        {
+          "blockType": "stack",
+          "direction": "vertical",
+          "align": "center",
+          "gap": "3",
+          "padding": "2rem 1.5rem",
+          "borderRadius": "1rem",
+          "borderWidth": "1px",
+          "borderStyle": "solid",
+          "borderColor": "default",
+          "textAlign": "center",
+          "children": [
+            {
+              "blockType": "avatar",
+              "name": "Jordan Lee",
+              "size": "2xl",
+              "variant": "solid"
+            },
+            {
+              "blockType": "heading",
+              "text": "Jordan Lee",
+              "size": "lg",
+              "as": "p"
+            },
+            {
+              "blockType": "text",
+              "size": "sm",
+              "content": "Engenheiro de Sistemas de Design",
+              "style": "color: var(--colors-fg-muted); font-weight: 600"
+            },
+            {
+              "blockType": "text",
+              "size": "sm",
+              "content": "Responsável pelo construtor de páginas do CMS e pelo registro de blocos que o alimenta.",
+              "style": "color: var(--colors-fg-muted)"
+            }
+          ]
+        },
+        {
+          "blockType": "stack",
+          "direction": "vertical",
+          "align": "center",
+          "gap": "3",
+          "padding": "2rem 1.5rem",
+          "borderRadius": "1rem",
+          "borderWidth": "1px",
+          "borderStyle": "solid",
+          "borderColor": "default",
+          "textAlign": "center",
+          "children": [
+            {
+              "blockType": "avatar",
+              "name": "Priya Nair",
+              "size": "2xl",
+              "variant": "solid"
+            },
+            {
+              "blockType": "heading",
+              "text": "Priya Nair",
+              "size": "lg",
+              "as": "p"
+            },
+            {
+              "blockType": "text",
+              "size": "sm",
+              "content": "Documentação e Acessibilidade",
+              "style": "color: var(--colors-fg-muted); font-weight: 600"
+            },
+            {
+              "blockType": "text",
+              "size": "sm",
+              "content": "Mantém a documentação honesta e cada componente testado com leitores de tela.",
+              "style": "color: var(--colors-fg-muted)"
+            }
+          ]
+        }
+      ],
+      "columns": "{\"base\": 1, \"md\": 3}"
+    },
+    {
+      "blockType": "stack",
+      "direction": "vertical",
+      "align": "center",
+      "gap": "4",
+      "backgroundColor": "#f5f3ff",
+      "padding": "4rem 2rem",
+      "borderRadius": "1.25rem",
+      "children": [
+        {
+          "blockType": "heading",
+          "text": "Quer ver em ação?",
+          "size": "3xl",
+          "as": "h2",
+          "style": "text-align:center"
+        },
+        {
+          "blockType": "text",
+          "size": "lg",
+          "content": "Navegue pela documentação de componentes ou confira uma página de produto ao vivo construída com os mesmos blocos.",
+          "style": "text-align:center"
+        },
+        {
+          "blockType": "stack",
+          "direction": "horizontal",
+          "gap": "4",
+          "children": [
+            {
+              "blockType": "link",
+              "children": [
+                {
+                  "blockType": "text",
+                  "content": "Ler a documentação"
+                }
+              ],
+              "href": "/docs/pt",
+              "variant": "solid",
+              "class": "button button--variant_solid button--size_lg"
+            },
+            {
+              "blockType": "link",
+              "children": [
+                {
+                  "blockType": "text",
+                  "content": "Ver página de exemplo"
+                }
+              ],
+              "href": "/product-landing",
+              "variant": "outline",
+              "class": "button button--variant_outline button--size_lg"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

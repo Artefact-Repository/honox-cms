@@ -1,0 +1,495 @@
+{
+  "title": "关于 Artefact UI",
+  "content": [
+    {
+      "blockType": "stack",
+      "direction": "vertical",
+      "gap": "10",
+      "padding": "1rem 1.5rem 3rem",
+      "backgroundImage": "/media/hero-placeholder-dark.svg",
+      "backgroundImageLight": "/media/hero-placeholder-light.svg",
+      "backgroundFit": "cover",
+      "fullBleed": true,
+      "children": [
+        {
+          "blockType": "stack",
+          "direction": "horizontal",
+          "align": "center",
+          "justify": "between",
+          "gap": "4",
+          "style": "max-width:80rem;margin:0 auto;width:100%",
+          "children": [
+            {
+              "blockType": "anchor",
+              "href": "/",
+              "variant": "plain",
+              "style": "flex-shrink:0;font-weight:600",
+              "children": [
+                {
+                  "blockType": "text",
+                  "content": "Artefact UI",
+                  "size": "lg"
+                }
+              ]
+            },
+            {
+              "blockType": "stack",
+              "direction": "horizontal",
+              "align": "center",
+              "gap": "6",
+              "children": [
+                {
+                  "blockType": "link",
+                  "href": "/blog/zh",
+                  "variant": "plain",
+                  "children": [{ "blockType": "text", "content": "博客" }]
+                },
+                {
+                  "blockType": "link",
+                  "href": "/docs/zh",
+                  "variant": "plain",
+                  "children": [{ "blockType": "text", "content": "文档" }]
+                },
+                {
+                  "blockType": "link",
+                  "href": "/pages/zh/about",
+                  "variant": "plain",
+                  "children": [{ "blockType": "text", "content": "关于" }]
+                },
+                {
+                  "blockType": "dropdown",
+                  "triggerIcon": "<circle cx=\"12\" cy=\"12\" r=\"10\"></circle><line x1=\"2\" y1=\"12\" x2=\"22\" y2=\"12\"></line><path d=\"M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z\"></path>",
+                  "triggerAriaLabel": "语言",
+                  "triggerText": "中文",
+                  "placement": "bottom-end",
+                  "items": [
+                    { "type": "item", "label": "English", "value": "en", "toggleLocale": "en" },
+                    { "type": "item", "label": "中文", "value": "zh", "toggleLocale": "zh" },
+                    { "type": "item", "label": "Español", "value": "es", "toggleLocale": "es" },
+                    { "type": "item", "label": "Português", "value": "pt", "toggleLocale": "pt" },
+                    { "type": "item", "label": "Français", "value": "fr", "toggleLocale": "fr" },
+                    { "type": "item", "label": "Deutsch", "value": "de", "toggleLocale": "de" }
+                  ]
+                },
+                {
+                  "blockType": "link",
+                  "href": "/admin",
+                  "variant": "plain",
+                  "class": "button button--variant_outline button--size_sm",
+                  "children": [{ "blockType": "text", "content": "Admin" }]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "blockType": "stack",
+          "direction": "vertical",
+          "align": "center",
+          "gap": "4",
+          "children": [
+            {
+              "blockType": "badge",
+              "variant": "subtle",
+              "text": "我们的故事",
+              "colorPalette": "purple",
+              "size": "lg"
+            },
+            {
+              "blockType": "heading",
+              "text": "打造我们一直想要的设计系统",
+              "size": "6xl",
+              "as": "h1",
+              "style": "text-align:center;max-width:44rem"
+            },
+            {
+              "blockType": "text",
+              "size": "lg",
+              "content": "Artefact UI 是一个组件库和 CMS 驱动的页面构建器，由一个小团队打造，他们厌倦了在每个项目中从零开始重建相同的基础组件。",
+              "style": "text-align:center;max-width:38rem"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "blockType": "grid",
+      "gap": "8",
+      "padding": "2.5rem 0",
+      "style": "border-top: 1px solid var(--colors-border); border-bottom: 1px solid var(--colors-border)",
+      "children": [
+        {
+          "blockType": "stack",
+          "direction": "vertical",
+          "align": "center",
+          "gap": "2",
+          "children": [
+            {
+              "blockType": "heading",
+              "text": "120+",
+              "size": "6xl",
+              "as": "p",
+              "style": "text-align:center"
+            },
+            {
+              "blockType": "badge",
+              "text": "已发布组件",
+              "variant": "subtle",
+              "colorPalette": "purple",
+              "size": "md"
+            }
+          ]
+        },
+        {
+          "blockType": "stack",
+          "direction": "vertical",
+          "align": "center",
+          "gap": "2",
+          "children": [
+            {
+              "blockType": "heading",
+              "text": "6",
+              "size": "6xl",
+              "as": "p",
+              "style": "text-align:center"
+            },
+            {
+              "blockType": "badge",
+              "text": "支持的语言",
+              "variant": "subtle",
+              "colorPalette": "cyan",
+              "size": "md"
+            }
+          ]
+        },
+        {
+          "blockType": "stack",
+          "direction": "vertical",
+          "align": "center",
+          "gap": "2",
+          "children": [
+            {
+              "blockType": "heading",
+              "text": "2021",
+              "size": "6xl",
+              "as": "p",
+              "style": "text-align:center"
+            },
+            {
+              "blockType": "badge",
+              "text": "创立于",
+              "variant": "subtle",
+              "colorPalette": "green",
+              "size": "md"
+            }
+          ]
+        }
+      ],
+      "columns": "{\"base\": 1, \"md\": 3}"
+    },
+    {
+      "blockType": "stack",
+      "direction": "vertical",
+      "gap": "4",
+      "backgroundColor": "#f8fafc",
+      "padding": "2.5rem 2rem",
+      "borderRadius": "1.25rem",
+      "children": [
+        {
+          "blockType": "badge",
+          "variant": "subtle",
+          "text": "我们存在的理由",
+          "colorPalette": "purple",
+          "size": "sm"
+        },
+        {
+          "blockType": "heading",
+          "text": "我们的使命",
+          "size": "3xl",
+          "as": "h2"
+        },
+        {
+          "blockType": "text",
+          "size": "lg",
+          "content": "我们相信，当设计和工程共享同一个事实来源时，团队能更快前进。Artefact UI 将真正的组件库与非工程师也能安全使用的页面构建器配对——这样设计系统就始终是变更发生的唯一地方，而不会散落到各处的一次性覆盖中。"
+        }
+      ]
+    },
+    {
+      "blockType": "stack",
+      "direction": "vertical",
+      "gap": "2",
+      "children": [
+        {
+          "blockType": "badge",
+          "variant": "subtle",
+          "text": "原则",
+          "colorPalette": "purple",
+          "size": "sm"
+        },
+        {
+          "blockType": "heading",
+          "text": "我们的价值观",
+          "size": "3xl",
+          "as": "h2"
+        }
+      ]
+    },
+    {
+      "blockType": "grid",
+      "gap": "6",
+      "children": [
+        {
+          "blockType": "card",
+          "children": [
+            {
+              "blockType": "badge",
+              "text": "无障碍",
+              "variant": "subtle",
+              "colorPalette": "green"
+            }
+          ],
+          "title": "默认无障碍",
+          "description": "每个组件都自带键盘和屏幕阅读器支持",
+          "body": "我们用真实的辅助技术进行测试，而不仅仅是自动化审计，确保无障碍性能在生产环境中经得起考验。",
+          "imagePosition": "top",
+          "variant": "elevated"
+        },
+        {
+          "blockType": "card",
+          "children": [
+            {
+              "blockType": "badge",
+              "text": "可组合",
+              "variant": "subtle",
+              "colorPalette": "purple"
+            }
+          ],
+          "title": "设计即组合",
+          "description": "小而可组合的组件，而非一个大配置",
+          "body": "每个组件都基于相同的配方系统构建，因此自定义一个组件并不意味着与其他组件冲突。",
+          "imagePosition": "top",
+          "variant": "elevated"
+        },
+        {
+          "blockType": "card",
+          "children": [
+            {
+              "blockType": "badge",
+              "text": "透明",
+              "variant": "subtle",
+              "colorPalette": "cyan"
+            }
+          ],
+          "title": "公开权衡取舍",
+          "description": "文档解释为什么，而不仅仅是 API",
+          "body": "当某件事是有意为之的权衡而非 bug 时，我们会说明——在文档中，而不仅仅是变更日志里。",
+          "imagePosition": "top",
+          "variant": "elevated"
+        }
+      ],
+      "columns": "{\"base\": 1, \"md\": 3}"
+    },
+    {
+      "blockType": "stack",
+      "direction": "vertical",
+      "gap": "2",
+      "children": [
+        {
+          "blockType": "badge",
+          "variant": "subtle",
+          "text": "幕后团队",
+          "colorPalette": "purple",
+          "size": "sm"
+        },
+        {
+          "blockType": "heading",
+          "text": "团队",
+          "size": "3xl",
+          "as": "h2"
+        },
+        {
+          "blockType": "text",
+          "size": "lg",
+          "content": "一个维护组件库、文档和 CMS 集成的小团队。"
+        }
+      ]
+    },
+    {
+      "blockType": "grid",
+      "gap": "6",
+      "children": [
+        {
+          "blockType": "stack",
+          "direction": "vertical",
+          "align": "center",
+          "gap": "3",
+          "padding": "2rem 1.5rem",
+          "borderRadius": "1rem",
+          "borderWidth": "1px",
+          "borderStyle": "solid",
+          "borderColor": "default",
+          "textAlign": "center",
+          "children": [
+            {
+              "blockType": "avatar",
+              "name": "Yumin Chen",
+              "size": "2xl",
+              "variant": "solid"
+            },
+            {
+              "blockType": "heading",
+              "text": "Yumin Chen",
+              "size": "lg",
+              "as": "p"
+            },
+            {
+              "blockType": "text",
+              "size": "sm",
+              "content": "创始人兼维护者",
+              "style": "color: var(--colors-fg-muted); font-weight: 600"
+            },
+            {
+              "blockType": "text",
+              "size": "sm",
+              "content": "领导组件库和 Panda CSS 设计令牌。",
+              "style": "color: var(--colors-fg-muted)"
+            }
+          ]
+        },
+        {
+          "blockType": "stack",
+          "direction": "vertical",
+          "align": "center",
+          "gap": "3",
+          "padding": "2rem 1.5rem",
+          "borderRadius": "1rem",
+          "borderWidth": "1px",
+          "borderStyle": "solid",
+          "borderColor": "default",
+          "textAlign": "center",
+          "children": [
+            {
+              "blockType": "avatar",
+              "name": "Jordan Lee",
+              "size": "2xl",
+              "variant": "solid"
+            },
+            {
+              "blockType": "heading",
+              "text": "Jordan Lee",
+              "size": "lg",
+              "as": "p"
+            },
+            {
+              "blockType": "text",
+              "size": "sm",
+              "content": "设计系统工程师",
+              "style": "color: var(--colors-fg-muted); font-weight: 600"
+            },
+            {
+              "blockType": "text",
+              "size": "sm",
+              "content": "负责 CMS 页面构建器和为其提供支持的区块注册表。",
+              "style": "color: var(--colors-fg-muted)"
+            }
+          ]
+        },
+        {
+          "blockType": "stack",
+          "direction": "vertical",
+          "align": "center",
+          "gap": "3",
+          "padding": "2rem 1.5rem",
+          "borderRadius": "1rem",
+          "borderWidth": "1px",
+          "borderStyle": "solid",
+          "borderColor": "default",
+          "textAlign": "center",
+          "children": [
+            {
+              "blockType": "avatar",
+              "name": "Priya Nair",
+              "size": "2xl",
+              "variant": "solid"
+            },
+            {
+              "blockType": "heading",
+              "text": "Priya Nair",
+              "size": "lg",
+              "as": "p"
+            },
+            {
+              "blockType": "text",
+              "size": "sm",
+              "content": "文档与无障碍",
+              "style": "color: var(--colors-fg-muted); font-weight: 600"
+            },
+            {
+              "blockType": "text",
+              "size": "sm",
+              "content": "保持文档诚实，确保每个组件都经过屏幕阅读器测试。",
+              "style": "color: var(--colors-fg-muted)"
+            }
+          ]
+        }
+      ],
+      "columns": "{\"base\": 1, \"md\": 3}"
+    },
+    {
+      "blockType": "stack",
+      "direction": "vertical",
+      "align": "center",
+      "gap": "4",
+      "backgroundColor": "#f5f3ff",
+      "padding": "4rem 2rem",
+      "borderRadius": "1.25rem",
+      "children": [
+        {
+          "blockType": "heading",
+          "text": "想看看实际效果？",
+          "size": "3xl",
+          "as": "h2",
+          "style": "text-align:center"
+        },
+        {
+          "blockType": "text",
+          "size": "lg",
+          "content": "浏览组件文档或查看使用相同区块构建的在线产品页面。",
+          "style": "text-align:center"
+        },
+        {
+          "blockType": "stack",
+          "direction": "horizontal",
+          "gap": "4",
+          "children": [
+            {
+              "blockType": "link",
+              "children": [
+                {
+                  "blockType": "text",
+                  "content": "阅读文档"
+                }
+              ],
+              "href": "/docs/zh",
+              "variant": "solid",
+              "class": "button button--variant_solid button--size_lg"
+            },
+            {
+              "blockType": "link",
+              "children": [
+                {
+                  "blockType": "text",
+                  "content": "查看示例页面"
+                }
+              ],
+              "href": "/product-landing",
+              "variant": "outline",
+              "class": "button button--variant_outline button--size_lg"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
