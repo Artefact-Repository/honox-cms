@@ -211,6 +211,35 @@ export function FieldRoot(props: FieldProps) {
 
 	const { class: restClass, ...otherRestProps } = restProps;
 
+	const INPUT_ATTRIBUTES = new Set([
+		"name",
+		"placeholder",
+		"autocomplete",
+		"autofocus",
+		"max",
+		"min",
+		"step",
+		"pattern",
+		"multiple",
+		"accept",
+		"capture",
+		"dirname",
+		"form",
+		"maxlength",
+		"rows",
+		"cols",
+		"wrap",
+	]);
+
+	const divProps: Record<string, unknown> = {};
+	if (!isChildrenEmpty) {
+		for (const key of Object.keys(otherRestProps as Record<string, unknown>)) {
+			if (!INPUT_ATTRIBUTES.has(key)) {
+				divProps[key] = (otherRestProps as Record<string, unknown>)[key];
+			}
+		}
+	}
+
 	return (
 		<FieldContext.Provider value={contextValue}>
 			<div
@@ -219,9 +248,7 @@ export function FieldRoot(props: FieldProps) {
 				data-invalid={isInvalid ? "" : undefined}
 				data-readonly={readOnly ? "" : undefined}
 				data-required={required ? "" : undefined}
-				{...(!isChildrenEmpty
-					? (otherRestProps as Record<string, unknown>)
-					: {})}
+				{...(!isChildrenEmpty ? divProps : {})}
 			>
 				{label && <FieldLabel for={id}>{label}</FieldLabel>}
 				{!isChildrenEmpty ? (
