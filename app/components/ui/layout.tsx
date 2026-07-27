@@ -1,7 +1,13 @@
 import { cx } from "design-system/css";
 import { layout } from "design-system/recipes";
-import type { JSX } from "hono/jsx";
-import { createContext, Fragment, useContext } from "hono/jsx";
+import type { JSX, PropsWithChildren } from "hono/jsx";
+import {
+	cloneElement,
+	createContext,
+	type ElementType,
+	Fragment,
+	useContext,
+} from "hono/jsx";
 import { ChevronDownIcon } from "../../icons/chevron-down";
 
 type LayoutStyles = ReturnType<typeof layout>;
@@ -14,12 +20,24 @@ export const LayoutContext = createContext<LayoutContextValue | null>(null);
 
 export const useLayoutContext = () => useContext(LayoutContext);
 
-export type HeaderProps = JSX.IntrinsicElements["header"] & {
-	sticky?: boolean;
-};
+export interface HeaderProps
+	extends PropsWithChildren<{
+		class?: string;
+		as?: ElementType;
+		asChild?: boolean;
+		sticky?: boolean;
+		[key: string]: unknown;
+	}> {}
 
 export function Header(props: HeaderProps) {
-	const { children, class: classProp, sticky, ...rest } = props;
+	const {
+		as: Component = "header",
+		asChild,
+		children,
+		class: classProp,
+		sticky,
+		...rest
+	} = props;
 	const context = useLayoutContext();
 
 	let headerClass: string;
@@ -29,21 +47,38 @@ export function Header(props: HeaderProps) {
 		headerClass = context?.classes.header ?? layout({}).header;
 	}
 
+	const className = cx(headerClass, classProp);
+
+	if (asChild && typeof children === "object" && children !== null) {
+		const child = children as JSX.Element;
+		return cloneElement(child, {
+			...rest,
+			class: cx(className, child.props?.class),
+		});
+	}
+
 	return (
-		<header class={cx(headerClass, classProp)} {...rest}>
+		<Component class={className} {...rest}>
 			{children}
-		</header>
+		</Component>
 	);
 }
 
-export type SiderProps = JSX.IntrinsicElements["aside"] & {
-	width?: "sm" | "md" | "lg";
-	hideBelow?: "sm" | "md" | "lg";
-	sticky?: boolean;
-};
+export interface SiderProps
+	extends PropsWithChildren<{
+		class?: string;
+		as?: ElementType;
+		asChild?: boolean;
+		width?: "sm" | "md" | "lg";
+		hideBelow?: "sm" | "md" | "lg";
+		sticky?: boolean;
+		[key: string]: unknown;
+	}> {}
 
 export function Sider(props: SiderProps) {
 	const {
+		as: Component = "aside",
+		asChild,
 		children,
 		class: classProp,
 		width,
@@ -64,14 +99,30 @@ export function Sider(props: SiderProps) {
 		siderClass = context?.classes.sider ?? layout({}).sider;
 	}
 
+	const className = cx(siderClass, classProp);
+
+	if (asChild && typeof children === "object" && children !== null) {
+		const child = children as JSX.Element;
+		return cloneElement(child, {
+			...rest,
+			class: cx(className, child.props?.class),
+		});
+	}
+
 	return (
-		<aside class={cx(siderClass, classProp)} {...rest}>
+		<Component class={className} {...rest}>
 			{children}
-		</aside>
+		</Component>
 	);
 }
 
-export type BodyProps = JSX.IntrinsicElements["div"];
+export interface BodyProps
+	extends PropsWithChildren<{
+		class?: string;
+		as?: ElementType;
+		asChild?: boolean;
+		[key: string]: unknown;
+	}> {}
 
 /** Groups `<Layout.Sider>` + `<Layout.Content>` into the row Panda's `body`
  * slot lays out (it's `display: flex` unconditionally, no variant needed).
@@ -83,97 +134,162 @@ export type BodyProps = JSX.IntrinsicElements["div"];
  * wrapping sider+content in its own `body` div; `<Layout.Body>` gives
  * compound-mode consumers the same structure explicitly. */
 export function Body(props: BodyProps) {
-	const { children, class: classProp, ...rest } = props;
+	const {
+		as: Component = "div",
+		asChild,
+		children,
+		class: classProp,
+		...rest
+	} = props;
 	const context = useLayoutContext();
 	const bodyClass = context?.classes.body ?? layout({}).body;
 
+	const className = cx(bodyClass, classProp);
+
+	if (asChild && typeof children === "object" && children !== null) {
+		const child = children as JSX.Element;
+		return cloneElement(child, {
+			...rest,
+			class: cx(className, child.props?.class),
+		});
+	}
+
 	return (
-		<div class={cx(bodyClass, classProp)} {...rest}>
+		<Component class={className} {...rest}>
 			{children}
-		</div>
+		</Component>
 	);
 }
 
-export type ContentProps = JSX.IntrinsicElements["main"];
+export interface ContentProps
+	extends PropsWithChildren<{
+		class?: string;
+		as?: ElementType;
+		asChild?: boolean;
+		[key: string]: unknown;
+	}> {}
 
 export function Content(props: ContentProps) {
-	const { children, class: classProp, ...rest } = props;
+	const {
+		as: Component = "main",
+		asChild,
+		children,
+		class: classProp,
+		...rest
+	} = props;
 	const context = useLayoutContext();
 	const contentClass = context?.classes.content ?? layout({}).content;
 
+	const className = cx(contentClass, classProp);
+
+	if (asChild && typeof children === "object" && children !== null) {
+		const child = children as JSX.Element;
+		return cloneElement(child, {
+			...rest,
+			class: cx(className, child.props?.class),
+		});
+	}
+
 	return (
-		<main class={cx(contentClass, classProp)} {...rest}>
+		<Component class={className} {...rest}>
 			{children}
-		</main>
+		</Component>
 	);
 }
 
-export type FooterProps = JSX.IntrinsicElements["footer"];
+export interface FooterProps
+	extends PropsWithChildren<{
+		class?: string;
+		as?: ElementType;
+		asChild?: boolean;
+		[key: string]: unknown;
+	}> {}
 
 export function Footer(props: FooterProps) {
-	const { children, class: classProp, ...rest } = props;
+	const {
+		as: Component = "footer",
+		asChild,
+		children,
+		class: classProp,
+		...rest
+	} = props;
 	const context = useLayoutContext();
 	const footerClass = context?.classes.footer ?? layout({}).footer;
 
+	const className = cx(footerClass, classProp);
+
+	if (asChild && typeof children === "object" && children !== null) {
+		const child = children as JSX.Element;
+		return cloneElement(child, {
+			...rest,
+			class: cx(className, child.props?.class),
+		});
+	}
+
 	return (
-		<footer class={cx(footerClass, classProp)} {...rest}>
+		<Component class={className} {...rest}>
 			{children}
-		</footer>
+		</Component>
 	);
 }
 
-export type LayoutProps = JSX.IntrinsicElements["div"] & {
-	/** Rendered inside a semantic `<header>` above the body. */
-	header?: string | JSX.Element;
-	/** Rendered inside a semantic `<aside>` rail. Its presence switches
-	 * the body to a row of sider + content. */
-	sider?: string | JSX.Element;
-	/** Rendered inside a semantic `<main>`. `children` are appended after
-	 * it, so either (or both) can carry the page content. */
-	content?: string | JSX.Element;
-	/** Rendered inside a semantic `<footer>` below the body. */
-	footer?: string | JSX.Element;
-	/** Fill the viewport height — for the outermost page shell. */
-	fullHeight?: boolean;
-	/** Pin the header to the top of the page scroll. */
-	stickyHeader?: boolean;
-	/** Pin the sider below a sticky header; it scrolls internally. */
-	stickySider?: boolean;
-	/** Sider rail width: sm (14rem), md (16rem, default), lg (18rem). */
-	siderWidth?: "sm" | "md" | "lg";
-	/** Hide the sider under this breakpoint. Pair with an in-flow
-	 * disclosure so small screens keep a nav — set `mobileNav` below to
-	 * use the built-in one instead of hand-rolling it per page. */
-	siderHideBelow?: "sm" | "md" | "lg";
-	/** Render a built-in `<details>` "Menu" disclosure containing `sider`.
-	 * Requires `sider`. Nested inside the same `<header>` as `header`
-	 * (rather than rendered as its own element) so it inherits
-	 * `stickyHeader` instead of scrolling away separately — pair with
-	 * `siderHideBelow` to also collapse it at the right breakpoint;
-	 * without that it just always shows. */
-	mobileNav?: boolean;
-	/** Label next to the disclosure's chevron. @default "Menu" */
-	mobileNavLabel?: string | JSX.Element;
-	/** Extra block rendered above `sider`'s content inside the disclosure
-	 * panel, set off by a divider — e.g. header links/actions that get
-	 * collapsed out of the desktop header below the same breakpoint. */
-	mobileNavActions?: string | JSX.Element;
-	/** Extra class for the `<details>` element. */
-	mobileNavClass?: string;
-	/** Force layout direction to horizontal/hasSider */
-	hasSider?: boolean;
-	/** Extra class for the `<header>` part. */
-	headerClass?: string;
-	/** Extra class for the `<aside>` part. */
-	siderClass?: string;
-	/** Extra class for the `<main>` part. */
-	contentClass?: string;
-	/** Extra class for the `<footer>` part. */
-	footerClass?: string;
-	/** Extra class for the row wrapper around sider + content (only
-	 * rendered when `sider` is set). */
-	bodyClass?: string;
-};
+export interface LayoutProps
+	extends PropsWithChildren<{
+		class?: string;
+		as?: ElementType;
+		asChild?: boolean;
+		/** Rendered inside a semantic `<header>` above the body. */
+		header?: string | JSX.Element;
+		/** Rendered inside a semantic `<aside>` rail. Its presence switches
+		 * the body to a row of sider + content. */
+		sider?: string | JSX.Element;
+		/** Rendered inside a semantic `<main>`. `children` are appended after
+		 * it, so either (or both) can carry the page content. */
+		content?: string | JSX.Element;
+		/** Rendered inside a semantic `<footer>` below the body. */
+		footer?: string | JSX.Element;
+		/** Fill the viewport height — for the outermost page shell. */
+		fullHeight?: boolean;
+		/** Pin the header to the top of the page scroll. */
+		stickyHeader?: boolean;
+		/** Pin the sider below a sticky header; it scrolls internally. */
+		stickySider?: boolean;
+		/** Sider rail width: sm (14rem), md (16rem, default), lg (18rem). */
+		siderWidth?: "sm" | "md" | "lg";
+		/** Hide the sider under this breakpoint. Pair with an in-flow
+		 * disclosure so small screens keep a nav — set `mobileNav` below to
+		 * use the built-in one instead of hand-rolling it per page. */
+		siderHideBelow?: "sm" | "md" | "lg";
+		/** Render a built-in `<details>` "Menu" disclosure containing `sider`.
+		 * Requires `sider`. Nested inside the same `<header>` as `header`
+		 * (rather than rendered as its own element) so it inherits
+		 * `stickyHeader` instead of scrolling away separately — pair with
+		 * `siderHideBelow` to also collapse it at the right breakpoint;
+		 * without that it just always shows. */
+		mobileNav?: boolean;
+		/** Label next to the disclosure's chevron. @default "Menu" */
+		mobileNavLabel?: string | JSX.Element;
+		/** Extra block rendered above `sider`'s content inside the disclosure
+		 * panel, set off by a divider — e.g. header links/actions that get
+		 * collapsed out of the desktop header below the same breakpoint. */
+		mobileNavActions?: string | JSX.Element;
+		/** Extra class for the `<details>` element. */
+		mobileNavClass?: string;
+		/** Force layout direction to horizontal/hasSider */
+		hasSider?: boolean;
+		/** Extra class for the `<header>` part. */
+		headerClass?: string;
+		/** Extra class for the `<aside>` part. */
+		siderClass?: string;
+		/** Extra class for the `<main>` part. */
+		contentClass?: string;
+		/** Extra class for the `<footer>` part. */
+		footerClass?: string;
+		/** Extra class for the row wrapper around sider + content (only
+		 * rendered when `sider` is set). */
+		bodyClass?: string;
+		[key: string]: unknown;
+	}> {}
 
 // Detects a bare `<Layout.Sider>` among compound-mode children so root can
 // switch to `flexDirection: row` on its own. Only correct when Sider (and
@@ -189,32 +305,13 @@ function hasSiderChild(children: unknown): boolean {
 	for (const child of arr) {
 		if (child && typeof child === "object") {
 			const node = child as Record<string, unknown>;
-			if (
-				node.tag === Sider ||
-				(typeof node.tag === "function" && node.tag.name === "Sider")
-			) {
+			if (node.tag === Sider) {
 				return true;
-			}
-			// Do not look inside Body, as that represents a compound layout body
-			if (
-				node.tag === Body ||
-				(typeof node.tag === "function" && node.tag.name === "Body")
-			) {
-				continue;
 			}
 			if (node.tag === Fragment && node.children) {
 				if (hasSiderChild(node.children)) {
 					return true;
 				}
-			}
-			if (node.props && typeof node.props === "object") {
-				const props = node.props as Record<string, unknown>;
-				if (props.children && hasSiderChild(props.children)) {
-					return true;
-				}
-			}
-			if (node.children && hasSiderChild(node.children)) {
-				return true;
 			}
 		}
 	}
@@ -223,6 +320,8 @@ function hasSiderChild(children: unknown): boolean {
 
 export function Layout(props: LayoutProps) {
 	const {
+		as: Component = "div",
+		asChild,
 		children,
 		class: classProp,
 		header,
@@ -265,6 +364,8 @@ export function Layout(props: LayoutProps) {
 
 	const contextValue = { classes };
 
+	const className = cx(classes.root, classProp);
+
 	if (isShorthand) {
 		const main = (
 			<main class={cx(classes.content, contentClass)}>
@@ -275,61 +376,83 @@ export function Layout(props: LayoutProps) {
 
 		const showMobileNav = mobileNav && sider !== undefined;
 
-		return (
+		const shorthandContent = (
 			<LayoutContext.Provider value={contextValue}>
-				<div class={cx(classes.root, classProp)} {...rest}>
-					{(header !== undefined || showMobileNav) && (
-						<header class={cx(classes.header, headerClass)}>
-							{header}
-							{showMobileNav && (
-								<details class={cx(classes.mobileNav, mobileNavClass)}>
-									<summary class={classes.mobileNavToggle}>
-										{mobileNavLabel ?? "Menu"}
-										<ChevronDownIcon width="16" height="16" />
-									</summary>
-									<script
-										dangerouslySetInnerHTML={{
-											__html: `(function(){var d=document.currentScript.parentElement;if(!d||d.tagName!=='DETAILS')return;document.addEventListener('click',function(e){if(d.hasAttribute('open')&&!d.contains(e.target)){d.removeAttribute('open');}});document.addEventListener('keydown',function(e){if(e.key==='Escape'&&d.hasAttribute('open')){d.removeAttribute('open');var s=d.querySelector('summary');if(s)s.focus();}});})();`,
-										}}
-									/>
-									<div class={classes.mobileNavPanel}>
-										{mobileNavActions !== undefined && (
-											<div class={classes.mobileNavActions}>
-												{mobileNavActions}
-											</div>
-										)}
-										{sider}
-									</div>
-								</details>
-							)}
-						</header>
-					)}
-					{sider !== undefined ? (
-						<div class={cx(classes.body, bodyClass)}>
-							<aside class={cx(classes.sider, siderClass)}>{sider}</aside>
-							{main}
-						</div>
-					) : (
-						main
-					)}
-					{footer !== undefined && (
-						<footer class={cx(classes.footer, footerClass)}>{footer}</footer>
-					)}
-				</div>
+				{(header !== undefined || showMobileNav) && (
+					<header class={cx(classes.header, headerClass)}>
+						{header}
+						{showMobileNav && (
+							<details class={cx(classes.mobileNav, mobileNavClass)}>
+								<summary class={classes.mobileNavToggle}>
+									{mobileNavLabel ?? "Menu"}
+									<ChevronDownIcon width="16" height="16" />
+								</summary>
+								<div class={classes.mobileNavPanel}>
+									{mobileNavActions !== undefined && (
+										<div class={classes.mobileNavActions}>
+											{mobileNavActions}
+										</div>
+									)}
+									{sider}
+								</div>
+							</details>
+						)}
+					</header>
+				)}
+				{sider !== undefined ? (
+					<div class={cx(classes.body, bodyClass)}>
+						<aside class={cx(classes.sider, siderClass)}>{sider}</aside>
+						{main}
+					</div>
+				) : (
+					main
+				)}
+				{footer !== undefined && (
+					<footer class={cx(classes.footer, footerClass)}>{footer}</footer>
+				)}
 			</LayoutContext.Provider>
+		);
+
+		if (asChild && typeof children === "object" && children !== null) {
+			const child = children as JSX.Element;
+			return cloneElement(child, {
+				...rest,
+				class: cx(className, child.props?.class),
+				children: shorthandContent,
+			});
+		}
+
+		return (
+			<Component class={className} {...rest}>
+				{shorthandContent}
+			</Component>
 		);
 	}
 
-	return (
+	const compoundContent = (
 		<LayoutContext.Provider value={contextValue}>
-			<div
-				class={cx(classes.root, classProp)}
-				data-has-sider={mergedHasSider || undefined}
-				{...rest}
-			>
-				{children}
-			</div>
+			{children}
 		</LayoutContext.Provider>
+	);
+
+	if (asChild && typeof children === "object" && children !== null) {
+		const child = children as JSX.Element;
+		return cloneElement(child, {
+			...rest,
+			class: cx(className, child.props?.class),
+			"data-has-sider": mergedHasSider || undefined,
+			children: compoundContent,
+		});
+	}
+
+	return (
+		<Component
+			class={className}
+			data-has-sider={mergedHasSider || undefined}
+			{...rest}
+		>
+			{compoundContent}
+		</Component>
 	);
 }
 

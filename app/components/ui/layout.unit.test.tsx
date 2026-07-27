@@ -150,6 +150,42 @@ describe("Layout Component", () => {
 		expect(html.indexOf("layout__body")).toBeLessThan(html.indexOf("<footer"));
 	});
 
+	it("should support custom rendering via 'as' prop on Layout and its subcomponents", () => {
+		const html = (
+			<Layout as="section">
+				<Layout.Header as="div">Header</Layout.Header>
+				<Layout.Sider as="nav">Sider</Layout.Sider>
+				<Layout.Content as="article">Content</Layout.Content>
+				<Layout.Footer as="div">Footer</Layout.Footer>
+			</Layout>
+		).toString();
+
+		expect(html).toContain("<section");
+		expect(html).toContain("</section>");
+		expect(html).toContain("<div");
+		expect(html).toContain("<nav");
+		expect(html).toContain("<article");
+		expect(html).not.toContain("<aside");
+		expect(html).not.toContain("<main");
+	});
+
+	it("should support 'asChild' prop on Layout and subcomponents for style delegation", () => {
+		const html = (
+			<Layout asChild>
+				<div id="root-delegated">
+					<Layout.Header asChild>
+						<span id="header-delegated">Header</span>
+					</Layout.Header>
+				</div>
+			</Layout>
+		).toString();
+
+		expect(html).toContain('id="root-delegated"');
+		expect(html).toContain('id="header-delegated"');
+		expect(html).toContain("layout__root");
+		expect(html).toContain("layout__header");
+	});
+
 	describe("mobileNav", () => {
 		it("should not render without both sider and siderHideBelow", () => {
 			const withoutSider = (
