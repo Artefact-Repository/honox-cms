@@ -1,11 +1,11 @@
 import { ssgParams } from "hono/ssg";
 import { createRoute } from "honox/factory";
-import { loadDocsSearchIndex } from "../../../../lib/docs";
 import { ALL_LOCALES, isLocale } from "../../../../lib/i18n";
+import { loadPosts } from "../../../../lib/posts";
 import type { SearchIndexDocument } from "../../../../utils/search";
 
-// GET /api/docs/:lang/search.json — locale-scoped doc search index for the
-// Search component in the docs header.
+// GET /api/posts/:lang/search.json — locale-scoped post search index for the
+// Search component on blog pages.
 //
 // A dynamic segment can't be combined with a literal prefix/suffix in
 // honox's file router (see app/routes/api/posts/[slug].json.ts), so the
@@ -13,20 +13,20 @@ import type { SearchIndexDocument } from "../../../../utils/search";
 // filename.
 export default createRoute(
 	ssgParams(async () => {
-		return ALL_LOCALES.filter((locale) => locale !== "en").map((lang) => ({
-			lang,
+		return ALL_LOCALES.filter((locale) => locale !== "en").map((locale) => ({
+			locale,
 		}));
 	}),
 	async (c) => {
-		const lang = c.req.param("lang");
-		if (!isLocale(lang)) {
+		const locale = c.req.param("locale");
+		if (!isLocale(locale)) {
 			return c.notFound();
 		}
-		const entries = await loadDocsSearchIndex(lang);
+		const { searchEntries } = await loadPosts(locale);
 
 		const document: SearchIndexDocument = {
 			generated: new Date().toISOString(),
-			entries,
+			entries: searchEntries,
 		};
 
 		return c.json(document);
