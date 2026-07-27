@@ -3,7 +3,11 @@ import { Anchor } from "./anchor";
 
 describe("Anchor component", () => {
 	it("renders an anchor with the default (underline / blue) recipe classes", () => {
-		const html = (<Anchor href="/home">Home</Anchor>).toString();
+		const html = (
+			<Anchor href="/home" colorPalette="blue">
+				Home
+			</Anchor>
+		).toString();
 		expect(html).toContain("<a");
 		expect(html).toContain("anchor--variant_underline");
 		expect(html).toContain("color-palette_blue");
