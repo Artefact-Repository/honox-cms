@@ -67,10 +67,10 @@
           "children": [
             {
               "blockType": "text",
-              "content": "Sveltia CMS"
+              "content": "Playground"
             }
           ],
-          "href": "/admin",
+          "href": "/playground",
           "variant": "plain"
         }
       ]
