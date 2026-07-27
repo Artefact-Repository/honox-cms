@@ -1,332 +1,415 @@
-import { css } from "design-system/css";
-import { button, code } from "design-system/recipes";
-import { useRef, useState } from "hono/jsx";
-import type { ComponentBlock } from "../components/block-types";
-import { PageRenderer } from "../components/page-renderer";
-import { InteractiveSplitter } from "../components/ui/splitter-primitive";
+import { css, cx } from "design-system/css";
+import { button } from "design-system/recipes";
+import { useEffect, useState } from "hono/jsx";
 
-export interface PlaygroundPage {
+interface PageInfo {
 	slug: string;
-	title: string;
 	json: string;
 }
 
-export interface PlaygroundIslandProps {
-	pages: PlaygroundPage[];
-	defaultSlug?: string;
+interface PlaygroundProps {
+	pages: PageInfo[];
 }
 
-type Viewport = "desktop" | "tablet" | "mobile";
+export default function PlaygroundIsland({ pages }: PlaygroundProps) {
+	const [selectedSlug, setSelectedSlug] = useState(
+		pages.length > 0 ? pages[0].slug : "",
+	);
+	const [jsonString, setJsonString] = useState("");
+	const [validationError, setValidationError] = useState<string | null>(null);
+	const [deviceWidth, setDeviceWidth] = useState<"100%" | "768px" | "375px">(
+		"100%",
+	);
+	const [iframeReady, setIframeReady] = useState(false);
+	const [isSynchronized, setIsSynchronized] = useState(false);
 
-const VIEWPORTS: { id: Viewport; label: string; width: string }[] = [
-	{ id: "desktop", label: "Desktop", width: "100%" },
-	{ id: "tablet", label: "Tablet", width: "48rem" },
-	{ id: "mobile", label: "Mobile", width: "24rem" },
-];
+	// Load page JSON when selectedSlug changes
+	useEffect(() => {
+		const page = pages.find((p) => p.slug === selectedSlug);
+		if (page) {
+			setJsonString(page.json);
+		}
+	}, [selectedSlug, pages]);
 
-const JSON_EDIT_DEBOUNCE_MS = 300;
+	// Send message to update preview
+	useEffect(() => {
+		if (!jsonString) return;
 
-const panelContentClass = css({
-	display: "flex",
-	flexDirection: "column",
-	gap: "2",
-	h: "full",
-	minH: "0",
-	minW: "0",
-	w: "full",
-});
-
-const panelHeaderClass = css({
-	display: "flex",
-	alignItems: "center",
-	justifyContent: "space-between",
-	gap: "2",
-	pb: "2",
-	borderBottomWidth: "1px",
-	borderStyle: "solid",
-	borderColor: "border.default",
-	flexShrink: "0",
-});
-
-const panelLabelClass = css({
-	fontSize: "sm",
-	fontWeight: "600",
-	fontFamily: "mono",
-	overflow: "hidden",
-	textOverflow: "ellipsis",
-	whiteSpace: "nowrap",
-});
-
-interface Draft {
-	title?: string;
-	content: ComponentBlock[];
-}
-
-export default function PlaygroundIsland({
-	pages,
-	defaultSlug,
-}: PlaygroundIslandProps) {
-	const initialSlug = defaultSlug ?? pages[0]?.slug ?? "";
-	const initialPage = pages.find((p) => p.slug === initialSlug) ?? pages[0];
-
-	const [selectedSlug, setSelectedSlug] = useState(initialSlug);
-	const [viewport, setViewport] = useState<Viewport>("desktop");
-	const [copied, setCopied] = useState(false);
-	const [jsonText, setJsonText] = useState(initialPage?.json ?? "");
-	const [parseError, setParseError] = useState<string | null>(null);
-	const [draft, setDraft] = useState<Draft | null>(null);
-
-	const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-	const selected = pages.find((page) => page.slug === selectedSlug) ?? pages[0];
-
-	if (!selected) {
-		return <p>No CMS pages found under content/pages.</p>;
-	}
-
-	// Re-renders the edited draft entirely client-side via the same
-	// PageRenderer/block-registry the real /pages/:slug route uses server-side
-	// — this app deploys as a static export (GitHub Pages, see
-	// .github/workflows/deploy.yml), so there is no server to round-trip an
-	// edited draft through at request time; the block tree has to be rendered
-	// in-browser instead. Safe to call directly (not through the SSR→hydration
-	// island boundary) because it runs inside this already-mounted island: no
-	// prop-serialization, so nested components' own hooks/state work normally.
-	const applyDraft = (text: string) => {
-		let parsed: unknown;
 		try {
-			parsed = JSON.parse(text);
-		} catch (err) {
-			setParseError(err instanceof Error ? err.message : "Invalid JSON");
-			return;
-		}
-		if (
-			typeof parsed !== "object" ||
-			parsed === null ||
-			!Array.isArray((parsed as { content?: unknown }).content)
-		) {
-			setParseError('Expected an object with a "content" array');
-			return;
-		}
-		setParseError(null);
-		setDraft(parsed as Draft);
-	};
+			const parsed = JSON.parse(jsonString);
+			setValidationError(null);
 
-	const handleSelectPage = (slug: string) => {
-		if (debounceRef.current) clearTimeout(debounceRef.current);
-		const page = pages.find((p) => p.slug === slug);
-		setSelectedSlug(slug);
-		setJsonText(page?.json ?? "");
-		setParseError(null);
-		setDraft(null);
-	};
+			// Persist to sessionStorage so reload/load recovers it
+			try {
+				sessionStorage.setItem(
+					"playground_preview_json",
+					JSON.stringify({ content: parsed.content || [] }),
+				);
+			} catch (e) {
+				console.error("sessionStorage save error", e);
+			}
 
-	const handleJsonInput = (value: string) => {
-		setJsonText(value);
-		if (debounceRef.current) clearTimeout(debounceRef.current);
-		debounceRef.current = setTimeout(() => {
-			applyDraft(value);
-		}, JSON_EDIT_DEBOUNCE_MS);
+			if (iframeReady) {
+				const iframe = document.getElementById(
+					"playground-iframe",
+				) as HTMLIFrameElement | null;
+				if (iframe?.contentWindow) {
+					iframe.contentWindow.postMessage(
+						{
+							type: "update-preview",
+							content: parsed.content || [],
+						},
+						"*",
+					);
+					setIsSynchronized(true);
+				}
+			} else {
+				setIsSynchronized(false);
+			}
+		} catch (e: any) {
+			setValidationError(e.message);
+			setIsSynchronized(false);
+		}
+	}, [jsonString, iframeReady]);
+
+	// Listen for preview-ready handshake from iframe
+	useEffect(() => {
+		const handleMessage = (event: MessageEvent) => {
+			if (event.data && event.data.type === "preview-ready") {
+				setIframeReady(true);
+			}
+		};
+
+		window.addEventListener("message", handleMessage);
+		return () => {
+			window.removeEventListener("message", handleMessage);
+		};
+	}, []);
+
+	const handleFormat = () => {
+		try {
+			const parsed = JSON.parse(jsonString);
+			setJsonString(JSON.stringify(parsed, null, 2));
+			setValidationError(null);
+		} catch (e: any) {
+			setValidationError(`Format failed: ${e.message}`);
+		}
 	};
 
 	const handleReset = () => {
-		if (debounceRef.current) clearTimeout(debounceRef.current);
-		setJsonText(selected.json);
-		setParseError(null);
-		setDraft(null);
-	};
-
-	const handleCopy = async () => {
-		try {
-			await navigator.clipboard.writeText(jsonText);
-			setCopied(true);
-			setTimeout(() => setCopied(false), 1500);
-		} catch {
-			// Clipboard API unavailable (e.g. insecure context) — ignore.
+		const original = pages.find((p) => p.slug === selectedSlug);
+		if (original) {
+			setJsonString(original.json);
+			setValidationError(null);
 		}
 	};
 
-	const activeWidth =
-		VIEWPORTS.find((v) => v.id === viewport)?.width ?? "100%";
-	const isEdited = jsonText !== selected.json;
-
-	const jsonPanelContent = (
-		<div class={panelContentClass}>
-			<div class={panelHeaderClass}>
-				<span class={panelLabelClass}>content/pages/{selected.slug}.json</span>
-				<div class={css({ display: "flex", alignItems: "center", gap: "2" })}>
-					{isEdited && (
-						<button
-							type="button"
-							class={button({ variant: "plain", size: "xs" })}
-							onClick={handleReset}
-						>
-							Reset
-						</button>
-					)}
-					<button
-						type="button"
-						class={button({ variant: "plain", size: "xs" })}
-						onClick={handleCopy}
-					>
-						{copied ? "Copied!" : "Copy JSON"}
-					</button>
-				</div>
-			</div>
-			<textarea
-				value={jsonText}
-				onInput={(e) =>
-					handleJsonInput((e.target as HTMLTextAreaElement).value)
-				}
-				spellcheck={false}
-				autocomplete="off"
-				class={css({
-					m: "0",
-					p: "0",
-					flex: "1",
-					minH: "0",
-					resize: "none",
-					borderWidth: "0",
-					outline: "none",
-					bg: "transparent",
-					color: "inherit",
-					fontFamily: "mono",
-					fontSize: "xs",
-					lineHeight: "1.6",
-					overflow: "auto",
-				})}
-			/>
-			{parseError && (
-				<p
-					class={css({
-						color: { base: "red.9", _dark: "red.7" },
-						fontSize: "xs",
-						m: "0",
-						flexShrink: "0",
-					})}
-				>
-					{parseError}
-				</p>
-			)}
-		</div>
-	);
-
-	const previewPanelContent = (
-		<div class={panelContentClass}>
-			<div class={panelHeaderClass}>
-				<span class={panelLabelClass}>
-					Preview{draft ? " (edited draft)" : `: /pages/${selected.slug}`}
-				</span>
-				<div class={css({ display: "flex", alignItems: "center", gap: "1" })}>
-					{VIEWPORTS.map((v) => (
-						<button
-							type="button"
-							class={button({
-								variant: viewport === v.id ? "solid" : "plain",
-								size: "xs",
-							})}
-							onClick={() => setViewport(v.id)}
-						>
-							{v.label}
-						</button>
-					))}
-					<a
-						href={`/pages/${selected.slug}`}
-						target="_blank"
-						rel="noreferrer"
-						class={button({ variant: "plain", size: "xs" })}
-					>
-						Open ↗
-					</a>
-				</div>
-			</div>
-			<div
-				class={css({
-					flex: "1",
-					minH: "0",
-					overflow: "auto",
-					bg: { base: "gray.100", _dark: "gray.900" },
-					borderRadius: "l2",
-					display: "flex",
-					justifyContent: "center",
-				})}
-			>
-				{draft ? (
-					<div
-						class={css({
-							bg: "bg.canvas",
-							color: "fg.default",
-							minH: "full",
-							flexShrink: "0",
-							px: "4",
-							py: "8",
-							display: "flex",
-							flexDirection: "column",
-							gap: "6",
-						})}
-						style={{ width: activeWidth }}
-					>
-						<PageRenderer
-							content={draft.content}
-							locale="en"
-							currentPath="/playground"
-						/>
-					</div>
-				) : (
-					<iframe
-						key={selected.slug}
-						src={`/pages/${selected.slug}`}
-						title={`Preview of ${selected.title}`}
-						class={css({ border: "none", h: "full", bg: "white" })}
-						style={{ width: activeWidth, flexShrink: "0" }}
-					/>
-				)}
-			</div>
-		</div>
-	);
+	const selectClass = css({
+		px: "3",
+		py: "1.5",
+		borderRadius: "md",
+		border: "1px solid",
+		borderColor: "border",
+		bg: "bg.default",
+		color: "fg.default",
+		fontSize: "sm",
+		fontWeight: "semibold",
+		cursor: "pointer",
+		outline: "none",
+		_focus: {
+			borderColor: "purple.500",
+		},
+	});
 
 	return (
 		<div
 			class={css({
-				display: "flex",
-				flexDirection: "column",
-				gap: "4",
-				px: "4",
-				py: "6",
-				maxW: "[120rem]",
-				mx: "auto",
-				w: "full",
-				flex: "1",
-				minH: "0",
+				display: "grid",
+				gridTemplateColumns: { base: "1fr", lg: "1fr 1fr" },
+				gap: "6",
+				minHeight: "calc(100vh - 120px)",
+				maxWidth: "100%",
+				px: { base: "4", md: "6" },
+				py: "4",
 			})}
 		>
-			<div class={css({ display: "flex", flexWrap: "wrap", gap: "2" })}>
-				{pages.map((page) => (
-					<button
-						type="button"
-						class={button({
-							variant: page.slug === selected.slug ? "solid" : "outline",
-							size: "sm",
+			{/* Left Column - Code Editor */}
+			<div
+				class={css({
+					display: "flex",
+					flexDirection: "column",
+					gap: "4",
+					bg: "bg.canvas",
+					borderWidth: "1px",
+					borderColor: "border",
+					borderRadius: "xl",
+					p: "5",
+					boxShadow: "sm",
+				})}
+			>
+				{/* Editor Toolbar */}
+				<div
+					class={css({
+						display: "flex",
+						flexWrap: "wrap",
+						justifyContent: "space-between",
+						alignItems: "center",
+						gap: "3",
+						borderBottomWidth: "1px",
+						borderColor: "border",
+						pb: "4",
+					})}
+				>
+					<div class={css({ display: "flex", alignItems: "center", gap: "2" })}>
+						<label
+							htmlFor="page-select"
+							class={css({
+								fontSize: "sm",
+								fontWeight: "semibold",
+								color: "fg.muted",
+							})}
+						>
+							Page:
+						</label>
+						<select
+							id="page-select"
+							class={selectClass}
+							value={selectedSlug}
+							onChange={(e: any) => {
+								setSelectedSlug(e.target.value);
+								setIframeReady(false);
+								const iframe = document.getElementById(
+									"playground-iframe",
+								) as HTMLIFrameElement | null;
+								if (iframe) {
+									iframe.src = "/playground/preview";
+								}
+							}}
+						>
+							{pages.map((p) => (
+								<option key={p.slug} value={p.slug}>
+									{p.slug}.json
+								</option>
+							))}
+						</select>
+					</div>
+
+					<div class={css({ display: "flex", gap: "2" })}>
+						<button
+							type="button"
+							class={cx(button({ variant: "outline", size: "sm" }))}
+							onClick={handleFormat}
+						>
+							Format JSON
+						</button>
+						<button
+							type="button"
+							class={cx(
+								button({ variant: "outline", size: "sm", colorPalette: "red" }),
+							)}
+							onClick={handleReset}
+						>
+							Reset Original
+						</button>
+					</div>
+				</div>
+
+				{/* Textarea Code Area */}
+				<div
+					class={css({
+						flex: "1",
+						display: "flex",
+						flexDirection: "column",
+						position: "relative",
+					})}
+				>
+					<textarea
+						value={jsonString}
+						onInput={(e: any) => setJsonString(e.target.value)}
+						class={css({
+							width: "100%",
+							minHeight: "500px",
+							height: "100%",
+							fontFamily: "monospace",
+							fontSize: "13px",
+							lineHeight: "1.6",
+							p: "4",
+							bg: "bg.default",
+							color: "fg.default",
+							borderWidth: "1px",
+							borderColor: "border",
+							borderRadius: "lg",
+							outline: "none",
+							resize: "vertical",
+							whiteSpace: "pre",
+							overflowWrap: "normal",
+							overflowX: "auto",
+							_focus: {
+								borderColor: "purple.500",
+								boxShadow: "0 0 0 1px var(--colors-purple-500)",
+							},
 						})}
-						onClick={() => handleSelectPage(page.slug)}
-					>
-						{page.title}
-					</button>
-				))}
+						placeholder="Paste or write page configuration JSON here..."
+					/>
+				</div>
+
+				{/* Error / Status Bar */}
+				<div>
+					{validationError ? (
+						<div
+							class={css({
+								p: "3",
+								borderRadius: "md",
+								bg: "red.50",
+								_dark: { bg: "red.950" },
+								borderWidth: "1px",
+								borderColor: "red.200",
+								_dark: { borderColor: "red.800" },
+								color: "red.600",
+								_dark: { color: "red.400" },
+								fontSize: "xs",
+								fontFamily: "monospace",
+								overflowWrap: "anywhere",
+							})}
+						>
+							<strong>Invalid JSON:</strong> {validationError}
+						</div>
+					) : (
+						<div
+							class={css({
+								display: "flex",
+								alignItems: "center",
+								gap: "2",
+								fontSize: "sm",
+								color: "green.600",
+								_dark: { color: "green.400" },
+							})}
+						>
+							<span
+								class={css({
+									width: "2.5",
+									height: "2.5",
+									borderRadius: "full",
+									bg: "green.500",
+								})}
+							/>
+							JSON is valid and synchronized with preview.
+						</div>
+					)}
+				</div>
 			</div>
 
-			<InteractiveSplitter
-				orientation="horizontal"
-				style={{ height: "75vh" }}
-				panels={[
-					{ id: "source", content: jsonPanelContent },
-					{ id: "preview", content: previewPanelContent },
-				]}
-				defaultSize={[
-					{ id: "source", size: 45 },
-					{ id: "preview", size: 55 },
-				]}
-			/>
+			{/* Right Column - Device IFrame Preview */}
+			<div
+				class={css({
+					display: "flex",
+					flexDirection: "column",
+					gap: "4",
+					bg: "bg.canvas",
+					borderWidth: "1px",
+					borderColor: "border",
+					borderRadius: "xl",
+					p: "5",
+					boxShadow: "sm",
+				})}
+			>
+				{/* Preview Toolbar */}
+				<div
+					class={css({
+						display: "flex",
+						justifyContent: "space-between",
+						alignItems: "center",
+						borderBottomWidth: "1px",
+						borderColor: "border",
+						pb: "4",
+					})}
+				>
+					<span class={css({ fontSize: "sm", fontWeight: "bold" })}>
+						Live Preview
+					</span>
+
+					{/* Device Selector */}
+					<div class={css({ display: "flex", gap: "1" })}>
+						<button
+							type="button"
+							class={cx(
+								button({
+									variant: deviceWidth === "100%" ? "solid" : "outline",
+									size: "xs",
+								}),
+							)}
+							onClick={() => setDeviceWidth("100%")}
+						>
+							Desktop
+						</button>
+						<button
+							type="button"
+							class={cx(
+								button({
+									variant: deviceWidth === "768px" ? "solid" : "outline",
+									size: "xs",
+								}),
+							)}
+							onClick={() => setDeviceWidth("768px")}
+						>
+							Tablet
+						</button>
+						<button
+							type="button"
+							class={cx(
+								button({
+									variant: deviceWidth === "375px" ? "solid" : "outline",
+									size: "xs",
+								}),
+							)}
+							onClick={() => setDeviceWidth("375px")}
+						>
+							Mobile
+						</button>
+					</div>
+				</div>
+
+				{/* Preview Container Wrapper */}
+				<div
+					class={css({
+						flex: "1",
+						display: "flex",
+						justifyContent: "center",
+						alignItems: "stretch",
+						bg: "bg.muted",
+						borderRadius: "lg",
+						p: "4",
+						minHeight: "500px",
+					})}
+				>
+					<div
+						style={{ width: deviceWidth }}
+						class={css({
+							display: "flex",
+							flexDirection: "column",
+							bg: "bg.default",
+							borderWidth: "1px",
+							borderColor: "border",
+							borderRadius: "lg",
+							boxShadow: "md",
+							transition: "width 0.3s ease-in-out",
+							overflow: "hidden",
+						})}
+					>
+						<iframe
+							id="playground-iframe"
+							src="/playground/preview"
+							class={css({
+								width: "100%",
+								height: "100%",
+								border: "none",
+								flex: "1",
+							})}
+							title="Playground Preview"
+						/>
+					</div>
+				</div>
+			</div>
 		</div>
 	);
 }

@@ -13,4 +13,9 @@
  * new collection whose own index route might gain a same-named
  * content/pages/<name>.json for header/intro content.
  */
-export const RESERVED_PAGE_SLUGS = new Set(["index", "blog", "docs"]);
+export const RESERVED_PAGE_SLUGS = new Set([
+	"index",
+	"blog",
+	"docs",
+	"playground",
+]);
