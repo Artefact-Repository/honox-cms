@@ -21,6 +21,8 @@ export interface ComboboxContextValue {
 	styles: ComboboxStyles;
 	open: boolean;
 	inputValue: string;
+	searchQuery?: string;
+	selectedValue?: string;
 	highlightedIndex: number;
 	items: ComboboxItem[];
 	rootId: string;
@@ -58,6 +60,8 @@ export interface ComboboxItem {
 export interface RootProps extends ComboboxVariantProps, PropsWithChildren {
 	open?: boolean;
 	inputValue?: string;
+	searchQuery?: string;
+	selectedValue?: string;
 	highlightedIndex?: number;
 	items?: ComboboxItem[];
 	disabled?: boolean;
@@ -81,6 +85,8 @@ export function Root(props: RootProps) {
 		children,
 		open = false,
 		inputValue = "",
+		searchQuery,
+		selectedValue,
 		highlightedIndex = -1,
 		items = [],
 		disabled,
@@ -107,6 +113,8 @@ export function Root(props: RootProps) {
 				styles,
 				open,
 				inputValue,
+				searchQuery,
+				selectedValue,
 				highlightedIndex,
 				items,
 				rootId,
@@ -351,7 +359,11 @@ export function Item(
 	} = props;
 	const context = useComboboxContext();
 	const isHighlighted = context?.highlightedIndex === index;
-	const isSelected = context?.inputValue === value;
+	const currentItemValue = itemValue ?? value;
+	const isSelected =
+		context?.selectedValue !== undefined
+			? context.selectedValue === currentItemValue
+			: context?.inputValue === value;
 
 	return (
 		<ItemContext.Provider value={{ value, disabled }}>
@@ -363,8 +375,9 @@ export function Item(
 				aria-selected={isSelected}
 				data-scope="combobox"
 				data-part="item"
+				data-index={index}
 				data-value={value}
-				data-item-value={itemValue ?? value}
+				data-item-value={currentItemValue}
 				data-disabled={disabled ? "" : undefined}
 				data-highlighted={isHighlighted ? "" : undefined}
 				data-state={isSelected ? "checked" : "unchecked"}
@@ -382,14 +395,27 @@ export function ItemText(
 		class?: string;
 		index?: number;
 		value?: string;
+		itemValue?: string;
 		disabled?: boolean;
 	}>,
 ) {
-	const { children, class: classProp, index, value, disabled, ...rest } = props;
+	const {
+		children,
+		class: classProp,
+		index,
+		value,
+		itemValue,
+		disabled,
+		...rest
+	} = props;
 	const context = useComboboxContext();
 	const item = useComboboxItemContext();
-	const itemValue = value || item?.value || "";
-	const isSelected = context?.inputValue === itemValue;
+	const textValue = value || item?.value || "";
+	const currentItemValue = itemValue ?? textValue;
+	const isSelected =
+		context?.selectedValue !== undefined
+			? context.selectedValue === currentItemValue
+			: context?.inputValue === textValue;
 	const isHighlighted = context?.highlightedIndex === index;
 
 	return (
@@ -408,13 +434,21 @@ export function ItemText(
 }
 
 export function ItemIndicator(
-	props: PropsWithChildren<{ class?: string; value?: string }>,
+	props: PropsWithChildren<{
+		class?: string;
+		value?: string;
+		itemValue?: string;
+	}>,
 ) {
-	const { children, class: classProp, value, ...rest } = props;
+	const { children, class: classProp, value, itemValue, ...rest } = props;
 	const context = useComboboxContext();
 	const item = useComboboxItemContext();
-	const itemValue = value || item?.value || "";
-	const isSelected = context?.inputValue === itemValue;
+	const textValue = value || item?.value || "";
+	const currentItemValue = itemValue ?? textValue;
+	const isSelected =
+		context?.selectedValue !== undefined
+			? context.selectedValue === currentItemValue
+			: context?.inputValue === textValue;
 
 	return (
 		<div
@@ -487,14 +521,23 @@ export interface ComboboxFlattenedProps extends RootProps {
 	placeholder?: string;
 	allowClear?: boolean;
 	closeOnSelect?: boolean;
+	name?: string;
+	value?: string;
+	defaultValue?: string;
+	onValueChange?: (value: string) => void;
 }
 
 export function ComboboxStructure(props: ComboboxFlattenedProps) {
 	const { items = [], label, placeholder, allowClear, children } = props;
 	const context = useComboboxContext();
 
+	const filterText =
+		context?.searchQuery !== undefined
+			? context.searchQuery
+			: context?.inputValue || "";
+
 	const filteredItems = items.filter((item) =>
-		item.label.toLowerCase().includes(context?.inputValue.toLowerCase() || ""),
+		item.label.toLowerCase().includes(filterText.toLowerCase()),
 	);
 
 	return (
@@ -534,11 +577,12 @@ export function ComboboxStructure(props: ComboboxFlattenedProps) {
 									<ItemText
 										index={index}
 										value={item.label}
+										itemValue={item.value}
 										disabled={item.disabled}
 									>
 										{item.label}
 									</ItemText>
-									<ItemIndicator value={item.label} />
+									<ItemIndicator value={item.label} itemValue={item.value} />
 								</Item>
 							))
 						) : (
@@ -564,10 +608,29 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 		id: idProp,
 		items = [],
 		closeOnSelect = true,
+		name,
+		value: valueProp,
+		defaultValue: defaultValueProp,
+		onValueChange,
 		...rest
 	} = props;
+
+	// Manage controlled/uncontrolled selected value
+	const [localSelectedValue, setLocalSelectedValue] = useState(
+		valueProp ?? defaultValueProp ?? "",
+	);
+	const isValueControlled = valueProp !== undefined;
+	const selectedValue = isValueControlled ? valueProp : localSelectedValue;
+
+	// Find initial input text based on selected value
+	const initialItem = items.find((item) => item.value === selectedValue);
+	const initialInputValue = initialItem
+		? initialItem.label
+		: (inputValueProp ?? "");
+
 	const [isOpen, setIsOpen] = useState(openProp ?? false);
-	const [inputValue, setInputValue] = useState(inputValueProp ?? "");
+	const [inputValue, setInputValue] = useState(initialInputValue);
+	const [searchQuery, setSearchQuery] = useState("");
 	const [highlightedIndex, setHighlightedIndex] = useState(
 		highlightedIndexProp ?? -1,
 	);
@@ -575,8 +638,9 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 	const isControlled = openProp !== undefined;
 	const open = isControlled ? openProp : isOpen;
 
+	const filterText = searchQuery;
 	const filteredItems = items.filter((item) =>
-		item.label.toLowerCase().includes(inputValue.toLowerCase()),
+		item.label.toLowerCase().includes(filterText.toLowerCase()),
 	);
 
 	const fallbackId = useId();
@@ -588,10 +652,19 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 	const handleItemSelectRef = useRef<(label: string, val: string) => void>(
 		() => {},
 	);
+	const handleSetHighlightedIndexRef = useRef<(index: number) => void>(
+		() => {},
+	);
 
 	const handleToggle = () => {
 		if (!isControlled) {
-			setIsOpen((prev) => !prev);
+			setIsOpen((prev) => {
+				const nextOpen = !prev;
+				if (nextOpen) {
+					setSearchQuery(""); // show full list on open
+				}
+				return nextOpen;
+			});
 		}
 	};
 
@@ -603,32 +676,32 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 
 	const handleInputChange = (val: string) => {
 		setInputValue(val);
-		if (val && !open) {
-			if (!isControlled) {
-				setIsOpen(true);
-			}
+		setSearchQuery(val);
+		if (!isControlled && !isOpen) {
+			setIsOpen(true);
 		}
 		props.onInputChange?.(val);
 	};
 
 	const handleItemSelect = (label: string, val: string) => {
+		if (!isValueControlled) {
+			setLocalSelectedValue(val);
+		}
 		setInputValue(label);
+		setSearchQuery(""); // clear search query on selection
 		setHighlightedIndex(-1);
 		if (!isControlled) {
 			setIsOpen(false);
 		}
 		props.onItemSelect?.(val);
+		onValueChange?.(val);
 	};
 
 	const handleSetHighlightedIndex = (index: number) => {
 		setHighlightedIndex(index);
 	};
 
-	const handleSetHighlightedIndexRef = useRef<(index: number) => void>(
-		() => {},
-	);
-
-	// Store handlers in refs
+	// Store handlers in refs to prevent closure stale problems in useEffect
 	useEffect(() => {
 		handleToggleRef.current = handleToggle;
 		handleCloseRef.current = handleClose;
@@ -642,6 +715,40 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 		handleItemSelect,
 		handleSetHighlightedIndex,
 	]);
+
+	// Sync inputValue with controlled valueProp changes
+	useEffect(() => {
+		if (valueProp !== undefined) {
+			const matchingItem = items.find((item) => item.value === valueProp);
+			if (matchingItem) {
+				setInputValue(matchingItem.label);
+			} else {
+				setInputValue("");
+			}
+		}
+	}, [valueProp, items]);
+
+	// Scroll highlighted item into view automatically
+	useEffect(() => {
+		if (highlightedIndex !== -1 && open) {
+			const root = document.getElementById(rootId);
+			if (root) {
+				const list = root.querySelector('[data-part="list"]') as HTMLElement;
+				const item = root.querySelector(
+					`[data-part="item"][data-index="${highlightedIndex}"]`,
+				) as HTMLElement;
+				if (list && item) {
+					const listRect = list.getBoundingClientRect();
+					const itemRect = item.getBoundingClientRect();
+					if (itemRect.bottom > listRect.bottom) {
+						list.scrollTop += itemRect.bottom - listRect.bottom;
+					} else if (itemRect.top < listRect.top) {
+						list.scrollTop -= listRect.top - itemRect.top;
+					}
+				}
+			}
+		}
+	}, [highlightedIndex, open, rootId]);
 
 	// Attach event listeners using event delegation
 	useEffect(() => {
@@ -659,19 +766,11 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 			if (!target) return;
 
 			const dataPart = target.getAttribute("data-part");
-			const isDisabled = target.hasAttribute("data-disabled");
+			const isDisabled =
+				target.hasAttribute("data-disabled") || target.hasAttribute("disabled");
+			if (isDisabled) return;
+
 			if (dataPart === "trigger") {
-				const currentOpen = root.getAttribute("data-state") === "open";
-				const nextOpen = !currentOpen;
-				if (nextOpen) {
-					const inputElement = root.querySelector(
-						'[data-part="input"]',
-					) as HTMLInputElement | null;
-					if (inputElement) {
-						inputElement.value = "";
-						handleInputChangeRef.current("");
-					}
-				}
 				handleToggleRef.current?.();
 			} else if (dataPart === "clear-trigger") {
 				const inputElement = root.querySelector(
@@ -679,19 +778,23 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 				) as HTMLInputElement | null;
 				if (inputElement) {
 					inputElement.value = "";
-					handleInputChangeRef.current("");
 				}
-			} else if (dataPart === "item" && !isDisabled) {
+				handleInputChangeRef.current("");
+				if (!isValueControlled) {
+					setLocalSelectedValue("");
+				}
+				props.onItemSelect?.("");
+				onValueChange?.("");
+			} else if (dataPart === "item") {
 				const label = target.getAttribute("data-value") || "";
-				const value = target.getAttribute("data-item-value") || label;
+				const val = target.getAttribute("data-item-value") || label;
 				const inputElement = root.querySelector(
 					'[data-part="input"]',
 				) as HTMLInputElement | null;
 				if (inputElement) {
 					inputElement.value = label;
-					setInputValue(label);
 				}
-				handleItemSelectRef.current?.(label, value);
+				handleItemSelectRef.current?.(label, val);
 			}
 		};
 
@@ -700,70 +803,94 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 				'[data-part="item"]',
 			) as HTMLElement;
 			if (target && !target.hasAttribute("data-disabled")) {
-				const items = Array.from(
-					root.querySelectorAll('[data-part="item"]:not([data-disabled])'),
-				);
-				const index = items.indexOf(target);
-				if (index !== -1) {
-					handleSetHighlightedIndexRef.current(index);
+				const idxAttr = target.getAttribute("data-index");
+				if (idxAttr !== null) {
+					const index = parseInt(idxAttr, 10);
+					if (!Number.isNaN(index)) {
+						handleSetHighlightedIndexRef.current(index);
+					}
 				}
+			}
+		};
+
+		// Close dropdown on outside click/pointerdown
+		const handleDocumentClick = (e: MouseEvent) => {
+			if (!root.contains(e.target as Node)) {
+				handleCloseRef.current();
 			}
 		};
 
 		// Attach event listeners
 		root.addEventListener("click", handleClick);
 		root.addEventListener("mouseover", handleMouseOver as any);
+		document.addEventListener("pointerdown", handleDocumentClick);
 
 		// Handle input change for opening/closing
 		const handleInputEvent = (e: Event) => {
 			const input = e.target as HTMLInputElement;
-			const value = input.value;
-			handleInputChangeRef.current(value);
+			const val = input.value;
+			handleInputChangeRef.current(val);
 			handleSetHighlightedIndexRef.current(-1);
-			if (value && root.getAttribute("data-state") !== "open") {
-				handleToggleRef.current();
-			}
 		};
 
 		const handleKeyDown = (e: KeyboardEvent) => {
 			const currentOpen = root.getAttribute("data-state") === "open";
-			const items = Array.from(
-				root.querySelectorAll<HTMLElement>(
-					'[data-part="item"]:not([data-disabled])',
-				),
-			);
+			// Get indices of all non-disabled items currently matched/rendered
+			const enabledIndices = filteredItems
+				.map((item, index) => (item.disabled ? null : index))
+				.filter((idx): idx is number => idx !== null);
 
 			if (e.key === "ArrowDown") {
 				e.preventDefault();
 				if (!currentOpen) {
 					handleToggleRef.current();
-					handleSetHighlightedIndexRef.current(0);
+					if (enabledIndices.length > 0) {
+						handleSetHighlightedIndexRef.current(enabledIndices[0]!);
+					}
 				} else {
 					setHighlightedIndex((prev) => {
-						const next = prev + 1 >= items.length ? 0 : prev + 1;
-						return next;
+						if (enabledIndices.length === 0) return -1;
+						const currentIndexInEnabled = enabledIndices.indexOf(prev);
+						const nextIndexInEnabled =
+							(currentIndexInEnabled + 1) % enabledIndices.length;
+						return enabledIndices[nextIndexInEnabled]!;
 					});
 				}
 			} else if (e.key === "ArrowUp") {
 				e.preventDefault();
 				if (!currentOpen) {
 					handleToggleRef.current();
-					handleSetHighlightedIndexRef.current(items.length - 1);
+					if (enabledIndices.length > 0) {
+						handleSetHighlightedIndexRef.current(
+							enabledIndices[enabledIndices.length - 1]!,
+						);
+					}
 				} else {
 					setHighlightedIndex((prev) => {
-						const next = prev - 1 < 0 ? items.length - 1 : prev - 1;
-						return next;
+						if (enabledIndices.length === 0) return -1;
+						const currentIndexInEnabled = enabledIndices.indexOf(prev);
+						const nextIndexInEnabled =
+							currentIndexInEnabled - 1 < 0
+								? enabledIndices.length - 1
+								: currentIndexInEnabled - 1;
+						return enabledIndices[nextIndexInEnabled]!;
 					});
 				}
 			} else if (e.key === "Home") {
 				if (currentOpen) {
 					e.preventDefault();
-					handleSetHighlightedIndexRef.current(0);
+					if (enabledIndices.length > 0) {
+						handleSetHighlightedIndexRef.current(enabledIndices[0]!);
+					}
 				}
 			} else if (e.key === "End") {
 				if (currentOpen) {
 					e.preventDefault();
-					handleSetHighlightedIndexRef.current(items.length - 1);
+					if (enabledIndices.length > 0) {
+						handleSetHighlightedIndexRef.current(
+							enabledIndices[enabledIndices.length - 1]!,
+						);
+					}
 				}
 			} else if (e.key === "Enter") {
 				if (currentOpen) {
@@ -773,7 +900,7 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 					if (highlightedItem) {
 						e.preventDefault();
 						const label = highlightedItem.getAttribute("data-value") || "";
-						const value =
+						const val =
 							highlightedItem.getAttribute("data-item-value") || label;
 						const input = root.querySelector(
 							'[data-part="input"]',
@@ -781,8 +908,7 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 						if (input) {
 							input.value = label;
 						}
-						setInputValue(label);
-						handleItemSelectRef.current(label, value);
+						handleItemSelectRef.current(label, val);
 					}
 				}
 			} else if (e.key === "Escape") {
@@ -820,6 +946,7 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 		return () => {
 			root.removeEventListener("click", handleClick);
 			root.removeEventListener("mouseover", handleMouseOver as any);
+			document.removeEventListener("pointerdown", handleDocumentClick);
 			if (inputElement) {
 				inputElement.removeEventListener("input", handleInputEvent);
 				inputElement.removeEventListener("keydown", handleKeyDown as any);
@@ -827,7 +954,7 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 				inputElement.removeEventListener("blur", handleBlur);
 			}
 		};
-	}, [rootId]);
+	}, [rootId, filteredItems]);
 
 	return (
 		<Root
@@ -836,6 +963,8 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 			{...rest}
 			open={open}
 			inputValue={inputValue}
+			searchQuery={searchQuery}
+			selectedValue={selectedValue}
 			highlightedIndex={highlightedIndex}
 			items={filteredItems}
 			onToggle={handleToggle}
@@ -844,6 +973,7 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 			onItemSelect={handleItemSelect}
 			setHighlightedIndex={setHighlightedIndex}
 		>
+			{name && <input type="hidden" name={name} value={selectedValue} />}
 			<ComboboxStructure {...props} />
 		</Root>
 	);

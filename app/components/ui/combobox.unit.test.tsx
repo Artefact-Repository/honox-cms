@@ -63,4 +63,42 @@ describe("Combobox Unit Tests", () => {
 		expect(html).toContain('data-part="item-text"');
 		expect(html).toContain('data-part="item-indicator"');
 	});
+
+	test("should support defaultValue, selectedValue, and form submission fields (interactive)", () => {
+		const html = (
+			<Combobox
+				interactive={true}
+				name="framework"
+				defaultValue="solid"
+				items={[
+					{ label: "React", value: "react" },
+					{ label: "Solid", value: "solid" },
+				]}
+			/>
+		).toString();
+
+		expect(html).toContain('type="hidden"');
+		expect(html).toContain('name="framework"');
+		expect(html).toContain('value="solid"');
+		expect(html).toContain('value="Solid"'); // The visible input should have the label "Solid"
+	});
+
+	test("should correctly bind data-index on item elements and align disabled status", () => {
+		const html = (
+			<Combobox
+				interactive={true}
+				items={[
+					{ label: "React", value: "react" },
+					{ label: "Vue", value: "vue", disabled: true },
+					{ label: "Solid", value: "solid" },
+				]}
+			/>
+		).toString();
+
+		expect(html).toContain('data-part="item"');
+		expect(html).toContain('data-index="0"');
+		expect(html).toContain('data-index="1"');
+		expect(html).toContain('data-disabled=""');
+		expect(html).toContain('data-index="2"');
+	});
 });
