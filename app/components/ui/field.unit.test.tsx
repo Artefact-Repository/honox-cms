@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
 import { Field } from "./field";
+import { Input } from "./input";
 
 test("Field - Flattened API renders basic structure", () => {
 	const html = (
@@ -80,4 +81,26 @@ test("Field - Correctly priorities value over defaultValue on SSR", () => {
 
 	expect(html).toContain('value="controlled-val"');
 	expect(html).not.toContain('value="default-val"');
+});
+
+test("Field - Composition with Input component and attribute filtration", () => {
+	const html = (
+		<Field
+			id="composed-field"
+			name="username-input"
+			placeholder="Composed Placeholder"
+			autocomplete="off"
+		>
+			<Input value="composed-val" />
+		</Field>
+	).toString();
+
+	// Verify wrapper div does not have name, placeholder, autocomplete attributes
+	expect(html).not.toContain('<div class="field__root" name="username-input"');
+	expect(html).not.toContain('placeholder="Composed Placeholder"');
+	expect(html).not.toContain('autocomplete="off"');
+
+	// Verify nested Input reads field context correctly
+	expect(html).toContain('<input id="composed-field"');
+	expect(html).toContain('value="composed-val"');
 });
