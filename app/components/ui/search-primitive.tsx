@@ -27,7 +27,7 @@ const inputClass = css({
 	transition: "all 0.2s",
 	_focus: {
 		outline: "none",
-		borderColor: "blue.9",
+		borderColor: "colorPalette.default",
 		shadow: "0 0 0 3px var(--colors-blue-6)",
 	},
 	_placeholder: { color: "fg.muted" },
