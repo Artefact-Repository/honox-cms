@@ -21,6 +21,7 @@ export default function SegmentGroupIsland(props: SegmentGroupIslandProps) {
 	} = props;
 	const [value, setValue] = useState(valueProp ?? defaultValue);
 	const rootRef = useRef<HTMLDivElement>(null);
+	const isFirstRenderRef = useRef(true);
 
 	useEffect(() => {
 		if (valueProp !== undefined) {
@@ -28,12 +29,24 @@ export default function SegmentGroupIsland(props: SegmentGroupIslandProps) {
 		}
 	}, [valueProp]);
 
-	const updateIndicator = (activeItem: HTMLElement) => {
+	const updateIndicator = (activeItem: HTMLElement, enableTransition = true) => {
 		const root = rootRef.current;
 		if (!root) return;
 
 		const rect = activeItem.getBoundingClientRect();
 		const rootRect = root.getBoundingClientRect();
+
+		const indicator = root.querySelector<HTMLElement>('[data-part="indicator"]');
+		if (indicator) {
+			if (enableTransition) {
+				indicator.removeAttribute("data-transition");
+			} else {
+				indicator.setAttribute("data-transition", "false");
+				requestAnimationFrame(() => {
+					indicator.removeAttribute("data-transition");
+				});
+			}
+		}
 
 		root.style.setProperty("--width", `${rect.width}px`);
 		root.style.setProperty("--height", `${rect.height}px`);
@@ -50,8 +63,12 @@ export default function SegmentGroupIsland(props: SegmentGroupIslandProps) {
 		);
 
 		if (activeItem) {
+			const enableTransition = !isFirstRenderRef.current;
+			if (isFirstRenderRef.current) {
+				isFirstRenderRef.current = false;
+			}
 			requestAnimationFrame(() => {
-				updateIndicator(activeItem);
+				updateIndicator(activeItem, enableTransition);
 			});
 		}
 

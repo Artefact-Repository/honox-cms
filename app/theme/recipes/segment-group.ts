@@ -95,6 +95,9 @@ export const segmentGroup = defineSlotRecipe({
 			transitionTimingFunction: "default",
 			width: "var(--width)",
 			zIndex: -1,
+			"&[data-transition='false']": {
+				transition: "none !important",
+			},
 		},
 	},
 
