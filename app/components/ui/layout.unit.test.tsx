@@ -93,6 +93,41 @@ describe("Layout Component", () => {
 		expect(html).toContain("custom-header");
 	});
 
+	it("should support standard HTML attributes on layout subcomponents", () => {
+		const html = (
+			<Layout id="my-layout-id" style="color: red;" aria-label="Main Layout">
+				<Layout.Header id="my-header-id" aria-label="My Header">
+					Header
+				</Layout.Header>
+				<Layout.Sider id="my-sider-id" aria-label="My Sider">
+					Sider
+				</Layout.Sider>
+				<Layout.Body id="my-body-id" aria-label="My Body">
+					<Layout.Content id="my-content-id" aria-label="My Content">
+						Content
+					</Layout.Content>
+				</Layout.Body>
+				<Layout.Footer id="my-footer-id" aria-label="My Footer">
+					Footer
+				</Layout.Footer>
+			</Layout>
+		).toString();
+
+		expect(html).toContain('id="my-layout-id"');
+		expect(html).toContain('style="color: red;"');
+		expect(html).toContain('aria-label="Main Layout"');
+		expect(html).toContain('id="my-header-id"');
+		expect(html).toContain('aria-label="My Header"');
+		expect(html).toContain('id="my-sider-id"');
+		expect(html).toContain('aria-label="My Sider"');
+		expect(html).toContain('id="my-body-id"');
+		expect(html).toContain('aria-label="My Body"');
+		expect(html).toContain('id="my-content-id"');
+		expect(html).toContain('aria-label="My Content"');
+		expect(html).toContain('id="my-footer-id"');
+		expect(html).toContain('aria-label="My Footer"');
+	});
+
 	it("should keep Header/Footer out of the sider row when Sider+Content are wrapped in Layout.Body", () => {
 		const html = (
 			<Layout>
