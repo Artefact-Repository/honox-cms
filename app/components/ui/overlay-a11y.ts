@@ -244,6 +244,8 @@ export function useOverlay(opts: OverlayOptions) {
 			}
 		};
 
+		let cancelPendingHide = () => {};
+
 		const deactivate = () => {
 			const idx = openOverlayRoots.indexOf(root);
 			if (idx !== -1) {
@@ -266,25 +268,54 @@ export function useOverlay(opts: OverlayOptions) {
 			const { positioners, backdrops, contents } = getElements();
 			root.setAttribute("data-state", "closed");
 			for (const p of positioners) {
-				p.style.cssText =
-					"display: none !important; visibility: hidden !important;";
 				p.setAttribute("data-state", "closed");
 			}
 			for (const b of backdrops) {
-				b.style.cssText =
-					"display: none !important; visibility: hidden !important;";
 				b.setAttribute("data-state", "closed");
 			}
 			for (const c of contents) {
 				c.setAttribute("data-state", "closed");
-				c.style.cssText =
-					"display: none !important; visibility: hidden !important;";
 			}
 
 			deactivate();
+
+			cancelPendingHide();
+			const animatedEl = contents[0] || positioners[0] || backdrops[0];
+			if (animatedEl) {
+				cancelPendingHide = whenAnimationEnds(animatedEl, () => {
+					if (root.getAttribute("data-state") === "closed") {
+						for (const p of positioners) {
+							p.style.cssText =
+								"display: none !important; visibility: hidden !important;";
+						}
+						for (const b of backdrops) {
+							b.style.cssText =
+								"display: none !important; visibility: hidden !important;";
+						}
+						for (const c of contents) {
+							c.style.cssText =
+								"display: none !important; visibility: hidden !important;";
+						}
+					}
+				});
+			} else {
+				for (const p of positioners) {
+					p.style.cssText =
+						"display: none !important; visibility: hidden !important;";
+				}
+				for (const b of backdrops) {
+					b.style.cssText =
+						"display: none !important; visibility: hidden !important;";
+				}
+				for (const c of contents) {
+					c.style.cssText =
+						"display: none !important; visibility: hidden !important;";
+				}
+			}
 		};
 
 		const show = () => {
+			cancelPendingHide();
 			if (root.getAttribute("data-state") === "open") return;
 
 			const { positioners, backdrops, contents } = getElements();
@@ -390,6 +421,7 @@ export function useOverlay(opts: OverlayOptions) {
 		window.addEventListener("keydown", onKeyDown, true);
 
 		return () => {
+			cancelPendingHide();
 			root.removeEventListener("click", handleClick);
 			window.removeEventListener("keydown", onKeyDown, true);
 			hide(); // Clean up overlay state on unmount

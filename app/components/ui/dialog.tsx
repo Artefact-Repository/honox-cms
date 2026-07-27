@@ -23,13 +23,13 @@ interface RootProps extends DialogPrimitiveRootProps {
 	interactive?: boolean;
 }
 
-const Root = (props: RootProps) => {
+function Root(props: RootProps) {
 	const { interactive, ...rest } = props;
 	if (shouldHydrate(interactive, true)) {
 		return <DialogIsland {...rest} />;
 	}
 	return <DialogPrimitiveRoot {...rest} />;
-};
+}
 
 export type { RootProps };
 
@@ -56,7 +56,7 @@ export interface DialogProps extends RootProps {
 	finalFocusEl?: () => HTMLElement | null;
 }
 
-export function Dialog(props: DialogProps) {
+function Dialog(props: DialogProps) {
 	const {
 		trigger,
 		title,
@@ -113,4 +113,33 @@ export function Dialog(props: DialogProps) {
 	);
 }
 
-export default Dialog;
+const DialogComponent = Object.assign(Dialog, {
+	Root,
+	Trigger,
+	Backdrop,
+	Positioner,
+	Content,
+	Header,
+	Body,
+	Footer,
+	Title,
+	Description,
+	CloseTrigger,
+	ActionTrigger,
+});
+
+export {
+	ActionTrigger,
+	Backdrop,
+	Body,
+	CloseTrigger,
+	Content,
+	DialogComponent as Dialog,
+	Footer,
+	Header,
+	Positioner,
+	Title,
+	Trigger,
+};
+
+export default DialogComponent;

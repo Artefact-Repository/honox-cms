@@ -54,7 +54,7 @@ export interface DrawerProps extends RootProps {
 	finalFocusEl?: () => HTMLElement | null;
 }
 
-export function Drawer(props: DrawerProps) {
+function Drawer(props: DrawerProps) {
 	const {
 		trigger,
 		title,
@@ -107,4 +107,33 @@ export function Drawer(props: DrawerProps) {
 	);
 }
 
-export default Drawer;
+const DrawerComponent = Object.assign(Drawer, {
+	Root,
+	Trigger,
+	Backdrop,
+	Positioner,
+	Content,
+	Header,
+	Body,
+	Footer,
+	Title,
+	Description,
+	CloseTrigger,
+	ActionTrigger,
+});
+
+export {
+	ActionTrigger,
+	Backdrop,
+	Body,
+	CloseTrigger,
+	Content,
+	DrawerComponent as Drawer,
+	Footer,
+	Header,
+	Positioner,
+	Title,
+	Trigger,
+};
+
+export default DrawerComponent;
