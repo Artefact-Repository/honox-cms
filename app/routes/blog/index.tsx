@@ -73,11 +73,6 @@ export default createRoute(async (c) => {
 					position: "sticky",
 					top: "0",
 					zIndex: "10",
-					// Safety net: the header row below wraps to stay in bounds, but
-					// this guards against any CMS-authored header content wide enough
-					// to overflow even a wrapped line from pushing the whole page into
-					// horizontal scroll.
-					overflowX: "hidden",
 				})}
 			>
 				<div
@@ -92,6 +87,16 @@ export default createRoute(async (c) => {
 						alignItems: "center",
 						justifyContent: "space-between",
 						gap: "4",
+						// Guards against CMS-authored header content wide enough to
+						// overflow even a wrapped line. Breaks the text itself rather
+						// than clipping with overflow-x: hidden, which would force
+						// overflow-y to auto too (CSS couples the two axes) and clip
+						// the dropdown/popover blocks that live in this row.
+						// `break-word` (not `anywhere`) because this is inherited by
+						// the dropdown/popover content nested in this row too, and
+						// `anywhere` also shrinks flex min-content sizing, breaking
+						// short words like "English" mid-word for no reason.
+						overflowWrap: "break-word",
 					})}
 				>
 					<Anchor

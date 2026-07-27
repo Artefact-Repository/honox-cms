@@ -23,11 +23,6 @@ export default createRoute(async (c) => {
 				bg: "bg.canvas",
 				minH: "screen",
 				color: "fg.default",
-				// Safety net: the header row below wraps to stay in bounds, but this
-				// guards against any CMS-authored header content that's wide enough
-				// to overflow even a wrapped line (e.g. one very long unbroken link
-				// label) from pushing the whole page into horizontal scroll.
-				overflowX: "hidden",
 			})}
 		>
 			<title>
@@ -63,6 +58,17 @@ export default createRoute(async (c) => {
 						rowGap: "3",
 						alignItems: "center",
 						justifyContent: "space-between",
+						// Guards against CMS-authored header content wide enough to
+						// overflow even a wrapped line (e.g. one very long unbroken
+						// link label). Breaks the text itself rather than clipping
+						// with overflow-x: hidden, which would force overflow-y to
+						// auto too (CSS couples the two axes) and clip the language
+						// dropdown / appearance popover that live in this row.
+						// `break-word` (not `anywhere`) because this is inherited by
+						// the dropdown/popover content nested in this row too, and
+						// `anywhere` also shrinks flex min-content sizing, breaking
+						// short words like "English" mid-word for no reason.
+						overflowWrap: "break-word",
 					})}
 				>
 					<PageRenderer content={data.headerBrand ?? []} />
