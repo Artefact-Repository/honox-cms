@@ -16,8 +16,8 @@ import remarkFrontmatter from "remark-frontmatter";
 import remarkGfm from "remark-gfm";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 import { defineConfig } from "vite";
-import { RESERVED_PAGE_SLUGS } from "./app/lib/reserved-page-slugs";
 import { TRANSLATED_LOCALES } from "./app/lib/i18n";
+import { RESERVED_PAGE_SLUGS } from "./app/lib/reserved-page-slugs";
 import pandaConfig from "./panda.config";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
