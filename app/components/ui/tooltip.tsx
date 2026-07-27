@@ -9,6 +9,7 @@ import {
 	TooltipContent,
 	type TooltipPlacement,
 	TooltipPositioner,
+	TooltipRoot,
 	TooltipTrigger,
 } from "./tooltip-primitive";
 
@@ -83,7 +84,7 @@ export interface TooltipProps extends TooltipBaseProps {
 /**
  * A high-level Tooltip component for common use cases.
  */
-export function Tooltip(props: TooltipProps) {
+function Tooltip(props: TooltipProps) {
 	const { interactive, ...rest } = props;
 	const autoId = useId();
 
@@ -136,3 +137,24 @@ export function Tooltip(props: TooltipProps) {
 
 	return <TooltipBase {...rest} />;
 }
+
+const TooltipComponent = Object.assign(Tooltip, {
+	Root: TooltipRoot,
+	Trigger: TooltipTrigger,
+	Positioner: TooltipPositioner,
+	Content: TooltipContent,
+	Arrow: TooltipArrow,
+	ArrowTip: TooltipArrowTip,
+});
+
+export {
+	TooltipComponent as Tooltip,
+	TooltipRoot as Root,
+	TooltipTrigger as Trigger,
+	TooltipPositioner as Positioner,
+	TooltipContent as Content,
+	TooltipArrow as Arrow,
+	TooltipArrowTip as ArrowTip,
+};
+
+export default TooltipComponent;

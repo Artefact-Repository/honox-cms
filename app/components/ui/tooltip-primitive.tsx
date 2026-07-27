@@ -107,6 +107,7 @@ export function TooltipTrigger(props: TooltipTriggerProps) {
 		<div
 			style={{ display: "inline-block" }}
 			class={cx(styles?.trigger, classProp)}
+			tabIndex={0}
 			{...triggerProps}
 		>
 			{children}

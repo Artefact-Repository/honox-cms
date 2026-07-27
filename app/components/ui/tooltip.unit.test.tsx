@@ -119,4 +119,48 @@ describe("Tooltip Unit Tests", () => {
 
 		expect(focusCalledCount).toBe(0);
 	});
+
+	test("should expose compound namespace on main export", () => {
+		expect(Tooltip.Root).toBeDefined();
+		expect(Tooltip.Trigger).toBeDefined();
+		expect(Tooltip.Positioner).toBeDefined();
+		expect(Tooltip.Content).toBeDefined();
+		expect(Tooltip.Arrow).toBeDefined();
+		expect(Tooltip.ArrowTip).toBeDefined();
+	});
+
+	test("should include default tabIndex=0 on static trigger div", () => {
+		const html = (
+			<Tooltip interactive={false} content="Helpful text">
+				<span>Trigger inline</span>
+			</Tooltip>
+		).toString();
+
+		expect(html).toContain('tabIndex="0"');
+		expect(html).toContain('data-part="trigger"');
+	});
+
+	test("should render compound components correctly", () => {
+		const html = (
+			<Tooltip.Root id="cmp-tip" open={true}>
+				<Tooltip.Trigger>My Trigger</Tooltip.Trigger>
+				<Tooltip.Positioner>
+					<Tooltip.Content>
+						<Tooltip.Arrow>
+							<Tooltip.ArrowTip />
+						</Tooltip.Arrow>
+						My Content
+					</Tooltip.Content>
+				</Tooltip.Positioner>
+			</Tooltip.Root>
+		).toString();
+
+		expect(html).toContain('data-part="trigger"');
+		expect(html).toContain("My Trigger");
+		expect(html).toContain('data-part="positioner"');
+		expect(html).toContain('data-part="content"');
+		expect(html).toContain("My Content");
+		expect(html).toContain('data-part="arrow"');
+		expect(html).toContain('data-part="arrow-tip"');
+	});
 });
