@@ -102,11 +102,24 @@ function RadioCardGroupIsland(props: RadioCardGroupIslandProps) {
 			);
 			const currentIndex = allItems.indexOf(currentItem);
 
+			const isRtl =
+				root.dir === "rtl" ||
+				root.getAttribute("dir") === "rtl" ||
+				window.getComputedStyle(root).direction === "rtl";
+
 			let nextIndex = -1;
 			if (e.key === "ArrowDown" || e.key === "ArrowRight") {
-				nextIndex = (currentIndex + 1) % allItems.length;
+				if (isRtl && e.key === "ArrowRight") {
+					nextIndex = (currentIndex - 1 + allItems.length) % allItems.length;
+				} else {
+					nextIndex = (currentIndex + 1) % allItems.length;
+				}
 			} else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
-				nextIndex = (currentIndex - 1 + allItems.length) % allItems.length;
+				if (isRtl && e.key === "ArrowLeft") {
+					nextIndex = (currentIndex + 1) % allItems.length;
+				} else {
+					nextIndex = (currentIndex - 1 + allItems.length) % allItems.length;
+				}
 			} else if (e.key === " " || e.key === "Enter") {
 				const newValue = currentItem.getAttribute("data-value");
 				if (newValue) {
