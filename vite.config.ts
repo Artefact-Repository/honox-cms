@@ -156,19 +156,26 @@ function copyLocalizedContentPagesPlugin() {
 
 			for (const slug of slugs) {
 				for (const locale of TRANSLATED_LOCALES) {
+					// Source: dist/<locale>/pages/<slug>.html (from
+					// app/routes/[locale]/pages/[slug].tsx). Destination:
+					// dist/<locale>/<slug>.html — the short form that drops
+					// "pages" entirely, matching
+					// app/routes/[locale]/[page].tsx's URL (locale-first, like
+					// docs/blog). `destDir` already exists (it's the same
+					// per-locale directory blog/docs/pages live under).
 					const source = path.join(
 						distDir,
-						"pages",
 						locale,
+						"pages",
 						`${slug}.html`,
 					);
 					if (!existsSync(source)) continue;
 
-					const destDir = path.join(distDir, slug);
-					const dest = path.join(destDir, `${locale}.html`);
+					const destDir = path.join(distDir, locale);
+					const dest = path.join(destDir, `${slug}.html`);
 					if (existsSync(dest)) {
 						console.warn(
-							`[copy-localized-content-pages] ⚠ dist/${slug}/${locale}.html already exists — skipping`,
+							`[copy-localized-content-pages] ⚠ dist/${locale}/${slug}.html already exists — skipping`,
 						);
 						continue;
 					}
@@ -177,7 +184,7 @@ function copyLocalizedContentPagesPlugin() {
 					}
 					copyFileSync(source, dest);
 					console.log(
-						`[copy-localized-content-pages] ✓ dist/pages/${locale}/${slug}.html → dist/${slug}/${locale}.html`,
+						`[copy-localized-content-pages] ✓ dist/${locale}/pages/${slug}.html → dist/${locale}/${slug}.html`,
 					);
 				}
 			}

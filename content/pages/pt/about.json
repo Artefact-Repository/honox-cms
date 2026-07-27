@@ -53,7 +53,7 @@
                 },
                 {
                   "blockType": "link",
-                  "href": "/pages/pt/about",
+                  "href": "/pt/about",
                   "variant": "plain",
                   "children": [{ "blockType": "text", "content": "Sobre" }]
                 },

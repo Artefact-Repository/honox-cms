@@ -6,41 +6,43 @@ import { isLocale, TRANSLATED_LOCALES } from "../../lib/i18n";
 import { listPageSlugs, loadPage } from "../../lib/pages";
 import { RESERVED_PAGE_SLUGS } from "../../lib/reserved-page-slugs";
 
-// The canonical translated-content-page URL: `/<slug>/<locale>` (e.g.
-// /about/zh) — shorter than, but otherwise equivalent to,
-// `/pages/<locale>/<slug>` (still served as-is by
-// app/routes/pages/[slug].tsx for existing links/bookmarks).
+// The canonical translated-content-page URL: `/<locale>/<page>` (e.g.
+// /zh/about) — matches docs/blog's locale-first convention, and is shorter
+// than, but otherwise equivalent to, `/<locale>/pages/<page>` (still served
+// as-is by app/routes/[locale]/pages/[slug].tsx for existing links/bookmarks).
 //
 // This route only renders for the dev server: like app/routes/[page].tsx,
 // its handler takes `(c, next)`, which @hono/vite-ssg's route discovery
 // treats as middleware and excludes from static generation — so it produces
 // no file in `dist/` on `bun run build`. The actual production output comes
 // from vite.config.ts's `copyLocalizedContentPagesPlugin`, which copies the
-// already-correctly-generated `dist/pages/<locale>/<slug>.html` (no such
-// SSG conflict) to `dist/<slug>/<locale>.html` as a build step. Keeping this
-// route (rather than deleting it) is purely so `bun run dev` can preview the
-// same content the build step will produce.
+// already-correctly-generated `dist/<locale>/pages/<page>.html` (no such SSG
+// conflict) to `dist/<locale>/<page>.html` as a build step.
 //
-// Guarded tightly (known content-page slug + real translated locale) since
-// this file sits at the routing root with a dynamic first segment — same
-// shadowing risk `RESERVED_PAGE_SLUGS` exists for on `app/routes/[page].tsx`.
-// For anything else (e.g. /blog/de, /docs/Introduction) it defers via `next()`.
+// The guard here isn't just belt-and-suspenders: this file sits alongside
+// app/routes/[locale]/{blog,docs,pages} with the identical dynamic-first-
+// segment shape (`/:locale/:page` vs. e.g. `/:locale/blog`), and verified
+// empirically (raw Hono, no HonoX) that WITHOUT an explicit defer-if-reserved
+// guard, this shape can silently swallow `/de/blog`/`/de/docs` depending on
+// file registration order alone — `[locale]` sorts before `blog`/`docs`
+// alphabetically, which is exactly the losing order. The 2-arg `next()`
+// guard makes this safe regardless of order, same as app/routes/[page].tsx.
 export default createRoute(
 	ssgParams(() =>
-		listPageSlugs()
-			.filter((slug) => !RESERVED_PAGE_SLUGS.has(slug))
-			.flatMap((page) =>
-				TRANSLATED_LOCALES.map((locale) => ({ page, locale })),
-			),
+		TRANSLATED_LOCALES.flatMap((locale) =>
+			listPageSlugs()
+				.filter((page) => !RESERVED_PAGE_SLUGS.has(page))
+				.map((page) => ({ locale, page })),
+		),
 	),
 	async (c, next) => {
-		const page = c.req.param("page");
 		const locale = c.req.param("locale");
+		const page = c.req.param("page");
 
 		if (
 			!page ||
-			RESERVED_PAGE_SLUGS.has(page) ||
 			!isLocale(locale) ||
+			RESERVED_PAGE_SLUGS.has(page) ||
 			!listPageSlugs().includes(page)
 		) {
 			return next();

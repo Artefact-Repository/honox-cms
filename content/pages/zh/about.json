@@ -53,7 +53,7 @@
                 },
                 {
                   "blockType": "link",
-                  "href": "/pages/zh/about",
+                  "href": "/zh/about",
                   "variant": "plain",
                   "children": [{ "blockType": "text", "content": "关于" }]
                 },
