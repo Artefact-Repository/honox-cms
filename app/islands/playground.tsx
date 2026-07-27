@@ -1,6 +1,6 @@
 import { css } from "design-system/css";
 import { button, code } from "design-system/recipes";
-import { useState } from "hono/jsx";
+import { useRef, useState } from "hono/jsx";
 import { InteractiveSplitter } from "../components/ui/splitter-primitive";
 
 export interface PlaygroundPage {
@@ -21,6 +21,8 @@ const VIEWPORTS: { id: Viewport; label: string; width: string }[] = [
 	{ id: "tablet", label: "Tablet", width: "48rem" },
 	{ id: "mobile", label: "Mobile", width: "24rem" },
 ];
+
+const JSON_EDIT_DEBOUNCE_MS = 500;
 
 const panelContentClass = css({
 	display: "flex",
@@ -57,11 +59,18 @@ export default function PlaygroundIsland({
 	pages,
 	defaultSlug,
 }: PlaygroundIslandProps) {
-	const [selectedSlug, setSelectedSlug] = useState(
-		defaultSlug ?? pages[0]?.slug ?? "",
-	);
+	const initialSlug = defaultSlug ?? pages[0]?.slug ?? "";
+	const initialPage = pages.find((p) => p.slug === initialSlug) ?? pages[0];
+
+	const [selectedSlug, setSelectedSlug] = useState(initialSlug);
 	const [viewport, setViewport] = useState<Viewport>("desktop");
 	const [copied, setCopied] = useState(false);
+	const [jsonText, setJsonText] = useState(initialPage?.json ?? "");
+	const [parseError, setParseError] = useState<string | null>(null);
+	const [previewHtml, setPreviewHtml] = useState<string | null>(null);
+	const [isRendering, setIsRendering] = useState(false);
+
+	const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	const selected = pages.find((page) => page.slug === selectedSlug) ?? pages[0];
 
@@ -69,9 +78,63 @@ export default function PlaygroundIsland({
 		return <p>No CMS pages found under content/pages.</p>;
 	}
 
+	const renderLivePreview = async (text: string) => {
+		let parsed: { title?: string; content?: unknown };
+		try {
+			parsed = JSON.parse(text);
+		} catch (err) {
+			setParseError(err instanceof Error ? err.message : "Invalid JSON");
+			return;
+		}
+		setParseError(null);
+		setIsRendering(true);
+		try {
+			const res = await fetch("/api/pages/preview", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					title: parsed.title,
+					content: parsed.content,
+				}),
+			});
+			if (!res.ok) throw new Error(`Preview request failed (${res.status})`);
+			setPreviewHtml(await res.text());
+		} catch (err) {
+			setParseError(
+				err instanceof Error ? err.message : "Live preview unavailable",
+			);
+		} finally {
+			setIsRendering(false);
+		}
+	};
+
+	const handleSelectPage = (slug: string) => {
+		if (debounceRef.current) clearTimeout(debounceRef.current);
+		const page = pages.find((p) => p.slug === slug);
+		setSelectedSlug(slug);
+		setJsonText(page?.json ?? "");
+		setParseError(null);
+		setPreviewHtml(null);
+	};
+
+	const handleJsonInput = (value: string) => {
+		setJsonText(value);
+		if (debounceRef.current) clearTimeout(debounceRef.current);
+		debounceRef.current = setTimeout(() => {
+			renderLivePreview(value);
+		}, JSON_EDIT_DEBOUNCE_MS);
+	};
+
+	const handleReset = () => {
+		if (debounceRef.current) clearTimeout(debounceRef.current);
+		setJsonText(selected.json);
+		setParseError(null);
+		setPreviewHtml(null);
+	};
+
 	const handleCopy = async () => {
 		try {
-			await navigator.clipboard.writeText(selected.json);
+			await navigator.clipboard.writeText(jsonText);
 			setCopied(true);
 			setTimeout(() => setCopied(false), 1500);
 		} catch {
@@ -81,38 +144,76 @@ export default function PlaygroundIsland({
 
 	const activeWidth =
 		VIEWPORTS.find((v) => v.id === viewport)?.width ?? "100%";
+	const isEdited = jsonText !== selected.json;
 
 	const jsonPanelContent = (
 		<div class={panelContentClass}>
 			<div class={panelHeaderClass}>
 				<span class={panelLabelClass}>content/pages/{selected.slug}.json</span>
-				<button
-					type="button"
-					class={button({ variant: "plain", size: "xs" })}
-					onClick={handleCopy}
-				>
-					{copied ? "Copied!" : "Copy JSON"}
-				</button>
+				<div class={css({ display: "flex", alignItems: "center", gap: "2" })}>
+					{isEdited && (
+						<button
+							type="button"
+							class={button({ variant: "plain", size: "xs" })}
+							onClick={handleReset}
+						>
+							Reset
+						</button>
+					)}
+					<button
+						type="button"
+						class={button({ variant: "plain", size: "xs" })}
+						onClick={handleCopy}
+					>
+						{copied ? "Copied!" : "Copy JSON"}
+					</button>
+				</div>
 			</div>
-			<pre
+			<textarea
+				value={jsonText}
+				onInput={(e) =>
+					handleJsonInput((e.target as HTMLTextAreaElement).value)
+				}
+				spellcheck={false}
+				autocomplete="off"
 				class={css({
 					m: "0",
-					overflow: "auto",
+					p: "0",
 					flex: "1",
 					minH: "0",
+					resize: "none",
+					borderWidth: "0",
+					outline: "none",
+					bg: "transparent",
+					color: "inherit",
+					fontFamily: "mono",
 					fontSize: "xs",
 					lineHeight: "1.6",
+					overflow: "auto",
 				})}
-			>
-				<code class={code({ variant: "plain" })}>{selected.json}</code>
-			</pre>
+			/>
+			{parseError && (
+				<p
+					class={css({
+						color: { base: "red.9", _dark: "red.7" },
+						fontSize: "xs",
+						m: "0",
+						flexShrink: "0",
+					})}
+				>
+					{parseError}
+				</p>
+			)}
 		</div>
 	);
 
 	const previewPanelContent = (
 		<div class={panelContentClass}>
 			<div class={panelHeaderClass}>
-				<span class={panelLabelClass}>Preview: /pages/{selected.slug}</span>
+				<span class={panelLabelClass}>
+					Preview{previewHtml ? " (edited draft)" : `: /pages/${selected.slug}`}
+					{isRendering ? "…" : ""}
+				</span>
 				<div class={css({ display: "flex", alignItems: "center", gap: "1" })}>
 					{VIEWPORTS.map((v) => (
 						<button
@@ -149,7 +250,8 @@ export default function PlaygroundIsland({
 			>
 				<iframe
 					key={selected.slug}
-					src={`/pages/${selected.slug}`}
+					src={previewHtml ? undefined : `/pages/${selected.slug}`}
+					srcdoc={previewHtml ?? undefined}
 					title={`Preview of ${selected.title}`}
 					class={css({ border: "none", h: "full", bg: "white" })}
 					style={{ width: activeWidth, flexShrink: "0" }}
@@ -181,7 +283,7 @@ export default function PlaygroundIsland({
 							variant: page.slug === selected.slug ? "solid" : "outline",
 							size: "sm",
 						})}
-						onClick={() => setSelectedSlug(page.slug)}
+						onClick={() => handleSelectPage(page.slug)}
 					>
 						{page.title}
 					</button>
