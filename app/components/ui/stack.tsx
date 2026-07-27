@@ -1,6 +1,10 @@
 import { cx } from "design-system/css";
 import { type StackProperties, stack } from "design-system/patterns";
-import type { PropsWithChildren } from "hono/jsx";
+import {
+	cloneElement,
+	type ElementType,
+	type PropsWithChildren,
+} from "hono/jsx";
 
 /**
  * Breakpoints accepted for responsive prop values. Mirrors Panda's default
@@ -50,19 +54,26 @@ type WrapValue = "wrap" | "nowrap" | "wrap-reverse";
  * `{ base: "column", md: "row" }`.
  */
 function resolveResponsive(
-	value: string | undefined | Partial<Record<Breakpoint, string>>,
+	value: unknown,
 	map: (value: string) => string,
 ): string | Partial<Record<Breakpoint, string>> | undefined {
-	if (value === undefined) return undefined;
-	if (typeof value === "object" && value !== null) {
+	if (value === undefined || value === null) return undefined;
+	if (typeof value === "boolean") {
+		return map(value ? "wrap" : "nowrap");
+	}
+	if (typeof value === "object") {
 		const out: Partial<Record<Breakpoint, string>> = {};
 		for (const key of Object.keys(value) as Breakpoint[]) {
-			const leaf = value[key];
-			if (leaf !== undefined) out[key] = map(leaf);
+			const leaf = (value as Record<string, unknown>)[key];
+			if (leaf !== undefined) {
+				const stringLeaf =
+					typeof leaf === "boolean" ? (leaf ? "wrap" : "nowrap") : String(leaf);
+				out[key] = map(stringLeaf);
+			}
 		}
 		return out;
 	}
-	return map(value);
+	return map(String(value));
 }
 
 const DIRECTION = {
@@ -90,6 +101,10 @@ const JUSTIFY = {
 export interface StackProps
 	extends PropsWithChildren<{
 		class?: string;
+		/** Render as a different element/component (e.g. "ul", "ol", "section"). */
+		as?: ElementType;
+		/** Merge the stack styles onto a single child element. */
+		asChild?: boolean;
 		/**
 		 * Alias for `flex-direction`. Defaults to `horizontal` (row).
 		 * Responsive: `{ base: "column", md: "row" }`.
@@ -101,12 +116,18 @@ export interface StackProps
 		align?: Responsive<AlignValue>;
 		/** Alias for `justify-content`. */
 		justify?: Responsive<JustifyValue>;
-		/** `flex-wrap` convenience. */
-		wrap?: Responsive<WrapValue>;
+		/** `flex-wrap` convenience. Can be a wrap value string or a boolean shortcut. */
+		wrap?:
+			| Responsive<WrapValue>
+			| boolean
+			| Partial<Record<Breakpoint, WrapValue | boolean>>;
+		[key: string]: unknown;
 	}> {}
 
 export function Stack(props: StackProps) {
 	const {
+		as: Component = "div",
+		asChild,
 		children,
 		class: classProp,
 		direction,
@@ -131,15 +152,23 @@ export function Stack(props: StackProps) {
 					(v) => JUSTIFY[v as keyof typeof JUSTIFY] ?? v,
 				)
 			: undefined,
-		flexWrap: wrap ? resolveResponsive(wrap, (v) => v) : undefined,
+		flexWrap:
+			wrap !== undefined ? resolveResponsive(wrap, (v) => v) : undefined,
 	};
 
+	const className = cx(stack(styles as Parameters<typeof stack>[0]), classProp);
+
+	if (asChild && typeof children === "object" && children !== null) {
+		const child = children as JSX.Element;
+		return cloneElement(child, {
+			...rest,
+			class: cx(className, child.props?.class),
+		});
+	}
+
 	return (
-		<div
-			class={cx(stack(styles as Parameters<typeof stack>[0]), classProp)}
-			{...rest}
-		>
+		<Component class={className} {...rest}>
 			{children}
-		</div>
+		</Component>
 	);
 }
