@@ -1,6 +1,8 @@
 import { css } from "design-system/css";
 import { button, code } from "design-system/recipes";
 import { useRef, useState } from "hono/jsx";
+import type { ComponentBlock } from "../components/block-types";
+import { PageRenderer } from "../components/page-renderer";
 import { InteractiveSplitter } from "../components/ui/splitter-primitive";
 
 export interface PlaygroundPage {
@@ -22,7 +24,7 @@ const VIEWPORTS: { id: Viewport; label: string; width: string }[] = [
 	{ id: "mobile", label: "Mobile", width: "24rem" },
 ];
 
-const JSON_EDIT_DEBOUNCE_MS = 500;
+const JSON_EDIT_DEBOUNCE_MS = 300;
 
 const panelContentClass = css({
 	display: "flex",
@@ -55,6 +57,11 @@ const panelLabelClass = css({
 	whiteSpace: "nowrap",
 });
 
+interface Draft {
+	title?: string;
+	content: ComponentBlock[];
+}
+
 export default function PlaygroundIsland({
 	pages,
 	defaultSlug,
@@ -67,8 +74,7 @@ export default function PlaygroundIsland({
 	const [copied, setCopied] = useState(false);
 	const [jsonText, setJsonText] = useState(initialPage?.json ?? "");
 	const [parseError, setParseError] = useState<string | null>(null);
-	const [previewHtml, setPreviewHtml] = useState<string | null>(null);
-	const [isRendering, setIsRendering] = useState(false);
+	const [draft, setDraft] = useState<Draft | null>(null);
 
 	const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -78,34 +84,32 @@ export default function PlaygroundIsland({
 		return <p>No CMS pages found under content/pages.</p>;
 	}
 
-	const renderLivePreview = async (text: string) => {
-		let parsed: { title?: string; content?: unknown };
+	// Re-renders the edited draft entirely client-side via the same
+	// PageRenderer/block-registry the real /pages/:slug route uses server-side
+	// — this app deploys as a static export (GitHub Pages, see
+	// .github/workflows/deploy.yml), so there is no server to round-trip an
+	// edited draft through at request time; the block tree has to be rendered
+	// in-browser instead. Safe to call directly (not through the SSR→hydration
+	// island boundary) because it runs inside this already-mounted island: no
+	// prop-serialization, so nested components' own hooks/state work normally.
+	const applyDraft = (text: string) => {
+		let parsed: unknown;
 		try {
 			parsed = JSON.parse(text);
 		} catch (err) {
 			setParseError(err instanceof Error ? err.message : "Invalid JSON");
 			return;
 		}
-		setParseError(null);
-		setIsRendering(true);
-		try {
-			const res = await fetch("/api/pages/preview", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					title: parsed.title,
-					content: parsed.content,
-				}),
-			});
-			if (!res.ok) throw new Error(`Preview request failed (${res.status})`);
-			setPreviewHtml(await res.text());
-		} catch (err) {
-			setParseError(
-				err instanceof Error ? err.message : "Live preview unavailable",
-			);
-		} finally {
-			setIsRendering(false);
+		if (
+			typeof parsed !== "object" ||
+			parsed === null ||
+			!Array.isArray((parsed as { content?: unknown }).content)
+		) {
+			setParseError('Expected an object with a "content" array');
+			return;
 		}
+		setParseError(null);
+		setDraft(parsed as Draft);
 	};
 
 	const handleSelectPage = (slug: string) => {
@@ -114,14 +118,14 @@ export default function PlaygroundIsland({
 		setSelectedSlug(slug);
 		setJsonText(page?.json ?? "");
 		setParseError(null);
-		setPreviewHtml(null);
+		setDraft(null);
 	};
 
 	const handleJsonInput = (value: string) => {
 		setJsonText(value);
 		if (debounceRef.current) clearTimeout(debounceRef.current);
 		debounceRef.current = setTimeout(() => {
-			renderLivePreview(value);
+			applyDraft(value);
 		}, JSON_EDIT_DEBOUNCE_MS);
 	};
 
@@ -129,7 +133,7 @@ export default function PlaygroundIsland({
 		if (debounceRef.current) clearTimeout(debounceRef.current);
 		setJsonText(selected.json);
 		setParseError(null);
-		setPreviewHtml(null);
+		setDraft(null);
 	};
 
 	const handleCopy = async () => {
@@ -211,8 +215,7 @@ export default function PlaygroundIsland({
 		<div class={panelContentClass}>
 			<div class={panelHeaderClass}>
 				<span class={panelLabelClass}>
-					Preview{previewHtml ? " (edited draft)" : `: /pages/${selected.slug}`}
-					{isRendering ? "…" : ""}
+					Preview{draft ? " (edited draft)" : `: /pages/${selected.slug}`}
 				</span>
 				<div class={css({ display: "flex", alignItems: "center", gap: "1" })}>
 					{VIEWPORTS.map((v) => (
@@ -248,14 +251,36 @@ export default function PlaygroundIsland({
 					justifyContent: "center",
 				})}
 			>
-				<iframe
-					key={selected.slug}
-					src={previewHtml ? undefined : `/pages/${selected.slug}`}
-					srcdoc={previewHtml ?? undefined}
-					title={`Preview of ${selected.title}`}
-					class={css({ border: "none", h: "full", bg: "white" })}
-					style={{ width: activeWidth, flexShrink: "0" }}
-				/>
+				{draft ? (
+					<div
+						class={css({
+							bg: "bg.canvas",
+							color: "fg.default",
+							minH: "full",
+							flexShrink: "0",
+							px: "4",
+							py: "8",
+							display: "flex",
+							flexDirection: "column",
+							gap: "6",
+						})}
+						style={{ width: activeWidth }}
+					>
+						<PageRenderer
+							content={draft.content}
+							locale="en"
+							currentPath="/playground"
+						/>
+					</div>
+				) : (
+					<iframe
+						key={selected.slug}
+						src={`/pages/${selected.slug}`}
+						title={`Preview of ${selected.title}`}
+						class={css({ border: "none", h: "full", bg: "white" })}
+						style={{ width: activeWidth, flexShrink: "0" }}
+					/>
+				)}
 			</div>
 		</div>
 	);
