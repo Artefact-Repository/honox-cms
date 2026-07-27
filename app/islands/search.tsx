@@ -1,5 +1,7 @@
-import { css, cx } from "design-system/css";
+import { cx } from "design-system/css";
+import { search } from "design-system/recipes";
 import { useEffect, useId, useMemo, useRef, useState } from "hono/jsx";
+import { CloseIcon } from "../icons/close";
 import { SearchIcon as SearchIconImport } from "../icons/search";
 import {
 	filterEntries,
@@ -7,47 +9,6 @@ import {
 	type SearchIndexEntry,
 	tokenize,
 } from "../utils/search";
-
-const inputWrapClass = css({ position: "relative" });
-
-const iconClass = css({
-	position: "absolute",
-	left: "3",
-	top: "50%",
-	transform: "translateY(-50%)",
-	color: "fg.muted",
-	pointerEvents: "none",
-	zIndex: "1",
-});
-
-const inputClass = css({
-	width: "full",
-	pl: "10",
-	pr: "4",
-	py: "3",
-	borderWidth: "2px",
-	borderRadius: "lg",
-	bg: "gray.surface.bg",
-	color: "fg.default",
-	borderColor: "border",
-	fontSize: "md",
-	transition: "all 0.2s",
-	_focus: {
-		outline: "none",
-		borderColor: "blue.9",
-		shadow: "0 0 0 3px var(--colors-blue-6)",
-	},
-	_placeholder: { color: "fg.muted" },
-});
-
-const countRowClass = css({
-	mt: "2",
-	display: "flex",
-	alignItems: "center",
-	gap: "3",
-	fontSize: "sm",
-	color: "fg.muted",
-});
 
 const SearchIcon = (props: any) => (
 	<SearchIconImport width="20" height="20" {...props} />
@@ -93,14 +54,15 @@ function highlightSegments(
 function Highlighted({ text, tokens }: { text: string; tokens: string[] }) {
 	return (
 		<>
-			{highlightSegments(text, tokens).map((segment) =>
+			{highlightSegments(text, tokens).map((segment, index) =>
 				segment.match ? (
 					<mark
-						class={css({
-							bg: "amber.5",
+						key={index}
+						style={{
+							backgroundColor: "var(--colors-amber-5)",
 							color: "inherit",
-							borderRadius: "xs",
-						})}
+							borderRadius: "2px",
+						}}
 					>
 						{segment.text}
 					</mark>
@@ -181,49 +143,33 @@ const DEFAULT_TRANSLATIONS: Record<
 	},
 };
 
-// Every collection's locale-scoped search index lives at
-// <collection>/[lang]/search.json.ts (e.g. app/routes/api/posts/[lang]/
-// search.json.ts, app/routes/api/docs/[lang]/search.json.ts) — a dynamic
-// segment can't be combined with a literal prefix/suffix in honox's file
-// router, so `:lang` gets its own directory segment after the collection
-// rather than a `search.[lang].json` filename. This maps a collection's
-// default (English) `src` to its locale-specific counterpart.
 function localiseSearchSrc(url: string, locale: string): string {
 	if (locale === "en" || !url.endsWith("/search.json")) return url;
 	return url.replace(/\/search\.json$/, `/${locale}/search.json`);
 }
 
 export interface SearchBaseProps {
-	/** Language locale code (defaults to "en") */
 	locale?: string;
-	/** URL of the SSG-generated JSON search index */
 	src?: string;
 	placeholder?: string;
 	initialQuery?: string;
-	/** Delay before a keystroke is applied as the active query (ms) */
 	debounceMs?: number;
-	/** Maximum entries shown in the autocomplete dropdown */
 	maxSuggestions?: number;
-	/**
-	 * When set, elements carrying this attribute (e.g. "data-post-slug") are
-	 * shown/hidden depending on whether their value matches an entry key.
-	 */
 	filterAttribute?: string;
-	/** id of an element to reveal when the filtered list has zero matches */
 	emptyStateId?: string;
-	/** Result count shown before the index has loaded */
 	total?: number;
-	/** Noun used in the result count, e.g. "articles" */
 	itemLabel?: string;
-	/** Show the "Showing X of N" result count row (default true) */
 	showCount?: boolean;
-	/** No-JS fallback: submit ?q= to this path via a plain GET form */
 	action?: string;
-	/** Mirror the active query into the address bar as ?q= (default true) */
 	syncUrl?: boolean;
+	variant?: "outline" | "surface" | "subtle";
+	size?: "sm" | "md" | "lg";
+	class?: string;
+	style?: any;
 }
 
 export function InteractiveSearch(props: SearchBaseProps) {
+	const [variantProps, localProps] = search.splitVariantProps(props);
 	const {
 		locale = "en",
 		src,
@@ -238,7 +184,12 @@ export function InteractiveSearch(props: SearchBaseProps) {
 		showCount = true,
 		action,
 		syncUrl = true,
-	} = props;
+		class: classProp,
+		style,
+		...rest
+	} = localProps;
+
+	const styles = search(variantProps);
 
 	const resolvedPlaceholder =
 		placeholder ?? DEFAULT_PLACEHOLDERS[locale] ?? DEFAULT_PLACEHOLDERS.en;
@@ -258,7 +209,10 @@ export function InteractiveSearch(props: SearchBaseProps) {
 	const [open, setOpen] = useState(false);
 	const [highlighted, setHighlighted] = useState(-1);
 	const fetchStarted = useRef(false);
-	const listboxId = `search-listbox-${useId()}`;
+
+	const fallbackId = useId();
+	const rootId = `search-root-${fallbackId}`;
+	const listboxId = `search-listbox-${fallbackId}`;
 
 	const ensureLoaded = () => {
 		if (fetchStarted.current) return;
@@ -332,6 +286,43 @@ export function InteractiveSearch(props: SearchBaseProps) {
 		}
 	}, [matches, filterAttribute, emptyStateId, query, syncUrl]);
 
+	// Auto scroll highlighted suggestion into view
+	useEffect(() => {
+		if (highlighted !== -1 && open) {
+			const root = document.getElementById(rootId);
+			if (root) {
+				const list = root.querySelector('[role="listbox"]') as HTMLElement;
+				const item = root.querySelector(
+					`[role="option"][id$="-option-${highlighted}"]`,
+				) as HTMLElement;
+				if (list && item) {
+					const listRect = list.getBoundingClientRect();
+					const itemRect = item.getBoundingClientRect();
+					if (itemRect.bottom > listRect.bottom) {
+						list.scrollTop += itemRect.bottom - listRect.bottom;
+					} else if (itemRect.top < listRect.top) {
+						list.scrollTop -= listRect.top - itemRect.top;
+					}
+				}
+			}
+		}
+	}, [highlighted, open, rootId]);
+
+	// Close on outside click/pointerdown
+	useEffect(() => {
+		const root = document.getElementById(rootId);
+		if (!root) return;
+		const handleDocumentClick = (e: MouseEvent) => {
+			if (!root.contains(e.target as Node)) {
+				setOpen(false);
+			}
+		};
+		document.addEventListener("pointerdown", handleDocumentClick);
+		return () => {
+			document.removeEventListener("pointerdown", handleDocumentClick);
+		};
+	}, [rootId]);
+
 	const navigateTo = (entry: SearchIndexEntry) => {
 		window.location.assign(entry.href);
 	};
@@ -369,8 +360,8 @@ export function InteractiveSearch(props: SearchBaseProps) {
 
 	const body = (
 		<>
-			<div class={inputWrapClass}>
-				<div class={iconClass}>
+			<div class={styles.inputWrap}>
+				<div class={styles.icon}>
 					<SearchIcon />
 				</div>
 				<input
@@ -383,7 +374,7 @@ export function InteractiveSearch(props: SearchBaseProps) {
 					aria-activedescendant={activeId}
 					placeholder={resolvedPlaceholder}
 					value={rawQuery}
-					class={inputClass}
+					class={styles.input}
 					onInput={(event: Event) => {
 						setRawQuery((event.target as HTMLInputElement).value);
 						setHighlighted(-1);
@@ -394,36 +385,33 @@ export function InteractiveSearch(props: SearchBaseProps) {
 						ensureLoaded();
 						if (rawQuery) setOpen(true);
 					}}
-					onBlur={() => setOpen(false)}
 					onKeyDown={handleKeyDown}
+					{...rest}
 				/>
-				{showDropdown && (
-					<div
-						id={listboxId}
-						role="listbox"
-						class={css({
-							position: "absolute",
-							top: "calc(100% + 6px)",
-							left: "0",
-							right: "0",
-							bg: "gray.surface.bg",
-							borderWidth: "1px",
-							borderColor: "gray.outline.border",
-							borderRadius: "lg",
-							shadow: "lg",
-							zIndex: "50",
-							maxHeight: "80",
-							overflowY: "auto",
-							p: "1",
-						})}
+				{rawQuery && (
+					<button
+						type="button"
+						aria-label="clear"
+						class={styles.clearTrigger}
+						onClick={() => {
+							setRawQuery("");
+							setQuery("");
+							setHighlighted(-1);
+							const root = document.getElementById(rootId);
+							const input = root?.querySelector(
+								'input[type="search"]',
+							) as HTMLElement | null;
+							input?.focus();
+						}}
 					>
-						{!matches && (
-							<div class={css({ px: "4", py: "3", color: "fg.muted" })}>
-								{t.loading}
-							</div>
-						)}
+						<CloseIcon width="16" height="16" />
+					</button>
+				)}
+				{showDropdown && (
+					<div id={listboxId} role="listbox" class={styles.listbox}>
+						{!matches && <div class={styles.status}>{t.loading}</div>}
 						{matches && suggestions.length === 0 && (
-							<div class={css({ px: "4", py: "3", color: "fg.muted" })}>
+							<div class={styles.status}>
 								{t.noMatches.replace("{query}", query)}
 							</div>
 						)}
@@ -434,15 +422,8 @@ export function InteractiveSearch(props: SearchBaseProps) {
 								role="option"
 								tabIndex={-1}
 								aria-selected={index === highlighted}
-								class={cx(
-									css({
-										px: "3",
-										py: "2.5",
-										borderRadius: "md",
-										cursor: "pointer",
-									}),
-									index === highlighted && css({ bg: "blue.3" }),
-								)}
+								data-highlighted={index === highlighted ? "" : undefined}
+								class={styles.item}
 								onMouseDown={(event: Event) => {
 									event.preventDefault();
 									navigateTo(entry);
@@ -450,31 +431,16 @@ export function InteractiveSearch(props: SearchBaseProps) {
 								onMouseOver={() => setHighlighted(index)}
 								onFocus={() => setHighlighted(index)}
 							>
-								<div class={css({ fontWeight: "medium", color: "fg.default" })}>
+								<div class={styles.itemTitle}>
 									<Highlighted text={entry.title} tokens={tokens} />
 								</div>
 								{entry.description && (
-									<div
-										class={css({
-											fontSize: "sm",
-											color: "fg.muted",
-											lineClamp: "2",
-											mt: "0.5",
-										})}
-									>
+									<div class={styles.itemDescription}>
 										<Highlighted text={entry.description} tokens={tokens} />
 									</div>
 								)}
 								{entry.tags && entry.tags.length > 0 && (
-									<div
-										class={css({
-											fontSize: "xs",
-											color: "blue.10",
-											mt: "1",
-										})}
-									>
-										{entry.tags.join(" · ")}
-									</div>
+									<div class={styles.itemTags}>{entry.tags.join(" · ")}</div>
 								)}
 							</div>
 						))}
@@ -482,8 +448,15 @@ export function InteractiveSearch(props: SearchBaseProps) {
 				)}
 			</div>
 			{showCount && (
-				<div class={countRowClass}>
-					<span>
+				<div
+					style={{
+						marginTop: "0.5rem",
+						display: "flex",
+						alignItems: "center",
+						gap: "0.75rem",
+					}}
+				>
+					<span class={styles.countText}>
 						{matches
 							? t.showingResults
 									.replace("{count}", String(matches.length))
@@ -503,16 +476,17 @@ export function InteractiveSearch(props: SearchBaseProps) {
 								setRawQuery("");
 								setQuery("");
 							}}
-							class={css({
-								color: "blue.10",
-								fontWeight: "medium",
+							style={{
+								color:
+									"var(--colors-color-palette-plain-fg, var(--colors-blue-10))",
+								fontWeight: "500",
 								cursor: "pointer",
-								bg: "transparent",
+								background: "transparent",
 								border: "none",
-								p: "0",
-								fontSize: "sm",
-								_hover: { textDecoration: "underline" },
-							})}
+								padding: "0",
+								fontSize: "0.875rem",
+								textDecoration: "none",
+							}}
 						>
 							{t.clear}
 						</button>
@@ -524,15 +498,19 @@ export function InteractiveSearch(props: SearchBaseProps) {
 
 	return action ? (
 		<form
+			id={rootId}
 			action={action}
 			method="get"
 			onSubmit={(event: Event) => event.preventDefault()}
-			class={css({ width: "full" })}
+			class={cx(styles.root, classProp)}
+			style={style}
 		>
 			{body}
 		</form>
 	) : (
-		<div class={css({ width: "full" })}>{body}</div>
+		<div id={rootId} class={cx(styles.root, classProp)} style={style}>
+			{body}
+		</div>
 	);
 }
 

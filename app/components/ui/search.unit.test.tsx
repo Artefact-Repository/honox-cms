@@ -33,4 +33,27 @@ describe("Search Component Localisation", () => {
 		).toString();
 		expect(html).toContain('placeholder="Custom Placeholder"');
 	});
+
+	test("should apply slot recipe classes correctly in static rendering", () => {
+		const html = (<Search interactive={false} />).toString();
+		expect(html).toContain("search__root"); // styles.root should have class "search__root"
+		expect(html).toContain("search__inputWrap"); // styles.inputWrap
+		expect(html).toContain("search__input"); // styles.input
+	});
+
+	test("should render interactive search as a hydrated island and support size/variant variants", () => {
+		const html = (
+			<Search
+				interactive={true}
+				size="sm"
+				variant="subtle"
+				initialQuery="Hono"
+			/>
+		).toString();
+
+		expect(html).toContain("search__root--size_sm");
+		expect(html).toContain("search__root--variant_subtle");
+		expect(html).toContain('value="Hono"');
+		expect(html).toContain('class="search__clearTrigger'); // clearTrigger should be visible
+	});
 });
