@@ -135,6 +135,56 @@ function copyContentPagesToRootPlugin() {
 	};
 }
 
+// Same root cause as copyContentPagesToRootPlugin above (2-arg `(c, next)`
+// handlers — app/routes/[page]/[locale].tsx included — are excluded from
+// @hono/vite-ssg's static generation), for the short-URL locale alias
+// (`/<slug>/<locale>`, e.g. /about/zh) instead of the bare English path.
+// `dist/pages/<locale>/<slug>.html` is already correctly generated (that
+// route has no such conflict), so copy it to `dist/<slug>/<locale>.html`.
+function copyLocalizedContentPagesPlugin() {
+	return {
+		name: "copy-localized-content-pages",
+		closeBundle: async () => {
+			const distDir = path.resolve(__dirname, "dist");
+			const pagesDir = path.resolve(__dirname, "content/pages");
+			if (!existsSync(pagesDir)) return;
+
+			const slugs = readdirSync(pagesDir, { withFileTypes: true })
+				.filter((entry) => entry.isFile() && entry.name.endsWith(".json"))
+				.map((entry) => entry.name.replace(/\.json$/, ""))
+				.filter((slug) => !RESERVED_PAGE_SLUGS.has(slug));
+
+			for (const slug of slugs) {
+				for (const locale of TRANSLATED_LOCALES) {
+					const source = path.join(
+						distDir,
+						"pages",
+						locale,
+						`${slug}.html`,
+					);
+					if (!existsSync(source)) continue;
+
+					const destDir = path.join(distDir, slug);
+					const dest = path.join(destDir, `${locale}.html`);
+					if (existsSync(dest)) {
+						console.warn(
+							`[copy-localized-content-pages] ⚠ dist/${slug}/${locale}.html already exists — skipping`,
+						);
+						continue;
+					}
+					if (!existsSync(destDir)) {
+						mkdirSync(destDir, { recursive: true });
+					}
+					copyFileSync(source, dest);
+					console.log(
+						`[copy-localized-content-pages] ✓ dist/pages/${locale}/${slug}.html → dist/${slug}/${locale}.html`,
+					);
+				}
+			}
+		},
+	};
+}
+
 const config = defineConfig(({ mode }) =>
 	mode === "client" ? clientConfig : mainConfig(mode),
 );
@@ -183,6 +233,7 @@ const mainConfig = (_mode: string) => ({
 		ssg({ entry: "app/server.ts" }),
 		fixSsgRoutingPlugin(),
 		copyContentPagesToRootPlugin(),
+		copyLocalizedContentPagesPlugin(),
 	],
 });
 

@@ -110,6 +110,7 @@ export function detectLocale(path: string): string {
  *
  *   /docs/Button   → /docs/fr/Button   (locale = "fr")
  *   /blog          → /blog/fr
+ *   /about         → /about/fr         (root-level content page)
  *   /              → /fr
  *
  * No-op for the default locale, external hrefs, or already-localized paths.
@@ -142,6 +143,15 @@ export function localiseHref(href: string, locale: string): string {
 	) {
 		const collection = segments[0]!;
 		const rest = segments.slice(1).join("/");
+		// "pages" is special: unlike docs/blog, its bare English rendering is
+		// itself only a build-time duplicate of the true canonical `/<slug>`
+		// (see app/routes/[page].tsx + vite.config.ts's
+		// copyContentPagesToRootPlugin) — so a `/pages/<slug>` href reaching
+		// here localizes straight to the short form (`/<slug>/<locale>`)
+		// instead of `/pages/<locale>/<slug>`.
+		if (collection === "pages" && rest) {
+			return `/${rest}/${locale}`;
+		}
 		return rest
 			? `/${collection}/${locale}/${rest}`
 			: `/${collection}/${locale}`;
@@ -149,12 +159,13 @@ export function localiseHref(href: string, locale: string): string {
 
 	// Bare single-segment path outside any known collection (e.g. "/about") —
 	// a root-level content page (`content/pages/<slug>.json`, served at
-	// `/<slug>` for English by `app/routes/[page].tsx`). Its translations
-	// live under the "pages" collection instead (`/pages/<locale>/<slug>`,
-	// via `app/routes/pages/<locale>/[slug].tsx`) — same as this file's own
-	// route-structure example above (`/pages/es/about`).
+	// `/<slug>` for English by `app/routes/[page].tsx`). Its translations are
+	// canonically `/<slug>/<locale>` (e.g. "/about/zh", via
+	// `app/routes/[page]/[locale].tsx`) — shorter than, but otherwise
+	// equivalent to, `/pages/<locale>/<slug>` (still served as-is by
+	// `app/routes/pages/<locale>/[slug].tsx` for existing links/bookmarks).
 	if (segments.length === 1) {
-		return `/pages/${locale}/${segments[0]}`;
+		return `/${segments[0]}/${locale}`;
 	}
 
 	// Homepage: prefix with locale, no trailing slash (`/` → `/fr`, not `/fr/`)
@@ -175,8 +186,17 @@ export function localiseHref(href: string, locale: string): string {
  *   /fr                      → /
  */
 export function stripLocale(path: string, locale: string): string {
-	if (locale === "en") return path;
 	const segments = path.split("/").filter(Boolean);
+
+	// "pages" collection route at the default locale (e.g. /pages/about, the
+	// shape SSG actually renders `/about` with — see the copy-plugin comment
+	// in localiseHref above) — its true bare form drops the "pages" prefix
+	// entirely, unlike docs/blog which keep theirs even at the default locale.
+	if (locale === "en" && segments.length === 2 && segments[0] === "pages") {
+		return `/${segments[1]}`;
+	}
+
+	if (locale === "en") return path;
 
 	// Old format: /<locale>/<collection>/<...>
 	if (
@@ -197,7 +217,22 @@ export function stripLocale(path: string, locale: string): string {
 	) {
 		const collection = segments[0]!;
 		const rest = segments.slice(2).join("/");
+		// "pages" strips fully bare (see the localiseHref comment above).
+		if (collection === "pages" && rest) {
+			return `/${rest}`;
+		}
 		return rest ? `/${collection}/${rest}` : `/${collection}`;
+	}
+
+	// Short content-page route: /<slug>/<locale> (see localiseHref above) —
+	// segments[0] deliberately isn't a known collection, so this can't
+	// collide with the collection-route case just above (e.g. /blog/fr).
+	if (
+		segments.length === 2 &&
+		segments[1] === locale &&
+		!(COLLECTIONS as readonly string[]).includes(segments[0]!)
+	) {
+		return `/${segments[0]}`;
 	}
 
 	// Root route: /<locale>/<...>
