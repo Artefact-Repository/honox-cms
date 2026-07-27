@@ -28,6 +28,7 @@ export default function TabsIsland(props: TabsIslandProps) {
 	const [mountedValues, setMountedValues] = useState<string[]>(
 		mountedValuesProp ?? (initialValue !== undefined ? [initialValue] : []),
 	);
+	const isFirstRenderRef = useRef(true);
 
 	useEffect(() => {
 		if (valueProp !== undefined) {
@@ -38,7 +39,7 @@ export default function TabsIsland(props: TabsIslandProps) {
 		}
 	}, [valueProp]);
 
-	const updateIndicator = (activeTrigger: HTMLElement) => {
+	const updateIndicator = (activeTrigger: HTMLElement, enableTransition = true) => {
 		const root = rootRef.current;
 		if (!root) return;
 
@@ -50,6 +51,18 @@ export default function TabsIsland(props: TabsIslandProps) {
 		const height = `${rect.height}px`;
 		const left = `${rect.left - listRect.left}px`;
 		const top = `${rect.top - listRect.top}px`;
+
+		const indicator = root.querySelector<HTMLElement>('[data-part="indicator"]');
+		if (indicator) {
+			if (enableTransition) {
+				indicator.removeAttribute("data-transition");
+			} else {
+				indicator.setAttribute("data-transition", "false");
+				requestAnimationFrame(() => {
+					indicator.removeAttribute("data-transition");
+				});
+			}
+		}
 
 		for (const el of [root, list] as unknown[]) {
 			if (el) {
@@ -111,8 +124,12 @@ export default function TabsIsland(props: TabsIslandProps) {
 			`[data-part="trigger"][data-value="${value}"]`,
 		);
 		if (activeTrigger) {
+			const enableTransition = !isFirstRenderRef.current;
+			if (isFirstRenderRef.current) {
+				isFirstRenderRef.current = false;
+			}
 			requestAnimationFrame(() => {
-				updateIndicator(activeTrigger);
+				updateIndicator(activeTrigger, enableTransition);
 			});
 		}
 	}, [value, focusedValue]);

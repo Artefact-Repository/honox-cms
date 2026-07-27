@@ -60,6 +60,12 @@ export const tabs = defineSlotRecipe({
 			width: "var(--width)",
 			height: "var(--height)",
 			zIndex: -1,
+			transitionDuration: "normal",
+			transitionProperty: "left, top, width, height",
+			transitionTimingFunction: "default",
+			"&[data-transition='false']": {
+				transition: "none !important",
+			},
 		},
 	},
 
