@@ -62,9 +62,9 @@ export interface EditableContextValue {
 	/** Enters edit mode. No-op until hydrated. */
 	edit: () => void;
 	/** Exits edit mode, discarding changes. No-op until hydrated. */
-	cancel: () => void;
+	cancel: (options?: { restoreFocus?: boolean }) => void;
 	/** Exits edit mode, committing changes. No-op until hydrated. */
-	submit: () => void;
+	submit: (options?: { restoreFocus?: boolean }) => void;
 	/** Sets the value directly (e.g. from the input's onChange). No-op until hydrated. */
 	setValue: (value: string) => void;
 }
@@ -103,9 +103,9 @@ export interface RootProps extends EditableVariantProps, PropsWithChildren {
 	/** Driven by the interactive island; ignored when set by hand. */
 	onEdit?: () => void;
 	/** Driven by the interactive island; ignored when set by hand. */
-	onCancel?: () => void;
+	onCancel?: (options?: { restoreFocus?: boolean }) => void;
 	/** Driven by the interactive island; ignored when set by hand. */
-	onSubmit?: () => void;
+	onSubmit?: (options?: { restoreFocus?: boolean }) => void;
 	/** Driven by the interactive island; ignored when set by hand. */
 	onSetValue?: (value: string) => void;
 	rootRef?: unknown;
@@ -331,6 +331,7 @@ export function Preview(props: PreviewProps) {
 							visibility: context.editing ? "hidden" : undefined,
 							overflow: "hidden",
 							textOverflow: "ellipsis",
+							minWidth: context.empty ? "3ch" : "0",
 						}
 					: undefined
 			}
@@ -388,7 +389,7 @@ export function Input(props: InputProps) {
 			}}
 			onKeyDown={(e) => {
 				if (e.key === "Escape") {
-					context?.cancel();
+					context?.cancel({ restoreFocus: true });
 					e.preventDefault();
 				} else if (
 					e.key === "Enter" &&
@@ -396,7 +397,7 @@ export function Input(props: InputProps) {
 					!e.shiftKey &&
 					!(e as unknown as { metaKey?: boolean }).metaKey
 				) {
-					context?.submit();
+					context?.submit({ restoreFocus: true });
 					e.preventDefault();
 				}
 				(onKeyDown as ((e: typeof e) => void) | undefined)?.(e);
@@ -410,7 +411,7 @@ export function Input(props: InputProps) {
 				) {
 					return;
 				}
-				context?.submit();
+				context?.submit({ restoreFocus: false });
 			}}
 			style={
 				autoResize
@@ -491,7 +492,7 @@ export function SubmitTrigger(props: SubmitTriggerProps) {
 		"aria-label": context?.translations.submit,
 		hidden: !context?.editing,
 		disabled: context?.disabled,
-		onClick: () => context?.submit(),
+		onClick: () => context?.submit({ restoreFocus: true }),
 		...rest,
 	};
 	return (
@@ -518,7 +519,7 @@ export function CancelTrigger(props: CancelTriggerProps) {
 		"aria-label": context?.translations.cancel,
 		hidden: !context?.editing,
 		disabled: context?.disabled,
-		onClick: () => context?.cancel(),
+		onClick: () => context?.cancel({ restoreFocus: true }),
 		...rest,
 	};
 	return (

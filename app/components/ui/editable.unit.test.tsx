@@ -92,4 +92,24 @@ describe("Editable Unit Tests", () => {
 		expect(html).toContain('data-part="submit-trigger"');
 		expect(html).toContain('data-part="cancel-trigger"');
 	});
+
+	test("should forward form association name and form", () => {
+		const html = (
+			<Editable
+				interactive={false}
+				defaultValue="John"
+				name="username"
+				form="login-form"
+			/>
+		).toString();
+
+		expect(html).toContain('name="username"');
+		expect(html).toContain('form="login-form"');
+	});
+
+	test("should apply minWidth workaround to autoResize preview when empty", () => {
+		const html = (<Editable interactive={false} autoResize />).toString();
+
+		expect(html).toContain("min-width:3ch");
+	});
 });

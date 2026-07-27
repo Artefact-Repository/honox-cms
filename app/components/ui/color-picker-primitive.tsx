@@ -770,8 +770,12 @@ export function ValueText(props: {
 		ctx?.format === "hex"
 			? hsvaToHex(value, !isAlphaDisabled && value.a < 1)
 			: ctx?.format === "hsla"
-				? (isAlphaDisabled ? hsvaToHslString(value) : hsvaToHslaString(value))
-				: (isAlphaDisabled ? hsvaToRgbString(value) : hsvaToRgbaString(value));
+				? isAlphaDisabled
+					? hsvaToHslString(value)
+					: hsvaToHslaString(value)
+				: isAlphaDisabled
+					? hsvaToRgbString(value)
+					: hsvaToRgbaString(value);
 	return (
 		<span
 			data-part="value-text"
@@ -1728,11 +1732,11 @@ export function InteractiveColorPicker(props: InteractiveColorPickerProps) {
 			{trigger ? (
 				<>
 					{label && <Label>{label}</Label>}
-					<Trigger style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
+					<Trigger
+						style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}
+					>
 						<SwatchTrigger />
-						{showText && (
-							<ValueText />
-						)}
+						{showText && <ValueText />}
 					</Trigger>
 					{open && (
 						<Positioner>

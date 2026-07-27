@@ -29,14 +29,19 @@ export default function SegmentGroupIsland(props: SegmentGroupIslandProps) {
 		}
 	}, [valueProp]);
 
-	const updateIndicator = (activeItem: HTMLElement, enableTransition = true) => {
+	const updateIndicator = (
+		activeItem: HTMLElement,
+		enableTransition = true,
+	) => {
 		const root = rootRef.current;
 		if (!root) return;
 
 		const rect = activeItem.getBoundingClientRect();
 		const rootRect = root.getBoundingClientRect();
 
-		const indicator = root.querySelector<HTMLElement>('[data-part="indicator"]');
+		const indicator = root.querySelector<HTMLElement>(
+			'[data-part="indicator"]',
+		);
 		if (indicator) {
 			if (enableTransition) {
 				indicator.removeAttribute("data-transition");
