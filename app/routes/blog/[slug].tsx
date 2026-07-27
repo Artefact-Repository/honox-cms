@@ -235,7 +235,6 @@ export default createRoute(
 											<Badge
 												key={tag}
 												variant="subtle"
-												colorPalette="blue"
 												class={css({
 													borderRadius: "full",
 													fontSize: "sm",
@@ -317,7 +316,6 @@ export default createRoute(
 											<Avatar
 												size="md"
 												variant="solid"
-												colorPalette="blue"
 												name={post.author || "Artefact Team"}
 											/>
 										</Anchor>
@@ -397,7 +395,6 @@ export default createRoute(
 									<Button
 										variant="outline"
 										size="sm"
-										colorPalette="blue"
 										onClick={() => {
 											if (navigator.share) {
 												navigator.share({
@@ -536,7 +533,6 @@ export default createRoute(
 						<a href={localiseLink("/blog")} style={{ textDecoration: "none" }}>
 							<Button
 								variant="solid"
-								colorPalette="blue"
 								size="lg"
 								class={css({
 									display: "inline-flex",

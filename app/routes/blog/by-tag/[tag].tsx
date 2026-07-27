@@ -155,7 +155,6 @@ export default createRoute(
 								>
 									<Button
 										variant="plain"
-										colorPalette="blue"
 										class={css({
 											px: "4",
 											_hover: { bg: "blue.3" },
@@ -214,7 +213,6 @@ export default createRoute(
 
 							<Badge
 								variant="subtle"
-								colorPalette="blue"
 								class={css({
 									mb: "4",
 									px: "4",
@@ -422,7 +420,7 @@ export default createRoute(
 											href={localiseLink("/blog")}
 											style={{ textDecoration: "none" }}
 										>
-											<Button variant="solid" colorPalette="blue" size="lg">
+											<Button variant="solid" size="lg">
 												Browse All Posts
 											</Button>
 										</a>
@@ -547,7 +545,6 @@ export default createRoute(
 														<Avatar
 															size="md"
 															variant="solid"
-															colorPalette="blue"
 															name={post.author}
 															class={css({ shadow: "sm" })}
 														/>
@@ -617,7 +614,6 @@ export default createRoute(
 													<Button
 														variant="plain"
 														size="sm"
-														colorPalette="blue"
 														class={css({
 															px: "3",
 															_hover: {
@@ -672,7 +668,6 @@ export default createRoute(
 														>
 															<Badge
 																variant="subtle"
-																colorPalette="blue"
 																size="sm"
 																class={css({
 																	borderRadius: "full",
@@ -722,7 +717,6 @@ export default createRoute(
 							>
 								<Button
 									variant="outline"
-									colorPalette="blue"
 									size="lg"
 									class={css({
 										px: "8",

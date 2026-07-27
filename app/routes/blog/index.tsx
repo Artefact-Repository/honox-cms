@@ -165,7 +165,6 @@ export default createRoute(async (c) => {
 							autoplay={featuredPosts.length > 1 ? { delay: 6000 } : false}
 							pauseOnHover
 							loop
-							colorPalette="blue"
 						>
 							<div class={css({ position: "relative" })}>
 								<Carousel.ItemGroup
@@ -231,7 +230,6 @@ export default createRoute(async (c) => {
 													{index === 0 && (
 														<Badge
 															variant="solid"
-															colorPalette="blue"
 															size="sm"
 															class={css({ mb: "3", pointerEvents: "auto" })}
 														>
@@ -299,7 +297,6 @@ export default createRoute(async (c) => {
 																<Avatar
 																	size="sm"
 																	variant="solid"
-																	colorPalette="blue"
 																	name={post.author}
 																/>
 																<Text
@@ -648,12 +645,7 @@ export default createRoute(async (c) => {
 													textDecoration: "none",
 												})}
 											>
-												<Avatar
-													size="sm"
-													variant="solid"
-													colorPalette="blue"
-													name={post.author}
-												/>
+												<Avatar size="sm" variant="solid" name={post.author} />
 											</Anchor>
 											<div>
 												<Anchor
@@ -712,7 +704,6 @@ export default createRoute(async (c) => {
 											<Button
 												variant="plain"
 												size="sm"
-												colorPalette="blue"
 												class={css({
 													px: "2",
 													_hover: {
@@ -757,7 +748,6 @@ export default createRoute(async (c) => {
 												>
 													<Badge
 														variant="subtle"
-														colorPalette="blue"
 														size="sm"
 														class={css({
 															borderRadius: "full",
@@ -863,11 +853,7 @@ export default createRoute(async (c) => {
 							<MailIcon width="28" height="28" stroke="white" />
 						</Stack>
 
-						<Badge
-							variant="subtle"
-							colorPalette="blue"
-							class={css({ mb: "4", px: "3", py: "1" })}
-						>
+						<Badge variant="subtle" class={css({ mb: "4", px: "3", py: "1" })}>
 							📬 Newsletter
 						</Badge>
 
@@ -938,7 +924,6 @@ export default createRoute(async (c) => {
 							<Button
 								type="submit"
 								variant="solid"
-								colorPalette="blue"
 								size="lg"
 								class={css({
 									px: "8",
