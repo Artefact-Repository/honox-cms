@@ -24,22 +24,29 @@ Live demo: [https://honox.chen.so](https://honox.chen.so), [https://honox-ts.ver
 
 ### Routes
 
+Locale, where present, always comes **before** the collection/item (`/zh/blog`, `/zh/docs/Foo`, `/zh/about`) — not after. This isn't stylistic: a collection's locale-index route and its English detail route would otherwise share the exact same router shape (e.g. `/docs/:locale` vs. `/docs/:doc`), and only one of two identically-shaped dynamic routes can ever be statically generated. Putting `[locale]` first makes them different shapes, so both coexist. See `app/lib/i18n.ts`'s top-of-file doc comment for the full reasoning.
+
 | Route | File | Purpose |
 |---|---|---|
-| `/` | `app/routes/index.tsx` | Homepage — Page Builder-driven (`content/pages/index.json`), locale-aware |
-| `/blog` (+ `/blog/:locale`) | `app/routes/blog/index.tsx` (+ `blog/<locale>/index.tsx` re-exports) | Post list with tag filtering |
-| `/blog/by-tag/:tag` (+ `/blog/:locale/by-tag/:tag`) | `app/routes/blog/by-tag/[tag].tsx` (+ `blog/[lang]/by-tag/[tag].tsx`) | Tag-filtered post list (static) |
-| `/blog/by-author/:author` (+ `/blog/:locale/by-author/:author`) | `app/routes/blog/by-author/[author].tsx` (+ `blog/[lang]/by-author/[author].tsx`) | Author-filtered post list (static) |
-| `/blog/:slug` (+ `/blog/:locale/:slug`) | `app/routes/blog/[slug].tsx` (+ `blog/<locale>/[slug].tsx` re-exports) | Individual post |
+| `/` (+ `/:locale`) | `app/routes/index.tsx` (+ `app/routes/{locale}/index.tsx`, one hardcoded file per locale) | Homepage — Page Builder-driven (`content/pages/index.json`), locale-aware |
+| `/blog` (+ `/:locale/blog`) | `app/routes/blog/index.tsx` (+ `app/routes/[locale]/blog/index.tsx`) | Post list with tag filtering |
+| `/blog/by-tag/:tag` (+ `/:locale/blog/by-tag/:tag`) | `app/routes/blog/by-tag/[tag].tsx` (+ `app/routes/[locale]/blog/by-tag/[tag].tsx`) | Tag-filtered post list (static) |
+| `/blog/by-author/:author` (+ `/:locale/blog/by-author/:author`) | `app/routes/blog/by-author/[author].tsx` (+ `app/routes/[locale]/blog/by-author/[author].tsx`) | Author-filtered post list (static) |
+| `/blog/:slug` (+ `/:locale/blog/:slug`) | `app/routes/blog/[slug].tsx` (+ `app/routes/[locale]/blog/[slug].tsx`) | Individual post |
+| `/docs` (+ `/:locale/docs`) | `app/routes/docs/index.tsx` (+ `app/routes/[locale]/docs/index.tsx`) | Docs index with sidenav |
+| `/docs/:doc` (+ `/:locale/docs/:doc`) | `app/routes/docs/[doc].tsx` (+ `app/routes/[locale]/docs/[doc].tsx`) | Individual doc/component page |
 | `/admin/` | `public/admin/index.html` | Sveltia CMS UI |
-| `/pages/:slug` (+ `/pages/:locale/:slug`) | `app/routes/pages/[slug].tsx` | Dynamic CMS-built pages |
+| `/pages/:slug` (+ `/:locale/pages/:slug`) | `app/routes/pages/[slug].tsx` (+ `app/routes/[locale]/pages/[slug].tsx`) | Dynamic CMS-built pages, long form |
+| `/:page` (+ `/:locale/:page`) | `app/routes/[page].tsx` (+ `app/routes/[locale]/[page].tsx`) | Same pages, canonical short form (e.g. `/about`, `/zh/about`) |
 | `/api/posts/index.json` | `app/routes/api/posts/index.json.ts` | Post collection (JSON) |
 | `/api/posts/:slug.json` | `app/routes/api/posts/[slug].json.ts` | Single post detail (JSON) |
-| `/api/posts/search.json` | `app/routes/api/posts/search.json.ts` | Search index (JSON), English only |
-| `/api/posts/:lang/search.json` | `app/routes/api/posts/[lang]/search.json.ts` | Locale-scoped search index (JSON) |
+| `/api/posts/search.json` (+ `/api/posts/:locale/search.json`) | `app/routes/api/posts/search.json.ts` (+ `api/posts/[locale]/search.json.ts`) | Search index (JSON); English-only vs. locale-scoped |
 | `/api/posts/by-author/:author.json` | `app/routes/api/posts/by-author/[author].json.ts` | Posts by author (JSON) |
+| `/api/docs/search.json` (+ `/api/docs/:locale/search.json`) | `app/routes/api/docs/search.json.ts` (+ `api/docs/[locale]/search.json.ts`) | Docs search index (JSON) |
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for UI components architecture details.
+The `/:page`, `/:locale`, and `/:locale/:page` routes use a 2-arg `(c, next)` handler and are dev-server preview only — `@hono/vite-ssg` excludes 2-arg handlers from static generation. Their production HTML comes from `vite.config.ts`'s build-time copy plugins (`copyContentPagesToRootPlugin`, `copyLocalizedContentPagesPlugin`), which duplicate the already-correctly-generated long-form output (`/pages/:slug`, `/:locale/pages/:slug`) to the short-form path instead.
+
+See [content/docs/Architecture.md](content/docs/Architecture.md) (served at `/docs/Architecture`) for the full routing/collision reasoning and UI components architecture details.
 
 ---
 
@@ -51,7 +58,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for UI components architecture 
 1. **Write** — Markdown files in `content/posts/*.md` with YAML frontmatter.
 2. **Manage** — Visit `/admin/` to edit posts.
 3. **Build** — `bun run build` generates static HTML for post list and individual posts.
-4. **Translate** — Add `content/posts/<locale>/<slug>.md` for a translated post (same convention as pages/docs); `loadPosts()`/`loadPostBySlug()` fall back to the English file for anything not translated. Each locale gets its own search index at `/api/posts/:lang/search.json`; set `blog.excludeUntranslatedFromSearch: true` in that locale's `content/configs.<locale>.json` once every post is actually translated, to stop search falling back to English-titled results for that locale.
+4. **Translate** — Add `content/posts/<locale>/<slug>.md` for a translated post (same convention as pages/docs); `loadPosts()`/`loadPostBySlug()` fall back to the English file for anything not translated. Each locale gets its own search index at `/api/posts/:locale/search.json`; set `blog.excludeUntranslatedFromSearch: true` in that locale's `content/configs.<locale>.json` once every post is actually translated, to stop search falling back to English-titled results for that locale.
 
 #### Dynamic Pages
 1. **Design** — Create pages in `content/pages/*.json` using the CMS UI. This includes the homepage itself (`content/pages/index.json`).
@@ -71,7 +78,7 @@ A read-only JSON REST API over the same `content/posts/*.md` files that back `/b
 | `GET /api/posts/index.json` | All published posts (drafts excluded in production), newest first. Shape: `{ generated, total, tags, posts: BlogPost[] }`. |
 | `GET /api/posts/:slug.json` | One post's full detail: frontmatter fields + rendered `html` + up to 3 `relatedPosts` sharing a tag. `404` with `{ "error": "Not found" }` for a missing or (in production) draft slug. |
 | `GET /api/posts/search.json` | The English-only search index the `Search` island fetches by default. Shape: `{ generated, entries: SearchIndexEntry[] }`. |
-| `GET /api/posts/:lang/search.json` | Same shape, scoped to one locale's translated posts (falling back to the English entry per-post unless that locale sets `blog.excludeUntranslatedFromSearch: true`). The `Search` island resolves this URL itself from its `locale` prop — see `localiseSearchSrc` in `app/islands/search.tsx`. |
+| `GET /api/posts/:locale/search.json` | Same shape, scoped to one locale's translated posts (falling back to the English entry per-post unless that locale sets `blog.excludeUntranslatedFromSearch: true`). The `Search` island resolves this URL itself from its `locale` prop — see `localiseSearchSrc` in `app/islands/search.tsx`. |
 | `GET /api/posts/by-author/:author.json` | All posts by a given author, newest first. Shape: `{ generated, author, total, posts: BlogPost[] }`. Returns empty array if no posts match. |
 
 Implementation: `app/lib/posts.ts` (`loadPosts`, `loadPostBySlug`, `loadPostsByAuthor`) backs all routes. `app/routes/api/posts/_404.tsx` scopes a JSON not-found handler to this namespace so API errors don't fall back to the site's HTML 404 page.
@@ -136,30 +143,53 @@ app/
   components/page-renderer.tsx # Dynamic Page layout compiler
   components/ui/    # Public component API
   islands/          # Client-side interactive islands
-  routes/           # File-based routing
-    blog/index.tsx               # Post list (blog/<locale>/index.tsx re-exports it)
-    blog/[slug].tsx               # Individual post (blog/<locale>/[slug].tsx re-exports it)
-    blog/by-tag/[tag].tsx        # Tag-filtered post list
-    blog/[lang]/by-tag/[tag].tsx # Same, locale-prefixed — a dynamic `[lang]`
-                                  #   segment, not per-locale re-exports, since
-                                  #   nothing else claims this deeper path shape
-    blog/by-author/[author].tsx  # Author-filtered post list
-    blog/[lang]/by-author/[author].tsx # Same, locale-prefixed
-    pages/[slug].tsx             # Page builder SSG route
-    api/posts/                   # Read-only posts REST API
-      index.json.ts              # GET /api/posts/index.json — collection
-      [slug].json.ts             # GET /api/posts/:slug.json — single post
-      search.json.ts             # GET /api/posts/search.json — English-only search index
-      [lang]/search.json.ts      # GET /api/posts/:lang/search.json — locale-scoped index
-      by-author/[author].json.ts # GET /api/posts/by-author/:author.json
-      _404.tsx                   # JSON 404s scoped to /api/posts/*
+  routes/           # File-based routing — locale always comes before the
+                     #   collection/item; see the Routes table above
+    index.tsx                       # Homepage (English)
+    [locale]/index.tsx              # Homepage, one hardcoded file per locale
+                                     #   (NOT a dynamic [locale] segment — that
+                                     #   would collide with [page].tsx, same
+                                     #   /:x shape; see Architecture.md)
+    blog/index.tsx                  # Post list (English)
+    blog/[slug].tsx                 # Individual post (English)
+    blog/by-tag/[tag].tsx           # Tag-filtered post list (English)
+    blog/by-author/[author].tsx     # Author-filtered post list (English)
+    [locale]/blog/index.tsx         # Post list, all locales — genuinely
+                                     #   dynamic, no per-locale files needed
+    [locale]/blog/[slug].tsx        # Individual post, all locales
+    [locale]/blog/by-tag/[tag].tsx
+    [locale]/blog/by-author/[author].tsx
+    docs/index.tsx                  # Docs index (English)
+    docs/[doc].tsx                  # Individual doc page (English)
+    [locale]/docs/index.tsx         # Docs index, all locales
+    [locale]/docs/[doc].tsx         # Individual doc page, all locales
+    pages/[slug].tsx                # Page builder route (English), long form
+    [locale]/pages/[slug].tsx       # Same, all locales, long form
+    [page].tsx                      # Same pages, short form (English) — /about
+    [locale]/[page].tsx             # Same, all locales — /zh/about (canonical)
+    api/posts/                      # Read-only posts REST API
+      index.json.ts                 # GET /api/posts/index.json — collection
+      [slug].json.ts                # GET /api/posts/:slug.json — single post
+      search.json.ts                # GET /api/posts/search.json — English-only search index
+      [locale]/search.json.ts       # GET /api/posts/:locale/search.json — locale-scoped index
+      by-author/[author].json.ts    # GET /api/posts/by-author/:author.json
+      _404.tsx                      # JSON 404s scoped to /api/posts/*
+    api/docs/
+      search.json.ts                 # GET /api/docs/search.json
+      [locale]/search.json.ts        # GET /api/docs/:locale/search.json
+  lib/i18n.ts       # Locale detection + href localization — detectLocale,
+                     #   localiseHref, stripLocale, localeToggleUrl
   lib/posts.ts      # Post loading/parsing shared by blog pages + API, locale-aware
-  lib/pages.ts      # Page builder JSON loading, locale-aware (used by / and /pages/:slug)
+  lib/pages.ts      # Page builder JSON loading, locale-aware
+  lib/docs.ts       # Docs loading + search index, locale-aware
+vite.config.ts       # Two build-time copy plugins duplicate the dev-preview-only
+                     #   short-form routes' output from their long-form
+                     #   equivalent — see the Routes section above
 utils/
   markdown.ts        # Frontmatter parser + MD→HTML
 content/posts/       # Blog post markdown files
 content/posts/<locale>/ # Translated posts, e.g. content/posts/zh/getting-started-with-honox.md
-content/pages/       # Page builder JSON layouts (index.json is the homepage; blog.json/docs.json are just title+intro content for /blog and /docs, not their header — see docs/PageBuilder.md)
+content/pages/       # Page builder JSON layouts (index.json is the homepage; blog.json/docs.json are just title+intro content for /blog and /docs, not their header — see content/docs/PageBuilder.md)
 content/pages/<locale>/ # Translated page layouts, e.g. content/pages/zh/index.json
 public/admin/        # Sveltia CMS static files
   config.yml          # CMS configuration

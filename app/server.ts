@@ -23,21 +23,29 @@ const app = createApp({
 	),
 });
 
-// Redirect legacy route structure /<locale>/<collection>/<item> to /<collection>/<locale>/<item>
+// Redirect legacy route structure /<collection>/<locale>/<item> to the
+// current locale-first shape /<locale>/<collection>/<item> — or, for
+// "pages", the short form /<locale>/<item> that drops the collection
+// segment entirely (see app/lib/i18n.ts's top-of-file doc comment for why
+// locale comes first: it avoids a router collision between a collection's
+// locale-index route and its English detail route at the same segment shape).
 app.use("*", async (c, next) => {
 	const url = new URL(c.req.url);
 	const segments = url.pathname.split("/").filter(Boolean);
 	if (
 		segments.length >= 2 &&
-		isLocale(segments[0]) &&
-		["docs", "blog", "pages"].includes(segments[1]!)
+		["docs", "blog", "pages"].includes(segments[0]!) &&
+		isLocale(segments[1])
 	) {
-		const locale = segments[0];
-		const collection = segments[1];
+		const collection = segments[0]!;
+		const locale = segments[1]!;
 		const rest = segments.slice(2).join("/");
-		const targetPath = rest
-			? `/${collection}/${locale}/${rest}`
-			: `/${collection}/${locale}`;
+		const targetPath =
+			collection === "pages"
+				? `/${locale}${rest ? `/${rest}` : ""}`
+				: rest
+					? `/${locale}/${collection}/${rest}`
+					: `/${locale}/${collection}`;
 		const search = url.search;
 		return c.redirect(`${targetPath}${search}`, 301);
 	}

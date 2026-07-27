@@ -140,21 +140,14 @@ export function localiseHref(href: string, locale: string): string {
 
 	const segments = href.split("/").filter(Boolean);
 
-	// Already localized in the old format? Let's convert it to the new format!
-	if (
-		segments.length >= 2 &&
-		isLocale(segments[0]) &&
-		(COLLECTIONS as readonly string[]).includes(segments[1]!)
-	) {
-		const lang = segments[0];
-		const collection = segments[1]!;
-		const rest = segments.slice(2).join("/");
-		return rest ? `/${collection}/${lang}/${rest}` : `/${collection}/${lang}`;
-	}
-
-	// Already localized? Don't double-prefix.
-	if (isLocale(segments[0])) return href; // e.g. /fr (homepage)
-	if (isLocale(segments[1])) return href; // e.g. /docs/fr/...
+	// Already localized? Don't double-prefix. Since locale-first is the
+	// canonical shape, `isLocale(segments[0])` alone (a CMS-authored href
+	// that's already e.g. "/zh/blog" or "/zh/about") is enough to no-op —
+	// every anchor/link href passes through this function unconditionally
+	// (see the `anchor`/`link` cases in page-registry.tsx), so re-processing
+	// an already-correct href must never rewrite it.
+	if (isLocale(segments[0])) return href; // e.g. /fr, /fr/blog, /fr/about
+	if (isLocale(segments[1])) return href; // e.g. /docs/fr/... (legacy shape)
 
 	// Collection route.
 	if (
