@@ -36,7 +36,6 @@ export { Dropdown, type DropdownItem, type DropdownProps } from "./dropdown";
 export * as DropdownPrimitive from "./dropdown-primitive";
 export { Editable, type EditableProps } from "./editable";
 export { Field, type FieldProps } from "./field";
-export { Input, type InputProps } from "./input";
 export {
 	Fieldset,
 	FieldsetContent,
