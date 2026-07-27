@@ -41,13 +41,13 @@
               "children": [
                 {
                   "blockType": "link",
-                  "href": "/blog/zh",
+                  "href": "/zh/blog",
                   "variant": "plain",
                   "children": [{ "blockType": "text", "content": "博客" }]
                 },
                 {
                   "blockType": "link",
-                  "href": "/docs/zh",
+                  "href": "/zh/docs",
                   "variant": "plain",
                   "children": [{ "blockType": "text", "content": "文档" }]
                 },
@@ -472,7 +472,7 @@
                   "content": "阅读文档"
                 }
               ],
-              "href": "/docs/zh",
+              "href": "/zh/docs",
               "variant": "solid",
               "class": "button button--variant_solid button--size_lg"
             },

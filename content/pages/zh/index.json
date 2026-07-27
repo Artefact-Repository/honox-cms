@@ -37,7 +37,7 @@
               "content": "博客"
             }
           ],
-          "href": "/blog/zh",
+          "href": "/zh/blog",
           "variant": "plain"
         },
         {
@@ -48,7 +48,7 @@
               "content": "文档"
             }
           ],
-          "href": "/docs/zh",
+          "href": "/zh/docs",
           "variant": "plain"
         },
         {

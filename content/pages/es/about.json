@@ -41,13 +41,13 @@
               "children": [
                 {
                   "blockType": "link",
-                  "href": "/blog/es",
+                  "href": "/es/blog",
                   "variant": "plain",
                   "children": [{ "blockType": "text", "content": "Blog" }]
                 },
                 {
                   "blockType": "link",
-                  "href": "/docs/es",
+                  "href": "/es/docs",
                   "variant": "plain",
                   "children": [{ "blockType": "text", "content": "Docs" }]
                 },
@@ -472,7 +472,7 @@
                   "content": "Leer la documentación"
                 }
               ],
-              "href": "/docs/es",
+              "href": "/es/docs",
               "variant": "solid",
               "class": "button button--variant_solid button--size_lg"
             },

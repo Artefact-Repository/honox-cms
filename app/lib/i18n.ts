@@ -1,9 +1,20 @@
 /**
  * Shared i18n utilities for route locale detection and link localization.
  *
- * Route structure: /<collection>/<locale?>/<item>
- *   e.g. /docs/fr/AbsoluteCenter, /blog/zh/my-post, /pages/es/about
- * The default locale (en) has no locale segment: /docs/AbsoluteCenter.
+ * Route structure:
+ *   - docs/blog: /<locale?>/<collection>/<item>
+ *     e.g. /fr/docs/AbsoluteCenter, /zh/blog/my-post — locale comes *before*
+ *     the collection (app/routes/[locale]/docs/*, app/routes/[locale]/blog/*)
+ *     so the locale-index route (`/:locale/docs`) doesn't collide with the
+ *     English detail route (`/docs/:doc`) — same segment shape otherwise,
+ *     and only one of two identically-shaped dynamic routes can ever be
+ *     statically generated (see app/lib/i18n.ts's git history / PR notes for
+ *     the collision this replaced).
+ *   - pages (root-level content pages): /<item>/<locale?> (short form, e.g.
+ *     /about/fr) or /pages/<locale?>/<item> (long form, still served as-is
+ *     for existing links) — no collision risk there, so no reason to prefer
+ *     locale-first.
+ * The default locale (en) has no locale segment: /docs/AbsoluteCenter, /about.
  *
  * Language homepages remain at /<locale> (e.g. /fr, /zh).
  */
@@ -83,7 +94,7 @@ export function isLocale(value: string | undefined): value is string {
  */
 export function detectLocale(path: string): string {
 	const segments = path.split("/").filter(Boolean);
-	// Old format: /<locale>/<collection>/...
+	// Locale-first (canonical for docs/blog): /<locale>/<collection>/...
 	if (
 		segments.length >= 2 &&
 		isLocale(segments[0]) &&
@@ -91,7 +102,8 @@ export function detectLocale(path: string): string {
 	) {
 		return segments[0];
 	}
-	// Collection route: /<collection>/<locale?>/...
+	// Collection-first (canonical for pages; still recognized for docs/blog
+	// too, for any old /docs/<locale>/... links): /<collection>/<locale?>/...
 	if (
 		segments.length >= 1 &&
 		(COLLECTIONS as readonly string[]).includes(segments[0]!)
@@ -105,11 +117,11 @@ export function detectLocale(path: string): string {
 }
 
 /**
- * Prefixes a bare in-app href with the current locale, inserting the locale
- * after the collection segment for collection routes.
+ * Prefixes a bare in-app href with the current locale — before the
+ * collection segment for docs/blog, after it (short form) for pages.
  *
- *   /docs/Button   → /docs/fr/Button   (locale = "fr")
- *   /blog          → /blog/fr
+ *   /docs/Button   → /fr/docs/Button   (locale = "fr")
+ *   /blog          → /fr/blog
  *   /about         → /about/fr         (root-level content page)
  *   /              → /fr
  *
@@ -136,7 +148,7 @@ export function localiseHref(href: string, locale: string): string {
 	if (isLocale(segments[0])) return href; // e.g. /fr (homepage)
 	if (isLocale(segments[1])) return href; // e.g. /docs/fr/...
 
-	// Collection route: insert locale after the collection segment.
+	// Collection route.
 	if (
 		segments.length >= 1 &&
 		(COLLECTIONS as readonly string[]).includes(segments[0]!)
@@ -149,12 +161,20 @@ export function localiseHref(href: string, locale: string): string {
 		// copyContentPagesToRootPlugin) — so a `/pages/<slug>` href reaching
 		// here localizes straight to the short form (`/<slug>/<locale>`)
 		// instead of `/pages/<locale>/<slug>`.
-		if (collection === "pages" && rest) {
-			return `/${rest}/${locale}`;
+		if (collection === "pages") {
+			return rest ? `/${rest}/${locale}` : `/${collection}/${locale}`;
 		}
+		// docs/blog: locale comes *first* (`/docs/Foo` → `/de/docs/Foo`, not
+		// `/docs/de/Foo`) — app/routes/[locale]/docs/[doc].tsx et al. put the
+		// `[locale]` directory ahead of the collection so the index route
+		// (`app/routes/[locale]/docs/index.tsx`, path `/:locale/docs`) doesn't
+		// collide with `docs/[doc].tsx` (`/docs/:doc`) — same segment shape,
+		// only one of two same-shape dynamic routes can ever be statically
+		// generated, which is exactly what broke when `[locale]` was nested
+		// inside the collection instead (`docs/[locale]/index.tsx`, `/docs/:locale`).
 		return rest
-			? `/${collection}/${locale}/${rest}`
-			: `/${collection}/${locale}`;
+			? `/${locale}/${collection}/${rest}`
+			: `/${locale}/${collection}`;
 	}
 
 	// Bare single-segment path outside any known collection (e.g. "/about") —
@@ -179,10 +199,12 @@ export function localiseHref(href: string, locale: string): string {
 
 /**
  * Strips the locale segment from a path, returning the bare (default-locale)
- * path. Handles both collection routes and the language homepage.
+ * path. Handles collection routes in either segment order (locale-first is
+ * canonical for docs/blog, but a collection-first `/docs/fr/...` still
+ * strips correctly too, for any old links), plus the language homepage.
  *
- *   /docs/fr/AbsoluteCenter  → /docs/AbsoluteCenter  (locale = "fr")
- *   /blog/fr                 → /blog
+ *   /fr/docs/AbsoluteCenter  → /docs/AbsoluteCenter  (locale = "fr")
+ *   /fr/blog                 → /blog
  *   /fr                      → /
  */
 export function stripLocale(path: string, locale: string): string {

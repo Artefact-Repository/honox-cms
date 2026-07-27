@@ -37,7 +37,7 @@
               "content": "Blog"
             }
           ],
-          "href": "/blog/pt",
+          "href": "/pt/blog",
           "variant": "plain"
         },
         {
@@ -48,7 +48,7 @@
               "content": "Documentação"
             }
           ],
-          "href": "/docs/pt",
+          "href": "/pt/docs",
           "variant": "plain"
         },
         {

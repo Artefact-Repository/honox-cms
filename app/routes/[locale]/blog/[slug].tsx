@@ -2,7 +2,7 @@ import { ssgParams } from "hono/ssg";
 import { createRoute } from "honox/factory";
 import { TRANSLATED_LOCALES } from "../../../lib/i18n";
 import { loadPosts } from "../../../lib/posts";
-import slugRoute from "../[slug]";
+import slugRoute from "../../blog/[slug]";
 
 // Reuse the exact same per-request handler as the unprefixed /blog/:slug
 // route — `createRoute(ssgParamsMiddleware, handler)` is a typed 2-tuple (see

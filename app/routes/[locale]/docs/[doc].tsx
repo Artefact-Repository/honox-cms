@@ -2,7 +2,7 @@ import { ssgParams } from "hono/ssg";
 import { createRoute } from "honox/factory";
 import { loadDocs } from "../../../lib/docs";
 import { TRANSLATED_LOCALES } from "../../../lib/i18n";
-import docRoute from "../[doc]";
+import docRoute from "../../docs/[doc]";
 
 // Reuse the exact same per-request handler as the unprefixed /docs/:doc
 // route — `createRoute(ssgParamsMiddleware, handler)` is a typed 2-tuple (see

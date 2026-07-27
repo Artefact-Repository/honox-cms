@@ -2,7 +2,7 @@ import { ssgParams } from "hono/ssg";
 import { createRoute } from "honox/factory";
 import { TRANSLATED_LOCALES } from "../../../../lib/i18n";
 import { loadPosts } from "../../../../lib/posts";
-import byAuthorRoute from "../../by-author/[author]";
+import byAuthorRoute from "../../../blog/by-author/[author]";
 
 // Reuse the exact same per-request handler as the unprefixed
 // /blog/by-author/:author route — see the by-tag/[tag].tsx sibling for why
