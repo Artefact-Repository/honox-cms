@@ -1,414 +1,406 @@
-import { css, cx } from "design-system/css";
-import { button } from "design-system/recipes";
-import { useEffect, useState } from "hono/jsx";
+import { css } from "design-system/css";
+import { button, code } from "design-system/recipes";
+import { useEffect, useRef, useState } from "hono/jsx";
+import type { ComponentBlock } from "../components/block-types";
+import type { PageRenderer as PageRendererType } from "../components/page-renderer";
+import { InteractiveSplitter } from "../components/ui/splitter-primitive";
 
-interface PageInfo {
+export interface PlaygroundPage {
 	slug: string;
-	json: string;
+	label: string;
 }
 
-interface PlaygroundProps {
-	pages: PageInfo[];
+export interface PlaygroundIslandProps {
+	pages: PlaygroundPage[];
+	defaultSlug?: string;
 }
 
-export default function PlaygroundIsland({ pages }: PlaygroundProps) {
-	const [selectedSlug, setSelectedSlug] = useState(
-		pages.length > 0 ? pages[0].slug : "",
-	);
-	const [jsonString, setJsonString] = useState("");
-	const [validationError, setValidationError] = useState<string | null>(null);
-	const [deviceWidth, setDeviceWidth] = useState<"100%" | "768px" | "375px">(
-		"100%",
-	);
-	const [iframeReady, setIframeReady] = useState(false);
-	const [isSynchronized, setIsSynchronized] = useState(false);
+type Viewport = "desktop" | "tablet" | "mobile";
 
-	// Load page JSON when selectedSlug changes
+const VIEWPORTS: { id: Viewport; label: string; width: string }[] = [
+	{ id: "desktop", label: "Desktop", width: "100%" },
+	{ id: "tablet", label: "Tablet", width: "48rem" },
+	{ id: "mobile", label: "Mobile", width: "24rem" },
+];
+
+const JSON_EDIT_DEBOUNCE_MS = 300;
+
+const panelContentClass = css({
+	display: "flex",
+	flexDirection: "column",
+	gap: "2",
+	h: "full",
+	minH: "0",
+	minW: "0",
+	w: "full",
+});
+
+const panelHeaderClass = css({
+	display: "flex",
+	alignItems: "center",
+	justifyContent: "space-between",
+	gap: "2",
+	pb: "2",
+	borderBottomWidth: "1px",
+	borderStyle: "solid",
+	borderColor: "border.default",
+	flexShrink: "0",
+});
+
+const panelLabelClass = css({
+	fontSize: "sm",
+	fontWeight: "600",
+	fontFamily: "mono",
+	overflow: "hidden",
+	textOverflow: "ellipsis",
+	whiteSpace: "nowrap",
+});
+
+interface Draft {
+	title?: string;
+	content: ComponentBlock[];
+}
+
+export default function PlaygroundIsland({
+	pages,
+	defaultSlug,
+}: PlaygroundIslandProps) {
+	const initialSlug = defaultSlug ?? pages[0]?.slug ?? "";
+
+	const [selectedSlug, setSelectedSlug] = useState(initialSlug);
+	const [viewport, setViewport] = useState<Viewport>("desktop");
+	const [copied, setCopied] = useState(false);
+	const [originalJson, setOriginalJson] = useState("");
+	const [jsonText, setJsonText] = useState("");
+	const [loadError, setLoadError] = useState<string | null>(null);
+	const [parseError, setParseError] = useState<string | null>(null);
+	const [draft, setDraft] = useState<Draft | null>(null);
+	const [isLoading, setIsLoading] = useState(false);
+	const [PageRenderer, setPageRenderer] =
+		useState<typeof PageRendererType | null>(null);
+
+	const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const requestIdRef = useRef(0);
+
+	const selected =
+		pages.find((page) => page.slug === selectedSlug) ?? pages[0];
+
+	// Dynamically imported instead of statically — this island is itself
+	// registered as a block renderer in page-registry.tsx (so the
+	// "pagePlayground" CMS block type can render it), and page-registry.tsx is
+	// exactly what PageRenderer resolves block types through. A static import
+	// here would close a 3-module cycle (page-registry → this island →
+	// page-renderer → page-registry) that hangs Vite's SSR module runner on
+	// eager route loading. A dynamic import defers that edge to the browser,
+	// after hydration, well past the SSR module graph that deadlocks on it.
 	useEffect(() => {
-		const page = pages.find((p) => p.slug === selectedSlug);
-		if (page) {
-			setJsonString(page.json);
-		}
-	}, [selectedSlug, pages]);
-
-	// Send message to update preview
-	useEffect(() => {
-		if (!jsonString) return;
-
-		try {
-			const parsed = JSON.parse(jsonString);
-			setValidationError(null);
-
-			// Persist to sessionStorage so reload/load recovers it
-			try {
-				sessionStorage.setItem(
-					"playground_preview_json",
-					JSON.stringify({ content: parsed.content || [] }),
-				);
-			} catch (e) {
-				console.error("sessionStorage save error", e);
-			}
-
-			if (iframeReady) {
-				const iframe = document.getElementById(
-					"playground-iframe",
-				) as HTMLIFrameElement | null;
-				if (iframe?.contentWindow) {
-					iframe.contentWindow.postMessage(
-						{
-							type: "update-preview",
-							content: parsed.content || [],
-						},
-						"*",
-					);
-					setIsSynchronized(true);
-				}
-			} else {
-				setIsSynchronized(false);
-			}
-		} catch (e: any) {
-			setValidationError(e.message);
-			setIsSynchronized(false);
-		}
-	}, [jsonString, iframeReady]);
-
-	// Listen for preview-ready handshake from iframe
-	useEffect(() => {
-		const handleMessage = (event: MessageEvent) => {
-			if (event.data && event.data.type === "preview-ready") {
-				setIframeReady(true);
-			}
-		};
-
-		window.addEventListener("message", handleMessage);
-		return () => {
-			window.removeEventListener("message", handleMessage);
-		};
+		import("../components/page-renderer").then((mod) => {
+			setPageRenderer(() => mod.PageRenderer);
+		});
 	}, []);
 
-	const handleFormat = () => {
+	// Lazily fetches each page's JSON on demand (via the prerendered
+	// /api/pages/:slug.json endpoint) instead of preloading every content
+	// page's full JSON into this block up front — this island is now embedded
+	// as a CMS block (content/pages/playground.json's "pagePlayground" entry)
+	// rather than getting its data server-side from a bespoke route, and the
+	// set of previewable pages only grows over time.
+	useEffect(() => {
+		if (!selected) return;
+		const requestId = ++requestIdRef.current;
+		setIsLoading(true);
+		setLoadError(null);
+		fetch(`/api/pages/${selected.slug}.json`)
+			.then((res) => {
+				if (!res.ok) throw new Error(`Request failed (${res.status})`);
+				return res.json();
+			})
+			.then((data) => {
+				if (requestId !== requestIdRef.current) return;
+				const text = JSON.stringify(data, null, 2);
+				setOriginalJson(text);
+				setJsonText(text);
+				setParseError(null);
+				setDraft(null);
+			})
+			.catch((err) => {
+				if (requestId !== requestIdRef.current) return;
+				setLoadError(err instanceof Error ? err.message : "Failed to load");
+			})
+			.finally(() => {
+				if (requestId === requestIdRef.current) setIsLoading(false);
+			});
+	}, [selected]);
+
+	// Re-renders the edited draft entirely client-side via the same
+	// PageRenderer/block-registry the real /pages/:slug route uses server-side
+	// — this app deploys as a static export (GitHub Pages, see
+	// .github/workflows/deploy.yml), so there is no server to round-trip an
+	// edited draft through at request time; the block tree has to be rendered
+	// in-browser instead. Safe to call directly (not through the SSR→hydration
+	// island boundary) because it runs inside this already-mounted island: no
+	// prop-serialization, so nested components' own hooks/state work normally.
+	const applyDraft = (text: string) => {
+		let parsed: unknown;
 		try {
-			const parsed = JSON.parse(jsonString);
-			setJsonString(JSON.stringify(parsed, null, 2));
-			setValidationError(null);
-		} catch (e: any) {
-			setValidationError(`Format failed: ${e.message}`);
+			parsed = JSON.parse(text);
+		} catch (err) {
+			setParseError(err instanceof Error ? err.message : "Invalid JSON");
+			return;
 		}
+		if (
+			typeof parsed !== "object" ||
+			parsed === null ||
+			!Array.isArray((parsed as { content?: unknown }).content)
+		) {
+			setParseError('Expected an object with a "content" array');
+			return;
+		}
+		setParseError(null);
+		setDraft(parsed as Draft);
+	};
+
+	const handleSelectPage = (slug: string) => {
+		if (debounceRef.current) clearTimeout(debounceRef.current);
+		setSelectedSlug(slug);
+	};
+
+	const handleJsonInput = (value: string) => {
+		setJsonText(value);
+		if (debounceRef.current) clearTimeout(debounceRef.current);
+		debounceRef.current = setTimeout(() => {
+			applyDraft(value);
+		}, JSON_EDIT_DEBOUNCE_MS);
 	};
 
 	const handleReset = () => {
-		const original = pages.find((p) => p.slug === selectedSlug);
-		if (original) {
-			setJsonString(original.json);
-			setValidationError(null);
+		if (debounceRef.current) clearTimeout(debounceRef.current);
+		setJsonText(originalJson);
+		setParseError(null);
+		setDraft(null);
+	};
+
+	const handleCopy = async () => {
+		try {
+			await navigator.clipboard.writeText(jsonText);
+			setCopied(true);
+			setTimeout(() => setCopied(false), 1500);
+		} catch {
+			// Clipboard API unavailable (e.g. insecure context) — ignore.
 		}
 	};
 
-	const selectClass = css({
-		px: "3",
-		py: "1.5",
-		borderRadius: "md",
-		border: "1px solid",
-		borderColor: "border",
-		bg: "bg.default",
-		color: "fg.default",
-		fontSize: "sm",
-		fontWeight: "semibold",
-		cursor: "pointer",
-		outline: "none",
-		_focus: {
-			borderColor: "purple.500",
-		},
-	});
+	if (!selected) {
+		return <p>No CMS pages found under content/pages.</p>;
+	}
 
-	return (
-		<div
-			class={css({
-				display: "grid",
-				gridTemplateColumns: { base: "1fr", lg: "1fr 1fr" },
-				gap: "6",
-				minHeight: "calc(100vh - 120px)",
-				maxWidth: "100%",
-				px: { base: "4", md: "6" },
-				py: "4",
-			})}
-		>
-			{/* Left Column - Code Editor */}
-			<div
-				class={css({
-					display: "flex",
-					flexDirection: "column",
-					gap: "4",
-					bg: "bg.canvas",
-					borderWidth: "1px",
-					borderColor: "border",
-					borderRadius: "xl",
-					p: "5",
-					boxShadow: "sm",
-				})}
-			>
-				{/* Editor Toolbar */}
-				<div
-					class={css({
-						display: "flex",
-						flexWrap: "wrap",
-						justifyContent: "space-between",
-						alignItems: "center",
-						gap: "3",
-						borderBottomWidth: "1px",
-						borderColor: "border",
-						pb: "4",
-					})}
-				>
-					<div class={css({ display: "flex", alignItems: "center", gap: "2" })}>
-						<label
-							htmlFor="page-select"
-							class={css({
-								fontSize: "sm",
-								fontWeight: "semibold",
-								color: "fg.muted",
-							})}
-						>
-							Page:
-						</label>
-						<select
-							id="page-select"
-							class={selectClass}
-							value={selectedSlug}
-							onChange={(e: any) => {
-								setSelectedSlug(e.target.value);
-								setIframeReady(false);
-								const iframe = document.getElementById(
-									"playground-iframe",
-								) as HTMLIFrameElement | null;
-								if (iframe) {
-									iframe.src = "/playground/preview";
-								}
-							}}
-						>
-							{pages.map((p) => (
-								<option key={p.slug} value={p.slug}>
-									{p.slug}.json
-								</option>
-							))}
-						</select>
-					</div>
+	const activeWidth =
+		VIEWPORTS.find((v) => v.id === viewport)?.width ?? "100%";
+	const isEdited = jsonText !== originalJson;
 
-					<div class={css({ display: "flex", gap: "2" })}>
+	const jsonPanelContent = (
+		<div class={panelContentClass}>
+			<div class={panelHeaderClass}>
+				<span class={panelLabelClass}>content/pages/{selected.slug}.json</span>
+				<div class={css({ display: "flex", alignItems: "center", gap: "2" })}>
+					{isEdited && (
 						<button
 							type="button"
-							class={cx(button({ variant: "outline", size: "sm" }))}
-							onClick={handleFormat}
-						>
-							Format JSON
-						</button>
-						<button
-							type="button"
-							class={cx(
-								button({ variant: "outline", size: "sm", colorPalette: "red" }),
-							)}
+							class={button({ variant: "plain", size: "xs" })}
 							onClick={handleReset}
 						>
-							Reset Original
+							Reset
 						</button>
-					</div>
-				</div>
-
-				{/* Textarea Code Area */}
-				<div
-					class={css({
-						flex: "1",
-						display: "flex",
-						flexDirection: "column",
-						position: "relative",
-					})}
-				>
-					<textarea
-						value={jsonString}
-						onInput={(e: any) => setJsonString(e.target.value)}
-						class={css({
-							width: "100%",
-							minHeight: "500px",
-							height: "100%",
-							fontFamily: "monospace",
-							fontSize: "13px",
-							lineHeight: "1.6",
-							p: "4",
-							bg: "bg.default",
-							color: "fg.default",
-							borderWidth: "1px",
-							borderColor: "border",
-							borderRadius: "lg",
-							outline: "none",
-							resize: "vertical",
-							whiteSpace: "pre",
-							overflowWrap: "normal",
-							overflowX: "auto",
-							_focus: {
-								borderColor: "purple.500",
-								boxShadow: "0 0 0 1px var(--colors-purple-500)",
-							},
-						})}
-						placeholder="Paste or write page configuration JSON here..."
-					/>
-				</div>
-
-				{/* Error / Status Bar */}
-				<div>
-					{validationError ? (
-						<div
-							class={css({
-								p: "3",
-								borderRadius: "md",
-								bg: "red.50",
-								_dark: { bg: "red.950" },
-								borderWidth: "1px",
-								borderColor: "red.200",
-								_dark: { borderColor: "red.800" },
-								color: "red.600",
-								_dark: { color: "red.400" },
-								fontSize: "xs",
-								fontFamily: "monospace",
-								overflowWrap: "anywhere",
-							})}
-						>
-							<strong>Invalid JSON:</strong> {validationError}
-						</div>
-					) : (
-						<div
-							class={css({
-								display: "flex",
-								alignItems: "center",
-								gap: "2",
-								fontSize: "sm",
-								color: "green.600",
-								_dark: { color: "green.400" },
-							})}
-						>
-							<span
-								class={css({
-									width: "2.5",
-									height: "2.5",
-									borderRadius: "full",
-									bg: "green.500",
-								})}
-							/>
-							JSON is valid and synchronized with preview.
-						</div>
 					)}
+					<button
+						type="button"
+						class={button({ variant: "plain", size: "xs" })}
+						onClick={handleCopy}
+						disabled={isLoading}
+					>
+						{copied ? "Copied!" : "Copy JSON"}
+					</button>
 				</div>
 			</div>
+			{loadError ? (
+				<p
+					class={css({
+						color: { base: "red.9", _dark: "red.7" },
+						fontSize: "xs",
+						m: "0",
+					})}
+				>
+					Failed to load: {loadError}
+				</p>
+			) : (
+				<textarea
+					value={jsonText}
+					onInput={(e) =>
+						handleJsonInput((e.target as HTMLTextAreaElement).value)
+					}
+					spellcheck={false}
+					autocomplete="off"
+					disabled={isLoading}
+					placeholder={isLoading ? "Loading…" : undefined}
+					class={css({
+						m: "0",
+						p: "0",
+						flex: "1",
+						minH: "0",
+						resize: "none",
+						borderWidth: "0",
+						outline: "none",
+						bg: "transparent",
+						color: "inherit",
+						fontFamily: "mono",
+						fontSize: "xs",
+						lineHeight: "1.6",
+						overflow: "auto",
+					})}
+				/>
+			)}
+			{parseError && (
+				<p
+					class={css({
+						color: { base: "red.9", _dark: "red.7" },
+						fontSize: "xs",
+						m: "0",
+						flexShrink: "0",
+					})}
+				>
+					{parseError}
+				</p>
+			)}
+		</div>
+	);
 
-			{/* Right Column - Device IFrame Preview */}
+	const previewPanelContent = (
+		<div class={panelContentClass}>
+			<div class={panelHeaderClass}>
+				<span class={panelLabelClass}>
+					Preview{draft ? " (edited draft)" : `: /pages/${selected.slug}`}
+				</span>
+				<div class={css({ display: "flex", alignItems: "center", gap: "1" })}>
+					{VIEWPORTS.map((v) => (
+						<button
+							type="button"
+							class={button({
+								variant: viewport === v.id ? "solid" : "plain",
+								size: "xs",
+							})}
+							onClick={() => setViewport(v.id)}
+						>
+							{v.label}
+						</button>
+					))}
+					<a
+						href={`/pages/${selected.slug}`}
+						target="_blank"
+						rel="noreferrer"
+						class={button({ variant: "plain", size: "xs" })}
+					>
+						Open ↗
+					</a>
+				</div>
+			</div>
+			<div
+				class={css({
+					flex: "1",
+					minH: "0",
+					overflow: "auto",
+					bg: { base: "gray.100", _dark: "gray.900" },
+					borderRadius: "l2",
+					display: "flex",
+					justifyContent: "center",
+				})}
+			>
+				{draft && PageRenderer ? (
+					<div
+						class={css({
+							bg: "bg.canvas",
+							color: "fg.default",
+							minH: "full",
+							flexShrink: "0",
+							px: "4",
+							py: "8",
+							display: "flex",
+							flexDirection: "column",
+							gap: "6",
+						})}
+						style={{ width: activeWidth }}
+					>
+						<PageRenderer
+							content={draft.content}
+							locale="en"
+							currentPath="/playground"
+						/>
+					</div>
+				) : (
+					<iframe
+						key={selected.slug}
+						src={`/pages/${selected.slug}`}
+						title={`Preview of ${selected.slug}`}
+						class={css({ border: "none", h: "full", bg: "white" })}
+						style={{ width: activeWidth, flexShrink: "0" }}
+					/>
+				)}
+			</div>
+		</div>
+	);
+
+	return (
+		// Breaks out of the generic /[page] route's `maxWidth: 5xl` content
+		// wrapper (this island is embedded as a CMS block, not given its own
+		// route) — same calc(50% - 50vw) technique as page-registry.tsx's
+		// `stack` block fullBleed toggle. Kept as its own element (not merged
+		// with the inner maxW/mx:auto div below) since Panda resolves `mx`
+		// and an explicit marginLeft/marginRight to the same CSS property —
+		// combining them on one element means one silently wins over the
+		// other instead of composing.
+		<div
+			class={css({
+				width: "100vw",
+				marginLeft: "calc(50% - 50vw)",
+				marginRight: "calc(50% - 50vw)",
+			})}
+		>
 			<div
 				class={css({
 					display: "flex",
 					flexDirection: "column",
 					gap: "4",
-					bg: "bg.canvas",
-					borderWidth: "1px",
-					borderColor: "border",
-					borderRadius: "xl",
-					p: "5",
-					boxShadow: "sm",
+					px: { base: "4", md: "6" },
+					maxW: "[120rem]",
+					mx: "auto",
 				})}
 			>
-				{/* Preview Toolbar */}
-				<div
-					class={css({
-						display: "flex",
-						justifyContent: "space-between",
-						alignItems: "center",
-						borderBottomWidth: "1px",
-						borderColor: "border",
-						pb: "4",
-					})}
-				>
-					<span class={css({ fontSize: "sm", fontWeight: "bold" })}>
-						Live Preview
-					</span>
-
-					{/* Device Selector */}
-					<div class={css({ display: "flex", gap: "1" })}>
+				<div class={css({ display: "flex", flexWrap: "wrap", gap: "2" })}>
+					{pages.map((page) => (
 						<button
 							type="button"
-							class={cx(
-								button({
-									variant: deviceWidth === "100%" ? "solid" : "outline",
-									size: "xs",
-								}),
-							)}
-							onClick={() => setDeviceWidth("100%")}
-						>
-							Desktop
-						</button>
-						<button
-							type="button"
-							class={cx(
-								button({
-									variant: deviceWidth === "768px" ? "solid" : "outline",
-									size: "xs",
-								}),
-							)}
-							onClick={() => setDeviceWidth("768px")}
-						>
-							Tablet
-						</button>
-						<button
-							type="button"
-							class={cx(
-								button({
-									variant: deviceWidth === "375px" ? "solid" : "outline",
-									size: "xs",
-								}),
-							)}
-							onClick={() => setDeviceWidth("375px")}
-						>
-							Mobile
-						</button>
-					</div>
-				</div>
-
-				{/* Preview Container Wrapper */}
-				<div
-					class={css({
-						flex: "1",
-						display: "flex",
-						justifyContent: "center",
-						alignItems: "stretch",
-						bg: "bg.muted",
-						borderRadius: "lg",
-						p: "4",
-						minHeight: "500px",
-					})}
-				>
-					<div
-						style={{ width: deviceWidth }}
-						class={css({
-							display: "flex",
-							flexDirection: "column",
-							bg: "bg.default",
-							borderWidth: "1px",
-							borderColor: "border",
-							borderRadius: "lg",
-							boxShadow: "md",
-							transition: "width 0.3s ease-in-out",
-							overflow: "hidden",
-						})}
-					>
-						<iframe
-							id="playground-iframe"
-							src="/playground/preview"
-							class={css({
-								width: "100%",
-								height: "100%",
-								border: "none",
-								flex: "1",
+							class={button({
+								variant: page.slug === selected.slug ? "solid" : "outline",
+								size: "sm",
 							})}
-							title="Playground Preview"
-						/>
-					</div>
+							onClick={() => handleSelectPage(page.slug)}
+						>
+							{page.label}
+						</button>
+					))}
 				</div>
+
+				<InteractiveSplitter
+					orientation="horizontal"
+					style={{ height: "75vh" }}
+					panels={[
+						{ id: "source", content: jsonPanelContent },
+						{ id: "preview", content: previewPanelContent },
+					]}
+					defaultSize={[
+						{ id: "source", size: 45 },
+						{ id: "preview", size: 55 },
+					]}
+				/>
 			</div>
 		</div>
 	);

@@ -1,6 +1,7 @@
 import { css, cx } from "design-system/css";
 import { ChevronDownIcon } from "../icons/chevron-down";
 import { localeToggleUrl, localiseHref } from "../lib/i18n";
+import { listPageSlugs } from "../lib/pages";
 import { extractLayoutStyle } from "./block-style";
 import { type BlockProps, type ComponentBlock, propsOf } from "./block-types";
 import {
@@ -34,6 +35,7 @@ import {
 	Icon,
 	Layout,
 	Loader,
+	PagePlayground,
 	PaginatedTable,
 	Pagination,
 	PinField,
@@ -912,6 +914,29 @@ const registry: Record<string, BlockRenderer> = {
 
 	paginatedTable: (b) => <PaginatedTable {...propsOf(b)} />,
 	pagination: (b) => <Pagination interactive {...propsOf(b)} />,
+
+	// Renders the interactive JSON-editor + live-preview tool at /playground
+	// (content/pages/playground.json). Discovers previewable pages itself via
+	// listPageSlugs() rather than taking them as CMS-authored props, so any
+	// new content/pages/*.json file shows up automatically. Excludes its own
+	// slug so the tool never lists itself.
+	pagePlayground: () => {
+		const pages = listPageSlugs()
+			.filter((slug) => slug !== "playground")
+			.sort((a, z) => a.localeCompare(z))
+			.map((slug) => ({
+				slug,
+				label: slug
+					.split("-")
+					.map((word) => word[0]!.toUpperCase() + word.slice(1))
+					.join(" "),
+			}));
+		const defaultSlug = pages.some((p) => p.slug === "about")
+			? "about"
+			: pages[0]?.slug;
+		return <PagePlayground pages={pages} defaultSlug={defaultSlug} />;
+	},
+
 	progress: (b) => <Progress {...propsOf(b)} />,
 	radioGroup: (b) => <RadioGroup interactive {...propsOf(b)} />,
 

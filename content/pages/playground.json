@@ -1,0 +1,35 @@
+{
+  "title": "Playground — Artefact UI",
+  "content": [
+    {
+      "blockType": "stack",
+      "direction": "vertical",
+      "align": "center",
+      "gap": "4",
+      "children": [
+        {
+          "blockType": "badge",
+          "variant": "subtle",
+          "text": "Try it live",
+          "colorPalette": "purple"
+        },
+        {
+          "blockType": "heading",
+          "text": "Playground",
+          "size": "6xl",
+          "as": "h1",
+          "style": "text-align:center;max-width:40rem"
+        },
+        {
+          "blockType": "text",
+          "size": "lg",
+          "content": "Pick a CMS page, edit its JSON, and see the live render update side by side.",
+          "style": "text-align:center;max-width:34rem"
+        }
+      ]
+    },
+    {
+      "blockType": "pagePlayground"
+    }
+  ]
+}
