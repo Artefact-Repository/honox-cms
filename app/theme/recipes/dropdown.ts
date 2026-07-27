@@ -64,7 +64,7 @@ export const dropdown = defineSlotRecipe({
 				bg: "gray.plain.bg.hover",
 			},
 			_focus: {
-				bg: "colorPalette.subtle.bg.hover",
+				bg: "gray.plain.bg.hover",
 			},
 			_highlighted: {
 				bg: "gray.plain.bg.hover",
