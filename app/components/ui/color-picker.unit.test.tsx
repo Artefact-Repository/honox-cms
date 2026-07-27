@@ -92,4 +92,43 @@ describe("ColorPicker component", () => {
 		expect(htmlString).toContain('data-part="label"');
 		expect(htmlString).toContain("Choose your favorite color");
 	});
+
+	it("should respect disabledAlpha and hide alpha-related sliders/inputs", async () => {
+		const html = (await ColorPicker({
+			value: "#ff0000",
+			disabledAlpha: true,
+			interactive: false,
+		})) as any;
+		const htmlString = html.toString();
+
+		// Should render hue slider but NOT alpha slider
+		expect(htmlString).toContain('data-channel="hue"');
+		expect(htmlString).not.toContain('data-channel="alpha"');
+	});
+
+	it("should render clear button when allowClear is enabled", async () => {
+		const html = (await ColorPicker({
+			value: "#ff0000",
+			allowClear: true,
+			interactive: false,
+		})) as any;
+		const htmlString = html.toString();
+
+		expect(htmlString).toContain('data-part="clear-button"');
+		expect(htmlString).toContain("Clear Color");
+	});
+
+	it("should render color text next to the swatch when showText is true and trigger is enabled", async () => {
+		const html = (await ColorPicker({
+			value: "#ff0000",
+			trigger: true,
+			showText: true,
+			interactive: true,
+		})) as any;
+		const htmlString = html.toString();
+
+		expect(htmlString).toContain('data-part="trigger"');
+		expect(htmlString).toContain('data-part="value-text"');
+		expect(htmlString).toContain("#ff0000");
+	});
 });

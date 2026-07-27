@@ -68,6 +68,12 @@ interface ColorPickerProps extends ColorPickerVariantProps {
 	interactive?: boolean;
 	class?: string;
 	id?: string;
+	disabledAlpha?: boolean;
+	allowClear?: boolean;
+	onClear?: () => void;
+	showText?: boolean;
+	onChange?: (details: ColorPickerChangeDetails) => void;
+	onChangeComplete?: (details: ColorPickerChangeDetails) => void;
 }
 
 function ColorPickerRoot(props: ColorPickerProps) {
@@ -95,6 +101,12 @@ function ColorPickerRoot(props: ColorPickerProps) {
 		interactive,
 		class: classProp,
 		id,
+		disabledAlpha,
+		allowClear,
+		onClear,
+		showText,
+		onChange,
+		onChangeComplete,
 		...rest
 	} = props;
 
@@ -106,7 +118,9 @@ function ColorPickerRoot(props: ColorPickerProps) {
 		defaultValue !== undefined ||
 		open !== undefined ||
 		defaultOpen !== undefined ||
-		trigger === true;
+		trigger === true ||
+		onChange !== undefined ||
+		onChangeComplete !== undefined;
 	const isInteractive = shouldHydrate(interactive, hasSignal);
 
 	if (isInteractive) {
@@ -135,6 +149,12 @@ function ColorPickerRoot(props: ColorPickerProps) {
 				showSwatches={showSwatches}
 				id={id}
 				class={classProp}
+				disabledAlpha={disabledAlpha}
+				allowClear={allowClear}
+				onClear={onClear}
+				showText={showText}
+				onChange={onChange}
+				onChangeComplete={onChangeComplete}
 			/>
 		);
 	}
@@ -149,6 +169,7 @@ function ColorPickerRoot(props: ColorPickerProps) {
 			readOnly={readOnly}
 			id={id}
 			class={classProp}
+			disabledAlpha={disabledAlpha}
 		>
 			{label && <Label>{label}</Label>}
 			<ColorPickerContent
@@ -159,6 +180,9 @@ function ColorPickerRoot(props: ColorPickerProps) {
 				showSliders={showSliders}
 				showInputs={showInputs}
 				showSwatches={showSwatches}
+				disabledAlpha={disabledAlpha}
+				allowClear={allowClear}
+				onClear={onClear}
 			/>
 		</ColorPickerPrimitiveRoot>
 	);

@@ -267,6 +267,7 @@ interface ColorPickerContextValue {
 	disabled?: boolean;
 	readOnly?: boolean;
 	id: string;
+	disabledAlpha?: boolean;
 }
 
 const ColorPickerContext = createContext<ColorPickerContextValue | null>(null);
@@ -287,6 +288,7 @@ export interface RootProps extends ColorPickerVariantProps, PropsWithChildren {
 	id?: string;
 	class?: string;
 	style?: Record<string, string | number>;
+	disabledAlpha?: boolean;
 }
 
 export function Root(props: RootProps) {
@@ -301,11 +303,15 @@ export function Root(props: RootProps) {
 		id: idProp,
 		class: classProp,
 		style,
+		disabledAlpha,
 		...rest
 	} = localProps;
 	const autoId = useId();
 	const id = idProp || `color-picker-${autoId}`;
 	const resolved = parseColor(value ?? defaultValue ?? "#ffffff");
+	if (disabledAlpha && resolved) {
+		resolved.a = 1;
+	}
 	const styles = colorPicker(variantProps);
 
 	const contextValue: ColorPickerContextValue = {
@@ -315,6 +321,7 @@ export function Root(props: RootProps) {
 		disabled,
 		readOnly,
 		id,
+		disabledAlpha,
 	};
 
 	return (
@@ -741,6 +748,16 @@ export function ValueSwatch(props: {
 	);
 }
 
+export function hsvaToRgbString(c: HSVA) {
+	const { r, g, b } = hsvToRgb(c.h, c.s, c.v);
+	return `rgb(${r}, ${g}, ${b})`;
+}
+
+export function hsvaToHslString(c: HSVA) {
+	const { h, s, l } = hsvToHsl(c.h, c.s, c.v);
+	return `hsl(${Math.round(h)}, ${s}%, ${l}%)`;
+}
+
 export function ValueText(props: {
 	class?: string;
 	style?: Record<string, string | number>;
@@ -748,12 +765,13 @@ export function ValueText(props: {
 	const { class: classProp, style, ...rest } = props;
 	const ctx = useColorPickerContext();
 	const value = ctx?.value ?? { h: 0, s: 0, v: 100, a: 1 };
+	const isAlphaDisabled = !!ctx?.disabledAlpha;
 	const text =
 		ctx?.format === "hex"
-			? hsvaToHex(value, value.a < 1)
+			? hsvaToHex(value, !isAlphaDisabled && value.a < 1)
 			: ctx?.format === "hsla"
-				? hsvaToHslaString(value)
-				: hsvaToRgbaString(value);
+				? (isAlphaDisabled ? hsvaToHslString(value) : hsvaToHslaString(value))
+				: (isAlphaDisabled ? hsvaToRgbString(value) : hsvaToRgbaString(value));
 	return (
 		<span
 			data-part="value-text"
@@ -981,6 +999,9 @@ export interface ColorPickerContentProps {
 	showSliders?: boolean;
 	showInputs?: boolean;
 	showSwatches?: boolean;
+	disabledAlpha?: boolean;
+	allowClear?: boolean;
+	onClear?: () => void;
 }
 
 export function ColorPickerContent(props: ColorPickerContentProps) {
@@ -992,8 +1013,12 @@ export function ColorPickerContent(props: ColorPickerContentProps) {
 		showSliders = true,
 		showInputs = true,
 		showSwatches = true,
+		disabledAlpha = false,
+		allowClear = false,
+		onClear,
 	} = props;
 	const ctx = useColorPickerContext();
+	const isAlphaDisabled = disabledAlpha || !!ctx?.disabledAlpha;
 	const value = ctx?.value ?? { h: 0, s: 0, v: 100, a: 1 };
 	const format = ctx?.format ?? "hex";
 	const disabled = !!ctx?.disabled;
@@ -1002,7 +1027,7 @@ export function ColorPickerContent(props: ColorPickerContentProps) {
 
 	const rgb = hsvToRgb(value.h, value.s, value.v);
 	const hsl = hsvToHsl(value.h, value.s, value.v);
-	const hex = hsvaToHex(value, value.a < 1);
+	const hex = hsvaToHex(value, !isAlphaDisabled && value.a < 1);
 	const rowStyle: Record<string, string> = {
 		display: "flex",
 		gap: "6px",
@@ -1030,15 +1055,17 @@ export function ColorPickerContent(props: ColorPickerContentProps) {
 						</div>
 						<ChannelSliderValueText channel="hue" />
 					</ChannelSlider>
-					<ChannelSlider channel="alpha">
-						<ChannelSliderLabel channel="alpha" />
-						<div style={{ position: "relative", flex: "1" }}>
-							<TransparencyGrid />
-							<ChannelSliderTrack channel="alpha" />
-							<ChannelSliderThumb channel="alpha" />
-						</div>
-						<ChannelSliderValueText channel="alpha" />
-					</ChannelSlider>
+					{!isAlphaDisabled && (
+						<ChannelSlider channel="alpha">
+							<ChannelSliderLabel channel="alpha" />
+							<div style={{ position: "relative", flex: "1" }}>
+								<TransparencyGrid />
+								<ChannelSliderTrack channel="alpha" />
+								<ChannelSliderThumb channel="alpha" />
+							</div>
+							<ChannelSliderValueText channel="alpha" />
+						</ChannelSlider>
+					)}
 				</>
 			)}
 
@@ -1072,12 +1099,14 @@ export function ColorPickerContent(props: ColorPickerContentProps) {
 								readOnly={inputsReadOnly}
 								aria-label="Blue"
 							/>
-							<ChannelInput
-								channel="a"
-								value={String(Math.round(value.a * 100))}
-								readOnly={inputsReadOnly}
-								aria-label="Alpha percentage"
-							/>
+							{!isAlphaDisabled && (
+								<ChannelInput
+									channel="a"
+									value={String(Math.round(value.a * 100))}
+									readOnly={inputsReadOnly}
+									aria-label="Alpha percentage"
+								/>
+							)}
 						</div>
 					)}
 					{format === "hsla" && (
@@ -1100,12 +1129,14 @@ export function ColorPickerContent(props: ColorPickerContentProps) {
 								readOnly={inputsReadOnly}
 								aria-label="Lightness"
 							/>
-							<ChannelInput
-								channel="a"
-								value={String(Math.round(value.a * 100))}
-								readOnly={inputsReadOnly}
-								aria-label="Alpha percentage"
-							/>
+							{!isAlphaDisabled && (
+								<ChannelInput
+									channel="a"
+									value={String(Math.round(value.a * 100))}
+									readOnly={inputsReadOnly}
+									aria-label="Alpha percentage"
+								/>
+							)}
 						</div>
 					)}
 					<FormatSelect />
@@ -1122,6 +1153,32 @@ export function ColorPickerContent(props: ColorPickerContentProps) {
 						/>
 					))}
 				</SwatchGroup>
+			)}
+
+			{allowClear && (
+				<button
+					type="button"
+					data-part="clear-button"
+					style={{
+						marginTop: "4px",
+						padding: "6px 12px",
+						borderRadius: "6px",
+						border: "1px solid var(--colors-border-default)",
+						background: "transparent",
+						color: "var(--colors-fg-muted)",
+						fontSize: "12px",
+						fontWeight: "500",
+						cursor: "pointer",
+						width: "100%",
+						textAlign: "center",
+						display: "flex",
+						alignItems: "center",
+						justifyContent: "center",
+						gap: "6px",
+					}}
+				>
+					Clear Color
+				</button>
 			)}
 
 			{name && <HiddenInput name={name} value={hex} />}
@@ -1162,6 +1219,12 @@ export interface InteractiveColorPickerProps extends ColorPickerVariantProps {
 	showSwatches?: boolean;
 	class?: string;
 	id?: string;
+	disabledAlpha?: boolean;
+	allowClear?: boolean;
+	onClear?: () => void;
+	showText?: boolean;
+	onChange?: (details: ColorPickerChangeDetails) => void;
+	onChangeComplete?: (details: ColorPickerChangeDetails) => void;
 }
 
 const DEFAULT_PRESETS = [
@@ -1205,6 +1268,12 @@ export function InteractiveColorPicker(props: InteractiveColorPickerProps) {
 		showSwatches = true,
 		class: classProp,
 		id: idProp,
+		disabledAlpha,
+		allowClear,
+		onClear,
+		showText,
+		onChange,
+		onChangeComplete,
 		...rest
 	} = props;
 
@@ -1263,15 +1332,38 @@ export function InteractiveColorPicker(props: InteractiveColorPickerProps) {
 
 	const interactive = !disabledRef.current && !readOnlyRef.current;
 
+	const onChangeRef = useRef(onChange);
+	onChangeRef.current = onChange;
+	const onChangeCompleteRef = useRef(onChangeComplete);
+	onChangeCompleteRef.current = onChangeComplete;
+
 	const emit = (next: HSVA) => {
 		if (!isControlledValue) {
 			setInternalColor(next);
 		}
 		colorRef.current = next;
-		onValueChangeRef.current?.({
+		const details = {
 			value: hsvaToHex(next, next.a < 1),
 			hsva: next,
+		};
+		onValueChangeRef.current?.(details);
+		onChangeRef.current?.(details);
+	};
+
+	const onClearRef = useRef(onClear);
+	onClearRef.current = onClear;
+
+	const handleClear = () => {
+		const transparentWhite: HSVA = { h: 0, s: 0, v: 100, a: 0 };
+		emit(transparentWhite);
+		onClearRef.current?.();
+		onChangeCompleteRef.current?.({
+			value: hsvaToHex(transparentWhite, transparentWhite.a < 1),
+			hsva: transparentWhite,
 		});
+		if (closeOnSelectRef.current && triggerRef.current) {
+			setOpenState(false);
+		}
 	};
 
 	// ── Geometry helpers ────────────────────────────────────────────────────
@@ -1335,6 +1427,11 @@ export function InteractiveColorPicker(props: InteractiveColorPickerProps) {
 					el.releasePointerCapture?.(pid);
 					el.removeEventListener("pointermove", move);
 					el.removeEventListener("pointerup", up);
+					const cur = colorRef.current;
+					onChangeCompleteRef.current?.({
+						value: hsvaToHex(cur, cur.a < 1),
+						hsva: cur,
+					});
 				};
 				el.addEventListener("pointermove", move);
 				el.addEventListener("pointerup", up);
@@ -1413,12 +1510,27 @@ export function InteractiveColorPicker(props: InteractiveColorPickerProps) {
 			if (!target) return;
 			const data = target.getAttribute("data-value");
 			if (!data) return;
-			emit(parseColor(data));
+			const nextColor = parseColor(data);
+			emit(nextColor);
+			onChangeCompleteRef.current?.({
+				value: hsvaToHex(nextColor, nextColor.a < 1),
+				hsva: nextColor,
+			});
 			if (closeOnSelectRef.current && triggerRef.current) {
 				setOpenState(false);
 			}
 		};
 		root.addEventListener("click", onSwatchClick);
+
+		const onClearClick = (e: MouseEvent) => {
+			const target = (e.target as HTMLElement).closest<HTMLElement>(
+				'[data-part="clear-button"]',
+			);
+			if (!target) return;
+			e.preventDefault();
+			handleClear();
+		};
+		root.addEventListener("click", onClearClick);
 
 		// Channel-input edits → parse and merge.
 		const onInputChange = (e: Event) => {
@@ -1432,7 +1544,12 @@ export function InteractiveColorPicker(props: InteractiveColorPickerProps) {
 				// garbage input, which must not be committed as a colour change.
 				const normalised = raw.startsWith("#") ? raw : `#${raw}`;
 				if (/^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(normalised)) {
-					emit(parseColor(normalised));
+					const next = parseColor(normalised);
+					emit(next);
+					onChangeCompleteRef.current?.({
+						value: hsvaToHex(next, next.a < 1),
+						hsva: next,
+					});
 				}
 				return;
 			}
@@ -1473,6 +1590,14 @@ export function InteractiveColorPicker(props: InteractiveColorPickerProps) {
 				emit({ ...cur, s: next.s, v: next.v });
 			} else if (channel === "v") {
 				emit({ ...cur, v: clamp(num, 0, 100) });
+			}
+
+			const updated = colorRef.current;
+			if (updated !== cur) {
+				onChangeCompleteRef.current?.({
+					value: hsvaToHex(updated, updated.a < 1),
+					hsva: updated,
+				});
 			}
 		};
 		root.addEventListener("change", onInputChange);
@@ -1539,6 +1664,7 @@ export function InteractiveColorPicker(props: InteractiveColorPickerProps) {
 			hueEl?.removeEventListener("keydown", hueKey);
 			alphaEl?.removeEventListener("keydown", alphaKey);
 			root.removeEventListener("click", onSwatchClick);
+			root.removeEventListener("click", onClearClick);
 			root.removeEventListener("change", onInputChange);
 			root.removeEventListener("change", onFormatChange);
 			root.removeEventListener("click", onRootClick);
@@ -1584,6 +1710,8 @@ export function InteractiveColorPicker(props: InteractiveColorPickerProps) {
 			showSliders={showSliders}
 			showInputs={showInputs}
 			showSwatches={showSwatches}
+			allowClear={allowClear}
+			disabledAlpha={disabledAlpha}
 		/>
 	);
 
@@ -1600,8 +1728,11 @@ export function InteractiveColorPicker(props: InteractiveColorPickerProps) {
 			{trigger ? (
 				<>
 					{label && <Label>{label}</Label>}
-					<Trigger>
+					<Trigger style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
 						<SwatchTrigger />
+						{showText && (
+							<ValueText />
+						)}
 					</Trigger>
 					{open && (
 						<Positioner>
