@@ -23,6 +23,7 @@ export interface TabsContextValue {
 	onValueChange?: (details: { value: string }) => void;
 	onFocusChange?: (details: { value: string }) => void;
 	mountedValues?: string[];
+	isMeasured?: boolean;
 }
 
 export const TabsContext = createContext<TabsContextValue | null>(null);
@@ -55,6 +56,7 @@ export interface RootProps extends TabsVariantProps, PropsWithChildren {
 	class?: string;
 	rootRef?: unknown;
 	mountedValues?: string[];
+	isMeasured?: boolean;
 	[key: string]: unknown;
 }
 
@@ -75,6 +77,7 @@ export function Root(props: RootProps) {
 		rootRef,
 		class: classProp,
 		mountedValues,
+		isMeasured,
 		...rest
 	} = localProps;
 
@@ -94,6 +97,7 @@ export function Root(props: RootProps) {
 		onValueChange,
 		onFocusChange,
 		mountedValues,
+		isMeasured,
 	};
 
 	return (
@@ -211,6 +215,7 @@ export function Content(props: ContentProps) {
 			id={contentId}
 			role="tabpanel"
 			aria-labelledby={triggerId}
+			tabIndex={isSelected ? 0 : -1}
 			data-scope="tabs"
 			data-part="content"
 			data-value={value}
@@ -239,11 +244,15 @@ export function Indicator(props: IndicatorProps) {
 	const { class: classProp, style, ...rest } = props;
 	const context = useTabsContext();
 
+	const dataMeasured =
+		context.isMeasured !== undefined ? String(context.isMeasured) : undefined;
+
 	return (
 		<div
 			data-scope="tabs"
 			data-part="indicator"
 			data-orientation={context.orientation}
+			data-measured={dataMeasured}
 			class={cx(context.styles.indicator, classProp)}
 			style={style as Record<string, unknown>}
 			{...rest}

@@ -115,4 +115,20 @@ describe("Tabs Unit Tests", () => {
 		expect(html).toContain("Content 1");
 		expect(html).not.toContain("Content 2");
 	});
+
+	test("should assign tabIndex={0} to selected tabpanel content and tabIndex={-1} to non-selected", () => {
+		const html = (
+			<Tabs defaultValue="tab-1">
+				<Tabs.List>
+					<Tabs.Trigger value="tab-1">Tab 1</Tabs.Trigger>
+					<Tabs.Trigger value="tab-2">Tab 2</Tabs.Trigger>
+				</Tabs.List>
+				<Tabs.Content value="tab-1">Content 1</Tabs.Content>
+				<Tabs.Content value="tab-2">Content 2</Tabs.Content>
+			</Tabs>
+		).toString();
+
+		expect(html).toContain('tabIndex="0"');
+		expect(html).toContain('tabIndex="-1"');
+	});
 });

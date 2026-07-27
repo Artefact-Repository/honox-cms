@@ -28,7 +28,7 @@ export default function TabsIsland(props: TabsIslandProps) {
 	const [mountedValues, setMountedValues] = useState<string[]>(
 		mountedValuesProp ?? (initialValue !== undefined ? [initialValue] : []),
 	);
-	const isFirstRenderRef = useRef(true);
+	const [isMeasured, setIsMeasured] = useState(false);
 
 	useEffect(() => {
 		if (valueProp !== undefined) {
@@ -39,7 +39,7 @@ export default function TabsIsland(props: TabsIslandProps) {
 		}
 	}, [valueProp]);
 
-	const updateIndicator = (activeTrigger: HTMLElement, enableTransition = true) => {
+	const updateIndicator = (activeTrigger: HTMLElement) => {
 		const root = rootRef.current;
 		if (!root) return;
 
@@ -52,26 +52,16 @@ export default function TabsIsland(props: TabsIslandProps) {
 		const left = `${rect.left - listRect.left}px`;
 		const top = `${rect.top - listRect.top}px`;
 
-		const indicator = root.querySelector<HTMLElement>('[data-part="indicator"]');
-		if (indicator) {
-			if (enableTransition) {
-				indicator.removeAttribute("data-transition");
-			} else {
-				indicator.setAttribute("data-transition", "false");
-				requestAnimationFrame(() => {
-					indicator.removeAttribute("data-transition");
-				});
-			}
-		}
+		const elementsToUpdate: HTMLElement[] = [];
+		if (root) elementsToUpdate.push(root);
+		const listEl = root.querySelector('[data-part="list"]');
+		if (listEl instanceof HTMLElement) elementsToUpdate.push(listEl);
 
-		for (const el of [root, list] as unknown[]) {
-			if (el) {
-				const element = el as HTMLElement;
-				element.style.setProperty("--width", width);
-				element.style.setProperty("--height", height);
-				element.style.setProperty("--left", left);
-				element.style.setProperty("--top", top);
-			}
+		for (const element of elementsToUpdate) {
+			element.style.setProperty("--width", width);
+			element.style.setProperty("--height", height);
+			element.style.setProperty("--left", left);
+			element.style.setProperty("--top", top);
 		}
 	};
 
@@ -124,12 +114,9 @@ export default function TabsIsland(props: TabsIslandProps) {
 			`[data-part="trigger"][data-value="${value}"]`,
 		);
 		if (activeTrigger) {
-			const enableTransition = !isFirstRenderRef.current;
-			if (isFirstRenderRef.current) {
-				isFirstRenderRef.current = false;
-			}
 			requestAnimationFrame(() => {
-				updateIndicator(activeTrigger, enableTransition);
+				updateIndicator(activeTrigger);
+				setIsMeasured(true);
 			});
 		}
 	}, [value, focusedValue]);
@@ -334,6 +321,7 @@ export default function TabsIsland(props: TabsIslandProps) {
 			onValueChange={handleValueChange}
 			rootRef={rootRef}
 			mountedValues={mountedValues}
+			isMeasured={isMeasured}
 			data-hydrated="true"
 		>
 			{children}
