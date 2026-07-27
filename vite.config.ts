@@ -163,12 +163,7 @@ function copyLocalizedContentPagesPlugin() {
 					// app/routes/[locale]/[page].tsx's URL (locale-first, like
 					// docs/blog). `destDir` already exists (it's the same
 					// per-locale directory blog/docs/pages live under).
-					const source = path.join(
-						distDir,
-						locale,
-						"pages",
-						`${slug}.html`,
-					);
+					const source = path.join(distDir, locale, "pages", `${slug}.html`);
 					if (!existsSync(source)) continue;
 
 					const destDir = path.join(distDir, locale);

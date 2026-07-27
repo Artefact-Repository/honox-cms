@@ -62,11 +62,7 @@ test("Field - Flattened API validation (minLength)", () => {
 
 test("Field - Supports type prop", () => {
 	const html = (
-		<Field
-			id="password-field"
-			label="Password"
-			type="password"
-		/>
+		<Field id="password-field" label="Password" type="password" />
 	).toString();
 
 	expect(html).toContain('type="password"');
