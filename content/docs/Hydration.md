@@ -65,7 +65,7 @@ Applies to:
 - Expand / collapse (collapsible)
 - Pure client singletons (toast)
 
-### Tier-2 — Smart auto-detect
+### Tier-2 — Conditional
 
 > **Core rule: `shouldHydrate(interactive, hasSignal)`**
 
@@ -119,7 +119,7 @@ Applies to:
 | `collapsible` | `shouldHydrate(interactive, true)` | Always hydrates (expand/collapse needs JS) | ✅ `collapsible.tsx` (Tier-1) |
 | `toast` | Always island (client singleton) | No prop, always an island | ✅ `toast.tsx` |
 
-### Tier-2 (smart auto-detect)
+### Tier-2 (conditional)
 
 | Component | Behaviour signal (`hasSignal` is true when…) | Status |
 | --- | --- | --- |

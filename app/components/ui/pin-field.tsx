@@ -7,7 +7,7 @@ export interface PinFieldProps extends Primitives.RootProps {
 	 * Whether to enable interactivity (hydration).
 	 * - `true`  → always hydrate (explicit opt-in)
 	 * - `false` → never hydrate, render pure static markup (explicit opt-out)
-	 * - omitted → smart auto-detect: hydrate iff a behavioural signal is present
+	 * - omitted → conditional: hydrate iff a behavioural signal is present
 	 *   (a handler, controlled state, or uncontrolled initial value)
 	 */
 	interactive?: boolean;
@@ -31,7 +31,7 @@ export function PinField(props: PinFieldProps) {
 		...rest
 	} = props;
 
-	// Tier-2 smart auto-detect: hydrate when any behavioural signal is present —
+	// Tier-2 conditional: hydrate when any behavioural signal is present —
 	// an event handler, controlled state, or uncontrolled initial value. An
 	// explicit `interactive` knob overrides this: `true` forces, `false` forbids.
 	const hasSignal =
