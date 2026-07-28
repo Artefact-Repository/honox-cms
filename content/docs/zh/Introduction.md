@@ -15,16 +15,20 @@ title: 简介
 
 ## 为什么选择这套技术栈
 
+大多数 UI 组件库都是为某一个特定的 JavaScript 框架而构建的 —— 一旦你需要在多个框架间混用或日后切换，这便成了负担。[HonoX](https://honox.dev) 以**元框架**的方式绕开了这个问题：它让你_自带框架_（BYOF），因此我们的组件保持_框架无关_，完全在构建时解析，而不与某个客户端运行时绑定。再结合 [`@hono/vite-ssg`](https://github.com/honojs/vite-plugins/tree/main/packages/ssg)，我们还获得了：
+
 * **默认静态。** 构建产物就是普通的 HTML/CSS/JS —— 请求时无需任何服务端进程，因此可以部署在任何支持静态文件托管的平台上（Cloudflare Pages 与 Vercel 已开箱配置）。
 * **在需要的地方才交互。** 并非每个组件都需要下发 JavaScript。三层[水合](/docs/zh/Hydration)模型让每个组件自行决定是急切水合、按行为条件水合，还是完全不水合 —— 在不牺牲丰富 UI 的前提下保持客户端 bundle 精简。
-* **无需接触代码即可编辑内容。** [Sveltia CMS](https://sveltiacms.app) 完全运行在客户端，并直接向 `content/` 下的文件提交变更，因此编辑者可以撰写博客与文档，甚至通过[页面构建器](/docs/zh/PageBuilder)以可视化方式组合整个页面，而开发者仍能将一切纳入版本控制。
-* **样式可靠可信。** [PandaCSS](https://panda-css.com) 会基于静态可分析的样式调用提前生成全部 CSS —— 没有运行时样式引擎，没有类名冲突，设计 token 拥有完整的类型安全。
+
+这些 UI 组件最初是将 [Park UI](https://park-ui.com/)（[Ark UI](https://ark-ui.com/)）从 React 移植到 Hono/jsx 而来。对于每一个组件，我们都为 [Sveltia CMS](https://sveltiacms.app) 构建了对应的绑定，因此内容无需编写代码即可通过 Web 管理界面轻松编辑。这也让 UI 代码更干净、更以数据驱动。该 CMS 以本地优先为理念，完全在客户端运行，并直接提交到 `content/` 下的文件，因此编辑者可以撰写博客与文档，甚至通过[页面构建器](/docs/zh/PageBuilder)以可视化方式组合整个页面，而开发者仍能将一切纳入版本控制。
+
+[PandaCSS](https://panda-css.com) 用于基于静态可分析的样式调用提前生成全部 CSS —— 没有运行时样式引擎，没有类名冲突，设计 token 拥有完整的类型安全。
 
 ***
 
 ## 项目中都有什么
 
-* **约 50 个 UI 组件**，位于 `app/components/ui/`，覆盖布局、表单、浮层与数据展示，每个组件在需要时都有一个对应的交互式岛屿位于 `app/islands/`。
+* **约 60 个 UI 组件**，位于 `app/components/ui/`，覆盖布局、表单、浮层与数据展示，每个组件在需要时都有一个对应的交互式岛屿位于 `app/islands/`。
 * **一个博客**（`content/posts/`），支持标签、作者页面以及只读的 JSON API。
 * **一个可视化页面构建器**（`content/pages/`），完全通过 CMS 由嵌套组件组合页面。
 * **文档**（即本区域），以纯 Markdown 或 MDX 撰写 —— 后者用于需要在正文中嵌入实时渲染示例的页面。

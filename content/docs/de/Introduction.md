@@ -15,16 +15,20 @@ Dies ist ein Full-Stack-Starter auf Basis von [**HonoX**](https://github.com/hon
 
 ## Warum dieser Stack
 
+Die meisten UI-Komponentenbibliotheken sind für ein bestimmtes JavaScript-Framework gebaut —— ein Nachteil, sobald man Frameworks mischen oder später wechseln muss. [HonoX](https://honox.dev) umgeht das als **Meta-Framework**: Es ermöglicht dir, dein eigenes Framework mitzubringen (_Bring Your Own Framework_, BYOF), sodass unsere Komponenten _framework-agnostisch_ bleiben und vollständig zur Build-Zeit aufgelöst werden, statt an eine Client-Laufzeit gebunden zu sein. Zusammen mit [`@hono/vite-ssg`](https://github.com/honojs/vite-plugins/tree/main/packages/ssg) verschafft uns das zudem:
+
 * **Standardmäßig statisch.** Das Build-Ergebnis ist reines HTML/CSS/JS —— zur Laufzeit einer Anfrage ist kein Serverprozess nötig, daher lässt es sich überall dort deployen, wo statische Dateien ausgeliefert werden können (Cloudflare Pages und Vercel sind bereits vorkonfiguriert).
 * **Interaktiv, wo es zählt.** Nicht jede Komponente muss JavaScript ausliefern. Ein dreistufiges [Hydration](/docs/de/Hydration)-Modell lässt jede Komponente selbst entscheiden, ob sie sofort, bedingt oder gar nicht hydratisiert —— so bleibt das Client-Bundle klein, ohne auf eine reichhaltige UI zu verzichten.
-* **Inhalte bearbeitbar, ohne Code anzufassen.** [Sveltia CMS](https://sveltiacms.app) läuft vollständig im Client und committet Änderungen direkt in die Dateien unter `content/`, sodass Redakteure Blogbeiträge und Dokumentation schreiben oder über den [Seitenbaukasten](/docs/de/PageBuilder) sogar ganze Seiten visuell zusammenstellen können, während Entwickler weiterhin alles unter Versionskontrolle behalten.
-* **Verlässliches Styling.** [PandaCSS](https://panda-css.com) generiert das gesamte CSS im Voraus aus statisch analysierbaren Style-Aufrufen —— keine Laufzeit-Styling-Engine, keine Klassennamenkollisionen und volle Typsicherheit bei den Design-Tokens.
+
+Diese UI-Komponenten begannen als Port von [Park UI](https://park-ui.com/) ([Ark UI](https://ark-ui.com/)) von React zu Hono/jsx. Für jede davon haben wir passende Bindings für [Sveltia CMS](https://sveltiacms.app) gebaut, sodass Inhalte über eine Web-Admin-Oberfläche leicht bearbeitbar bleiben, ohne Code anfassen zu müssen. Das macht den UI-Code außerdem sauberer und datengetriebener. Das CMS ist local-first, läuft vollständig clientseitig und committet direkt in die Dateien unter `content/`, sodass Redakteure Blogbeiträge und Dokumentation schreiben oder über den [Seitenbaukasten](/docs/de/PageBuilder) ganze Seiten visuell zusammenstellen können, während Entwickler weiterhin alles unter Versionskontrolle behalten.
+
+[PandaCSS](https://panda-css.com) wird verwendet, um das gesamte CSS im Voraus aus statisch analysierbaren Style-Aufrufen zu generieren —— keine Laufzeit-Styling-Engine, keine Klassennamenkollisionen und volle Typsicherheit bei den Design-Tokens.
 
 ***
 
 ## Was enthalten ist
 
-* **Rund 50 UI-Komponenten** unter `app/components/ui/`, die Layout, Formulare, Overlays und Datenanzeige abdecken, jede bei Bedarf mit einer passenden interaktiven Island in `app/islands/`.
+* **Rund 60 UI-Komponenten** unter `app/components/ui/`, die Layout, Formulare, Overlays und Datenanzeige abdecken, jede bei Bedarf mit einer passenden interaktiven Island in `app/islands/`.
 * **Ein Blog** (`content/posts/`) mit Tags, Autorenseiten und einer schreibgeschützten JSON-API.
 * **Ein visueller Seitenbaukasten** (`content/pages/`) zum Zusammenstellen von Seiten aus verschachtelten Komponenten, vollständig über das CMS.
 * **Dokumentation** (dieser Bereich), verfasst als reines Markdown oder MDX —— letzteres für Seiten, die ein live gerendertes Beispiel direkt im Fließtext brauchen.

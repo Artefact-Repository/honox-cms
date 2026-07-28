@@ -15,16 +15,20 @@ Este es un starter full-stack construido sobre [**HonoX**](https://github.com/ho
 
 ## Por qué este stack
 
+La mayoría de las bibliotecas de componentes de UI están construidas para un framework de JavaScript específico —— un lastre en el momento en que necesitas mezclar frameworks o cambiar más adelante. [HonoX](https://honox.dev) esquiva eso como un **meta-framework**: te permite _traer tu propio framework_ (BYOF), así nuestros componentes permanecen _agnósticos al framework_, resueltos totalmente en tiempo de build en lugar de estar atados a una runtime del cliente. Combinado con [`@hono/vite-ssg`](https://github.com/honojs/vite-plugins/tree/main/packages/ssg), esto también nos da:
+
 * **Estático por defecto.** El resultado del build es HTML/CSS/JS plano —— no se requiere ningún proceso de servidor en tiempo de petición, así que se despliega en cualquier lugar donde se sirvan archivos estáticos (Cloudflare Pages y Vercel ya vienen configurados).
 * **Interactivo donde importa.** No todos los componentes necesitan enviar JavaScript. Un modelo de [hidratación](/docs/es/Hydration) de tres niveles permite que cada componente decida si se hidrata de forma inmediata, condicional, o nunca —— manteniendo el bundle del cliente pequeño sin renunciar a una UI rica.
-* **Contenido editable sin tocar código.** [Sveltia CMS](https://sveltiacms.app) se ejecuta enteramente en el cliente y hace commit directamente sobre los archivos bajo `content/`, de modo que los editores pueden escribir entradas de blog, documentación, e incluso componer páginas enteras visualmente mediante el [Constructor de Páginas](/docs/es/PageBuilder), mientras que los desarrolladores mantienen todo bajo control de versiones.
-* **Estilos con confianza.** [PandaCSS](https://panda-css.com) genera todo el CSS por adelantado a partir de llamadas de estilo analizables estáticamente —— sin motor de estilos en runtime, sin colisiones de nombres de clase, y con seguridad de tipos completa en los design tokens.
+
+Estos componentes de UI comenzaron como un port de [Park UI](https://park-ui.com/) ([Ark UI](https://ark-ui.com/)) de React a Hono/jsx. Para cada uno, hemos construido bindings coincidentes para [Sveltia CMS](https://sveltiacms.app), un CMS respaldado por Git, de modo que el contenido sigue siendo fácilmente editable a través de una interfaz de administración web sin tener que tocar código. Esto también hace que el código de UI sea más limpio y orientado a datos. El CMS es local-first, se ejecuta completamente en el cliente y hace commit directamente en los archivos bajo `content/`, de modo que los editores pueden escribir entradas de blog, documentación, e incluso componer páginas enteras visualmente mediante el [Constructor de Páginas](/docs/es/PageBuilder), mientras que los desarrolladores mantienen todo bajo control de versiones.
+
+[PandaCSS](https://panda-css.com) se usa para generar todo el CSS por adelantado a partir de llamadas de estilo analizables estáticamente —— sin motor de estilos en runtime, sin colisiones de nombres de clase, y con seguridad de tipos completa en los design tokens.
 
 ***
 
 ## Qué incluye
 
-* **Cerca de 50 componentes de UI** bajo `app/components/ui/`, cubriendo layout, formularios, overlays y presentación de datos, cada uno con su contraparte interactiva en `app/islands/` cuando es necesario.
+* **Cerca de 60 componentes de UI** bajo `app/components/ui/`, cubriendo layout, formularios, overlays y presentación de datos, cada uno con su contraparte interactiva en `app/islands/` cuando es necesario.
 * **Un blog** (`content/posts/`) con etiquetas, páginas de autor y una API JSON de solo lectura.
 * **Un constructor de páginas visual** (`content/pages/`) para componer páginas a partir de componentes anidados enteramente desde el CMS.
 * **Documentación** (esta sección), escrita en Markdown plano o MDX, este último para páginas que necesitan un ejemplo renderizado en vivo incrustado en el texto.
