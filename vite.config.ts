@@ -17,6 +17,7 @@ import remarkGfm from "remark-gfm";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 import { defineConfig } from "vite";
 import { TRANSLATED_LOCALES } from "./app/lib/i18n";
+import { remarkDemoPreviewCodeMerge } from "./app/lib/remark-demo-preview-code";
 import { RESERVED_PAGE_SLUGS } from "./app/lib/reserved-page-slugs";
 import pandaConfig from "./panda.config";
 
@@ -221,7 +222,12 @@ const mainConfig = (_mode: string) => ({
 			// string before checking the extension.
 			include: /\.mdx$/,
 			jsxImportSource: "hono/jsx",
-			remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter, remarkGfm],
+			remarkPlugins: [
+				remarkFrontmatter,
+				remarkMdxFrontmatter,
+				remarkGfm,
+				remarkDemoPreviewCodeMerge,
+			],
 		}),
 		honox({
 			devServer: {
