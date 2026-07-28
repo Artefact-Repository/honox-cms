@@ -76,14 +76,14 @@ export default function PlaygroundIsland({
 	const [parseError, setParseError] = useState<string | null>(null);
 	const [draft, setDraft] = useState<Draft | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
-	const [PageRenderer, setPageRenderer] =
-		useState<typeof PageRendererType | null>(null);
+	const [PageRenderer, setPageRenderer] = useState<
+		typeof PageRendererType | null
+	>(null);
 
 	const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const requestIdRef = useRef(0);
 
-	const selected =
-		pages.find((page) => page.slug === selectedSlug) ?? pages[0];
+	const selected = pages.find((page) => page.slug === selectedSlug) ?? pages[0];
 
 	// Dynamically imported instead of statically — this island is itself
 	// registered as a block renderer in page-registry.tsx (so the
@@ -194,8 +194,7 @@ export default function PlaygroundIsland({
 		return <p>No CMS pages found under content/pages.</p>;
 	}
 
-	const activeWidth =
-		VIEWPORTS.find((v) => v.id === viewport)?.width ?? "100%";
+	const activeWidth = VIEWPORTS.find((v) => v.id === viewport)?.width ?? "100%";
 	const isEdited = jsonText !== originalJson;
 
 	const jsonPanelContent = (

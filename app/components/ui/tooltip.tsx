@@ -148,13 +148,13 @@ const TooltipComponent = Object.assign(Tooltip, {
 });
 
 export {
-	TooltipComponent as Tooltip,
-	TooltipRoot as Root,
-	TooltipTrigger as Trigger,
-	TooltipPositioner as Positioner,
-	TooltipContent as Content,
 	TooltipArrow as Arrow,
 	TooltipArrowTip as ArrowTip,
+	TooltipComponent as Tooltip,
+	TooltipContent as Content,
+	TooltipPositioner as Positioner,
+	TooltipRoot as Root,
+	TooltipTrigger as Trigger,
 };
 
 export default TooltipComponent;
