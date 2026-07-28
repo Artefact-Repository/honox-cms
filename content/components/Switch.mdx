@@ -9,54 +9,90 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-A control that allows the user to toggle between checked and unchecked states.
+An input control that allows users to quickly toggle between binary checked and unchecked states (e.g., On/Off, Enabled/Disabled). Primarily used for app settings, configuration options, preferences, and instant filter updates.
 
-# Usage
+The **Switch** component is fully integrated as an interactive `switch` block in the **Page Builder**, allowing content authors and developers to easily configure visual labels, sizing, default states, and color themes directly within the CMS.
+
+***
+
+# Usage via CMS Page Builder (JSON)
+
+These examples illustrate how content editors bind and structure interactive switch components inside the JSON page schemas (`content/pages/*.json`).
+
+## 1. Standard Preference Toggle (Uncontrolled / Checked)
+
+A standard switch preset with a default enabled state, commonly used to toggle notifications or user preferences.
 
 <DemoPreview>
-  <Switch defaultChecked interactive>Enable Notifications</Switch>
+  <Switch defaultChecked interactive>Enable Push Notifications</Switch>
 </DemoPreview>
-
-```tsx
-import { Switch } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Switch
-      defaultChecked={true}
-      onCheckedChange={(details) => console.log(details.checked)}
-      interactive
-    >
-      Enable Notifications
-    </Switch>
-  );
-}
-```
-
-## CMS Page Builder
-
-This component is available as a `switch` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
 
 ```json
 {
   "type": "switch",
-  "label": "Dark Mode",
+  "label": "Enable Push Notifications",
   "checked": true,
-  "colorPalette": "blue"
+  "colorPalette": "blue",
+  "interactive": true
 }
 ```
 
-# Props
+## 2. Accented Configuration Toggle (Purple Theme)
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `children` | `any` | Label content to be rendered next to the switch. |
-| `class` | `string` | Custom CSS classes. |
-| `checked` | `boolean` | Whether the switch is checked (controlled). |
-| `defaultChecked` | `boolean` | The initial checked state (uncontrolled). |
-| `disabled` | `boolean` | Whether the switch is disabled. |
-| `onCheckedChange` | `(details: { checked: boolean }) => void` | Callback triggered when the checked state changes. |
+Features a custom visual accent color theme and size adjustment. Ideal for custom platform tools, branding highlights, or dedicated dashboard toggles.
 
-| `size` | \`"sm" \ | "md" \ | "lg"\` | The size of the switch. |
+<DemoPreview>
+  <Switch colorPalette="purple" size="lg" defaultChecked interactive>Automatic Dark Mode</Switch>
+</DemoPreview>
 
-| `interactive` | `boolean` | Forces hydration as an island. |
+```json
+{
+  "type": "switch",
+  "label": "Automatic Dark Mode",
+  "checked": true,
+  "size": "lg",
+  "colorPalette": "purple",
+  "interactive": true
+}
+```
+
+## 3. Disabled System Option
+
+Demonstrates a read-only or temporarily unavailable configuration toggle. This prevents any hover states or mouse interactions while communicating the unavailable option clearly.
+
+<DemoPreview>
+  <Switch disabled interactive>Sync Background Data</Switch>
+</DemoPreview>
+
+```json
+{
+  "type": "switch",
+  "label": "Sync Background Data",
+  "checked": false,
+  "disabled": true,
+  "interactive": true
+}
+```
+
+***
+
+# CMS Configuration Reference
+
+These fields map directly to Sveltia CMS block properties under `public/admin/config.yml` or the Page Builder configurations:
+
+| Property | CMS Field Type | Default | Description / Supported Options |
+| :--- | :--- | :--- | :--- |
+| **Label Text** (`label`) | `string` | - | The companion descriptive text positioned adjacent to the visual switch control. |
+| **Initial Value** (`checked`) | `boolean` | `false` | Whether the toggle control begins in the active (On) or inactive (Off) state. |
+| **Disabled** (`disabled`) | `boolean` | `false` | Disables all user interaction and applies a dimmed styling overlay. |
+| **Color Theme** (`colorPalette`) | `select` | `"blue"` | Visual theme applied to background track when toggled active. <br/>• Options: `blue`, `green`, `red`, `purple`, `orange`, `amber`, `cyan`, `slate`. |
+| **Size Scale** (`size`) | `select` | `"md"` | Controls overall height, width, and thumb toggle scale. <br/>• Options: `"sm"`, `"md"`, `"lg"`. |
+| **Force Interactive** (`interactive`) | `boolean` | `true` | Ensures client-side hydration as a Preact interactive island so click actions trigger state changes instantly. |
+
+***
+
+# Developer Notes & Accessibility
+
+- **Hydration Island:** Because the Switch requires immediate user interaction to toggle active/inactive states on client machines, it is designated as a client-side island by default (`"interactive": true`).
+- **WAI-ARIA Compliance:** Under the hood, this component compiles to a semantic, accessible switch button container (`role="switch"`, `aria-checked="true|false"`). Keyboard navigation via the Spacebar or Enter key functions automatically out-of-the-box.
+- **Form Integration:** It outputs a native hidden `<input type="checkbox">` alongside the button control. This ensures form submissions (such as standard POST requests) correctly capture active states without additional Javascript mapping.
