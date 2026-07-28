@@ -7,58 +7,133 @@ category: Forms
 import { SegmentGroup } from "../../app/components/ui";
 import { DemoPreview } from "../../app/components/demo-preview";
 
-A group of radio-like buttons that look like a single segmented control.
+# Introduction
 
-## Usage
+An option-selector control that allows users to toggle between multiple mutually exclusive values within a single consolidated track. Similar to a radio group but styled with an animated, sliding indicator highlighting the active selection. Primarily used for view toggles, dashboard filter ranges, panel options, and status selections.
+
+The **SegmentGroup** component is fully integrated as an interactive `segmentGroup` block in the **Page Builder**, allowing content authors and developers to easily configure custom items, orientations, and size scales directly within the CMS.
+
+***
+
+# Usage via CMS Page Builder (JSON)
+
+These examples illustrate how content editors bind and structure interactive segment group components inside the JSON page schemas (`content/pages/*.json`).
+
+## 1. Standard View Layout Selector (Fitted & Horizontal)
+
+A standard layout selector option with two values that stretches to fill the container's width, commonly used for toggling between List and Grid representations of content.
 
 <DemoPreview>
   <SegmentGroup
-    label="View"
+    defaultValue="grid"
+    fitted
+    interactive
     items={[
-      { label: "List", value: "list" },
-      { label: "Grid", value: "grid" },
+      { label: "List View", value: "list" },
+      { label: "Grid View", value: "grid" },
     ]}
   />
 </DemoPreview>
 
-### CMS Page Builder
-
-This component is available as a `segmentGroup` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
-
 ```json
 {
   "type": "segmentGroup",
-  "label": "View",
+  "defaultValue": "grid",
+  "fitted": true,
+  "interactive": true,
   "items": [
-    { "label": "List", "value": "list" },
-    { "label": "Grid", "value": "grid" }
+    { "label": "List View", "value": "list" },
+    { "label": "Grid View", "value": "grid" }
   ]
 }
 ```
 
-## Props
+## 2. Prominent Time Range Selector (Large Size Scale)
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `label` | `string` | - | Group label. |
-| `items` | `SegmentGroupItem[]` | - | Array of items with `label` and `value`. |
+Features a larger visual size scale, rendering a prominent filter control suitable for main dashboard dashboards and analytics platforms.
 
-## CMS Configuration
+<DemoPreview>
+  <SegmentGroup
+    defaultValue="30d"
+    size="lg"
+    interactive
+    items={[
+      { label: "7 Days", value: "7d" },
+      { label: "30 Days", value: "30d" },
+      { label: "90 Days", value: "90d" },
+    ]}
+  />
+</DemoPreview>
 
-```yaml
-- label: SegmentGroup
-  name: segment-group
-  widget: object
-  fields:
-    - { label: Label, name: label, widget: string, required: false }
-    - label: Items
-      name: items
-      widget: list
-      fields:
-        - { label: Label, name: label, widget: string }
-        - { label: Value, name: value, widget: string }
+```json
+{
+  "type": "segmentGroup",
+  "defaultValue": "30d",
+  "size": "lg",
+  "interactive": true,
+  "items": [
+    { "label": "7 Days", "value": "7d" },
+    { "label": "30 Days", "value": "30d" },
+    { "label": "90 Days", "value": "90d" }
+  ]
+}
 ```
 
-## Hydration
+## 3. Compact Vertical System Selection with Disabled Options
 
-Tier-2: Hydrates when `value`, `defaultValue`, or `onValueChange` is provided.
+Demonstrates a vertical arrangement with custom item constraints. Useful for side panels or settings dialogs where certain options might be temporarily locked or restricted.
+
+<DemoPreview>
+  <SegmentGroup
+    label="Notification Frequency"
+    defaultValue="daily"
+    orientation="vertical"
+    size="sm"
+    interactive
+    items={[
+      { label: "Real-time Alerts", value: "instant", disabled: true },
+      { label: "Daily Digest", value: "daily" },
+      { label: "Weekly Summary", value: "weekly" },
+    ]}
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "segmentGroup",
+  "label": "Notification Frequency",
+  "defaultValue": "daily",
+  "orientation": "vertical",
+  "size": "sm",
+  "interactive": true,
+  "items": [
+    { "label": "Real-time Alerts", "value": "instant", "disabled": true },
+    { "label": "Daily Digest", "value": "daily" },
+    { "label": "Weekly Summary", "value": "weekly" }
+  ]
+}
+```
+
+***
+
+# CMS Configuration Reference
+
+These fields map directly to Sveltia CMS block properties under `public/admin/config.yml` or the Page Builder configurations:
+
+| Property | CMS Field Type | Default | Description / Supported Options |
+| :--- | :--- | :--- | :--- |
+| **Label Text** (`label`) | `string` | - | Optional group label positioned above the segmented controller track. |
+| **Default Value** (`defaultValue`) | `string` | - | The value of the option that should be active by default upon initial render. |
+| **Items List** (`items`) | `list` | - | Array of selection options containing `label` (text), `value` (ID), and optional `disabled` status. |
+| **Orientation** (`orientation`) | `select` | `"horizontal"` | Directional layout flow of the segment buttons. <br/>• Options: `"horizontal"`, `"vertical"`. |
+| **Fitted Layout** (`fitted`) | `boolean` | `false` | Whether individual segments expand evenly to stretch and fill the parent container's width. |
+| **Size Scale** (`size`) | `select` | `"md"` | Controls the vertical height, padding, and text-sizing of segment items. <br/>• Options: `"xs"`, `"sm"`, `"md"`, `"lg"`, `"xl"`. |
+| **Force Interactive** (`interactive`) | `boolean` | `true` | Hydrates the component as a Preact interactive island so click events trigger option changes immediately. |
+
+***
+
+# Developer Notes & Accessibility
+
+- **Hydration Island:** As an input selector that captures active click interactions and computes slide offsets, the SegmentGroup operates as an interactive client-side island by default (`"interactive": true`).
+- **WAI-ARIA Compliance:** Under the hood, this component compiles to a fully-accessible radio group button container (`role="radiogroup"`, `aria-label`) containing individual options (`role="radio"`). Keyboard arrow keys automatically cycle through available values, and focus transitions follow correct ARIA tabs standards.
+- **Form Integration:** It outputs native hidden `<input type="radio">` controls bound to each active item. This ensures form submissions (such as standard POST requests) correctly capture values without requiring extra state synchronization in Javascript.
