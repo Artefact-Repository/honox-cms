@@ -1,7 +1,7 @@
 ---
 title: Carousel
-hydration: 1
 category: Data Display
+hydration: 1
 ---
 
 import { Carousel } from "../../app/components/ui";
@@ -13,11 +13,11 @@ The `Carousel` component is a high-performance, native-scrolling slideshow that 
 
 As a result, touch swiping, trackpad scrolling, and keyboard arrow-key navigation work instantly even before client hydration. JavaSript is gracefully layered on only when indicators, prev/next buttons, and auto-play triggers are clicked.
 
----
+***
 
-# Usage via CMS Page Builder (JSON)
+# Usage
 
-This component is fully integrated as a `carousel` block type in the JSON-driven page templates under `content/pages/*.json`. Content authors can configure and order slides, set display layouts, and control auto-play properties entirely within their CMS workspace.
+You can configure and order slides, set display layouts, and control auto-play properties.
 
 ## Basic Slideshow
 
@@ -74,7 +74,7 @@ A standard image banner featuring full-width slides with caption overlays and na
 }
 ```
 
----
+***
 
 ## Autoplay Banner with Hover Controls
 
@@ -126,7 +126,7 @@ Configure the carousel to auto-advance at a set speed. To keep the interface acc
 }
 ```
 
----
+***
 
 ## Multi-Slide Layout
 
@@ -178,7 +178,7 @@ Display several slides side-by-side simultaneously. Excellent for product lists,
 }
 ```
 
----
+***
 
 ## Vertical Gallery Feed
 
@@ -219,7 +219,7 @@ Scroll through your slide content vertically instead of horizontally. Excellent 
 }
 ```
 
----
+***
 
 ## Accent-Themed with Overlaid Controls
 
@@ -258,16 +258,12 @@ Make the previous/next triggers and dots float on top of the images directly (in
 }
 ```
 
----
+***
 
-# CMS Configuration & Property Reference
-
-## Block Configuration schema
-
-The following parameters are supported by the `carousel` block under the Page Builder config. They correspond precisely to the block schema declared in `public/admin/config.yml`.
+# Props
 
 | Parameter | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
+| --- | --- | --- | --- |
 | `slides` | `List` | - | An ordered collection of individual slides (see schema below). |
 | `slidesPerPage` | `Number` | `1` | Number of slides visible in the viewport simultaneously. |
 | `spacing` | `String` | - | CSS-compatible gap/space between visible slides (e.g., `"16px"`, `"1rem"`). |
@@ -283,12 +279,12 @@ The following parameters are supported by the `carousel` block under the Page Bu
 Each entry in the `slides` parameter accepts the following properties:
 
 | Property | Type | Required | Description |
-| :--- | :--- | :--- | :--- |
+| --- | --- | --- | --- |
 | `image` | `Image` | Yes | Path or URL to the background slide image. |
 | `caption` | `String` | No | Overlay description text rendered dynamically over the slide's lower region. |
 | `href` | `String` | No | Navigation URL or localized page route that the entire slide triggers upon click. |
 
----
+***
 
 # Architecture Notes
 
