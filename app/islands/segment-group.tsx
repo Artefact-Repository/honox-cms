@@ -36,9 +36,6 @@ export default function SegmentGroupIsland(props: SegmentGroupIslandProps) {
 		const root = rootRef.current;
 		if (!root) return;
 
-		const rect = activeItem.getBoundingClientRect();
-		const rootRect = root.getBoundingClientRect();
-
 		const indicator = root.querySelector<HTMLElement>(
 			'[data-part="indicator"]',
 		);
@@ -53,10 +50,15 @@ export default function SegmentGroupIsland(props: SegmentGroupIslandProps) {
 			}
 		}
 
-		root.style.setProperty("--width", `${rect.width}px`);
-		root.style.setProperty("--height", `${rect.height}px`);
-		root.style.setProperty("--left", `${rect.left - rootRect.left}px`);
-		root.style.setProperty("--top", `${rect.top - rootRect.top}px`);
+		// offsetLeft/Top/Width/Height are pure layout measurements: unlike
+		// getBoundingClientRect(), they're unaffected by an in-progress CSS
+		// `transform` on an ancestor (e.g. a Popover/Dialog's scale-fade-in
+		// open animation), so a ResizeObserver firing mid-animation can't
+		// bake in a scaled-down snapshot.
+		root.style.setProperty("--width", `${activeItem.offsetWidth}px`);
+		root.style.setProperty("--height", `${activeItem.offsetHeight}px`);
+		root.style.setProperty("--left", `${activeItem.offsetLeft}px`);
+		root.style.setProperty("--top", `${activeItem.offsetTop}px`);
 	};
 
 	useEffect(() => {
