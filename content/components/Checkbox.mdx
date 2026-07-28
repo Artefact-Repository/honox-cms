@@ -1,7 +1,7 @@
 ---
 title: Checkbox
-hydration: 2
 category: Forms
+hydration: 2
 ---
 
 import { Checkbox } from "../../app/components/ui";
@@ -11,11 +11,11 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 The `Checkbox` component is a form control that allows users to toggle between binary choices (checked or unchecked) and indeterminate states. Fully optimized for the page builder, the component supports standard browser behaviors and can be customized with state conditions (such as invalid and disabled states) and accented design themes.
 
----
+***
 
-# Usage via CMS Page Builder (JSON)
+# Usage
 
-This component is available as a `checkbox` block inside our JSON page templates (`content/pages/*.json`). Content authors can customize and structure checkboxes entirely within their CMS workspace.
+You can customise and structure checkboxes as following for example:
 
 ## Basic Checkbox
 
@@ -32,7 +32,7 @@ A standard checkbox with an interactive click label for straightforward user opt
 }
 ```
 
----
+***
 
 ## Pre-Checked Checkbox
 
@@ -50,7 +50,7 @@ Configure a checkbox to render in the checked state by default when the page fir
 }
 ```
 
----
+***
 
 ## Disabled Checkbox
 
@@ -70,7 +70,7 @@ Prevent users from interacting with the checkbox while preserving its current vi
 }
 ```
 
----
+***
 
 ## Invalid Validation State
 
@@ -88,7 +88,7 @@ Indicate that a checkbox field has failed validation. For example, forcing a che
 }
 ```
 
----
+***
 
 ## Accent-Themed Checkbox
 
@@ -108,16 +108,12 @@ Tint checked states and focus markers with custom aesthetic accents from the des
 }
 ```
 
----
+***
 
-# CMS Configuration & Property Reference
-
-## Block Configuration Schema
-
-The following parameters are supported by the `checkbox` block in our Page Builder configurations. They correspond precisely to the properties declared in `public/admin/config.yml`.
+# Props
 
 | Parameter | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
+| --- | --- | --- | --- |
 | `label` | `String` | - | The text description displayed adjacent to the checkbox control. Clicking the label also toggles the checkbox state. |
 | `checked` | `Boolean` | `false` | Whether the checkbox is checked initially. (Mapped to `defaultChecked` server-side to allow free, uncontrolled clicking without locking the input state). |
 | `disabled` | `Boolean` | `false` | Disables user interactions and visual click response. |
@@ -125,7 +121,7 @@ The following parameters are supported by the `checkbox` block in our Page Build
 | `size` | `Select` | `md` | Adjusts the height and width of the checkbox bounding box. Options: `sm`, `md`, `lg`. |
 | `colorPalette` | `Select` | - | Accent color theme applied to the checkbox's background when active or checked. Options: `blue`, `green`, `red`, `purple`, `orange`, `amber`, `cyan`, `slate`. |
 
----
+***
 
 # Architecture Notes
 
