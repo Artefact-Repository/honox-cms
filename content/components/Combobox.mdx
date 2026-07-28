@@ -9,30 +9,19 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-A widget that combines a text input with a listbox, allowing users to filter and select from a list of options.
+An autocomplete input control that combines a text box with a dropdown listbox, allowing users to filter and select options from a list. Primarily used for long option feeds, platform filters, tags, and category selection.
 
-# Hydration
+The **Combobox** component is fully integrated as an interactive `combobox` block in the **Page Builder**, allowing content authors and developers to easily configure input labels, placeholders, pre-defined item lists, and interaction settings directly within the CMS.
 
-**Tier 2 — conditional.** A `Combobox` renders as static HTML and ships no client JS unless a behavioral signal is present. Pass `interactive={true}` to force hydration, or `interactive={false}` to force a static render.
+***
 
-It hydrates as an island when **any** of the following signals is present (or `interactive={true}` is set):
+# Usage via CMS Page Builder (JSON)
 
-- `open` (controlled open state)
-- `inputValue` (controlled input value)
-- `onToggle`
-- `onInputChange`
-- `onItemSelect` (item selection callback — select-only comboboxes hydrate on this)
+These examples illustrate how content editors bind and structure interactive combobox components inside the JSON page schemas (`content/pages/*.json`).
 
-| `interactive` prop | Result |
-| --- | --- |
-| omitted, **no** signal | Static — no client JS |
-| omitted, a signal present | Hydrates as an island |
-| `true` | Hydrates as an island |
-| `false` | Static — no client JS |
+## 1. Standard Technology Filter (Interactive Select)
 
-All interactivity decisions in the library route through the shared `shouldHydrate()` helper in `app/components/ui/island-utils.ts`.
-
-# Usage
+A standard searchable combobox preloaded with choices, allowing users to filter or directly select their target options.
 
 <DemoPreview>
   <Combobox
@@ -44,71 +33,114 @@ All interactivity decisions in the library route through the shared `shouldHydra
       { label: "Vue", value: "vue" },
       { label: "Hono", value: "hono" },
     ]}
-    label="Framework"
+    label="Preferred Tech Stack"
     placeholder="Select a Framework"
-    allowClear
   />
 </DemoPreview>
-
-```tsx
-import { Combobox } from "../components/ui";
-
-const items = [
-  { label: "React", value: "react" },
-  { label: "Solid", value: "solid" },
-  { label: "Svelte", value: "svelte" },
-  { label: "Vue", value: "vue" },
-  { label: "Hono", value: "hono" },
-];
-
-export default function MyPage() {
-  return (
-    <Combobox
-      interactive
-      items={items}
-      label="Framework"
-      placeholder="Select a Framework"
-      allowClear
-    />
-  );
-}
-```
-
-## CMS Page Builder
-
-This component is available as a `combobox` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
 
 ```json
 {
   "type": "combobox",
-  "label": "Framework",
+  "label": "Preferred Tech Stack",
   "placeholder": "Select a Framework",
   "items": [
     { "label": "React", "value": "react" },
+    { "label": "Solid", "value": "solid" },
+    { "label": "Svelte", "value": "svelte" },
+    { "label": "Vue", "value": "vue" },
     { "label": "Hono", "value": "hono" }
-  ]
+  ],
+  "interactive": true
 }
 ```
 
-# Props
+## 2. Clearable Option Search (Custom Items)
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `items` | `ComboboxItem[]` | An array of items to display in the list. |
-| `label` | `Child` | The label for the combobox. |
-| `placeholder` | `string` | The placeholder text for the input. |
-| `allowClear` | `boolean` | Whether to show a clear button in the input. |
-| `interactive` | `boolean` | Forces hydration as an island. |
-| `open` | `boolean` | Whether the combobox list is open (controlled). |
-| `inputValue` | `string` | The current value of the input (controlled). |
-| `onToggle` | `() => void` | Callback triggered when the list is toggled. |
-| `onInputChange` | `(value: string) => void` | Callback triggered when the input value changes. |
-| `onItemSelect` | `(value: string) => void` | Callback triggered when an item is selected. |
+Features a companion clear action, enabling users to purge selected choices with a single click. Ideal for platform searches, locations, or country selection lists.
 
-## ComboboxItem
+<DemoPreview>
+  <Combobox
+    interactive
+    items={[
+      { label: "United States", value: "us" },
+      { label: "Germany", value: "de" },
+      { label: "France", value: "fr" },
+      { label: "United Kingdom", value: "uk" },
+      { label: "Canada", value: "ca" },
+    ]}
+    label="Country Selection"
+    placeholder="Search countries..."
+    allowClear
+  />
+</DemoPreview>
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `label` | `string` | The display text for the item. |
-| `value` | `string` | The unique value for the item. |
-| `disabled` | `boolean` | Whether the item is disabled. |
+```json
+{
+  "type": "combobox",
+  "label": "Country Selection",
+  "placeholder": "Search countries...",
+  "items": [
+    { "label": "United States", "value": "us" },
+    { "label": "Germany", "value": "de" },
+    { "label": "France", "value": "fr" },
+    { "label": "United Kingdom", "value": "uk" },
+    { "label": "Canada", "value": "ca" }
+  ],
+  "allowClear": true,
+  "interactive": true
+}
+```
+
+## 3. Disabled Input Field
+
+Demonstrates a temporarily locked autocomplete field. This preserves current labels and selections but prevents input typing, filtering, or dropdown activation.
+
+<DemoPreview>
+  <Combobox
+    disabled
+    items={[]}
+    label="Select Database Engine"
+    placeholder="Temporarily unavailable"
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "combobox",
+  "label": "Select Database Engine",
+  "placeholder": "Temporarily unavailable",
+  "items": [],
+  "disabled": true,
+  "interactive": true
+}
+```
+
+***
+
+# CMS Configuration Reference
+
+These fields map directly to Sveltia CMS block properties under `public/admin/config.yml` or the Page Builder configurations:
+
+| Property | CMS Field Type | Default | Description / Supported Options |
+| :--- | :--- | :--- | :--- |
+| **Label Text** (`label`) | `string` | - | Companion visual text positioned above the autocomplete search box. |
+| **Placeholder** (`placeholder`) | `string` | - | Shown inside the input box when no item is selected. |
+| **Clear Button** (`allowClear`) | `boolean` | `false` | When true, renders an end-aligned clear button inside the text input to easily reset selection. |
+| **Disabled** (`disabled`) | `boolean` | `false` | Freezes user search inputs, dropdown popups, and click activations. |
+| **Items List** (`items`) | `list` | `[]` | An ordered array of object entries representing list selections (see list sub-properties below). |
+
+### List Item Properties (`items`)
+
+| Sub-Property | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| **Label** (`label`) | `string` | Yes | Display name rendered in the list popup options. |
+| **Value** (`value`) | `string` | Yes | Unique string identifier captured behind-the-scenes on option selection. |
+| **Disabled Option** (`disabled`) | `boolean` | No | Dim/lock a single selection choice within the dropdown feed. |
+
+***
+
+# Developer Notes & Accessibility
+
+- **Smart Adaptive Hydration (Tier 2):** To optimize initial page speeds, the Combobox compiles to static, zero-JS HTML/CSS markups on server loads, downloading interactive JS payloads only when custom signals are provided or when `"interactive": true` is explicitly passed.
+- **Accessible Listboxes:** The component operates in complete alignment with WAI-ARIA combobox accessibility roles. Focus jumps, arrow key options selections, and keyboard activations occur natively out-of-the-box.
+- **Unified Form Submissions:** Selection values map directly to standard form POST requests, preventing the need for developers to programmatically link selection states to global custom submission logic.
