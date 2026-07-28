@@ -62,7 +62,7 @@ See [content/docs/Architecture.md](content/docs/Architecture.md) (served at `/do
 
 #### Dynamic Pages
 1. **Design** — Create pages in `content/pages/*.json` using the CMS UI. This includes the homepage itself (`content/pages/index.json`).
-2. **Components** — Choose from 25+ UI components (Stack, Card, Dialog, etc.).
+2. **Components** — Choose from 50+ UI components (Stack, Card, Dialog, etc.).
 3. **Nesting** — Build complex layouts with recursive nesting (e.g., a Card inside a Stack inside another Stack).
 4. **Render** — The `PageRenderer` component (`app/components/page-renderer.tsx`) maps JSON data to themed UI components, loaded via `app/lib/pages.ts`.
 5. **Translate** — Add `content/pages/<locale>/<slug>.json` for a translated page; `loadPage()` falls back to the default-locale file for anything not translated.
@@ -91,19 +91,20 @@ This starter contains an advanced layout builder inside the Sveltia CMS `pages` 
 
 ### Recursively Nestable Components
 
-We support a full collection of over **25+ rich presentational and interactive components**:
+We support a full collection of **50+ rich presentational and interactive components** (see [content/docs/PageBuilder.md](content/docs/PageBuilder.md) for the complete, categorized reference):
 
-* **Layout & Structure:** `Stack` (Direction/Align/Justify/Gap), `Group` (Grow/Attached), `Fieldset` (Legend/Helper/Error)
+* **Layout & Structure:** `Stack` (Direction/Align/Justify/Gap), `Grid`, `Group` (Grow/Attached), `Fieldset` (Legend/Helper/Error), `Layout`, `AbsoluteCenter`, `Splitter`
 * **Text & Typography:** `Heading` (Level/Size), `Text` (Content/Size)
-* **UI Elements:** `Button` (Variant/Palette/Size), `Badge` (Variant/Palette/Size), `Alert` (Status/Variant), `Card` (Variant/Size/Clickable)
-* **Form & Controls:** `Checkbox`, `Combobox` (Items list/Clear trigger), `Field`, `RadioGroup`, `SegmentGroup`, `Slider`, `Switch`
-* **Feedback & Loaders:** `Progress` (Linear/Circular), `Skeleton` (NoOfLines/Circle), `Spinner`, `Toast` (global toast host, paired with a Button's raw onClick)
-* **Overlays & Dialogs:** `Collapsible` (Trigger/Open), `Popover` (ShowArrow/Closable), `Dialog` (Cancel/Confirm/Closable), `Drawer` (Cancel/Confirm/Closable), `Dropdown` (Nestable item action list)
-* **Tables & Data:** `PaginatedTable`, `Pagination`
+* **UI Elements:** `Anchor`, `Avatar`, `Button` (Variant/Palette/Size), `Badge` (Variant/Palette/Size), `Alert` (Status/Variant), `Card` (Variant/Size/Clickable), `Breadcrumb`
+* **Form & Controls:** `Checkbox`, `Combobox` (Items list/Clear trigger), `Field`, `Textarea`, `RadioGroup`, `RadioCardGroup`, `SegmentGroup`, `Slider`, `Switch`, `Select`, `Search`, `FileUpload`, `ColorPicker`, `PinField`, `RatingGroup`, `TagsField`, `DatePicker`, `Editable`
+* **Feedback & Loaders:** `Progress` (Linear/Circular), `Skeleton` (NoOfLines/Circle), `Spinner`, `Loader`, `Toast` (global toast host, paired with a Button's raw onClick)
+* **Overlays & Dialogs:** `Collapsible` (Trigger/Open), `Popover` (ShowArrow/Closable), `Tooltip`, `HoverCard`, `Dialog` (Cancel/Confirm/Closable), `Drawer` (Cancel/Confirm/Closable), `Dropdown` (Nestable item action list), `Tabs`
+* **Tables & Data:** `PaginatedTable`, `Pagination`, `Table`
+* **Media:** `Carousel`, `Clipboard`, `Icon`
 
 ### Multi-Level Nested Recursion
 
-Components like `Stack`, `Fieldset`, `Group`, `HoverCard`, `Popover`, `Collapsible`, `Dialog`, and `Drawer` fully support **recursive children nesting**. Through carefully designed YAML anchors and references in Sveltia CMS `public/admin/config.yml` and a smart layout compiler inside `app/components/page-renderer.tsx`, users can nest components (e.g. Buttons/Skeletons inside a Card inside a Collapsible inside a Stack) to build sophisticated dashboard layouts.
+Components like `Stack`, `Grid`, `Card`, `Fieldset`, `Group`, `Field`, `Anchor`, `Layout`, `AbsoluteCenter`, `Splitter`, `HoverCard`, `Popover`, `Collapsible`, `Dialog`, and `Drawer` fully support **recursive children nesting**. Through carefully designed YAML anchors and references in Sveltia CMS `public/admin/config.yml` and a smart layout compiler inside `app/components/page-registry.tsx`, users can nest components (e.g. Buttons/Skeletons inside a Card inside a Collapsible inside a Stack) to build sophisticated dashboard layouts.
 
 ---
 
