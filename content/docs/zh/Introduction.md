@@ -17,7 +17,7 @@ title: 简介
 
 大多数 UI 组件库都是为某一个特定的 JavaScript 框架而构建的 —— 一旦你需要在多个框架间混用或日后切换，这便成了负担。[HonoX](https://honox.dev) 以**元框架**的方式绕开了这个问题：它让你_自带框架_（BYOF），因此我们的组件保持_框架无关_，完全在构建时解析，而不与某个客户端运行时绑定。再结合 [`@hono/vite-ssg`](https://github.com/honojs/vite-plugins/tree/main/packages/ssg)，我们还获得了：
 
-* **默认静态。** 构建产物就是普通的 HTML/CSS/JS —— 请求时无需任何服务端进程，因此可以部署在任何支持静态文件托管的平台上（Cloudflare Pages 与 Vercel 已开箱配置）。
+* **默认静态且框架无关。** 构建产物就是普通的 HTML/CSS/JS —— 请求时无需任何服务端进程，因此可以部署在任何支持静态文件托管的平台上（Cloudflare Pages 与 Vercel 已开箱配置）。
 * **在需要的地方才交互。** 并非每个组件都需要下发 JavaScript。三层[水合](/docs/zh/Hydration)模型让每个组件自行决定是急切水合、按行为条件水合，还是完全不水合 —— 在不牺牲丰富 UI 的前提下保持客户端 bundle 精简。
 
 这些 UI 组件最初是将 [Park UI](https://park-ui.com/)（[Ark UI](https://ark-ui.com/)）从 React 移植到 Hono/jsx 而来。对于每一个组件，我们都为 [Sveltia CMS](https://sveltiacms.app) 构建了对应的绑定，因此内容无需编写代码即可通过 Web 管理界面轻松编辑。这也让 UI 代码更干净、更以数据驱动。该 CMS 以本地优先为理念，完全在客户端运行，并直接提交到 `content/` 下的文件，因此编辑者可以撰写博客与文档，甚至通过[页面构建器](/docs/zh/PageBuilder)以可视化方式组合整个页面，而开发者仍能将一切纳入版本控制。
