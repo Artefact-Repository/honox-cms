@@ -74,7 +74,7 @@ A flat `defineRecipe` (no slots — `badge.ts`, `anchor.ts`, `button.ts`) uses t
 
 **Cause:** Panda emits `base` styles and `variants` styles into **separate CSS cascade layers**, with the variants layer ordered after base. CSS layer order beats selector specificity unconditionally — a highly-specific `base` selector still loses to a bare unconditional rule in the `variants` layer if they set the same property.
 
-**Fix:** move the conditional override into **every relevant `variant.<name>.<slot>` block** instead of `base`, spreading a shared object into each if the styles repeat. `app/theme/recipes/input.ts`'s `_invalid` handling (duplicated per-variant, not centralized in `base`) is the existing reference pattern.
+**Fix:** move the conditional override into **every relevant `variant.<name>.<slot>` block** instead of `base`, spreading a shared object into each if the styles repeat. `app/theme/recipes/input.ts`'s `_invalid` handling (duplicated per-variant, not centralised in `base`) is the existing reference pattern.
 
 ### 4. `colorPalette.*` tokens resolve to a real (gray-ish, near-black) color, never "no color" — an *active scope* is required
 
@@ -82,7 +82,7 @@ A flat `defineRecipe` (no slots — `badge.ts`, `anchor.ts`, `button.ts`) uses t
 
 **Cause:** `colorPalette.*` are virtual tokens that resolve against whatever `--colors-color-palette-*` custom properties are in scope at that DOM node. The theme sets a **global default scope to `gray`** at `:root`/`html`, so anywhere no more specific colorPalette scope is active, `colorPalette.solid.bg` silently resolves to `gray.solid.bg` — not transparent, not an error, a real (dark) color. This is easy to misdiagnose as "broken" when it's actually just "unscoped."
 
-**Fix:** apply an actual colorPalette scope, per the centralized pattern below — don't assume a component "just doesn't have color" because it looks gray/black.
+**Fix:** apply an actual colorPalette scope, per the centralised pattern below — don't assume a component "just doesn't have color" because it looks gray/black.
 
 ### 5. Responsive variant props don't emit breakpoint CSS
 
@@ -90,7 +90,7 @@ A flat `defineRecipe` (no slots — `badge.ts`, `anchor.ts`, `button.ts`) uses t
 
 ***
 
-## `colorPalette` theming: the centralized pattern
+## `colorPalette` theming: the centralised pattern
 
 Panda's officially-supported JSX frameworks get `colorPalette` "for free": their `styled()` wrapper auto-splits a `colorPalette` prop off any component and merges it in as a generic utility class, alongside whatever the recipe's own variants produce. **This repo doesn't get that**, because `jsxFramework: undefined`. Upstream [Park UI](https://park-ui.com) recipes (this project's original component source, ported by hand to `hono/jsx`) rely on exactly that missing integration — their own `switch.ts` has no `colorPalette` variant either.
 
@@ -137,7 +137,7 @@ html: {
 
 This sets the root `colorPalette` scope every unscoped element inherits. It's a plain CSS declaration, easy to overlook, and easy to lose track of — if you ever wonder "why does this project use `gray` as its accent instead of `cyan`/whatever I picked at init," this line is the answer, and changing it is a one-line, low-risk edit (every color file has the identical token shape, so swapping the value is a clean drop-in).
 
-**This default is a fallback only.** Any of the 13 components migrated to the centralized `colorPaletteClass()` pattern above (switch, badge, button, card, …) carry their **own** explicit default (see the per-component list in that section) and will not follow a change to this line — only components/utilities with no explicit `colorPalette` of their own (the global focus-ring/selection custom properties also declared in `global-css.ts`, and any not-yet-migrated recipe) actually read this root value.
+**This default is a fallback only.** Any of the 13 components migrated to the centralised `colorPaletteClass()` pattern above (switch, badge, button, card, …) carry their **own** explicit default (see the per-component list in that section) and will not follow a change to this line — only components/utilities with no explicit `colorPalette` of their own (the global focus-ring/selection custom properties also declared in `global-css.ts`, and any not-yet-migrated recipe) actually read this root value.
 
 ### `fg`/`border`/`canvas` are deliberately gray-only, always
 

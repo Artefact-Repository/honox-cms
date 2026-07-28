@@ -133,14 +133,14 @@ export function detectLocale(path: string): string {
  *   /about         → /fr/about         (root-level content page)
  *   /              → /fr
  *
- * No-op for the default locale, external hrefs, or already-localized paths.
+ * No-op for the default locale, external hrefs, or already-localised paths.
  */
 export function localiseHref(href: string, locale: string): string {
 	if (locale === "en" || !href.startsWith("/")) return href;
 
 	const segments = href.split("/").filter(Boolean);
 
-	// Already localized? Don't double-prefix. Since locale-first is the
+	// Already localised? Don't double-prefix. Since locale-first is the
 	// canonical shape, `isLocale(segments[0])` alone (a CMS-authored href
 	// that's already e.g. "/zh/blog" or "/zh/about") is enough to no-op —
 	// every anchor/link href passes through this function unconditionally
@@ -160,7 +160,7 @@ export function localiseHref(href: string, locale: string): string {
 		// itself only a build-time duplicate of the true canonical `/<slug>`
 		// (see app/routes/[page].tsx + vite.config.ts's
 		// copyContentPagesToRootPlugin) — so a `/pages/<slug>` href reaching
-		// here localizes straight to the short form (`/<locale>/<slug>`,
+		// here localises straight to the short form (`/<locale>/<slug>`,
 		// dropping "pages" entirely) instead of `/<locale>/pages/<slug>`.
 		if (collection === "pages") {
 			return `/${locale}${rest ? `/${rest}` : ""}`;

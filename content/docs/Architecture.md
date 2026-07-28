@@ -23,9 +23,9 @@ This project is built on [**HonoX**](https://github.com/honojs/honox), a meta-fr
 - **`--mode client`** builds `app/client.ts` (`createClient()` from `honox/client`) with `jsxImportSource: "hono/jsx/dom"`. This is the browser bundle: it hydrates islands and nothing else.
 - **The default (server) pass** builds `app/server.ts` (`createApp()` from `honox/server`) with `jsxImportSource: "hono/jsx"` (the SSR JSX runtime), then hands the whole app to the [`ssg()`](https://github.com/honojs/vite-plugins/tree/main/packages/ssg) plugin, which crawls every route and writes pre-rendered HTML into `dist/`.
 
-### SSG Routing and Localized URL Fixes
+### SSG Routing and Localised URL Fixes
 
-To prevent 404 routing errors on static file hosts after route compilation, a custom `fixSsgRoutingPlugin` in `vite.config.ts` recursively processes all `.html` files in the build output (`dist/`). It renames and moves localized index/homepage files (e.g. `zh.html`, `docs/fr.html`) into nested clean paths (`zh/index.html`, `docs/fr/index.html`) if a matching directory exists or if the name corresponds to a supported locale. This ensures that `/zh` and other localized endpoints resolve cleanly as directory indexes on any static host.
+To prevent 404 routing errors on static file hosts after route compilation, a custom `fixSsgRoutingPlugin` in `vite.config.ts` recursively processes all `.html` files in the build output (`dist/`). It renames and moves localised index/homepage files (e.g. `zh.html`, `docs/fr.html`) into nested clean paths (`zh/index.html`, `docs/fr/index.html`) if a matching directory exists or if the name corresponds to a supported locale. This ensures that `/zh` and other localised endpoints resolve cleanly as directory indexes on any static host.
 
 ### Test Environment Resolution
 
@@ -68,11 +68,11 @@ Routes for translatable collections (`docs`, `blog`, `pages`) follow `/​<colle
 /blog/zh/my-post            (zh)
 ```
 
-Locale-agnostic **language homepages** live at the bare locale segment (`/fr`, `/zh`, …). All of this is centralized in `app/lib/i18n.ts` (`detectLocale`, `localiseHref`, `stripLocale`, `localeToggleUrl`) — no route file hand-rolls locale logic. A legacy route shape, `/<locale>/<collection>/<item>`, is 301-redirected to the current shape by middleware in `app/server.ts`, so old bookmarks/links keep working.
+Locale-agnostic **language homepages** live at the bare locale segment (`/fr`, `/zh`, …). All of this is centralised in `app/lib/i18n.ts` (`detectLocale`, `localiseHref`, `stripLocale`, `localeToggleUrl`) — no route file hand-rolls locale logic. A legacy route shape, `/<locale>/<collection>/<item>`, is 301-redirected to the current shape by middleware in `app/server.ts`, so old bookmarks/links keep working.
 
 Supported locales are declared once, in `ALL_LOCALES` / `TRANSLATED_LOCALES` (`app/lib/i18n.ts`) — this list must stay in sync with `public/admin/config.yml`'s `i18n.locales` and the mirrored `app/routes/<locale>/` route directories.
 
-#### Two ways to localize a route, and why both exist
+#### Two ways to localise a route, and why both exist
 
 - **Directory-per-locale re-export** (`/`, `/blog`, `/blog/:slug`, `/docs`, `/docs/:doc`, …): a real static directory per locale (`app/routes/blog/zh/index.tsx`) containing a one-line `export { default } from "../index"`. This only works because the locale segment is a **literal, static** path component — required here specifically because a *dynamic* `blog/[lang]/index.tsx` would match the exact same shape (`/blog/:something`) as the already-existing `blog/[slug].tsx` (an individual post), and Hono's router does not prefer the static-looking route over the dynamic one just because it "looks" more specific — the two would genuinely collide. `blog/[slug].tsx` works around this collision with an explicit `isLocale(slug)` guard that calls `next()` to defer to the locale-specific file when the "slug" param is actually a locale code.
 - **Dynamic `[lang]` segment** (`/blog/:lang/by-tag/:tag`, `/blog/:lang/by-author/:author`, `/api/posts/:lang/search.json`): a single file (`app/routes/blog/[lang]/by-tag/[tag].tsx`) handling every locale, because nothing else registers a route at that specific, one-level-deeper path shape — so there's no ambiguity to guard against. This needs its own `ssgParams` (not a re-export of the base route's), since the base route's `ssgParams` only enumerates `{tag}`/`{author}`, and SSG needs the full `{lang, tag}` cross product to pre-render every combination; the actual per-request handler is still reused directly (`createRoute`'s `createHandlers` returns a typed tuple, so `[, handler] = require("../../by-tag/[tag]")` pulls it out without duplicating any logic).
@@ -98,8 +98,8 @@ Multi-part components like `HoverCard` that render children across HonoX island 
 
 ### Overlay Positioning & Interaction Hacks
 
-- **Correct Positioning:** The `Popover` and `HoverCard` root component wrappers utilize inline styles `position: 'relative'` and `display: 'inline-block'` (for both static and interactive/island implementations). This prevents them from taking up block-level inline space and correctly positions their absolute overlay content relative to the trigger.
-- **Focus Management:** In `app/components/ui/popover-primitive.tsx`, the `InteractivePopoverRoot` utilizes an `isFirstRender` ref to ensure that `closePopover` does not focus the trigger element on the initial render/mount when the popover is closed, preventing unexpected auto-focus on page load.
+- **Correct Positioning:** The `Popover` and `HoverCard` root component wrappers utilise inline styles `position: 'relative'` and `display: 'inline-block'` (for both static and interactive/island implementations). This prevents them from taking up block-level inline space and correctly positions their absolute overlay content relative to the trigger.
+- **Focus Management:** In `app/components/ui/popover-primitive.tsx`, the `InteractivePopoverRoot` utilises an `isFirstRender` ref to ensure that `closePopover` does not focus the trigger element on the initial render/mount when the popover is closed, preventing unexpected auto-focus on page load.
 - **Pointer Events Pass-Through:** To prevent invalid HTML nesting of anchor tags (`<a>`) inside large clickable parent elements (like card or carousel slides), the overlay text container is structured with `pointer-events: none` and `pointer-events: auto` is applied to targeted nested `<Anchor>` or `<a>` elements.
 
 ### Advanced Component Mechanics
@@ -110,11 +110,11 @@ Multi-part components like `HoverCard` that render children across HonoX island 
 - **DatePicker:** Supports granular views using the `picker` prop (`"date" | "month" | "year"`), seamlessly mapping sizes and variants to Panda CSS token configurations. It supports deep custom semantic styling via `classNames` and `styles` props onto specific inner elements (e.g., label, control, input, positioner, clearTrigger).
 - **Tabs Component:** Ported entirely to Hono/JSX. The static SSR layout primitives are defined in `app/components/ui/tabs-primitive.tsx`, while the eagerly interactive client-side island wrapper `app/islands/tabs.tsx` handles active state, indicator tracking via a `ResizeObserver`, and standard ARIA/keyboard navigation rules. It maps Ant Design-style properties (`activeKey`, `defaultActiveKey`, `onChange`, `onTabClick`, sizes, and types) to the underlying primitives.
 - **Select Component:** Dynamically maps traditional framework inputs like `size="small"`/`"medium"`/`"large"` and `variant="outlined"`/`"flushed"` to standard Panda CSS scales (`sm`/`md`/`lg` and `outline`/`underlined`) before calculating slot classes to ensure seamless cross-framework compatibility. It has been refined to support client-side search/filtering inside dropdown lists using the `showSearch` prop, as well as rendering selected items as interactive, dismissible Tags in multiple-selection mode (customizable via `tagRender`).
-- **PinField Component:** Implemented with a static SSR primitive (`app/components/ui/pin-field-primitive.tsx`) and an interactive island (`app/islands/pin-field.tsx`). It normalizes `value` and `defaultValue` to support both string and array types, defaults `selectOnFocus` to `true`, supports `autoSubmit` form execution, sanitizes paste characters by removing spaces and hyphens, and handles RTL keyboard navigation.
+- **PinField Component:** Implemented with a static SSR primitive (`app/components/ui/pin-field-primitive.tsx`) and an interactive island (`app/islands/pin-field.tsx`). It normalises `value` and `defaultValue` to support both string and array types, defaults `selectOnFocus` to `true`, supports `autoSubmit` form execution, sanitizes paste characters by removing spaces and hyphens, and handles RTL keyboard navigation.
 - **Grid Layout System:** Provides a high-performance 24-column flexbox container via `Row` and `Col` components, mapping responsive breakout settings (like `xs`, `sm`, `md`, `lg`, `xl`, `xxl`) to standard Panda CSS breakpoints. Row maps static, array-based, and responsive gutters into Panda CSS spacing shorthand outputs (`cg` and `rg`), while Col converts responsive props and breakpoint objects into matching design system classes dynamically.
 - **Flattened Grid Layout:** Flat `Grid` and `GridItem` layout components in `app/components/ui/grid.tsx` are based on Panda CSS's native layout patterns, supporting 2D control via `columns` and `rows`. These patterns are registered in `staticCss.patterns` inside `panda.config.ts` (`grid` and `gridItem`) and bound recursively in Sveltia CMS `config.yml` under `pages` to simplify multi-column layouts without nested Row/Col elements. Responsive breakpoints support JSON-stringified responsive objects (e.g., `"columns": "{\"base\": 1, \"md\": 3}"`).
 - **Layout Grid Recipes:** Layout grid recipes for `row` and `col` are programmatically compiled into static, discrete variants (spans, offsets, orders 0 to 24) and registered in `panda.config.ts` static CSS to support static page layout nesting inside Sveltia CMS and PageRenderer without dynamic JavaScript hydration.
-- **Centralized SVG Icon Directory:** The codebase utilizes individual, reusable SVG icon components located in `app/icons/*` (e.g. `CloseIcon`, `ChevronDownIcon`, `CheckIcon`, etc.) that accept `JSX.IntrinsicElements["svg"]` to forward attributes like `width`, `height`, and custom styles. Hardcoded inline SVGs across UI components and routes have been refactored to import from this central icons directory to promote code reusability and prevent duplication.
+- **Centralised SVG Icon Directory:** The codebase utilises individual, reusable SVG icon components located in `app/icons/*` (e.g. `CloseIcon`, `ChevronDownIcon`, `CheckIcon`, etc.) that accept `JSX.IntrinsicElements["svg"]` to forward attributes like `width`, `height`, and custom styles. Hardcoded inline SVGs across UI components and routes have been refactored to import from this central icons directory to promote code reusability and prevent duplication.
 
 ***
 
@@ -150,7 +150,7 @@ Sveltia CMS is configured for internationalization (i18n) under `public/admin/co
 To add a new translation locale to the repository, follow this step-by-step workflow:
 
 1. **CMS Configuration:** Add the locale code (e.g. `fr` or `de`) to the `i18n.locales` section of `public/admin/config.yml`.
-2. **Translation Keys:** Create a matching config file under `content/configs.<locale>.json` with the localized translation keys.
+2. **Translation Keys:** Create a matching config file under `content/configs.<locale>.json` with the localised translation keys.
 3. **Language Switcher Registration:** Register the locale code and its human-readable name in `ALL_LOCALES` and `LOCALE_NAMES` inside `app/lib/i18n.ts`.
 4. **Docs Loader Array:** Add the locale code to the `LOCALES` array inside `app/lib/docs.ts`.
 5. **Route Re-export:** Re-export the standard routes by creating a directory `app/routes/<locale>/` matching the root route files structure. This also covers `app/lib/posts.ts`'s `parsePostPath`, which validates the locale segment in a translated post's path against `TRANSLATED_LOCALES` (`app/lib/i18n.ts`) — a locale missing from that list is silently treated as a plain (non-locale) folder and its posts get skipped.
@@ -228,7 +228,7 @@ _Note: Always run unit tests using `bun test unit` to bypass potential missing-d
 
 ### Biome Linter & Code Quality
 
-The repository utilizes **Biome** for code linting and formatting. To ensure `bun run check` and `bun run fix` execute successfully with exit code 0, restrictive and highly noisy rules that generate false-positives on standard dynamic component attributes are explicitly turned `off` in `biome.json`. These rules include:
+The repository utilises **Biome** for code linting and formatting. To ensure `bun run check` and `bun run fix` execute successfully with exit code 0, restrictive and highly noisy rules that generate false-positives on standard dynamic component attributes are explicitly turned `off` in `biome.json`. These rules include:
 
 - `useExportsLast`
 - `useAriaPropsSupportedByRole`

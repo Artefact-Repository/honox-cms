@@ -44,7 +44,7 @@ Locale, where present, always comes **before** the collection/item (`/zh/blog`, 
 | `/api/posts/by-author/:author.json` | `app/routes/api/posts/by-author/[author].json.ts` | Posts by author (JSON) |
 | `/api/docs/search.json` (+ `/api/docs/:locale/search.json`) | `app/routes/api/docs/search.json.ts` (+ `api/docs/[locale]/search.json.ts`) | Docs search index (JSON) |
 
-The `/:page`, `/:locale`, and `/:locale/:page` routes use a 2-arg `(c, next)` handler and are dev-server preview only — `@hono/vite-ssg` excludes 2-arg handlers from static generation. Their production HTML comes from `vite.config.ts`'s build-time copy plugins (`copyContentPagesToRootPlugin`, `copyLocalizedContentPagesPlugin`), which duplicate the already-correctly-generated long-form output (`/pages/:slug`, `/:locale/pages/:slug`) to the short-form path instead.
+The `/:page`, `/:locale`, and `/:locale/:page` routes use a 2-arg `(c, next)` handler and are dev-server preview only — `@hono/vite-ssg` excludes 2-arg handlers from static generation. Their production HTML comes from `vite.config.ts`'s build-time copy plugins (`copyContentPagesToRootPlugin`, `copyLocalisedContentPagesPlugin`), which duplicate the already-correctly-generated long-form output (`/pages/:slug`, `/:locale/pages/:slug`) to the short-form path instead.
 
 See [content/docs/Architecture.md](content/docs/Architecture.md) (served at `/docs/Architecture`) for the full routing/collision reasoning and UI components architecture details.
 

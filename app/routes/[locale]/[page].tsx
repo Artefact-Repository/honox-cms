@@ -15,7 +15,7 @@ import { RESERVED_PAGE_SLUGS } from "../../lib/reserved-page-slugs";
 // its handler takes `(c, next)`, which @hono/vite-ssg's route discovery
 // treats as middleware and excludes from static generation — so it produces
 // no file in `dist/` on `bun run build`. The actual production output comes
-// from vite.config.ts's `copyLocalizedContentPagesPlugin`, which copies the
+// from vite.config.ts's `copyLocalisedContentPagesPlugin`, which copies the
 // already-correctly-generated `dist/<locale>/pages/<page>.html` (no such SSG
 // conflict) to `dist/<locale>/<page>.html` as a build step.
 //

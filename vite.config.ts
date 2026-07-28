@@ -142,9 +142,9 @@ function copyContentPagesToRootPlugin() {
 // (`/<slug>/<locale>`, e.g. /about/zh) instead of the bare English path.
 // `dist/pages/<locale>/<slug>.html` is already correctly generated (that
 // route has no such conflict), so copy it to `dist/<slug>/<locale>.html`.
-function copyLocalizedContentPagesPlugin() {
+function copyLocalisedContentPagesPlugin() {
 	return {
-		name: "copy-localized-content-pages",
+		name: "copy-localised-content-pages",
 		closeBundle: async () => {
 			const distDir = path.resolve(__dirname, "dist");
 			const pagesDir = path.resolve(__dirname, "content/pages");
@@ -171,7 +171,7 @@ function copyLocalizedContentPagesPlugin() {
 					const dest = path.join(destDir, `${slug}.html`);
 					if (existsSync(dest)) {
 						console.warn(
-							`[copy-localized-content-pages] ⚠ dist/${locale}/${slug}.html already exists — skipping`,
+							`[copy-localised-content-pages] ⚠ dist/${locale}/${slug}.html already exists — skipping`,
 						);
 						continue;
 					}
@@ -180,7 +180,7 @@ function copyLocalizedContentPagesPlugin() {
 					}
 					copyFileSync(source, dest);
 					console.log(
-						`[copy-localized-content-pages] ✓ dist/${locale}/pages/${slug}.html → dist/${locale}/${slug}.html`,
+						`[copy-localised-content-pages] ✓ dist/${locale}/pages/${slug}.html → dist/${locale}/${slug}.html`,
 					);
 				}
 			}
@@ -241,7 +241,7 @@ const mainConfig = (_mode: string) => ({
 		ssg({ entry: "app/server.ts" }),
 		fixSsgRoutingPlugin(),
 		copyContentPagesToRootPlugin(),
-		copyLocalizedContentPagesPlugin(),
+		copyLocalisedContentPagesPlugin(),
 	],
 });
 

@@ -4,7 +4,7 @@ import glob
 import time
 from deep_translator import GoogleTranslator
 
-# Initialize the translator
+# Initialise the translator
 translator = GoogleTranslator(source='en', target='fr')
 
 # Title Maps for Component MDX Files
