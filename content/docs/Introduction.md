@@ -33,12 +33,3 @@ The UI components started as a port of [Park UI](https://park-ui.com/) ([Ark UI]
 * **A visual page builder** (`content/pages/`) for composing pages from nested components entirely through the CMS.
 * **Docs** (this section) authored as plain Markdown or MDX, the latter for pages that need a live, rendered example embedded in the prose.
 * **i18n** across six locales (`en`, `zh`, `es`, `pt`, `fr`, `de`) for docs, components, and site chrome.
-
-***
-
-## Finding Your Way Around
-
-* [Getting Started](/docs/Getting-Started) — install dependencies and run the project locally.
-* [Architecture](/docs/Architecture) — a deeper look at the build, routing, component structure, and content pipelines.
-* [Hydration](/docs/Hydration) — how components opt into client-side interactivity.
-* [CMS Page Builder](/docs/PageBuilder) — composing pages visually through Sveltia CMS.
