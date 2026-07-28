@@ -16,6 +16,7 @@ import {
 	getArrowStyle,
 	getPlacementStyle,
 	type OverlayPlacement,
+	ownedBy,
 	positionOverlay,
 } from "./overlay-position";
 
@@ -561,26 +562,28 @@ function InteractivePopoverRoot(props: InteractivePopoverProps) {
 			if (isCurrentlyOpen()) return;
 			prevFocusRef.current = document.activeElement as HTMLElement | null;
 			root.setAttribute("data-state", "open");
-			const positioners = Array.from(
-				root.querySelectorAll<HTMLElement>('[data-part="positioner"]'),
+			const positioners = ownedBy<HTMLElement>(
+				root,
+				'[data-part="positioner"]',
 			);
 			positioners.forEach((p) => {
 				p.style.setProperty("display", "block", "important");
 				p.setAttribute("data-state", "open");
 			});
 			positionOverlay(root, PLACEMENT_CONFIG);
-			const content = root.querySelector<HTMLElement>('[data-part="content"]');
+			const content = ownedBy<HTMLElement>(root, '[data-part="content"]')[0];
 			if (content) {
 				content.setAttribute("data-state", "open");
 				const focusable = getFocusable(content);
 				(focusable[0] ?? content).focus();
 			}
-			const trigger = root.querySelector<HTMLElement>('[data-part="trigger"]');
+			const trigger = ownedBy<HTMLElement>(root, '[data-part="trigger"]')[0];
 			if (trigger) {
 				trigger.setAttribute("data-state", "open");
 				trigger.setAttribute("aria-expanded", "true");
 			}
-			const indicators = root.querySelectorAll<HTMLElement>(
+			const indicators = ownedBy<HTMLElement>(
+				root,
 				'[data-part="indicator"]',
 			);
 			indicators.forEach((i) => {
@@ -594,22 +597,24 @@ function InteractivePopoverRoot(props: InteractivePopoverProps) {
 		const hide = (shouldFocus = true) => {
 			if (!isCurrentlyOpen()) return;
 			root.setAttribute("data-state", "closed");
-			const positioners = Array.from(
-				root.querySelectorAll<HTMLElement>('[data-part="positioner"]'),
+			const positioners = ownedBy<HTMLElement>(
+				root,
+				'[data-part="positioner"]',
 			);
-			const content = root.querySelector<HTMLElement>('[data-part="content"]');
+			const content = ownedBy<HTMLElement>(root, '[data-part="content"]')[0];
 			positioners.forEach((p) => {
 				p.setAttribute("data-state", "closed");
 			});
 			if (content) {
 				content.setAttribute("data-state", "closed");
 			}
-			const trigger = root.querySelector<HTMLElement>('[data-part="trigger"]');
+			const trigger = ownedBy<HTMLElement>(root, '[data-part="trigger"]')[0];
 			if (trigger) {
 				trigger.setAttribute("data-state", "closed");
 				trigger.setAttribute("aria-expanded", "false");
 			}
-			const indicators = root.querySelectorAll<HTMLElement>(
+			const indicators = ownedBy<HTMLElement>(
+				root,
 				'[data-part="indicator"]',
 			);
 			indicators.forEach((i) => {

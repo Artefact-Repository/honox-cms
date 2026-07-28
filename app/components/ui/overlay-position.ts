@@ -20,7 +20,7 @@ const CENTER_ARROW_OFFSET = "50%";
  * from within another Popover's content). Every overlay root must carry a
  * `data-overlay-root` marker for this scoping to work.
  */
-function ownedBy<T extends HTMLElement>(
+export function ownedBy<T extends HTMLElement>(
 	root: HTMLElement,
 	selector: string,
 ): T[] {
