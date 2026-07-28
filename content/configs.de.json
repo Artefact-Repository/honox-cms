@@ -516,7 +516,9 @@
   "docsUi": {
     "edit": "Bearbeiten",
     "admin": "Verwaltung",
-    "menu": "Menü"
+    "menu": "Menü",
+    "previous": "Zurück",
+    "next": "Weiter"
   },
   "home": {
     "brandName": "Artefact UI",

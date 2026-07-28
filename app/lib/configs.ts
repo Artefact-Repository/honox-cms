@@ -65,6 +65,10 @@ export interface DocsUiConfig {
 	edit?: string;
 	admin?: string;
 	menu?: string;
+	/** Label prefix for the previous/next doc pager at the bottom of a doc
+	 * page (see `app/routes/docs/[doc].tsx`'s `DocPager`). */
+	previous?: string;
+	next?: string;
 }
 
 /** A plain link rendered in the home page footer (e.g. HonoX Docs). */
@@ -165,6 +169,8 @@ export const DEFAULT_DOCS_UI: Required<DocsUiConfig> = {
 	edit: "Edit",
 	admin: "Admin",
 	menu: "Menu",
+	previous: "Previous",
+	next: "Next",
 };
 
 // Singleton i18n uses the `{{locale}}` file-path placeholder (see the

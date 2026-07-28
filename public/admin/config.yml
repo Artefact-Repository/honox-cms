@@ -2220,6 +2220,20 @@ singletons:
             default: Menu
             i18n: true
             hint: "Label for the mobile disclosure that expands into the sidenav."
+          - label: Previous Doc Label
+            name: previous
+            widget: string
+            required: false
+            default: Previous
+            i18n: true
+            hint: "Label prefix for the previous-doc link at the bottom of a doc page."
+          - label: Next Doc Label
+            name: next
+            widget: string
+            required: false
+            default: Next
+            i18n: true
+            hint: "Label prefix for the next-doc link at the bottom of a doc page."
       - label: Home
         name: home
         widget: object

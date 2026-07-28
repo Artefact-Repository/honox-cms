@@ -12,6 +12,8 @@ import {
 	Stack,
 	Text,
 } from "../../components/ui";
+import { ArrowLeftIcon as ArrowLeftIconImport } from "../../icons/arrow-left";
+import { ArrowRightIcon as ArrowRightIconImport } from "../../icons/arrow-right";
 import { ExternalLinkIcon as ExternalLinkIconImport } from "../../icons/external-link";
 import { GitHubIcon as GitHubIconImport } from "../../icons/github";
 import {
@@ -117,6 +119,14 @@ function buildDocGroups(docs: DocSummary[], config: DocsConfig): DocGroup[] {
 	}
 
 	return groups;
+}
+
+/** Flattens the sidenav's grouped/ordered doc list back into one sequence,
+ * so the previous/next pager below the doc content follows exactly the
+ * order a reader sees in the sidenav (config.groups order, docOrder within
+ * each, fallback group last) rather than re-deriving its own ordering. */
+function flattenDocGroups(groups: DocGroup[]): DocSummary[] {
+	return groups.flatMap((group) => group.items);
 }
 
 interface DocsSidenavProps {
@@ -396,6 +406,108 @@ function tierLabel(
 	return tiers?.find((t) => t.tier === tier)?.label ?? `Tier ${tier}`;
 }
 
+interface DocPagerLinkProps {
+	doc: DocSummary;
+	direction: "prev" | "next";
+	label: string;
+	currentLocale: string;
+}
+
+function DocPagerLink({
+	doc,
+	direction,
+	label,
+	currentLocale,
+}: DocPagerLinkProps) {
+	const isPrev = direction === "prev";
+	return (
+		<Anchor
+			href={localiseHref(`/docs/${doc.slug}`, currentLocale)}
+			variant="plain"
+			class={css({
+				display: "flex",
+				flexDirection: "column",
+				gap: "1",
+				flex: "1",
+				px: "4",
+				py: "3",
+				borderWidth: "1px",
+				borderColor: "border",
+				borderRadius: "lg",
+				textDecoration: "none",
+				alignItems: isPrev ? "flex-start" : "flex-end",
+				textAlign: isPrev ? "left" : "right",
+				_hover: {
+					borderColor: "colorPalette.7",
+					bg: "bg.subtle",
+				},
+			})}
+		>
+			<Stack direction="horizontal" gap="1" align="center">
+				{isPrev && <ArrowLeftIconImport width="14" height="14" />}
+				<Text size="xs" class={css({ color: "fg.muted" })}>
+					{label}
+				</Text>
+				{!isPrev && <ArrowRightIconImport width="14" height="14" />}
+			</Stack>
+			<Text size="sm" class={css({ fontWeight: "medium", color: "fg" })}>
+				{doc.title}
+			</Text>
+		</Anchor>
+	);
+}
+
+interface DocPagerProps {
+	prevDoc?: DocSummary;
+	nextDoc?: DocSummary;
+	currentLocale: string;
+	previousLabel: string;
+	nextLabel: string;
+}
+
+// Two-up prev/next footer nav, driven entirely by `flattenDocGroups`'s
+// sidenav-order sequence (see there) — no separate ordering logic here.
+function DocPager({
+	prevDoc,
+	nextDoc,
+	currentLocale,
+	previousLabel,
+	nextLabel,
+}: DocPagerProps) {
+	if (!prevDoc && !nextDoc) return null;
+	return (
+		<Stack
+			direction="horizontal"
+			gap="4"
+			class={css({
+				mt: "10",
+				pt: "6",
+				borderTopWidth: "1px",
+				borderColor: "border",
+			})}
+		>
+			{prevDoc ? (
+				<DocPagerLink
+					doc={prevDoc}
+					direction="prev"
+					label={previousLabel}
+					currentLocale={currentLocale}
+				/>
+			) : (
+				<div class={css({ flex: "1" })} />
+			)}
+			{nextDoc && (
+				<DocPagerLink
+					doc={nextDoc}
+					direction="next"
+					label={nextLabel}
+					currentLocale={currentLocale}
+				/>
+			)}
+		</Stack>
+	);
+}
+
 export default createRoute(
 	ssgParams(async () => {
 		const docs = await loadDocs();
@@ -424,6 +536,14 @@ export default createRoute(
 		}
 
 		const groups = buildDocGroups(docs, config);
+		const flatDocs = flattenDocGroups(groups);
+		const currentIndex = flatDocs.findIndex((d) => d.slug === slug);
+		const prevDoc =
+			currentIndex > 0 ? flatDocs[currentIndex - 1] : undefined;
+		const nextDoc =
+			currentIndex >= 0 && currentIndex < flatDocs.length - 1
+				? flatDocs[currentIndex + 1]
+				: undefined;
 		const DocContent = doc.Component;
 		const ui = { ...DEFAULT_DOCS_UI, ...config.docsUi };
 		const editUrl = docEditUrl(doc, config);
@@ -518,6 +638,14 @@ export default createRoute(
 								dangerouslySetInnerHTML={{ __html: doc.html ?? "" }}
 							/>
 						)}
+
+						<DocPager
+							prevDoc={prevDoc}
+							nextDoc={nextDoc}
+							currentLocale={currentLocale}
+							previousLabel={ui.previous}
+							nextLabel={ui.next}
+						/>
 					</>
 				}
 			/>,
