@@ -9,59 +9,111 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-Displays a brief, important message in a way that attracts the user's attention without interrupting the user's tasks.
+Displays brief, important, and highly visible messages to keep users informed about system events, success statuses, warnings, or errors without interrupting active workflows or requiring immediate layout blocks.
 
-# Usage
+The **Alert** component is fully integrated as an `alert` block in the **Page Builder**, enabling content editors and administrators to quickly configure layouts, messaging, icon indicators, and severity statuses directly inside the Sveltia CMS page templates.
+
+***
+
+# Usage via CMS Page Builder (JSON)
+
+These configurations represent exactly how page-builder block items are constructed inside the page schema collections (`content/pages/*.json`).
+
+## 1. Success Message (Subtle Variant)
+
+Used to notify users about positive events, completions, or successfully processed forms (e.g., "Account Created", "Changes Saved").
 
 <DemoPreview>
-  <Alert
-    status="success"
-    title="Success"
-    description="Your changes have been saved."
-    indicator={<AlertIcon />}
-  />
-</DemoPreview>
-
-```tsx
-import { Alert, AlertIcon } from "../components/ui";
-
-export default function MyPage() {
-  return (
+  <div style={{ width: "100%", maxWidth: "600px" }}>
     <Alert
       status="success"
-      title="Success"
-      description="Your changes have been saved."
+      title="Changes Saved"
+      description="Your profile changes and document uploads have been successfully processed."
       indicator={<AlertIcon />}
     />
-  );
-}
-```
-
-## CMS Page Builder
-
-This component is available as an `alert` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
+  </div>
+</DemoPreview>
 
 ```json
 {
   "type": "alert",
   "status": "success",
-  "title": "Success",
-  "description": "Your changes have been saved.",
-  "variant": "subtle"
+  "variant": "subtle",
+  "title": "Changes Saved",
+  "description": "Your profile changes and document uploads have been successfully processed."
 }
 ```
 
-# Props
+## 2. Dynamic Warning Callout (Solid Variant)
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `title` | `string` | The title of the alert. |
-| `description` | `string` | The description of the alert. |
-| `indicator` | `Child` | An icon or element to be rendered as an indicator. |
-| `children` | `Child` | Additional content to be rendered inside the component. |
-| `class` | `string` | Custom CSS classes. |
+Draws attention to potential issues or actions that require caution (e.g., "Plan Expiring soon", "System Maintenance scheduled").
 
-| `status` | \`"info" \ | "success" \ | "warning" \ | "error" \ | "neutral"\` | The status color palette of the alert. |
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "600px" }}>
+    <Alert
+      status="warning"
+      variant="solid"
+      title="Approaching Storage Limit"
+      description="Your workspace has used 85% of allocated file capacity. Upgrade plan to avoid system freezes."
+      indicator={<AlertIcon />}
+    />
+  </div>
+</DemoPreview>
 
-| `variant` | \`"subtle" \ | "solid" \ | "outline"\` | The visual style of the alert. |
-| `aria-live` | \`"polite" \ | "assertive" \ | "off"\` | The aria-live setting of the alert. Defaults to "polite". |
+```json
+{
+  "type": "alert",
+  "status": "warning",
+  "variant": "solid",
+  "title": "Approaching Storage Limit",
+  "description": "Your workspace has used 85% of allocated file capacity. Upgrade plan to avoid system freezes."
+}
+```
+
+## 3. High-Priority Error / Failure (Outline Variant)
+
+Informs the user of critical failures, expired credentials, or transaction errors that block progress.
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "600px" }}>
+    <Alert
+      status="error"
+      variant="outline"
+      title="Connection Terminated"
+      description="The analytics engine timed out while pulling data. Check database credentials and try again."
+      indicator={<AlertIcon />}
+    />
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "alert",
+  "status": "error",
+  "variant": "outline",
+  "title": "Connection Terminated",
+  "description": "The analytics engine timed out while pulling data. Check database credentials and try again."
+}
+```
+
+***
+
+# CMS Configuration Reference
+
+These properties can be mapped directly to Sveltia CMS widget fields under `public/admin/config.yml`:
+
+| Property | CMS Field Type | Default | Description / Supported Options |
+| :--- | :--- | :--- | :--- |
+| **Title** (`title`) | `string` | - | Bold header text displayed on the top line of the alert block. |
+| **Description** (`description`) | `string` | - | Detailed body message containing supplementary context or action instructions. |
+| **Severity Status** (`status`) | `select` | `"info"` | Sets the semantic layout color and default indicator icon. <br/>• Options: `"success"`, `"warning"`, `"error"`, `"info"`, `"neutral"`. |
+| **Visual Variant** (`variant`) | `select` | `"subtle"` | Controls layout borders and container background density. <br/>• `"subtle"` — Light translucent backdrop color (best for generic content). <br/>• `"solid"` — Dense, opaque, highly saturated backdrop. <br/>• `"outline"` — Transparent background paired with a thin, color-matched border. |
+| **Aria Live Setting** (`aria-live`) | `select` | `"polite"` | Screen reader priority announcement mode. <br/>• `"polite"` — Announces the message when the user becomes idle. <br/>• `"assertive"` — Immediately interrupts screen-reader activity (use sparingly for errors). |
+
+***
+
+# Developer Notes & Accessibility
+
+- **Server-Side Rendered Icons:** To prevent hydration mismatch warnings and optimize asset delivery, the semantic `AlertIcon` is dynamically compiled into an inline, highly optimized SVG depending on the chosen `status` prop.
+- **WAI-ARIA Accessibility:** Alerts automatically feature the `role="alert"` attribute to notify assistive technologies upon mounting. The default `aria-live` parameter is set to `"polite"` to ensure user tasks are not assertively broken.
+- **Layout Flow Integration:** Designed as block-level container layouts. If nested inside flexible grid directories, the alert container will automatically expand horizontally to snap smoothly with existing column boundaries.
