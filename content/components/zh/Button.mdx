@@ -9,138 +9,115 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # 简介
 
-一个可点击的组件，用于触发操作和用户交互。包含用于图标和按钮组的变体。
+`Button` 组件是一个灵活、高度可交互的可点击元素，用于触发操作、提交表单或重置输入。它以零 JS 的静态默认值为设计出发点，原生支持多种视觉变体、尺寸缩放与强调色主题。
+
+在进阶用法中，按钮可配置加载指示状态，或内嵌自定义的原始 JavaScript 执行字段（`onclick`），从而在无需依赖完整客户端水合负载的情况下即时运行自定义行为。
+
+***
 
 # 用法
 
-## 基础按钮
+你可以像下面这样构建并为按钮设置样式：
+
+## 基础操作按钮
+
+一个经典的主要行动号召按钮，使用实心填充或标准描边样式。
 
 <DemoPreview>
   <Button variant="solid" colorPalette="blue">Click me</Button>
   <Button variant="outline" colorPalette="blue">Click me</Button>
   <Button variant="subtle" colorPalette="blue">Click me</Button>
-  <Button variant="surface" colorPalette="blue">Click me</Button>
-  <Button variant="plain" colorPalette="blue">Click me</Button>
 </DemoPreview>
-
-```tsx
-import { Button } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Button variant="solid" colorPalette="blue">
-      Click me
-    </Button>
-  );
-}
-```
-
-## 加载状态
-
-<DemoPreview>
-  <Button loading loadingText="Saving...">Save</Button>
-</DemoPreview>
-
-```tsx
-import { Button } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Button loading loadingText="Saving...">
-      Save
-    </Button>
-  );
-}
-```
-
-## IconButton
-
-为图标优化的按钮。
-
-```tsx
-import { IconButton } from "../components/ui";
-import { SearchIcon } from "./icons";
-
-export default function MyPage() {
-  return (
-    <IconButton aria-label="Search">
-      <SearchIcon />
-    </IconButton>
-  );
-}
-```
-
-## CloseButton
-
-一个用于关闭元素的预样式按钮。
-
-```tsx
-import { CloseButton } from "../components/ui";
-
-export default function MyPage() {
-  return <CloseButton onClick={() => console.log("closed")} interactive />;
-}
-```
-
-## ButtonGroup
-
-<DemoPreview>
-  <ButtonGroup attached>
-    <Button>First</Button>
-    <Button>Second</Button>
-  </ButtonGroup>
-</DemoPreview>
-
-```tsx
-import { Button, ButtonGroup } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <ButtonGroup attached>
-      <Button>First</Button>
-      <Button>Second</Button>
-    </ButtonGroup>
-  );
-}
-```
-
-## CMS 页面构建器
-
-该组件在 [页面构建器](/docs/PageBuilder) (`content/pages/*.json`) 中作为 `button` 区块提供：
 
 ```json
 {
-  "type": "button",
-  "text": "Click me",
+  "blockType": "button",
+  "text": "Get Started",
   "variant": "solid",
   "colorPalette": "blue"
 }
 ```
 
+***
+
+## 表单提交按钮
+
+在包含交互式表单字段（例如 `Fieldset` 内的文本框）的页面布局中，将按钮的操作类型配置为 `"submit"`。这样父级表单便能正确捕获事件并提交字段。
+
+```json
+{
+  "blockType": "button",
+  "text": "Submit Registration",
+  "buttonType": "submit",
+  "variant": "solid",
+  "colorPalette": "green"
+}
+```
+
+***
+
+## 内联客户端脚本按钮（进阶）
+
+若要在不水合整个页面的情况下实现即时交互——例如切换浮层、平滑滚动或派发自定义事件——可在 `onclick` 字段中提供一段原始 JavaScript 代码片段。
+
+```json
+{
+  "blockType": "button",
+  "text": "Notify System",
+  "variant": "outline",
+  "onclick": "window.dispatchEvent(new CustomEvent('park-ui:toast:create', { detail: { title: 'Action Registered' } }))"
+}
+```
+
+***
+
+## 按钮组
+
+将多个互补的按钮并排渲染，或作为连贯、连续的片段连接在一起。在 CMS 页面构建器中，将 `button` 区块嵌套进容器区块（例如启用了 `attached` 的 `Group` 区块）即可无缝合并它们的边框。
+
+<DemoPreview>
+  <ButtonGroup attached>
+    <Button variant="outline">Previous</Button>
+    <Button variant="outline">Next</Button>
+  </ButtonGroup>
+</DemoPreview>
+
+```json
+{
+  "blockType": "group",
+  "attached": true,
+  "children": [
+    {
+      "blockType": "button",
+      "text": "Previous",
+      "variant": "outline"
+    },
+    {
+      "blockType": "button",
+      "text": "Next",
+      "variant": "outline"
+    }
+  ]
+}
+```
+
+***
+
 # 属性
 
-## Button
+| 参数 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `text` | `String` | - | 渲染在按钮内部的文本标签。 |
+| `variant` | `Select` | `solid` | 按钮的视觉样式。可选值：`solid`、`outline`、`subtle`、`surface`、`plain`。 |
+| `size` | `Select` | `md` | 按钮内边距与字号的缩放尺寸。可选值：`xs`、`sm`、`md`、`lg`。 |
+| `buttonType` | `Select` | `button` | HTML 操作类型。可选值：`button`、`submit`、`reset`。（从原生 HTML `type` 属性映射而来，以避免与 CMS 构建器中的 schema 冲突）。 |
+| `colorPalette` | `Select` | - | 用于背景/边框强调色的视觉色彩主题。可选值：`blue`、`green`、`red`、`purple`、`orange`、`amber`、`cyan`、`slate`。 |
+| `onclick` | `String` | - | 点击时即时运行的原始 JavaScript 表达式。无需客户端水合负载即可运行。 |
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `children` | `any` | 组件内部渲染的内容。 |
-| `class` | `string` | 自定义 CSS 类。 |
+***
 
-| `variant` | \`"solid" \ | "surface" \ | "subtle" \ | "outline" \ | "plain"\` | 按钮的视觉样式。 |
+# 架构说明
 
-| `size` | \`"2xs" \ | "xs" \ | "sm" \ | "md" \ | "lg" \ | "xl" \ | "2xl"\` | 按钮的尺寸。 |
-
-| `loading` | `boolean` | 如果为 `true`，按钮将显示加载 spinner。 |
-| `loadingText` | `string` | 加载时显示的文本。 |
-
-| `type` | \`"button" \ | "submit" \ | "reset"\` | HTML 按钮类型。 |
-
-| `colorPalette` | `string` | 按钮的色彩主题。 |
-| `interactive` | `boolean` | 是否启用客户端水合。 |
-
-## ButtonGroup
-
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `children` | `any` | 要分组的按钮。 |
-| `attached` | `boolean` | 是否将按钮连接在一起。 |
+- **避免冲突：** CMS 配置字段使用 `buttonType` 键而非 `type`。这可防止可视化页面构建器编辑器将 HTML 按钮类型与系统内部的区块判别字段（`blockType`）混淆。
+- **即时执行：** 在 `onclick` 中提供脚本会将原始事件处理器直接写入服务端渲染出的 HTML 标记。由于逻辑完全以内联方式运行，浏览器无需在 hydration 期间下载、解析并绑定 JS 监听器，因此性能极高。
+- **无障碍：** 标准的键盘行为（通过 **Tab** 聚焦、通过 **Space** 或 **Enter** 激活）由浏览器基础 HTML 按钮标签原生提供，无需自定义 ARIA 处理器。

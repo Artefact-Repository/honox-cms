@@ -9,138 +9,115 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introduction
 
-Un composant cliquable pour déclencher des actions et des interactions utilisateur. Comprend des variantes pour les icônes et les boutons groupés.
+Le composant `Button` est un élément cliquable flexible et hautement interactif utilisé pour déclencher des actions, soumettre des formulaires ou réinitialiser des entrées. Conçu avec des valeurs statiques par défaut sans JavaScript, il prend nativement en charge plusieurs variantes visuelles, la mise à l'échelle des tailles et des thèmes d'accentuation.
+
+Pour les configurations avancées, les boutons peuvent être configurés avec des états d'indicateur de chargement ou intégrer des champs d'exécution JavaScript brut et personnalisé (`onclick`) pour exécuter un comportement personnalisé instantanément, sans dépendre d'une charge d'hydratation côté client complète.
+
+***
 
 # Utilisation
 
-## Bouton de base
+Vous pouvez construire et styliser des boutons comme ci-dessous :
+
+## Bouton d'action de base
+
+Un bouton d'appel à l'action principal classique, stylisé avec des remplissages pleins ou des styles de contour standard.
 
 <DemoPreview>
   <Button variant="solid" colorPalette="blue">Click me</Button>
   <Button variant="outline" colorPalette="blue">Click me</Button>
   <Button variant="subtle" colorPalette="blue">Click me</Button>
-  <Button variant="surface" colorPalette="blue">Click me</Button>
-  <Button variant="plain" colorPalette="blue">Click me</Button>
 </DemoPreview>
-
-```tsx
-import { Button } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Button variant="solid" colorPalette="blue">
-      Click me
-    </Button>
-  );
-}
-```
-
-## État de chargement
-
-<DemoPreview>
-  <Button loading loadingText="Saving...">Save</Button>
-</DemoPreview>
-
-```tsx
-import { Button } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Button loading loadingText="Saving...">
-      Save
-    </Button>
-  );
-}
-```
-
-## IcôneBouton
-
-Un bouton optimisé pour les icônes.
-
-```tsx
-import { IconButton } from "../components/ui";
-import { SearchIcon } from "./icons";
-
-export default function MyPage() {
-  return (
-    <IconButton aria-label="Search">
-      <SearchIcon />
-    </IconButton>
-  );
-}
-```
-
-## Bouton Fermer
-
-Un bouton pré-stylisé pour fermer les éléments.
-
-```tsx
-import { CloseButton } from "../components/ui";
-
-export default function MyPage() {
-  return <CloseButton onClick={() => console.log("closed")} interactive />;
-}
-```
-
-## Groupe de boutons
-
-<DemoPreview>
-  <ButtonGroup attached>
-    <Button>First</Button>
-    <Button>Second</Button>
-  </ButtonGroup>
-</DemoPreview>
-
-```tsx
-import { Button, ButtonGroup } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <ButtonGroup attached>
-      <Button>First</Button>
-      <Button>Second</Button>
-    </ButtonGroup>
-  );
-}
-```
-
-## Constructeur de pages CMS
-
-Ce composant est disponible sous forme de bloc `bouton` dans [Page Builder](/docs/PageBuilder) (`content/pages/*.json`) :
 
 ```json
 {
-  "type": "button",
-  "text": "Click me",
+  "blockType": "button",
+  "text": "Get Started",
   "variant": "solid",
   "colorPalette": "blue"
 }
 ```
 
+***
+
+## Bouton de soumission de formulaire
+
+Dans les mises en page de pages comportant des champs de formulaire interactifs (tels que des champs texte à l'intérieur d'un `Fieldset`), configurez le type d'action du bouton sur `"submit"`. Cela garantit que le formulaire parent capture l'événement et soumet les champs correctement.
+
+```json
+{
+  "blockType": "button",
+  "text": "Submit Registration",
+  "buttonType": "submit",
+  "variant": "solid",
+  "colorPalette": "green"
+}
+```
+
+***
+
+## Bouton avec script client en ligne (avancé)
+
+Pour des interactions instantanées comme basculer des superpositions, défiler en douceur ou déclencher des événements personnalisés sans hydrater toute la page, fournissez un extrait JavaScript brut dans le champ `onclick`.
+
+```json
+{
+  "blockType": "button",
+  "text": "Notify System",
+  "variant": "outline",
+  "onclick": "window.dispatchEvent(new CustomEvent('park-ui:toast:create', { detail: { title: 'Action Registered' } }))"
+}
+```
+
+***
+
+## Boutons groupés
+
+Rendez plusieurs boutons complémentaires côte à côte ou joints en un segment cohérent et contigu. Dans le constructeur de pages CMS, l'imbrication de blocs `button` dans un bloc conteneur (comme un bloc `Group` avec `attached` activé) fusionne leurs bordures de manière transparente.
+
+<DemoPreview>
+  <ButtonGroup attached>
+    <Button variant="outline">Previous</Button>
+    <Button variant="outline">Next</Button>
+  </ButtonGroup>
+</DemoPreview>
+
+```json
+{
+  "blockType": "group",
+  "attached": true,
+  "children": [
+    {
+      "blockType": "button",
+      "text": "Previous",
+      "variant": "outline"
+    },
+    {
+      "blockType": "button",
+      "text": "Next",
+      "variant": "outline"
+    }
+  ]
+}
+```
+
+***
+
 # Propriétés
 
-## Bouton
+| Paramètre | Type | Défaut | Description |
+| --- | --- | --- | --- |
+| `text` | `String` | - | Le libellé texte rendu à l'intérieur du bouton. |
+| `variant` | `Select` | `solid` | Le style visuel du bouton. Options : `solid`, `outline`, `subtle`, `surface`, `plain`. |
+| `size` | `Select` | `md` | Taille d'échelle du remplissage et de la typographie du bouton. Options : `xs`, `sm`, `md`, `lg`. |
+| `buttonType` | `Select` | `button` | Le type d'action HTML. Options : `button`, `submit`, `reset`. (Mappé depuis l'attribut HTML natif `type` pour éviter les conflits de schéma dans les constructeurs CMS). |
+| `colorPalette` | `Select` | - | Thème de couleur visuel pour les accents de fond/bordure. Options : `blue`, `green`, `red`, `purple`, `orange`, `amber`, `cyan`, `slate`. |
+| `onclick` | `String` | - | Expression JavaScript brute exécutée instantanément au clic. S'exécute sans nécessiter de charges d'hydratation côté client. |
 
-| Propriété | Type | Description |
-| --- | --- | --- |
-| `children` | `any` | Contenu à restituer à l'intérieur du composant. |
-| `class` | `string` | Classes CSS personnalisées. |
+***
 
-| `variant` | \`"solid" \ | "surface" \ | "subtle" \ | "outline" \ | "plain"\` | The visual style of the button. |
+# Notes d'architecture
 
-| `size` | \`"2xs" \ | "xs" \ | "sm" \ | "md" \ | "lg" \ | "xl" \ | "2xl"\` | The size of the button. |
-
-| `loading` | `boolean` | Si « vrai », le bouton affichera une flèche de chargement. |
-| `loadingText` | `string` | Le texte à afficher lors du chargement. |
-
-| `type` | \`"button" \ | "soumettre" \ | "reset"\` | The HTML button type. |
-
-| `colorPalette` | `string` | Le thème de couleur du bouton. |
-| `interactive` | `boolean` | S'il faut activer l'hydratation côté client. |
-
-## Groupe de boutons
-
-| Propriété | Type | Description |
-| --- | --- | --- |
-| `children` | `any` | Boutons à regrouper. |
-| `attached` | `boolean` | S'il faut attacher les boutons ensemble. |
+- **Prévention des collisions :** Le champ de configuration CMS utilise la clé `buttonType` au lieu de `type`. Cela empêche les éditeurs visuels du constructeur de pages de confondre le type de bouton HTML avec le discriminateur de bloc interne (`blockType`) du système.
+- **Exécutions immédiates :** Fournir des scripts dans `onclick` écrit un gestionnaire d'événement brut directement dans le balisage HTML rendu côté serveur. C'est extrêmement performant car la logique s'exécute entièrement en ligne sans que le navigateur n'ait besoin de télécharger, analyser et attacher des écouteurs JS pendant l'hydratation.
+- **Accessibilité :** Les comportements clavier standard (focus via **Tab**, activation via **Space** ou **Enter**) sont natifs de la balise de bouton HTML de base du navigateur et ne nécessitent aucun gestionnaire ARIA personnalisé.

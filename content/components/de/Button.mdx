@@ -9,138 +9,115 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Einführung
 
-Eine klickbare Komponente zum Auslösen von Aktionen und Benutzerinteraktionen. Umfasst Varianten für Symbole und gruppierte Schaltflächen.
+Die `Button`-Komponente ist ein flexibles, hoch interaktives klickbares Element zum Auslösen von Aktionen, Absenden von Formularen oder Zurücksetzen von Eingaben. Sie ist auf statische Zero-JS-Standardwerte ausgelegt und unterstützt nativ mehrere visuelle Varianten, Größenanpassung und Akzent-Farbthemen.
+
+Für fortgeschrittene Setups können Buttons mit Ladeanzeige-Zuständen konfiguriert oder mit eigenen, rohen JavaScript-Ausführungsfeldern (`onclick`) versehen werden, um benutzerdefiniertes Verhalten sofort auszuführen, ohne auf eine vollständige Hydration-Last auf der Client-Seite angewiesen zu sein.
+
+***
 
 # Verwendung
 
-## Einfache Schaltfläche
+Du kannst Buttons wie folgt erstellen und gestalten:
+
+## Einfacher Aktionsbutton
+
+Ein klassischer primärer Call-to-Action-Button, gestaltet mit soliden Füllungen oder Standard-Umriss-Stilen.
 
 <DemoPreview>
   <Button variant="solid" colorPalette="blue">Click me</Button>
   <Button variant="outline" colorPalette="blue">Click me</Button>
   <Button variant="subtle" colorPalette="blue">Click me</Button>
-  <Button variant="surface" colorPalette="blue">Click me</Button>
-  <Button variant="plain" colorPalette="blue">Click me</Button>
 </DemoPreview>
-
-```tsx
-import { Button } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Button variant="solid" colorPalette="blue">
-      Click me
-    </Button>
-  );
-}
-```
-
-## Ladezustand
-
-<DemoPreview>
-  <Button loading loadingText="Saving...">Save</Button>
-</DemoPreview>
-
-```tsx
-import { Button } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Button loading loadingText="Saving...">
-      Save
-    </Button>
-  );
-}
-```
-
-## Symbol-Schaltfläche
-
-Eine für Symbole optimierte Schaltfläche.
-
-```tsx
-import { IconButton } from "../components/ui";
-import { SearchIcon } from "./icons";
-
-export default function MyPage() {
-  return (
-    <IconButton aria-label="Search">
-      <SearchIcon />
-    </IconButton>
-  );
-}
-```
-
-## Schließen-Schaltfläche
-
-Eine vorformatierte Schaltfläche zum Schließen von Elementen.
-
-```tsx
-import { CloseButton } from "../components/ui";
-
-export default function MyPage() {
-  return <CloseButton onClick={() => console.log("closed")} interactive />;
-}
-```
-
-## Schaltflächengruppe
-
-<DemoPreview>
-  <ButtonGroup attached>
-    <Button>First</Button>
-    <Button>Second</Button>
-  </ButtonGroup>
-</DemoPreview>
-
-```tsx
-import { Button, ButtonGroup } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <ButtonGroup attached>
-      <Button>First</Button>
-      <Button>Second</Button>
-    </ButtonGroup>
-  );
-}
-```
-
-## CMS-Seitenbauer
-
-Diese Komponente ist als `button`-Block im [Seitenbauer](/docs/PageBuilder) (`content/pages/*.json`) verfügbar:
 
 ```json
 {
-  "type": "button",
-  "text": "Click me",
+  "blockType": "button",
+  "text": "Get Started",
   "variant": "solid",
   "colorPalette": "blue"
 }
 ```
 
+***
+
+## Formular-Absende-Button
+
+In Seitenlayouts mit interaktiven Formularfeldern (wie Textfeldern innerhalb eines `Fieldset`) konfigurierst du den Aktionstyp des Buttons auf `"submit"`. Dadurch erfasst das übergeordnete Formular das Ereignis und übermittelt die Felder korrekt.
+
+```json
+{
+  "blockType": "button",
+  "text": "Submit Registration",
+  "buttonType": "submit",
+  "variant": "solid",
+  "colorPalette": "green"
+}
+```
+
+***
+
+## Inline-Client-Script-Button (Fortgeschritten)
+
+Für sofortige Interaktionen wie das Umschalten von Overlays, sanftes Scrollen oder das Auslösen benutzerdefinierter Events ohne Hydration der gesamten Seite stellst du ein rohes JavaScript-Snippet im Feld `onclick` bereit.
+
+```json
+{
+  "blockType": "button",
+  "text": "Notify System",
+  "variant": "outline",
+  "onclick": "window.dispatchEvent(new CustomEvent('park-ui:toast:create', { detail: { title: 'Action Registered' } }))"
+}
+```
+
+***
+
+## Gruppierte Buttons
+
+Mehrere ergänzende Buttons nebeneinander oder als zusammenhängendes, kontinuierliches Segment rendern. Im CMS-Seitenbauer verschmilzt das Verschachteln von `button`-Blöcken in einen Container-Block (etwa einen `Group`-Block mit aktiviertem `attached`) ihre Ränder nahtlos.
+
+<DemoPreview>
+  <ButtonGroup attached>
+    <Button variant="outline">Previous</Button>
+    <Button variant="outline">Next</Button>
+  </ButtonGroup>
+</DemoPreview>
+
+```json
+{
+  "blockType": "group",
+  "attached": true,
+  "children": [
+    {
+      "blockType": "button",
+      "text": "Previous",
+      "variant": "outline"
+    },
+    {
+      "blockType": "button",
+      "text": "Next",
+      "variant": "outline"
+    }
+  ]
+}
+```
+
+***
+
 # Eigenschaften
 
-## Schaltfläche
+| Parameter | Typ | Standard | Beschreibung |
+| --- | --- | --- | --- |
+| `text` | `String` | - | Das im Button gerenderte Textlabel. |
+| `variant` | `Select` | `solid` | Der visuelle Stil des Buttons. Optionen: `solid`, `outline`, `subtle`, `surface`, `plain`. |
+| `size` | `Select` | `md` | Skalierungsgröße von Button-Padding und Typografie. Optionen: `xs`, `sm`, `md`, `lg`. |
+| `buttonType` | `Select` | `button` | Der HTML-Aktionstyp. Optionen: `button`, `submit`, `reset`. (Vom nativen HTML-Attribut `type` abgeleitet, um Schema-Konflikte in CMS-Buildern zu vermeiden). |
+| `colorPalette` | `Select` | - | Visuelles Farbthema für Hintergrund-/Rahmen-Akzente. Optionen: `blue`, `green`, `red`, `purple`, `orange`, `amber`, `cyan`, `slate`. |
+| `onclick` | `String` | - | Roher JavaScript-Ausdruck, der beim Klick sofort ausgeführt wird. Läuft ohne clientseitige Hydration-Last. |
 
-| Eigenschaft | Typ | Beschreibung |
-| --- | --- | --- |
-| `children` | `any` | Inhalt, der innerhalb der Komponente gerendert wird. |
-| `class` | `string` | Benutzerdefinierte CSS-Klassen. |
+***
 
-| `variant` | `"solid" | "surface" | "subtle" | "outline" | "plain"` | Der visuelle Stil der Schaltfläche. |
+# Architektur-Hinweise
 
-| `size` | `"2xs" | "xs" | "sm" | "md" | "lg" | "xl" | "2xl"` | Die Größe der Schaltfläche. |
-
-| `loading` | `boolean` | Wenn `true`, zeigt die Schaltfläche einen Ladespinner an. |
-| `loadingText` | `string` | Der während des Ladevorgangs angezeigte Text. |
-
-| `type` | `"button" | "submit" | "reset"` | Der HTML-Schaltflächentyp. |
-
-| `colorPalette` | `string` | Das Farbschema der Schaltfläche. |
-| `interactive` | `boolean` | Legt fest, ob die clientseitige Hydration aktiviert wird. |
-
-## Schaltflächengruppe
-
-| Eigenschaft | Typ | Beschreibung |
-| --- | --- | --- |
-| `children` | `any` | Zu gruppierende Schaltflächen. |
-| `attached` | `boolean` | Legt fest, ob die Schaltflächen aneinandergehängt werden. |
+- **Kollisionsvermeidung:** Das CMS-Konfigurationsfeld verwendet den Schlüssel `buttonType` statt `type`. Das verhindert, dass visuelle Page-Builder-Editoren den HTML-Button-Typ mit dem internen Block-Diskriminator (`blockType`) des Systems verwechseln.
+- **Sofortige Ausführung:** Das Bereitstellen von Skripten in `onclick` schreibt einen rohen Event-Handler direkt in das serverseitig gerenderte HTML-Markup. Dies ist extrem performant, da die Logik vollständig inline abläuft, ohne dass der Browser JS-Listener während der Hydration herunterladen, parsen und anhängen muss.
+- **Barrierefreiheit:** Standard-Tastaturverhalten (Fokussieren via **Tab**, Aktivieren via **Space** oder **Enter**) ist im Basis-HTML-Button-Tag des Browsers nativ verfügbar und erfordert keine benutzerdefinierten ARIA-Handler.
