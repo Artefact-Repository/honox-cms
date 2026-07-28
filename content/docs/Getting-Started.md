@@ -8,9 +8,9 @@ This guide walks through installing the project, running it locally, and underst
 
 * [Bun](https://bun.sh) — the project's package manager and JS/TS runtime. Install it with:
 
-  ```bash
+```bash
   curl -fsSL https://bun.sh/install | bash
-  ```
+```
 
 * Git, for cloning the repository and for the CMS's git-backed content commits.
 
@@ -87,9 +87,3 @@ bun run deploy
 Builds the site and deploys `dist/` to Cloudflare Pages via `wrangler`. A Vercel target (`vercel.json`) is also configured out of the box if you'd rather deploy there — either way, the output is a fully static site with no server process required at request time.
 
 ***
-
-## Next Steps
-
-* [Architecture](/docs/Architecture) — how routing, styling, content, and the build pipeline fit together.
-* [Hydration](/docs/Hydration) — the three-tier model for deciding whether a component ships JS to the client.
-* [CMS Page Builder](/docs/PageBuilder) — building pages visually through Sveltia CMS.
