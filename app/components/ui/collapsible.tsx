@@ -115,20 +115,24 @@ function Collapsible(props: CollapsibleProps) {
 			trigger
 		);
 
+	// hono/jsx's `cloneElement(el, props, ...children)` only accepts new
+	// children as rest args — a `children` key inside `props` is silently
+	// discarded (it falls back to `el.props.children`). So the replacement
+	// children must be passed positionally, not via the props object.
 	const triggerWithIndicator = indicator
-		? cloneElement(triggerElement, {
-				children: (
-					<>
-						{indicatorPlacement === "start" && (
-							<Indicator class={indicatorClass}>{indicator}</Indicator>
-						)}
-						{triggerElement.props?.children}
-						{indicatorPlacement === "end" && (
-							<Indicator class={indicatorClass}>{indicator}</Indicator>
-						)}
-					</>
-				),
-			} as Record<string, unknown>)
+		? cloneElement(
+				triggerElement,
+				{},
+				<>
+					{indicatorPlacement === "start" && (
+						<Indicator class={indicatorClass}>{indicator}</Indicator>
+					)}
+					{triggerElement.props?.children}
+					{indicatorPlacement === "end" && (
+						<Indicator class={indicatorClass}>{indicator}</Indicator>
+					)}
+				</>,
+			)
 		: triggerElement;
 
 	return (
