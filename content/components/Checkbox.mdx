@@ -9,71 +9,126 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-A control that allows the user to toggle between checked, unchecked, and indeterminate states.
+The `Checkbox` component is a form control that allows users to toggle between binary choices (checked or unchecked) and indeterminate states. Fully optimized for the page builder, the component supports standard browser behaviors and can be customized with state conditions (such as invalid and disabled states) and accented design themes.
 
-# Usage
+---
+
+# Usage via CMS Page Builder (JSON)
+
+This component is available as a `checkbox` block inside our JSON page templates (`content/pages/*.json`). Content authors can customize and structure checkboxes entirely within their CMS workspace.
+
+## Basic Checkbox
+
+A standard checkbox with an interactive click label for straightforward user options.
 
 <DemoPreview>
-  <Checkbox defaultChecked interactive>Accept Terms and Conditions</Checkbox>
+  <Checkbox interactive>Accept Terms and Conditions</Checkbox>
 </DemoPreview>
-
-```tsx
-import { Checkbox } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Checkbox
-      defaultChecked={true}
-      onCheckedChange={(details) => console.log(details.checked)}
-      interactive
-    >
-      Accept Terms and Conditions
-    </Checkbox>
-  );
-}
-```
-
-## Indeterminate state
-
-```tsx
-import { Checkbox } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Checkbox checked="indeterminate" interactive>
-      Parent Checkbox
-    </Checkbox>
-  );
-}
-```
-
-## CMS Page Builder
-
-This component is available as a `checkbox` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
 
 ```json
 {
-  "type": "checkbox",
-  "label": "Accept Terms and Conditions",
-  "checked": true,
-  "colorPalette": "blue"
+  "blockType": "checkbox",
+  "label": "Accept Terms and Conditions"
 }
 ```
 
-# Props
+---
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `children` | `any` | Label content to be rendered next to the checkbox. |
-| `class` | `string` | Custom CSS classes. |
+## Pre-Checked Checkbox
 
-| `checked` | \`boolean \ | "indeterminate"\` | Whether the checkbox is checked (controlled). |
-| `defaultChecked` | \`boolean \ | "indeterminate"\` | The initial checked state (uncontrolled). |
+Configure a checkbox to render in the checked state by default when the page first loads.
 
-| `disabled` | `boolean` | Whether the checkbox is disabled. |
+<DemoPreview>
+  <Checkbox defaultChecked interactive>Subscribe to our newsletter</Checkbox>
+</DemoPreview>
 
-| `onCheckedChange` | \`(details: \{ checked: boolean \ | "indeterminate" \}) => void\` | Callback triggered when the checked state changes. |
+```json
+{
+  "blockType": "checkbox",
+  "label": "Subscribe to our newsletter",
+  "checked": true
+}
+```
 
-| `size` | \`"sm" \ | "md" \ | "lg"\` | The size of the checkbox. |
+---
 
-| `interactive` | `boolean` | Forces hydration as an island. |
+## Disabled Checkbox
+
+Prevent users from interacting with the checkbox while preserving its current visual state.
+
+<DemoPreview>
+  <Checkbox disabled interactive>Premium feature unlocked</Checkbox>
+  <Checkbox checked={true} disabled interactive>Auto-renew subscription (fixed)</Checkbox>
+</DemoPreview>
+
+```json
+{
+  "blockType": "checkbox",
+  "label": "Auto-renew subscription (fixed)",
+  "checked": true,
+  "disabled": true
+}
+```
+
+---
+
+## Invalid Validation State
+
+Indicate that a checkbox field has failed validation. For example, forcing a check to accept mandatory policy terms. The input is highlighted with error boundaries using the design system's default status tokens.
+
+<DemoPreview>
+  <Checkbox invalid interactive>I accept the User Policy Agreement</Checkbox>
+</DemoPreview>
+
+```json
+{
+  "blockType": "checkbox",
+  "label": "I accept the User Policy Agreement",
+  "invalid": true
+}
+```
+
+---
+
+## Accent-Themed Checkbox
+
+Tint checked states and focus markers with custom aesthetic accents from the design system's color palette, and scale sizes up or down.
+
+<DemoPreview>
+  <Checkbox size="lg" colorPalette="purple" defaultChecked interactive>Purple Large Checkbox</Checkbox>
+</DemoPreview>
+
+```json
+{
+  "blockType": "checkbox",
+  "label": "Purple Large Checkbox",
+  "checked": true,
+  "size": "lg",
+  "colorPalette": "purple"
+}
+```
+
+---
+
+# CMS Configuration & Property Reference
+
+## Block Configuration Schema
+
+The following parameters are supported by the `checkbox` block in our Page Builder configurations. They correspond precisely to the properties declared in `public/admin/config.yml`.
+
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `label` | `String` | - | The text description displayed adjacent to the checkbox control. Clicking the label also toggles the checkbox state. |
+| `checked` | `Boolean` | `false` | Whether the checkbox is checked initially. (Mapped to `defaultChecked` server-side to allow free, uncontrolled clicking without locking the input state). |
+| `disabled` | `Boolean` | `false` | Disables user interactions and visual click response. |
+| `invalid` | `Boolean` | `false` | Highlights the component with red/invalid borders to flag a validation error. |
+| `size` | `Select` | `md` | Adjusts the height and width of the checkbox bounding box. Options: `sm`, `md`, `lg`. |
+| `colorPalette` | `Select` | - | Accent color theme applied to the checkbox's background when active or checked. Options: `blue`, `green`, `red`, `purple`, `orange`, `amber`, `cyan`, `slate`. |
+
+---
+
+# Architecture Notes
+
+- **Uncontrolled Default Checks:** To prevent checkboxes from locking up (preventing user clicks) in static, data-driven templates without custom inline handlers, the CMS field `checked` resolves as `defaultChecked` in our page registry.
+- **Form Standard Reset:** The component integrates with standard HTML form resets. Resets seamlessly return the checkboxes back to their original `checked` states configured in the JSON template.
+- **Native Keyboard Focus:** Focus indicators and toggle interactions (spacebar key triggers) rely on standard HTML inputs and browser behavior. This remains highly performant and accessible on assistive screen-readers.
