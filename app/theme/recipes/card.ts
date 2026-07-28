@@ -26,7 +26,7 @@ export const card = defineSlotRecipe({
 			// `elevated` overrides this with a heavier `lg` shadow below, and a
 			// CMS author can override it per-card via the Box Shadow field
 			// (see block-style.ts's `--cms-box-shadow`).
-			boxShadow: "sm",
+			boxShadow: "md",
 			transition: "all 0.2s ease-in-out",
 		},
 		header: {

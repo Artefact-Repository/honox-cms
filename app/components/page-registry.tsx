@@ -410,13 +410,13 @@ const registry: Record<string, BlockRenderer> = {
 		// boxShadow (plus margin/padding/maxWidth/... if ever set on a card)
 		// goes through the same validated `--cms-*` token pipeline as
 		// Stack/Grid/Layout — see block-style.ts. Default it to the recipe's
-		// own "sm" base shadow (card.ts) so that setting some *other* style
+		// own "md" base shadow (card.ts) so that setting some *other* style
 		// field (e.g. margin) doesn't silently zero out the shadow: once
 		// `extractLayoutStyle` emits any `--cms-*` var, its shared utility
 		// class sets `box-shadow: var(--cms-box-shadow, initial)` on the card
 		// regardless of whether this block set boxShadow itself, and that
 		// utility class's layer wins over the recipe's own default.
-		if (rest.boxShadow === undefined) rest.boxShadow = "sm";
+		if (rest.boxShadow === undefined) rest.boxShadow = "md";
 		const layoutStyle = extractLayoutStyle(rest);
 		// Card's root is `overflow: hidden` by default (clips its image slot to
 		// the border radius) — but that also clips any absolutely-positioned
