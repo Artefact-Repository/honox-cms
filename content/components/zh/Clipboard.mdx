@@ -1,7 +1,7 @@
 ---
 title: Clipboard 剪贴板
-hydration: 2
 category: Forms
+hydration: 2
 ---
 
 import { Clipboard } from "../../../app/components/ui";
@@ -9,12 +9,22 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # 简介
 
-一个只读字段，配合复制到剪贴板的触发器使用，内置已复制/未复制的提示状态。
+`Clipboard` 组件是一个只读文本容器，配有一个复制到剪贴板操作触发器。它内置响应式的视觉指示器状态变化（已复制/未复制），以便在用户复制终端命令、API 密钥、令牌或链接时提供即时反馈。
+
+**Clipboard** 已作为 `clipboard` 区块完整集成到 **Page Builder** 中，内容作者和开发者可以直接在 CMS 内轻松配置描述性标签、复制值、操作超时和配色主题。
+
+***
 
 # 用法
 
+以下示例展示了内容编辑者如何绑定并结构化复制到剪贴板元素。
+
+## 1. 标准代码克隆命令
+
+一条标准终端代码或 Git 克隆命令片段，配有一个可视复制触发器。
+
 <DemoPreview>
-  <div style={{ width: "100%", maxWidth: "360px" }}>
+  <div style={{ width: "100%", maxWidth: "480px" }}>
     <Clipboard
       label="Clone Command"
       value="git clone https://github.com/honojs/honox"
@@ -23,82 +33,85 @@ import { DemoPreview } from "../../../app/components/demo-preview";
   </div>
 </DemoPreview>
 
-```tsx
-import { Clipboard } from "../components/ui";
+```json
+{
+  "type": "clipboard",
+  "label": "Clone Command",
+  "value": "git clone https://github.com/honojs/honox",
+  "interactive": true
+}
+```
 
-export default function MyPage() {
-  return (
+## 2. 带自定义超时的 API 密钥剪贴板（紫色主题）
+
+展示一个自定义配色的平台配置，其更快的自定义状态重置超时设置为 1500 毫秒。
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "480px" }}>
     <Clipboard
-      label="Clone Command"
-      value="git clone https://github.com/honojs/honox"
+      label="Production API Key"
+      value="pk_live_51HxF4pE2"
+      colorPalette="purple"
+      timeout={1500}
+      interactive
     />
-  );
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "clipboard",
+  "label": "Production API Key",
+  "value": "pk_live_51HxF4pE2",
+  "colorPalette": "purple",
+  "timeout": 1500,
+  "interactive": true
 }
 ```
 
-## 自定义组合
+## 3. 紧凑只读配置
 
-向 `Clipboard.Trigger` 传入 `children` 以覆盖默认的复制/对勾图标切换，或直接组合各个部分以获得完全控制：
+非常适合在紧凑的仪表盘侧边栏或紧凑元数据布局中嵌入简短 URL 或系统 ID。
 
-```tsx
-import { Clipboard } from "../components/ui";
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "480px" }}>
+    <Clipboard
+      label="Endpoint URL"
+      value="https://api.acme.com/v1/deploy"
+      size="sm"
+      interactive
+    />
+  </div>
+</DemoPreview>
 
-export default function MyPage() {
-  return (
-    <Clipboard.Root value="npm install honox">
-      <Clipboard.Label>Install Command</Clipboard.Label>
-      <Clipboard.Control>
-        <Clipboard.Input />
-        <Clipboard.Trigger>
-          <Clipboard.CopyText />
-        </Clipboard.Trigger>
-      </Clipboard.Control>
-    </Clipboard.Root>
-  );
+```json
+{
+  "type": "clipboard",
+  "label": "Endpoint URL",
+  "value": "https://api.acme.com/v1/deploy",
+  "size": "sm",
+  "interactive": true
 }
 ```
+
+***
 
 # 属性
 
-## Root
+| 属性 | CMS 字段类型 | 默认值 | 说明 / 可选项 |
+| --- | --- | --- | --- |
+| **标签文本** (`label`) | `string` | - | 直接渲染在只读输入框上方的可视文本标题。 |
+| **复制值** (`value`) | `string` | - | 点击触发器时实际复制到用户系统剪贴板的文本值。 |
+| **超时延迟** (`timeout`) | `number` | `3000` | “已复制”对勾状态在恢复之前保持激活状态的持续时间（毫秒）。 |
+| **配色主题** (`colorPalette`) | `select` | `"green"` | 切换为激活状态时应用于复制触发器的视觉色彩强调。 <br/>• 选项：`blue`、`green`、`red`、`purple`、`orange`、`amber`、`cyan`、`slate`。 |
+| **尺寸刻度** (`size`) | `select` | `"md"` | 控制整体高度、内边距与文本缩放。 <br/>• 选项：`"sm"`、`"md"`、`"lg"`。 |
+| **强制交互** (`interactive`) | `boolean` | `true` | 作为 Preact 交互式岛屿进行客户端水合，确保点击操作触发即时复制。 |
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `value` | `string` | 要复制的文本（受控）。 |
-| `defaultValue` | `string` | 初始要复制的文本（非受控）。 |
-| `disabled` | `boolean` | 禁用触发器。 |
-| `timeout` | `number` | 已复制状态在恢复前保持激活的毫秒数。默认 `3000`。 |
-| `translations` | `Partial<ClipboardTranslations>` | 触发器 `aria-label` 的覆盖值。 |
-| `onValueChange` | `(details: { value: string }) => void` | 值变化时调用（例如通过自定义输入框）。 |
-| `onStatusChange` | `(details: { copied: boolean }) => void` | 复制状态切换时调用。 |
-| `size` | `"sm" \| "md" \| "lg"` | 视觉尺寸。默认 `"md"`。 |
-| `colorPalette` | `string` | 颜色主题。默认 `"green"`。 |
-| `interactive` | `boolean` | 强制（或抑制）作为岛屿进行水合。 |
-| `class` | `string` | 根元素的自定义 CSS 类。 |
+***
 
-## 默认组合
+# 开发者说明与无障碍
 
-这些仅适用于顶层 `<Clipboard>`（而非 `Clipboard.Root`），它会为你渲染 `Label` + `Control`（`Input` + `Trigger`）。
-
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `label` | `JSX.Element \| string` | 渲染在控件上方的标签。 |
-| `children` | `JSX.Element` | 自定义 `Trigger` 内容，覆盖默认的复制/对勾图标切换。 |
-
-## 子组件
-
-| 部分 | 说明 |
-| --- | --- |
-| `Clipboard.Label` | 绑定到只读输入框的 `<label>`。 |
-| `Clipboard.Control` | 包裹 `Input` 和 `Trigger`。 |
-| `Clipboard.Input` | 只读 `<input>`，显示当前值；聚焦时选中其文本。通过 Ctrl/Cmd+C 手动复制也会触发已复制状态。 |
-| `Clipboard.Trigger` | 点击时将 `value` 复制到剪贴板。接受 `asChild`，可合并到自定义子元素上，而不是渲染 `<button>`。 |
-| `Clipboard.Indicator` | 将 `children` 和一个 `copied` 变体都作为同级节点渲染，通过 `hidden` 切换——用于自定义的已复制/未复制图标或文本切换。 |
-| `Clipboard.CopyText` | 便捷的 `Indicator`，在 `"Copy"` / `"Copied"` 文本之间切换（通过 `children`/`copied` 属性覆盖）。 |
-| `Clipboard.Context` | 通过渲染属性访问剪贴板上下文：`<Clipboard.Context>{(ctx) => ...}</Clipboard.Context>`。 |
-
-# 无障碍
-
-- `Trigger` 从 `translations.triggerLabel(copied)` 获取 `aria-label`（默认 `"Copy to clipboard"` / `"Copied to clipboard"`），向辅助技术播报状态变化。
-- `Input` 是 `readOnly` 而非 `disabled`，因此它保持可聚焦，其文本可通过原生键盘快捷键选择和复制，即使不点击触发器也可以。
-- `data-copied` 会镜像到每个部分，以便基于状态进行样式设置。
+- **无障碍标签与状态通告：** 在底层，该组件原生处理屏幕阅读器的无障碍支持：
+    - 复制按钮触发器会接收本地化的 `aria-label` 更新（在 `"Copy to clipboard"` / `"Copied to clipboard"` 之间切换），确保屏幕阅读器立即通告状态变化。
+- **聚焦选中与只读输入：** 输入字段保持可聚焦（`readOnly` 而非 `disabled`）。聚焦时，它会自动选中其完整内部文本，以便键盘用户可以使用 `Ctrl+C` 或 `Cmd+C` 手动复制内容。
+- **激活状态标记：** 激活时，`data-copied` 属性会动态镜像到外层容器及所有后代部件上，便于在复制期间进行自定义 CSS 样式设置。

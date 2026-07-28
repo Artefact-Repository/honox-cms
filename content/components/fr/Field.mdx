@@ -1,7 +1,7 @@
 ---
 title: Field Champ
-hydration: 2
 category: Forms
+hydration: 2
 ---
 
 import { Field } from "../../../app/components/ui";
@@ -9,143 +9,127 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introduction
 
-Un composant fondamental pour les champs de formulaire, la gestion des étiquettes, du texte d'assistance, des messages d'erreur et de l'état de validation. Il suit le modèle « Smart Switcher », s'hydratant automatiquement comme un îlot interactif en cas de besoin.
+Un contrôle de saisie fondamental conçu pour gérer les formulaires de manière propre et accessible. Il agrège les libellés de saisie, les textes d'aide contextuels, les états de validation d'erreur dynamiques et la vérification de règles basée sur du JS personnalisé dans une interface cohérente et conviviale pour les développeurs.
+
+Le composant **Field** est entièrement intégré en tant que bloc interactif `field` dans le **Page Builder**. Cela permet aux créateurs de contenu et aux concepteurs de rédiger des champs, de placer des entrées de formulaire HTML personnalisées et de fournir une logique de validation côté client instantanée directement depuis Sveltia CMS sans écrire de code répétitif de mise en page.
+
+***
 
 # Utilisation
 
-## Hydratation automatique intelligente
+Ces exemples illustrent comment les éditeurs de contenu lient et configurent les structures de champs de formulaire.
 
-Le composant `Field` détermine automatiquement s'il doit être interactif. Il devient une île si l'un des accessoires suivants est fourni : `interactive`, `onValueChange`, `value`, `defaultValue`, `validator` ou `minLength`.
+## 1. Champ de Saisie Standard
 
-## Validation
-
-Field prend en charge la validation intégrée et personnalisée.
-
-### Longueur minimale
-
-L'utilisation de `minLength` affichera automatiquement un message d'erreur si l'entrée est trop courte.
-
-```tsx
-<Field
-  label="Username"
-  minLength={5}
-  placeholder="Enter at least 5 characters"
-/>
-```
-
-### Validateur personnalisé
-
-La prop `validator` accepte une fonction qui renvoie `true` pour valide, `false` pour invalide (en utilisant le message d'erreur par défaut) ou une `string` comme message d'erreur personnalisé.
-
-```tsx
-<Field
-  label="Email"
-  validator={(value) => {
-    if (!value.includes("@")) return "Must be a valid email";
-    return true;
-  }}
-/>
-```
-
-La façon la plus simple d'utiliser Field consiste à utiliser les accessoires aplatis. Il rendra automatiquement une entrée.
+Un champ de texte standard comprenant un libellé accompagnateur, un espace réservé et un texte d'aide descriptif situé directement sous l'élément de saisie.
 
 <DemoPreview>
   <div style={{ width: "100%", maxWidth: "320px" }}>
     <Field
       label="Username"
-      helperText="Choose a unique username."
-      placeholder="Type here..."
-      minLength={3}
+      placeholder="e.g. jules_architect"
+      helperText="Choose a unique public username."
+      interactive
     />
   </div>
 </DemoPreview>
-
-```tsx
-import { Field } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Field
-      label="Username"
-      helperText="Choose a unique username."
-      placeholder="Type here..."
-      minLength={3}
-    />
-  );
-}
-```
-
-## Héritage des ensembles de champs
-
-Un `Field` imbriqué dans un `Fieldset` hérite du groupe `disabled`/`required`
-état, et son état "invalide" également - mais seulement lorsque le "Champ" n'a pas
-validation qui lui est propre (pas de `validator`/`minLength` et pas de `invalid` explicite
-soutenir). Un accessoire explicite sur « Field » l'emporte toujours sur la valeur héritée.
-
-```tsx
-<Fieldset legend="Shipping address" disabled>
-  {/* inherits disabled — no need to repeat it */}
-  <Field label="Street" />
-</Fieldset>
-```
-
-Notez que le `<fieldset désactivé>` natif désactive également chaque formulaire descendant
-contrôle au niveau du navigateur quel que soit cet héritage - l'héritage
-La prop `disabled` maintient uniquement le style/ARIA du `Field` en synchronisation avec cela,
-il ne peut pas être remplacé par activé à partir d'un ensemble de champs désactivé.
-
-## Composition
-
-Pour plus de contrôle, vous pouvez envelopper d'autres composants comme « Textarea » ou des entrées personnalisées. Le « Field » fournit un contexte à ses enfants.
-
-```tsx
-import { Field, Textarea } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Field
-      label="Bio"
-      helperText="Tell us about yourself."
-      minLength={10}
-    >
-      <Textarea placeholder="A short bio" />
-    </Field>
-  );
-}
-```
-
-## Constructeur de pages CMS
-
-Ce composant est disponible sous forme de bloc `field` dans [Page Builder](/docs/PageBuilder) (`content/pages/*.json`) :
 
 ```json
 {
   "type": "field",
   "label": "Username",
-  "helperText": "Choose a unique username.",
-  "required": true
+  "placeholder": "e.g. jules_architect",
+  "helperText": "Choose a unique public username.",
+  "name": "username",
+  "interactive": true
 }
 ```
 
-# Propriétés
+## 2. Saisie Dynamique avec Validation Côté Client
 
-| Propriété | Type | Description |
-| --- | --- | --- |
-| `children` | `any` | Contenu à restituer à l'intérieur du composant. Si elle est fournie, l’entrée interne n’est pas rendue. |
-| `class` | `string` | Classes CSS personnalisées. |
-| `id` | `string` | Identifiant unique. S’il n’est pas fourni, un est généré. |
-| `label` | `Child` | L'étiquette du champ. |
-| `helperText` | `Child` | Le texte d'assistance pour le champ. |
-| `errorText` | `Child` | Le texte d'erreur pour le champ. S'il est fourni sous forme de chaîne, il sera utilisé comme message. |
-| `disabled` | `boolean` | Si le champ est désactivé. |
-| `invalid` | `boolean` | Si le champ est dans un état invalide. |
-| `required` | `boolean` | Si le champ est obligatoire. |
-| `readOnly` | `boolean` | Indique si le champ est en lecture seule. |
-| `value` | `string` | La valeur actuelle (force le mode interactif). |
-| `defaultValue` | `string` | La valeur initiale (force le mode interactif). |
-| `onValueChange` | `(val: string) => void` | Rappel déclenché lorsque la valeur change (force le mode interactif). |
-| `minLength` | `number` | Validation de la longueur minimale (force le mode interactif). |
+Utilise une logique de validation personnalisée. Lorsque l'utilisateur saisit moins de 5 caractères ou omet le symbole `@`, un message d'erreur s'affiche et est annoncé automatiquement de manière dynamique.
 
-| `validator` | \`(val: string) => boolean \ | chaîne\` | Custom validation function (forces interactive mode). |
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <Field
+      label="Email Address"
+      placeholder="architect@domain.com"
+      defaultValue="invalid-email"
+      validator={(value) => value.includes("@") || "Must be a valid email containing '@'"}
+      interactive
+    />
+  </div>
+</DemoPreview>
 
-| `interactive` | `boolean` | Force l’hydratation comme une île. |
+```json
+{
+  "type": "field",
+  "label": "Email Address",
+  "placeholder": "architect@domain.com",
+  "defaultValue": "invalid-email",
+  "validator": "(value) => value.includes('@') || 'Must be a valid email containing \'@\''",
+  "name": "email",
+  "interactive": true
+}
+```
+
+## 3. Champs d'Option Requis et Désactivés
+
+Démontre les styles de champs de formulaire sous des états de bloc HTML standard. Cela aide les rédacteurs de contenu à visualiser l'apparence des champs lorsqu'ils sont obligatoires (indicateur d'astérisque) ou verrouillés en raison d'autorisations.
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+    <Field
+      label="Secret Key"
+      defaultValue="SUPER_SECURE_TOKEN"
+      readOnly
+      required
+      interactive
+    />
+    <Field
+      label="Legacy Code"
+      placeholder="Not available"
+      disabled
+      interactive
+    />
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "field",
+  "label": "Secret Key",
+  "defaultValue": "SUPER_SECURE_TOKEN",
+  "readOnly": true,
+  "required": true,
+  "interactive": true
+}
+```
+
+***
+
+# Props
+
+| Propriété | Type de Champ CMS | Par défaut | Description / Options Prises en Charge |
+| --- | --- | --- | --- |
+| **Texte de Libellé** (`label`) | `string` | - | Le titre visuel ou la description positionné directement au-dessus de l'élément de saisie. |
+| **Nom** (`name`) | `string` | - | Attribut name HTML standard envoyé avec les soumissions de formulaire. |
+| **Espace Réservé** (`placeholder`) | `string` | - | Texte d'espace réservé léger affiché dans la saisie lorsqu'elle est complètement vide. |
+| **Texte d'Aide** (`helperText`) | `string` | - | Texte d'indice ou d'instruction contextuel imprimé sous le champ de saisie. |
+| **Texte d'Erreur** (`errorText`) | `string` | - | Remplacement manuel du message d'erreur. Déclenche le style invalide et les annonces du lecteur d'écran. |
+| **Valeur Par Défaut** (`defaultValue`) | `string` | - | Pré-remplit la saisie au chargement de la page. Force le mode d'îlot interactif côté client. |
+| **Requis** (`required`) | `boolean` | `false` | Rend un indicateur d'astérisque rouge signalant que cette saisie ne doit pas rester vide. |
+| **Désactivé** (`disabled`) | `boolean` | `false` | Empêche toute frappe ou interaction du curseur et atténue tout le champ. |
+| **Lecture Seule** (`readOnly`) | `boolean` | `false` | Garde la valeur sélectionnable et focalisable par tabulation, mais empêche l'édition du texte. |
+| **État Invalide** (`invalid`) | `boolean` | `false` | Force explicitement le champ dans un état d'erreur, mettant les bordures en rouge. |
+| **Expression de Validateur** (`validator`) | `string` | - | Expression de fonction JavaScript avancée évaluant l'entrée de chaîne. Reconstruite côté client via `new Function()`.<br/>*Exemple :* `(value) => value.includes('@') | 'Invalid email address'` |
+| **Forcer Interactif** (`interactive`) | `boolean` | `true` | Assure l'hydratation côté client en tant qu'îlot interactif pour prendre en charge la validation utilisateur en temps réel. |
+
+***
+
+# Notes de Développement et Accessibilité
+
+- **Hydratation à Commutateur Intelligent :** Par défaut, si le champ est une présentation statique standard sans déclencheurs de validation personnalisés ni liaisons dynamiques, il reste un balisage SSR statique léger. Fournir l'un des éléments `validator`, `defaultValue` ou `"interactive": true` promeut automatiquement l'élément en une îlot client entièrement hydratée.
+- **Connexions Descriptives WAI-ARIA :** L'élément wrapper gère dynamiquement les connexions aria. L'élément de saisie enregistre automatiquement `aria-describedby` pointant vers les ID générés exacts à la fois du slot de texte d'aide et du slot de texte d'erreur.
+- **Prévention des Fuites d'Attributs :** La primitive `FieldRoot` inclut des filtres intégrés pour empêcher les propriétés d'entrée standard (comme `placeholder`, `autocomplete` ou `name`) de fuiter sur le `<div>` wrapper externe, garantissant une sortie HTML complètement valide et propre.
+- **Contexte Compositionnel :** Le composant Field prend en charge une architecture compositionnelle. Lors de l'imbrication de sous-éléments (comme des éléments `Textarea` personnalisés ou des éléments select personnalisés) en tant qu'enfants dans le Page Builder, ils consomment automatiquement le contexte partagé du Field externe pour résoudre les attributs de validation appropriés.

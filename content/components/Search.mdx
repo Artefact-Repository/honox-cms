@@ -9,23 +9,19 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-An instant-search input over a pre-generated JSON index: keystrokes are debounced, matches surface as an autocomplete dropdown, and picking a result navigates to its `href`. It can optionally filter server-rendered elements in place (e.g. a list of blog cards) and always degrades to a plain `?q=` GET form when JS is unavailable.
+The `Search` component is an instant-search autocomplete input that filters and navigates through pre-compiled JSON document indexes completely client-side. Rather than firing expensive database requests on every keystroke, the Search input lazily loads its static JSON document once on initial user interaction and provides debounced, instant matches.
 
-`Search` does not fetch on every keystroke against a live endpoint — it lazily loads one JSON document (`src`) on first interaction, then filters it entirely client-side. Build a matching index (see [Search Index Format](#search-index-format) below) for whatever content you want searchable.
+The **Search** component is fully integrated as a `search` block in the **Page Builder**, allowing content authors and developers to configure index source addresses, result label metrics, dropdown constraints, and empty-state placeholders directly within the CMS.
 
-# Hydration
+***
 
-**Tier 1 — auto-interactive.** Debounced filtering, the autocomplete dropdown, and keyboard navigation all require client JS, so `Search` hydrates by default. Pass `interactive={false}` to force the static fallback: a plain `<input type="search" name="q">`, wrapped in a GET `<form>` when `action` is set.
+# Usage via CMS Page Builder (JSON)
 
-| `interactive` prop | Result |
-| --- | --- |
-| omitted | Hydrates as an island |
-| `true` | Hydrates as an island |
-| `false` | Static — a plain GET form input, no client JS |
+These examples illustrate how content editors bind and structure instant search controls inside the JSON page schemas (`content/pages/*.json`).
 
-All interactivity decisions in the library route through the shared `shouldHydrate()` helper in `app/components/ui/island-utils.ts`.
+## 1. Instant Article Search Dropdown
 
-# Usage
+Queries are filtered against a pre-compiled blog post search index, displaying a dropdown with up to 5 matching results.
 
 <DemoPreview>
   <div style={{ width: "100%", maxWidth: "420px" }}>
@@ -37,114 +33,77 @@ All interactivity decisions in the library route through the shared `shouldHydra
   </div>
 </DemoPreview>
 
-```tsx
-import { Search } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Search
-      src="/api/posts/search.json"
-      placeholder="Search articles..."
-      itemLabel="articles"
-    />
-  );
+```json
+{
+  "type": "search",
+  "src": "/api/posts/search.json",
+  "placeholder": "Search articles...",
+  "itemLabel": "articles",
+  "maxSuggestions": 5,
+  "debounceMs": 150,
+  "interactive": true
 }
 ```
 
-## Search Index Format
+## 2. In-Place Element Grid Filtering
 
-`src` points to a static JSON document shaped like `SearchIndexDocument` (`app/utils/search.ts`):
-
-```ts
-interface SearchIndexEntry {
-  /** Stable id (e.g. post slug) — matched against DOM filter attributes */
-  key: string;
-  /** Navigation target when the entry is picked from autocomplete */
-  href: string;
-  title: string;
-  description?: string;
-  tags?: string[];
-  /** Precomputed lowercase text blob the query tokens are matched against */
-  haystack: string;
-}
-
-interface SearchIndexDocument {
-  generated: string;
-  entries: SearchIndexEntry[];
-}
-```
-
-`buildHaystack()` and `tokenize()` / `filterEntries()` in the same module are shared by the SSG index builder, the no-JS `?q=` server fallback, and the client island, so all three agree on what counts as a match. `/api/posts/search.json` and `/api/docs/search.json` are the two indices already generated in this project — point `src` at either, or build your own the same way.
-
-## Filtering results in place
-
-Set `filterAttribute` to also show/hide matching server-rendered elements as the query changes, instead of only offering an autocomplete dropdown. This is how the blog index page (`app/routes/blog/index.tsx`) pairs the search box with its already-rendered post cards:
-
-```tsx
-<Search
-  src="/api/posts/search.json"
-  action="/blog"
-  initialQuery={searchQuery}
-  placeholder="Search articles..."
-  itemLabel="articles"
-  total={blogPosts.length}
-  filterAttribute="data-post-slug"
-  emptyStateId="blog-search-empty"
-/>
-
-{blogPosts.map((post) => (
-  <article data-post-slug={post.slug}>...</article>
-))}
-
-<div id="blog-search-empty" hidden>
-  No articles match your search.
-</div>
-```
-
-Each element carrying `data-post-slug` is hidden unless its value matches an entry `key` in the current results; the element whose `id` matches `emptyStateId` is revealed once matches drop to zero. `total` seeds the result count shown before the index has finished loading.
-
-## No-JS fallback
-
-When `action` is set, both the static and hydrated variants render a `<form method="get">` around the input, named `q`. Without client JS this posts `?q=` straight to `action`; a route reading that query param (e.g. via `filterEntries()` server-side) answers the same request the island would otherwise have handled — the blog page's `/blog?q=...` reads work whether or not JS ran.
-
-## Keyboard Interaction
-
-| Key | Behavior |
-| --- | --- |
-| `ArrowDown` | Open the dropdown, or move the highlight to the next suggestion (wraps). |
-| `ArrowUp` | Move the highlight to the previous suggestion (wraps). |
-| `Enter` | Navigate to the highlighted suggestion's `href`. |
-| `Escape` | Close the dropdown if open; otherwise clear the query. |
-
-## CMS Page Builder
-
-This component is available as a `search` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
+Instead of displaying a navigation dropdown, this configuration hides or reveals existing elements on the page (such as card modules or lists) whose unique attributes (like `data-post-slug`) match the filtered results.
 
 ```json
 {
   "type": "search",
   "src": "/api/posts/search.json",
-  "placeholder": "Search posts...",
-  "itemLabel": "posts",
-  "maxSuggestions": 5,
-  "debounceMs": 150
+  "placeholder": "Filter visual cards...",
+  "itemLabel": "modules",
+  "filterAttribute": "data-post-slug",
+  "emptyStateId": "search-no-results-placeholder",
+  "interactive": true
 }
 ```
 
-# Props
+## 3. Standard No-JS Fallback Form
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `src` | `string` | `/api/posts/search.json` | URL of the SSG-generated JSON search index. |
-| `placeholder` | `string` | `"Search..."` | Placeholder text for the input. |
-| `initialQuery` | `string` | - | Initial query, e.g. seeded from a `?q=` URL param on first render. |
-| `debounceMs` | `number` | `150` | Delay before a keystroke is applied as the active query. |
-| `maxSuggestions` | `number` | `8` | Maximum entries shown in the autocomplete dropdown. |
-| `filterAttribute` | `string` | - | When set, elements carrying this attribute (e.g. `data-post-slug`) are shown/hidden based on whether their value matches an entry `key`. |
-| `emptyStateId` | `string` | - | `id` of an element to reveal when the filtered list has zero matches. |
-| `total` | `number` | - | Result count shown before the index has loaded. |
-| `itemLabel` | `string` | `"results"` | Noun used in the result count, e.g. `"articles"`. |
-| `showCount` | `boolean` | `true` | Show the "Showing X of N" result count row. |
-| `action` | `string` | - | No-JS fallback: submit `?q=` to this path via a plain GET form. |
-| `syncUrl` | `boolean` | `true` | Mirror the active query into the address bar as `?q=`. |
-| `interactive` | `boolean` | - | Overrides the hydration decision (see above). |
+Demonstrates a standard layout configuration wrapping a semantic GET form method that queries a direct URL parameter when Javascript execution is unavailable.
+
+```json
+{
+  "type": "search",
+  "src": "/api/posts/search.json",
+  "action": "/blog",
+  "placeholder": "Search website...",
+  "syncUrl": true,
+  "interactive": true
+}
+```
+
+***
+
+# CMS Configuration Reference
+
+These fields map directly to Sveltia CMS block properties under `public/admin/config.yml` or the Page Builder configurations:
+
+| Property | CMS Field Type | Default | Description / Supported Options |
+| :--- | :--- | :--- | :--- |
+| **Index Source URL** (`src`) | `string` | `"/api/posts/search.json"` | Relative or absolute path pointing to the static compiled JSON search index document. |
+| **Placeholder Text** (`placeholder`) | `string` | `"Search..."` | Ghost helper text rendered inside the input field before typing. |
+| **Initial Query** (`initialQuery`) | `string` | - | Pre-seeded query value (e.g. matching an active `?q=` URL parameter). |
+| **Debounce Delay** (`debounceMs`) | `number` | `150` | Time delay in milliseconds after a keystroke is registered before filtering matches. |
+| **Max Suggestions** (`maxSuggestions`) | `number` | `8` | Maximum number of results displayed inside the autocomplete list. |
+| **Filter Attribute** (`filterAttribute`) | `string` | - | Target DOM attribute (e.g. `data-post-slug`) of page elements to show/hide in-place based on matches. |
+| **Empty State ID** (`emptyStateId`) | `string` | - | DOM ID of the visual "No matches found" placeholder card to reveal when matches drop to zero. |
+| **Noun Label** (`itemLabel`) | `string` | `"results"` | Text used to denote categories in the counts (e.g., `"articles"`, `"resources"`). |
+| **Show Result Count** (`showCount`) | `boolean` | `true` | Renders a small status count ("Showing X of N") below the search input. |
+| **No-JS Action Path** (`action`) | `string` | - | Fallback endpoint path where the GET form is submitted with a standard `?q=` parameter. |
+| **Sync URL** (`syncUrl`) | `boolean` | `true` | Mirrors the active search string directly into the browser address bar as `?q=`. |
+| **Force Interactive** (`interactive`) | `boolean` | `true` | Hydrates the component as an interactive client-side island to fetch indices and filter entries instantly. |
+
+***
+
+# Developer Notes & Accessibility
+
+- **Standard GET Fallback:** When the `action` parameter is specified, the input wraps inside a semantic HTML `<form method="get">` element. If JavaScript fails to hydrate, standard keystroke submission queries are safely posted straight to the fallback action path for robust static compatibility.
+- **Roving Dropdown Keyboard Controls:** Fully supports intuitive accessibility keys:
+  - Arrow keys (`ArrowUp`/`ArrowDown`) roam active focus sequentially through autocomplete dropdown items.
+  - Pressing `Enter` triggers immediate navigation to the highlighted item's target route (`href`).
+  - Pressing `Escape` collapses the dropdown or clears the active search string.
+- **Micro-Payload Client Filtering:** Index documents point to pre-compiled static haystacks matching token structures. By separating content compiling to the build step (SSG), search execution is kept extremely lightweight with no live runtime APIs required.

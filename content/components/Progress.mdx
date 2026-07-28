@@ -1,7 +1,7 @@
 ---
 title: Progress
-hydration: 3
 category: Feedback
+hydration: 3
 ---
 
 import { Progress } from "../../app/components/ui";
@@ -9,79 +9,105 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-A component that shows the completion progress of an operation as a linear bar or circular indicator.
+A visual status component that communicates the completion progress of an operation. It displays real-time status values through either a standard linear bar tracker or a modern circular dial indicator. Primarily used to guide users during multi-step wizards, content uploading, file processing, or system installation routines.
+
+The **Progress** component is fully integrated as a `progress` block in the **Page Builder**, allowing content authors and developers to easily configure visual ranges, themes, sizes, labels, and indicator layouts directly within the CMS.
+
+***
 
 # Usage
 
-## Linear Progress
+These examples illustrate how content editors bind and structure interactive progress indicators.
+
+## 1. Standard Linear Progress Bar with Status Label
+
+A classic linear bar indicator showing download or processing progress with active label details and formatted percent texts.
 
 <DemoPreview>
-  <div style={{ width: "100%", maxWidth: "320px" }}>
-    <Progress value={72} showValueText />
+  <div style={{ width: "100%", maxWidth: "360px" }}>
+    <Progress label="System Backup" value={72} showValueText />
   </div>
 </DemoPreview>
-
-```tsx
-import { Progress } from "../components/ui";
-
-export default function MyPage() {
-  return <Progress value={72} showValueText />;
-}
-```
-
-## Circular Progress
-
-<DemoPreview>
-  <Progress type="circular" value={40} showValueText />
-</DemoPreview>
-
-```tsx
-import { Progress } from "../components/ui";
-
-export default function MyPage() {
-  return <Progress type="circular" value={40} showValueText />;
-}
-```
-
-## CMS Page Builder
-
-This component is available as a `progress` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
 
 ```json
 {
   "type": "progress",
+  "label": "System Backup",
   "value": 72,
+  "showValueText": true,
+  "type": "linear",
+  "size": "md"
+}
+```
+
+## 2. Compact Circular Progress Meter
+
+Renders the visual completion metric as a compact circular dial. Useful for statistics overview charts, mini dashboard widgets, or isolated grid items.
+
+<DemoPreview>
+  <Progress type="circular" value={40} showValueText label="Storage Used" />
+</DemoPreview>
+
+```json
+{
+  "type": "progress",
+  "label": "Storage Used",
+  "type": "circular",
+  "value": 40,
   "showValueText": true
 }
 ```
 
+## 3. Accented Striped Progress with Custom Color (Success Green)
+
+Demonstrates how to apply a dedicated color theme palette, striped visual pattern, and large visual layout scale to a progress operations bar.
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "360px" }}>
+    <Progress
+      label="Uploading media files"
+      colorPalette="green"
+      striped
+      value={85}
+      size="lg"
+      showValueText
+    />
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "progress",
+  "label": "Uploading media files",
+  "value": 85,
+  "showValueText": true,
+  "striped": true,
+  "colorPalette": "green",
+  "size": "lg"
+}
+```
+
+***
+
 # Props
 
-## Progress
+| Property | CMS Field Type | Default | Description / Supported Options |
+| --- | --- | --- | --- |
+| **Progress Label** (`label`) | `string` | - | Optional descriptive heading positioned above the indicator track. |
+| **Current Value** (`value`) | `number` | `0` | Numeric completion value. Set to `null` to render an indeterminate/loading state. |
+| **Minimum Value** (`min`) | `number` | `0` | Lower bounds of the progress scale. |
+| **Maximum Value** (`max`) | `number` | `100` | Upper bounds of the progress scale. |
+| **Display Percent** (`showValueText`) | `boolean` | `false` | When checked, displays the exact numerical percentage text alongside the tracker. |
+| **Indicator Type** (`type`) | `select` | `"linear"` | Visual design format of the progress layout. <br/>• Options: `"linear"`, `"circular"`. |
+| **Visual Variant** (`variant`) | `select` | `"solid"` | Visual styling of the track and fill range. <br/>• Options: `"solid"`, `"subtle"`. |
+| **Border Shape** (`shape`) | `select` | `"full"` | Corner rounding applied to linear tracks. <br/>• Options: `"square"`, `"rounded"`, `"full"`. |
+| **Striped Track** (`striped`) | `boolean` | `false` | Renders a visually striped diagonal pattern on linear bars. |
+| **Color Theme** (`colorPalette`) | `select` | `"blue"` | Theme palette applied to the track progress fill. <br/>• Options: `blue`, `green`, `red`, `purple`, `orange`, `amber`, `cyan`, `slate`. |
+| **Size Scale** (`size`) | `select` | `"md"` | Controls the vertical height or circular radius scale. <br/>• Options: `"xs"`, `"sm"`, `"md"`, `"lg"`, `"xl"`. |
 
-| Prop | Type | Description |
-| --- | --- | --- |
+***
 
-| `value` | \`number \ | null\` | The current value. |
+# Developer Notes & Accessibility
 
-| `min` | `number` | The minimum value. Default: `0`. |
-| `max` | `number` | The maximum value. Default: `100`. |
-| `label` | `Child` | Label to display above the indicator. |
-| `showValueText` | `boolean` | Whether to show the value text. Default: `false`. |
-| `valueText` | `Child` | Custom value text to display. |
-
-| `type` | \`"linear" \ | "circular"\` | The visual style of the progress. Default: `"linear"`. |
-| `variant` | \`"solid" \ | "subtle"\` | The visual variant. |
-
-| `shape` | \`"square" \ | "rounded" \ | "full"\` | The shape of the indicator. |
-
-| `striped` | `boolean` | Whether to show a striped fill (linear). |
-| `animated` | `boolean` | Whether the fill animates. |
-
-| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg" \ | "xl"\` | The size of the indicator. |
-
-| `class` | `string` | Custom CSS classes for the root element. |
-
-# Sub-components
-
-`Progress.Root`, `Progress.Track`, `Progress.Range`, `Progress.Circle`, `Progress.CircleTrack`, `Progress.CircleRange`, `Progress.Label`, `Progress.ValueText`, `Progress.View`
+- **Hydration Free (Static-Only):** The Progress component operates purely through layout bindings and standard CSS animations, designating it as a Static-Only component (`Tier 3`) with zero client-side JavaScript bundle footprint.
+- **WAI-ARIA Compliance:** Under the hood, this component compiles to standard semantic progress wrappers (`role="progressbar"`, `aria-valuenow`, `aria-valuemin`, `aria-valuemax`). If the value prop is unset or null, it automatically switches to an indeterminate loading state.

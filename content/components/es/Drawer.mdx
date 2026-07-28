@@ -1,7 +1,7 @@
 ---
 title: Drawer Panel Lateral
-hydration: 1
 category: Overlays
+hydration: 1
 ---
 
 import { Drawer, Button } from "../../../app/components/ui";
@@ -9,72 +9,108 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introducción
 
-Un panel que se desliza desde el borde de la pantalla para presentar contenido o acciones sin abandonar la página actual.
+Un panel superpuesto que se desliza desde el borde de la pantalla, alojando contenido temporal, formularios, configuraciones o flujos de varios pasos. Este componente permite a los usuarios realizar tareas, ajustar preferencias o revisar información detallada sin perder el contexto de sus vistas de página principales.
+
+El componente **Drawer** está totalmente integrado como un bloque `drawer` en el **Page Builder**, lo que permite a los autores de contenido y desarrolladores configurar fácilmente botones de activación, encabezados descriptivos y pies de página de acción personalizados directamente dentro del CMS.
+
+***
 
 # Uso
 
-## Cajón básico
+Estos ejemplos ilustran cómo los editores de contenido enlazan y estructuran los componentes drawer.
+
+## 1. Cajón de Configuración de Ajustes Estándar
+
+Un panel de configuración estándar que incluye un título, una descripción y activadores de botones primarios/secundarios.
 
 <DemoPreview>
   <Drawer
-    trigger={<Button>Open Drawer</Button>}
-    title="Settings"
-    description="Adjust your preferences."
-    body="Drawer body content goes here."
-    cancel={<Button variant="outline">Close</Button>}
-    confirm={<Button>Save</Button>}
+    trigger={<Button>Open Settings</Button>}
+    title="Workspace Preferences"
+    description="Customize your development workspace configurations."
+    body="Configure default themes, enable telemetry, toggle system status reports, and authorize third-party API hook integrations for your active workspace."
+    cancel={<Button variant="outline">Cancel</Button>}
+    confirm={<Button>Apply Changes</Button>}
   />
 </DemoPreview>
-
-```tsx
-import { Drawer, Button } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Drawer
-      trigger={<Button>Open Drawer</Button>}
-      title="Settings"
-      description="Adjust your preferences."
-      body="Drawer body content goes here."
-      cancel={<Button variant="outline">Close</Button>}
-      confirm={<Button>Save</Button>}
-    />
-  );
-}
-```
-
-## Constructor de páginas CMS
-
-Este componente está disponible como un bloque `drawer` en el [Constructor de páginas](/docs/PageBuilder) (`content/pages/*.json`). `trigger` es una lista de bloques anidada (el CMS siempre envía un array):
 
 ```json
 {
   "type": "drawer",
-  "title": "Settings",
-  "description": "Adjust your preferences.",
-  "confirmText": "Save",
-  "cancelText": "Close",
-  "trigger": [{ "type": "button", "text": "Open Drawer" }]
+  "title": "Workspace Preferences",
+  "description": "Customize your development workspace configurations.",
+  "confirmText": "Apply Changes",
+  "cancelText": "Cancel",
+  "trigger": [
+    {
+      "type": "button",
+      "text": "Open Settings",
+      "variant": "outline"
+    }
+  ]
 }
 ```
 
-# Propiedades
+## 2. Cajón de Revisión de Información con Pie de Página Personalizado
 
-## Drawer
+Presenta una composición de diseño alternativa donde se proporciona una lista de botones de acción personalizados dentro del array de pie de página junto con los controles estándar.
 
-| Prop | Tipo | Descripción |
-| --- | --- | --- |
-| `trigger` | `JSX.Element` | Elemento que abre el cajón al activarse. |
+<DemoPreview>
+  <Drawer
+    trigger={<Button>Review System Specs</Button>}
+    title="System Diagnostics"
+    description="Real-time node and performance overview."
+    body="All background microservices are reporting healthy statuses. Memory allocation is stable at 42%, and static page routing delivery latency is currently averaging 12ms."
+    cancel={<Button variant="outline">Dismiss</Button>}
+    footer={[
+      <Button variant="subtle" colorPalette="blue" style={{ marginRight: "8px" }}>Refresh Node</Button>
+    ]}
+  />
+</DemoPreview>
 
-| `title` | \`string \ | JSX.Element\` | El título del cajón. |
-| `description` | \`string \ | JSX.Element\` | La descripción del cajón. |
-| `body` | \`string \ | JSX.Element\` | El contenido principal. |
-| `footer` | \`string \ | JSX.Element\` | Contenido personalizado del pie. |
+```json
+{
+  "type": "drawer",
+  "title": "System Diagnostics",
+  "description": "Real-time node and performance overview.",
+  "cancelText": "Dismiss",
+  "trigger": [
+    {
+      "type": "button",
+      "text": "Review System Specs"
+    }
+  ],
+  "footer": [
+    {
+      "type": "button",
+      "text": "Refresh Node",
+      "variant": "subtle",
+      "colorPalette": "blue"
+    }
+  ]
+}
+```
 
-| `cancel` | `JSX.Element` | Elemento renderizado como disparador de cierre (cancelar). |
-| `confirm` | `JSX.Element` | Elemento renderizado como disparador de acción. |
-| `closable` | `boolean` | Si se muestra el botón de cierre. Por defecto: `true`. |
-| `interactive` | `boolean` | Habilita la hidratación del lado del cliente para comportamiento interactivo. |
-| `class` | `string` | Clases CSS personalizadas para el elemento raíz. |
+***
 
-Los props adicionales (por ejemplo, `open`, `defaultOpen`, `onOpenChange`, `id`) se reenvían al primitive de cajón subyacente.
+# Props
+
+| Propiedad | Tipo de Campo CMS | Predeterminado | Descripción / Opciones Compatibles |
+| --- | --- | --- | --- |
+| **Título del Drawer** (`title`) | `string` | - | Encabezado principal mostrado prominentemente en la parte superior del panel del drawer deslizante. |
+| **Descripción** (`description`) | `string` | - | Mensaje de subtítulo de soporte anidado debajo del título. |
+| **Contenido del Cuerpo** (`body`) | `string` | - | Contenido de texto principal mostrado dentro del contenedor de desplazamiento del drawer. |
+| **Bloques Desencadenantes** (`trigger`) | `list` | - | Matriz de componentes (típicamente un solo Botón) renderizados en la página para abrir el drawer. |
+| **Texto de Confirmación** (`confirmText`) | `string` | - | Etiqueta personalizada para el botón de acción principal. Omitir para ocultar el control de confirmación. |
+| **Texto de Cancelación** (`cancelText`) | `string` | - | Etiqueta personalizada para el botón secundario de descartar. Omitir para ocultar el control de cancelación. |
+| **Bloques de Pie de Página** (`footer`) | `list` | - | Lista de bloques de botones auxiliares renderizados junto a las acciones estándar de confirmar/cancelar. |
+| **Mostrar Botón de Cerrar** (`closable`) | `boolean` | `true` | Cuando está habilitado, renderiza un icono visual estándar de cierre "X" en la esquina superior. |
+| **Forzar Interactivo** (`interactive`) | `boolean` | `true` | Hidrata instantáneamente la superposición del drawer, las capas de transición y la captura de foco como una isla del lado del cliente. |
+
+***
+
+# Notas para Desarrolladores y Accesibilidad
+
+- **Isla de Hidratación:** Debido a que el panel deslizante depende de transformaciones de estado del lado del cliente, descartes de superposición de fondo, trampas de foco de teclado e interacciones táctiles, se hidrata como una isla de cliente interactiva por defecto (`"interactive": true`).
+- **Cumplimiento WAI-ARIA:** En su interior, este componente cumple con las especificaciones de superposición (`role="dialog"`, `aria-modal="true"`, `aria-labelledby`, `aria-describedby`). Abrir el drawer atrapa automáticamente el foco del teclado dentro del panel. Presionar la tecla `Escape` o hacer clic en la capa de fondo oscurecida descarta el drawer de forma segura, devolviendo el foco al elemento desencadenante.
+- **Composición de Isla Unificada:** Para prevenir discrepancias de hidratación y errores de colisión de superposición dentro de marcos de cliente complejos, los elementos anidados (incluidos los activadores de confirmación, los escudos de cierre y los spinner de carga) se agrupan dentro de un único entorno de isla unificado.

@@ -4,71 +4,134 @@ hydration: 1
 category: Overlays
 ---
 
-import { HoverCard } from "../../../app/components/ui";
+import { HoverCard, Button, Avatar } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
 # 简介
 
-一种在用户悬停于触发器上时出现的浮层，适用于显示补充信息。
+一个浮动的、非模态的弹出容器，在用户悬停或聚焦到附加的触发元素时显示。它提供轻量级的上下文信息、富预览内容或快速操作，而无需离开当前页面。
 
-# 用法
+**HoverCard** 组件已作为 `hovercard` 区块完全集成到 **Page Builder** 中，使内容作者和开发者能够直接在 CMS 中轻松将触发元素（如按钮或文本片段）绑定到详细预览区块。
 
-## 基础 HoverCard
+***
+
+# 通过 CMS 页面构建器使用（JSON）
+
+以下示例展示了内容编辑者如何在 JSON 页面模式（`content/pages/*.json`）中绑定和构建悬浮卡片预览区块。
+
+## 1. 标准资料预览
+
+将一个按钮触发器包裹在一个浮动的卡片中，显示快速的用户快照，包括头像、姓名和角色。
 
 <DemoPreview>
   <HoverCard
-    trigger={<a href="#">Hover me</a>}
-    title="Supplementary information"
-    description="Shown on hover, positioned automatically."
-    showArrow
+    trigger={<Button variant="outline">About the Author</Button>}
+    content={
+      <>
+        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+          <Avatar name="J. Chen" />
+          <div>
+            <strong>Jules Chen</strong>
+            <p style={{ margin: 0, fontSize: "0.85rem", opacity: 0.7 }}>Lead Architect</p>
+          </div>
+        </div>
+      </>
+    }
   />
 </DemoPreview>
 
-```tsx
-import { HoverCard } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <HoverCard.Root>
-      <HoverCard.Trigger>
-        <a href="#">Hover me</a>
-      </HoverCard.Trigger>
-      <HoverCard.Positioner>
-        <HoverCard.Content>
-          Supplementary information shown on hover.
-        </HoverCard.Content>
-      </HoverCard.Positioner>
-    </HoverCard.Root>
-  );
+```json
+{
+  "type": "hovercard",
+  "openDelay": 200,
+  "closeDelay": 150,
+  "positioning": "bottom",
+  "trigger": [
+    {
+      "type": "button",
+      "text": "About the Author",
+      "variant": "outline"
+    }
+  ],
+  "content": [
+    {
+      "type": "avatar",
+      "name": "J. Chen"
+    },
+    {
+      "type": "heading",
+      "level": 4,
+      "text": "Jules Chen"
+    },
+    {
+      "type": "text",
+      "text": "Lead Architect"
+    }
+  ]
 }
 ```
 
-## CMS 页面构建器
+## 2. 富链接上下文
 
-该组件在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中作为 `hoverCard` 区块提供：
+使用自定义子 JSX 将 HoverCard 附加到内联文本上。展示了如何注入自定义标题文本和描述。
+
+<DemoPreview>
+  <HoverCard
+    trigger={<span style={{ borderBottom: "1px dotted", cursor: "help" }}>Hono framework</span>}
+    content={
+      <>
+        <strong>Hono</strong>
+        <p style={{ margin: "0.5rem 0 0", fontSize: "0.85rem", opacity: 0.8 }}>Ultrafast web framework for the Edge.</p>
+      </>
+    }
+  />
+</DemoPreview>
 
 ```json
 {
-  "type": "hoverCard",
-  "triggerText": "Hover me",
-  "showArrow": true,
-  "title": "Supplementary information",
-  "description": "Shown on hover."
+  "type": "hovercard",
+  "openDelay": 300,
+  "closeDelay": 100,
+  "positioning": "top",
+  "trigger": [
+    {
+      "type": "text",
+      "text": "Hono framework"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 4,
+      "text": "Hono"
+    },
+    {
+      "type": "text",
+      "text": "Ultrafast web framework for the Edge."
+    }
+  ]
 }
 ```
 
-# 属性
+***
 
-## HoverCard
+# CMS 配置参考
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `interactive` | `boolean` | 启用客户端水合。默认：`true`。 |
-| `open` | `boolean` | 受控的展开状态。 |
-| `openDelay` | `number` | 悬停后打开前的延迟（毫秒）。 |
-| `closeDelay` | `number` | 离开后关闭前的延迟（毫秒）。 |
-| `class` | `string` | 根元素的自定义 CSS 类名。 |
+这些字段直接映射到 `public/admin/config.yml` 下的 Sveltia CMS 区块属性，或 Page Builder 配置：
 
-# 子组件
+| 属性 | CMS 字段类型 | 默认值 | 描述 / 支持选项 |
+| :--- | :--- | :--- | :--- |
+| **触发元素** (`trigger`) | `list` | - | 在页面上渲染的区块条目（如按钮或文本），在悬停或聚焦时激活浮动卡片。 |
+| **悬浮内容** (`content`) | `list` | - | 在浮动预览卡片主体内渲染的区块条目（如头像、文本或标题）。 |
+| **打开延迟** (`openDelay`) | `number` | `200` | 悬停后系统渲染弹出层的等待时间（毫秒）。 |
+| **关闭延迟** (`closeDelay`) | `number` | `150` | 鼠标离开后系统关闭弹出层的等待时间（毫秒）。 |
+| **定位策略** (`positioning`) | `select` | `"bottom"` | 卡片所依附的触发元素的首选边缘。<br/>• 选项：`"top"`、`"bottom"`、`"left"`、`"right"`。 |
+| **交互内容** (`interactive`) | `boolean` | `false` | 为 true 时，将卡片水合为客户端孤岛，使内部链接和按钮可点击。 |
 
-`HoverCard.Root`、`HoverCard.Trigger`、`HoverCard.Positioner`、`HoverCard.Content`、`HoverCard.Arrow`、`HoverCard.ArrowTip`
+***
+
+# 开发者说明与无障碍
+
+- **智能延迟水合：** 默认情况下，触发器和卡片以静态 HTML 渲染。仅当提供 `"interactive": true` 时，HoverCard 才会以水合为客户端孤岛的形式运行，从而使内部可点击链接生效。
+- **WAI-ARIA 合规：** 在底层，组件使用标准的 `aria-describedby` 连接并正确管理焦点环。当按下 Esc 键或焦点离开触发器边界时，浮动卡片会正确关闭。
+- **优雅的焦点回退：** 由于悬停事件对键盘和屏幕阅读器用户不可访问，卡片也会在键盘聚焦（Tab）时激活，从而确保非鼠标交互的等价体验。

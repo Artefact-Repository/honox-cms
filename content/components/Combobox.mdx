@@ -1,7 +1,7 @@
 ---
 title: Combobox
-hydration: 2
 category: Forms
+hydration: 2
 ---
 
 import { Combobox } from "../../app/components/ui";
@@ -11,13 +11,11 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 An autocomplete input control that combines a text box with a dropdown listbox, allowing users to filter and select options from a list. Primarily used for long option feeds, platform filters, tags, and category selection.
 
-The **Combobox** component is fully integrated as an interactive `combobox` block in the **Page Builder**, allowing content authors and developers to easily configure input labels, placeholders, pre-defined item lists, and interaction settings directly within the CMS.
-
 ***
 
-# Usage via CMS Page Builder (JSON)
+# Usage
 
-These examples illustrate how content editors bind and structure interactive combobox components inside the JSON page schemas (`content/pages/*.json`).
+These examples illustrate how content editors bind and structure interactive combobox components.
 
 ## 1. Standard Technology Filter (Interactive Select)
 
@@ -117,12 +115,10 @@ Demonstrates a temporarily locked autocomplete field. This preserves current lab
 
 ***
 
-# CMS Configuration Reference
-
-These fields map directly to Sveltia CMS block properties under `public/admin/config.yml` or the Page Builder configurations:
+# Props
 
 | Property | CMS Field Type | Default | Description / Supported Options |
-| :--- | :--- | :--- | :--- |
+| --- | --- | --- | --- |
 | **Label Text** (`label`) | `string` | - | Companion visual text positioned above the autocomplete search box. |
 | **Placeholder** (`placeholder`) | `string` | - | Shown inside the input box when no item is selected. |
 | **Clear Button** (`allowClear`) | `boolean` | `false` | When true, renders an end-aligned clear button inside the text input to easily reset selection. |
@@ -132,7 +128,7 @@ These fields map directly to Sveltia CMS block properties under `public/admin/co
 ### List Item Properties (`items`)
 
 | Sub-Property | Type | Required | Description |
-| :--- | :--- | :--- | :--- |
+| --- | --- | --- | --- |
 | **Label** (`label`) | `string` | Yes | Display name rendered in the list popup options. |
 | **Value** (`value`) | `string` | Yes | Unique string identifier captured behind-the-scenes on option selection. |
 | **Disabled Option** (`disabled`) | `boolean` | No | Dim/lock a single selection choice within the dropdown feed. |

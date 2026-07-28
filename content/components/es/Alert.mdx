@@ -1,7 +1,7 @@
 ---
 title: Alert Alerta
-hydration: 3
 category: Feedback
+hydration: 3
 ---
 
 import { Alert, AlertIcon } from "../../../app/components/ui";
@@ -9,59 +9,111 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introducción
 
-Muestra un mensaje breve e importante de una manera que atrae la atención del usuario sin interrumpir sus tareas.
+Muestra mensajes breves, importantes y muy visibles para mantener a los usuarios informados sobre eventos del sistema, estados de éxito, advertencias o errores sin interrumpir los flujos de trabajo activos ni requerir bloques de diseño inmediatos.
 
-# Uso
+El componente **Alert** está totalmente integrado como un bloque `alert` en el **Page Builder**, lo que permite a los editores de contenido y administradores configurar rápidamente diseños, mensajes, indicadores de iconos y niveles de severidad directamente dentro de las plantillas de página de Sveltia CMS.
+
+***
+
+# Uso a través del Page Builder de CMS (JSON)
+
+Estas configuraciones representan exactamente cómo se construyen los elementos de bloque del page builder dentro de las colecciones de esquema de página (`content/pages/*.json`).
+
+## 1. Mensaje de éxito (variante Subtle)
+
+Se usa para notificar a los usuarios sobre eventos positivos, finalizaciones o formularios procesados correctamente (p. ej., "Cuenta creada", "Cambios guardados").
 
 <DemoPreview>
-  <Alert
-    status="success"
-    title="Success"
-    description="Your changes have been saved."
-    indicator={<AlertIcon />}
-  />
-</DemoPreview>
-
-```tsx
-import { Alert, AlertIcon } from "../components/ui";
-
-export default function MyPage() {
-  return (
+  <div style={{ width: "100%", maxWidth: "600px" }}>
     <Alert
       status="success"
-      title="Success"
-      description="Your changes have been saved."
+      title="Changes Saved"
+      description="Your profile changes and document uploads have been successfully processed."
       indicator={<AlertIcon />}
     />
-  );
-}
-```
-
-## Constructor de Páginas CMS
-
-Este componente está disponible como un bloque `alert` en el [Constructor de Páginas](/docs/PageBuilder) (`content/pages/*.json`):
+  </div>
+</DemoPreview>
 
 ```json
 {
   "type": "alert",
   "status": "success",
-  "title": "Success",
-  "description": "Your changes have been saved.",
-  "variant": "subtle"
+  "variant": "subtle",
+  "title": "Changes Saved",
+  "description": "Your profile changes and document uploads have been successfully processed."
 }
 ```
 
-# Propiedades
+## 2. Aviso de advertencia dinámico (variante Solid)
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `title` | `string` | El título de la alerta. |
-| `description` | `string` | La descripción de la alerta. |
-| `indicator` | `Child` | Un icono o elemento que se renderiza como indicador. |
-| `children` | `Child` | Contenido adicional que se renderiza dentro del componente. |
-| `class` | `string` | Clases CSS personalizadas. |
+Llama la atención sobre problemas potenciales o acciones que requieren precaución (p. ej., "Plan por caducar pronto", "Mantenimiento del sistema programado").
 
-| `status` | \`"info" \ | "success" \ | "warning" \ | "error" \ | "neutral"\` | La paleta de color de estado de la alerta. |
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "600px" }}>
+    <Alert
+      status="warning"
+      variant="solid"
+      title="Approaching Storage Limit"
+      description="Your workspace has used 85% of allocated file capacity. Upgrade plan to avoid system freezes."
+      indicator={<AlertIcon />}
+    />
+  </div>
+</DemoPreview>
 
-| `variant` | \`"subtle" \ | "solid" \ | "outline"\` | El estilo visual de la alerta. |
-| `aria-live` | \`"polite" \ | "assertive" \ | "off"\` | La configuración aria-live de la alerta. Por defecto "polite". |
+```json
+{
+  "type": "alert",
+  "status": "warning",
+  "variant": "solid",
+  "title": "Approaching Storage Limit",
+  "description": "Your workspace has used 85% of allocated file capacity. Upgrade plan to avoid system freezes."
+}
+```
+
+## 3. Error / fallo de alta prioridad (variante Outline)
+
+Informa al usuario sobre fallos críticos, credenciales caducadas o errores de transacción que bloquean el progreso.
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "600px" }}>
+    <Alert
+      status="error"
+      variant="outline"
+      title="Connection Terminated"
+      description="The analytics engine timed out while pulling data. Check database credentials and try again."
+      indicator={<AlertIcon />}
+    />
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "alert",
+  "status": "error",
+  "variant": "outline",
+  "title": "Connection Terminated",
+  "description": "The analytics engine timed out while pulling data. Check database credentials and try again."
+}
+```
+
+***
+
+# Referencia de configuración de CMS
+
+Estas propiedades se pueden mapear directamente a los campos de widget de Sveltia CMS en `public/admin/config.yml`:
+
+| Propiedad | Tipo de campo CMS | Predeterminado | Descripción / Opciones admitidas |
+| :--- | :--- | :--- | :--- |
+| **Título** (`title`) | `string` | - | Texto de encabezado en negrita mostrado en la línea superior del bloque de alerta. |
+| **Descripción** (`description`) | `string` | - | Mensaje detallado del cuerpo que contiene contexto complementario o instrucciones de acción. |
+| **Estado de severidad** (`status`) | `select` | `"info"` | Define el color semántico del diseño y el icono indicador predeterminado. <br/>• Opciones: `"success"`, `"warning"`, `"error"`, `"info"`, `"neutral"`. |
+| **Variante visual** (`variant`) | `select` | `"subtle"` | Controla los bordes del diseño y la densidad del fondo del contenedor. <br/>• `"subtle"` — Color de fondo translúcido claro (ideal para contenido genérico). <br/>• `"solid"` — Fondo denso, opaco y muy saturado. <br/>• `"outline"` — Fondo transparente junto con un borde fino y del mismo color. |
+| **Configuración Aria Live** (`aria-live`) | `select` | `"polite"` | Modo de prioridad de anuncio del lector de pantalla. <br/>• `"polite"` — Anuncia el mensaje cuando el usuario queda inactivo. <br/>• `"assertive"` — Interrumpe inmediatamente la actividad del lector de pantalla (úsalo con moderación para errores). |
+
+***
+
+# Notas para desarrolladores y accesibilidad
+
+- **Iconos renderizados en el servidor:** Para evitar advertencias de discrepancia de hidratación y optimizar la entrega de recursos, el icono semántico `AlertIcon` se compila dinámicamente en un SVG en línea y muy optimizado según la prop `status` elegida.
+- **Accesibilidad WAI-ARIA:** Las alertas incluyen automáticamente el atributo `role="alert"` al montarse para notificar a las tecnologías de asistencia. El parámetro `aria-live` predeterminado se establece en `"polite"` para no interrumpir bruscamente las tareas del usuario.
+- **Integración con el flujo de diseño:** Diseñado como contenedores de diseño a nivel de bloque. Si se anida dentro de directorios de cuadrícula flexibles, el contenedor de alerta se expandirá horizontalmente de forma automática para encajar suavemente con los límites de columna existentes.

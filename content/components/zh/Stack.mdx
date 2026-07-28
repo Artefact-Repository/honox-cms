@@ -1,39 +1,35 @@
 ---
 title: Stack 堆栈
-hydration: 3
 category: Layout
+hydration: 3
 ---
 
-import { Stack } from "../../../app/components/ui";
+import { Stack, Button } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-一种可用于创建垂直或水平元素堆叠的布局原语。
+# 简介
 
-## 用法
+`Stack` 组件是一个高性能的布局容器，用于在线性流（纵向或横向）中对相关组件进行分组与排列。它基于 CSS Flexbox 构建，可精确控制对齐方式、主轴分布、间距以及响应式换行。
+
+**Stack** 已作为 `stack` 区块完全集成到**页面构建器（Page Builder）**中，使内容作者与开发者能够直接在 CMS 内轻松组织可视化区块、导航菜单与表单结构。
+
+***
+
+# 用法
+
+以下示例展示了内容编辑者如何绑定并组织线性布局。
+
+## 1. 水平布局堆栈
+
+沿水平 X 轴以自定义间距依次排列子元素。非常适合水平导航项、头像或标签徽章。
 
 <DemoPreview>
   <Stack direction="row" gap="4">
-    <div style={{ padding: "0.75rem 1rem", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Item 1</div>
-    <div style={{ padding: "0.75rem 1rem", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Item 2</div>
-    <div style={{ padding: "0.75rem 1rem", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Item 3</div>
+    <div style={{ padding: "0.75rem 1rem", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Item A</div>
+    <div style={{ padding: "0.75rem 1rem", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Item B</div>
+    <div style={{ padding: "0.75rem 1rem", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Item C</div>
   </Stack>
 </DemoPreview>
-
-```tsx
-import { Stack } from '../components/ui/stack'
-
-export const Example = () => (
-  <Stack direction="row" gap="4">
-    <div>Item 1</div>
-    <div>Item 2</div>
-    <div>Item 3</div>
-  </Stack>
-)
-```
-
-### CMS 页面构建器
-
-该组件可作为 `stack` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用：
 
 ```json
 {
@@ -41,27 +37,69 @@ export const Example = () => (
   "direction": "horizontal",
   "gap": "4",
   "children": [
-    { "type": "text", "content": "Item 1" },
-    { "type": "text", "content": "Item 2" }
+    { "type": "badge", "text": "Item A", "colorPalette": "blue" },
+    { "type": "badge", "text": "Item B", "colorPalette": "blue" },
+    { "type": "badge", "text": "Item C", "colorPalette": "blue" }
   ]
 }
 ```
 
-## 属性
+## 2. 垂直流式堆栈
 
-| 属性 | 类型 | 默认 | 说明 |
-| --- | --- | --- | --- |
-| `direction` | `flex-direction` | `column` | 堆叠的 flex 方向。 |
-| `gap` | `spacing` | `8px` | 堆叠中元素之间的间距。 |
-| `align` | `align-items` | - | 堆叠中元素的对齐方式。 |
-| `justify` | `justify-content` | - | 堆叠中元素的对齐分布。 |
+沿垂直 Y 轴依次排列子元素。适用于标准设置偏好、落地页重点展示或卡片目录。
 
-## 响应式
+<DemoPreview>
+  <Stack direction="column" gap="3" style={{ width: "100%", maxWidth: "320px" }}>
+    <div style={{ padding: "0.75rem 1rem", background: "var(--colors-purple-3)", borderRadius: "8px" }}>Priority Option 1</div>
+    <div style={{ padding: "0.75rem 1rem", background: "var(--colors-purple-3)", borderRadius: "8px" }}>Priority Option 2</div>
+  </Stack>
+</DemoPreview>
 
-`Stack` 组件的所有属性都支持响应式值。
-
-```tsx
-<Stack direction={{ base: 'column', md: 'row' }} gap={{ base: '4', md: '8' }}>
-  {/* Elements will be stacked vertically on mobile and horizontally on desktop */}
-</Stack>
+```json
+{
+  "type": "stack",
+  "direction": "vertical",
+  "gap": "3",
+  "children": [
+    { "type": "text", "content": "Priority Option 1" },
+    { "type": "text", "content": "Priority Option 2" }
+  ]
+}
 ```
+
+## 3. 响应式列到行切换
+
+将布局配置为在较小屏幕尺寸上纵向堆叠子元素，并在平板/桌面端自动横向排列。
+
+```json
+{
+  "type": "stack",
+  "direction": "{\"base\": \"column\", \"md\": \"row\"}",
+  "gap": "{\"base\": \"4\", \"md\": \"8\"}",
+  "children": [
+    { "type": "button", "text": "Call to Action 1" },
+    { "type": "button", "text": "Call to Action 2", "variant": "outline" }
+  ]
+}
+```
+
+***
+
+# 属性
+
+| 属性 | CMS 字段类型 | 默认值 | 描述 / 支持选项 |
+| --- | --- | --- | --- |
+| **堆叠方向** (`direction`) | `select` \ | `string` | `"vertical"` | flex 布局方向。可接受字符串化的 JSON 以进行响应式配置（例如 `'{"base": "column", "md": "row"}'`）。<br/>• 选项：`"vertical"`、`"horizontal"`。 |
+| **间距** (`gap`) | `string` | `"8px"` | 堆栈内部子元素之间的外边距间距。 |
+| **对齐元素** (`align`) | `select` | - | 元素沿交叉轴（Flexbox `align-items`）的视觉对齐。<br/>• 选项：`"start"`、`"center"`、`"end"`、`"stretch"`。 |
+| **主轴分布** (`justify`) | `select` | - | 主轴上空白空间的分配（Flexbox `justify-content`）。<br/>• 选项：`"start"`、`"center"`、`"end"`、`"between"`、`"around"`。 |
+| **子内容** (`children`) | `list` | - | 在容器内部堆叠的嵌套布局或视觉区块集合。 |
+| **自定义类** (`class`) | `string` | - | 直接应用于堆栈容器的自定义 CSS 类覆盖。 |
+
+***
+
+# 开发者须知与无障碍
+
+- **响应式 JSON 字符串：** 在 Sveltia CMS 中，可通过向 `direction` 与 `gap` 属性传入字符串化的 JSON 布局，来定义复杂的按断点样式规则（例如从行折叠为列）。
+- **可访问的导航：** 在堆栈内排列可交互的活跃元素（如按钮流）时，请保留标准的 HTML 顺序。不要过度依赖 CSS 布局重排（例如 `flex-direction: row-reverse`），它可能与物理 Tab 键流不一致。
+- **浏览器 Flex Gap 支持：** gap 属性使用原生 CSS Flexbox 的 `gap` 规则，在现代移动/桌面浏览器中无需负外边距覆盖即可实现整洁布局。

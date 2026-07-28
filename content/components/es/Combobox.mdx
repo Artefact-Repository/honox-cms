@@ -1,7 +1,7 @@
 ---
 title: Combobox Cuadro Combinado
-hydration: 2
 category: Forms
+hydration: 2
 ---
 
 import { Combobox } from "../../../app/components/ui";
@@ -9,30 +9,19 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introducción
 
-Un widget que combina un campo de texto con un listbox, permitiendo a los usuarios filtrar y seleccionar de una lista de opciones.
+Un control de entrada de autocompletado que combina un cuadro de texto con una lista desplegable (listbox), permitiendo a los usuarios filtrar y seleccionar opciones de una lista. Se utiliza principalmente para feeds de opciones largas, filtros de plataforma, etiquetas y selección de categorías.
 
-# Hidratación
+El componente **Combobox** está totalmente integrado como un bloque interactivo `combobox` en el **Page Builder**, lo que permite a los autores de contenido y desarrolladores configurar fácilmente etiquetas de entrada, marcadores de posición, listas de elementos predefinidas y ajustes de interacción directamente dentro del CMS.
 
-**Nivel 2 — detección automática inteligente.** Un `Combobox` se renderiza como HTML estático y no envía JS de cliente a menos que haya presente una señal de comportamiento. Pasa `interactive={true}` para forzar la hidratación, o `interactive={false}` para forzar un renderizado estático.
-
-Se hidrata como isla cuando está presente **cualquiera** de las siguientes señales (o se establece `interactive={true}`):
-
-- `open` (estado de apertura controlado)
-- `inputValue` (valor de entrada controlado)
-- `onToggle`
-- `onInputChange`
-- `onItemSelect` (callback de selección de elemento — los comboboxes de solo selección se hidratan por esto)
-
-| Prop `interactive` | Resultado |
-| --- | --- |
-| omitido, **sin** señal | Estático — sin JS de cliente |
-| omitido, señal presente | Se hidrata como isla |
-| `true` | Se hidrata como isla |
-| `false` | Estático — sin JS de cliente |
-
-Todas las decisiones de interactividad en la librería pasan por el helper compartido `shouldHydrate()` en `app/components/ui/island-utils.ts`.
+***
 
 # Uso
+
+Estos ejemplos ilustran cómo los editores de contenido enlazan y estructuran componentes combobox interactivos.
+
+## 1. Filtro de tecnología estándar (selección interactiva)
+
+Una combobox buscable estándar precargada con opciones, que permite a los usuarios filtrar o seleccionar directamente sus opciones deseadas.
 
 <DemoPreview>
   <Combobox
@@ -44,71 +33,112 @@ Todas las decisiones de interactividad en la librería pasan por el helper compa
       { label: "Vue", value: "vue" },
       { label: "Hono", value: "hono" },
     ]}
-    label="Framework"
+    label="Preferred Tech Stack"
     placeholder="Select a Framework"
-    allowClear
   />
 </DemoPreview>
-
-```tsx
-import { Combobox } from "../components/ui";
-
-const items = [
-  { label: "React", value: "react" },
-  { label: "Solid", value: "solid" },
-  { label: "Svelte", value: "svelte" },
-  { label: "Vue", value: "vue" },
-  { label: "Hono", value: "hono" },
-];
-
-export default function MyPage() {
-  return (
-    <Combobox
-      interactive
-      items={items}
-      label="Framework"
-      placeholder="Select a Framework"
-      allowClear
-    />
-  );
-}
-```
-
-## Constructor de páginas CMS
-
-Este componente está disponible como un bloque `combobox` en el [Constructor de páginas](/docs/PageBuilder) (`content/pages/*.json`):
 
 ```json
 {
   "type": "combobox",
-  "label": "Framework",
+  "label": "Preferred Tech Stack",
   "placeholder": "Select a Framework",
   "items": [
     { "label": "React", "value": "react" },
+    { "label": "Solid", "value": "solid" },
+    { "label": "Svelte", "value": "svelte" },
+    { "label": "Vue", "value": "vue" },
     { "label": "Hono", "value": "hono" }
-  ]
+  ],
+  "interactive": true
 }
 ```
 
+## 2. Búsqueda de opciones borrables (elementos personalizados)
+
+Cuenta con una acción de borrado acompañante, que permite a los usuarios purgar las opciones seleccionadas con un solo clic. Ideal para búsquedas en plataformas, ubicaciones o listas de selección de países.
+
+<DemoPreview>
+  <Combobox
+    interactive
+    items={[
+      { label: "United States", value: "us" },
+      { label: "Germany", value: "de" },
+      { label: "France", value: "fr" },
+      { label: "United Kingdom", value: "uk" },
+      { label: "Canada", value: "ca" },
+    ]}
+    label="Country Selection"
+    placeholder="Search countries..."
+    allowClear
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "combobox",
+  "label": "Country Selection",
+  "placeholder": "Search countries...",
+  "items": [
+    { "label": "United States", "value": "us" },
+    { "label": "Germany", "value": "de" },
+    { "label": "France", "value": "fr" },
+    { "label": "United Kingdom", "value": "uk" },
+    { "label": "Canada", "value": "ca" }
+  ],
+  "allowClear": true,
+  "interactive": true
+}
+```
+
+## 3. Campo de entrada deshabilitado
+
+Demuestra un campo de autocompletado temporalmente bloqueado. Esto conserva las etiquetas y selecciones actuales, pero impide escribir, filtrar o activar el desplegable.
+
+<DemoPreview>
+  <Combobox
+    disabled
+    items={[]}
+    label="Select Database Engine"
+    placeholder="Temporarily unavailable"
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "combobox",
+  "label": "Select Database Engine",
+  "placeholder": "Temporarily unavailable",
+  "items": [],
+  "disabled": true,
+  "interactive": true
+}
+```
+
+***
+
 # Propiedades
 
-| Prop | Tipo | Descripción |
-| --- | --- | --- |
-| `items` | `ComboboxItem[]` | Un array de elementos para mostrar en la lista. |
-| `label` | `Child` | La etiqueta del combobox. |
-| `placeholder` | `string` | El texto de marcador de posición del input. |
-| `allowClear` | `boolean` | Si se debe mostrar un botón de limpiar en el input. |
-| `interactive` | `boolean` | Fuerza la hidratación como isla. |
-| `open` | `boolean` | Si la lista del combobox está abierta (controlado). |
-| `inputValue` | `string` | El valor actual del input (controlado). |
-| `onToggle` | `() => void` | Callback activado cuando se alterna la lista. |
-| `onInputChange` | `(value: string) => void` | Callback activado cuando cambia el valor del input. |
-| `onItemSelect` | `(value: string) => void` | Callback activado cuando se selecciona un elemento. |
+| Propiedad | Tipo de campo CMS | Predeterminado | Descripción / opciones admitidas |
+| --- | --- | --- | --- |
+| **Texto de etiqueta** (`label`) | `string` | - | Texto visual acompañante posicionado encima del cuadro de búsqueda de autocompletado. |
+| **Marcador de posición** (`placeholder`) | `string` | - | Se muestra dentro del cuadro de entrada cuando no hay ningún elemento seleccionado. |
+| **Botón de borrar** (`allowClear`) | `boolean` | `false` | Cuando es true, renderiza un botón de borrar alineado al final dentro de la entrada de texto para restablecer fácilmente la selección. |
+| **Deshabilitado** (`disabled`) | `boolean` | `false` | Congela las entradas de búsqueda del usuario, las ventanas emergentes desplegables y las activaciones con clic. |
+| **Lista de elementos** (`items`) | `list` | `[]` | Un array ordenado de entradas de objeto que representan selecciones de lista (ver subpropiedades de la lista más abajo). |
 
-## ComboboxItem
+### Propiedades de elementos de lista (`items`)
 
-| Prop | Tipo | Descripción |
-| --- | --- | --- |
-| `label` | `string` | El texto mostrado para el elemento. |
-| `value` | `string` | El valor único del elemento. |
-| `disabled` | `boolean` | Si el elemento está deshabilitado. |
+| Subpropiedad | Tipo | Requerido | Descripción |
+| --- | --- | --- | --- |
+| **Etiqueta** (`label`) | `string` | Sí | Nombre para mostrar renderizado en las opciones emergentes de la lista. |
+| **Valor** (`value`) | `string` | Sí | Identificador de cadena único capturado en segundo plano al seleccionar una opción. |
+| **Opción deshabilitada** (`disabled`) | `boolean` | No | Atenúa/bloquea una sola opción de selección dentro del feed desplegable. |
+
+***
+
+# Notas para desarrolladores y accesibilidad
+
+- **Hidratación adaptativa inteligente (Nivel 2):** Para optimizar la velocidad inicial de la página, la Combobox se compila en marcado HTML/CSS estático y sin JS en las cargas del servidor, descargando cargas útiles de JS interactivas solo cuando se proporcionan señales personalizadas o cuando se pasa explícitamente `"interactive": true`.
+- **Listbox accesibles:** El componente opera en completa alineación con los roles de accesibilidad de combobox de WAI-ARIA. Los saltos de foco, las selecciones de opciones con teclas de flecha y las activaciones con teclado ocurren de forma nativa lista para usar.
+- **Envíos de formulario unificados:** Los valores seleccionados se asignan directamente a solicitudes POST de formulario estándar, evitando que los desarrolladores deban vincular estados de selección a lógica de envío personalizada global mediante programación.

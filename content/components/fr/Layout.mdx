@@ -1,7 +1,7 @@
 ---
 title: Layout Mise en Page
-hydration: 3
 category: Layout
+hydration: 3
 ---
 
 import { Layout, Heading, Text, Stack } from "../../../app/components/ui";
@@ -9,53 +9,56 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introduction
 
-Imbriquer un `<Layout>` dans le `contenu` d'un autre `<Layout>` ou dans des enfants imbriqués pour créer un composite
-coquilles, par ex. une mise en page externe avec un en-tête/pied de page et une mise en page interne
-tenant un rail sidenav.
+Le composant `Layout` fournit une structure de page sémantique composée d'en-têtes personnalisés, de barres de navigation latérales (siders), de régions de contenu principal et de pieds de page. Il prend en charge le dimensionnement personnalisé de la barre latérale, la visibilité basée sur les points d'arrêt, le verrouillage de défilement épinglé (sticky) et les conteneurs remplissant le viewport.
+
+Dans le CMS Page Builder, les auteurs de contenu et les développeurs peuvent configurer des panneaux structurels sémantiques en plaçant des cartes, des en-têtes, des stacks et des boutons dans des tableaux d'emplacements dédiés.
+
+***
 
 # Utilisation
 
-## En-tête + Contenu + Pied de page
+Ces exemples illustrent comment les éditeurs de contenu lient et structurent des modèles de page sémantiques.
 
-Sans « sider », les pièces s'empilent dans une seule colonne.
+## 1. Coque de page standard avec en-tête, contenu et pied de page
+
+Une mise en page de document ou d'article standard avec des en-têtes sémantiques en haut et un panneau de pied de page en bas.
 
 <DemoPreview>
   <div style={{ width: "100%", border: "1px solid var(--colors-border)", borderRadius: "12px", overflow: "hidden" }}>
     <Layout
       header={
         <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--colors-border)", background: "var(--colors-bg-subtle)" }}>
-          <Heading as="h4" size="sm">Header</Heading>
+          <Heading as="h4" size="sm">Site Brand Header</Heading>
         </div>
       }
-      content={<div style={{ padding: "16px" }}><Text size="sm">Content</Text></div>}
+      content={<div style={{ padding: "16px" }}><Text size="sm">Main Article and Interactive Content</Text></div>}
       footer={
         <div style={{ padding: "12px 16px", borderTop: "1px solid var(--colors-border)", background: "var(--colors-bg-subtle)" }}>
-          <Text size="xs">Footer</Text>
+          <Text size="xs">© 2026 Acme Corp. All rights reserved.</Text>
         </div>
       }
     />
   </div>
 </DemoPreview>
 
-```tsx
-import { Layout } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Layout
-      header={<SiteHeader />}
-      content={<Article />}
-      footer={<SiteFooter />}
-    />
-  );
+```json
+{
+  "type": "layout",
+  "header": [
+    { "type": "heading", "text": "Site Brand Header", "as": "h4", "size": "sm" }
+  ],
+  "content": [
+    { "type": "text", "content": "Main Article and Interactive Content" }
+  ],
+  "footer": [
+    { "type": "text", "content": "© 2026 Acme Corp. All rights reserved.", "size": "xs" }
+  ]
 }
 ```
 
-## En-tête + Côté + Contenu
+## 2. Coque de tableau de bord avec navigation latérale (Sider)
 
-Passer `sider` l'enveloppe ainsi que `content` dans une rangée. `siderWidth` choisit un rail
-largeur (`sm` 14rem, `md` 16rem par défaut, `lg` 18rem) ; `siderHideBelow` se cache
-le rail sous un point d'arrêt pour les petits écrans.
+Ajoute un tiroir ou un rail de navigation à gauche de la région de contenu principal. Les siders peuvent avoir des largeurs personnalisées sm, md ou lg et être configurés pour se replier automatiquement sur les petits viewports mobiles.
 
 <DemoPreview>
   <div style={{ width: "100%", border: "1px solid var(--colors-border)", borderRadius: "12px", overflow: "hidden" }}>
@@ -63,91 +66,21 @@ le rail sous un point d'arrêt pour les petits écrans.
       siderWidth="sm"
       header={
         <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--colors-border)", background: "var(--colors-bg-subtle)" }}>
-          <Heading as="h4" size="sm">Dashboard</Heading>
+          <Heading as="h4" size="sm">Dashboard System</Heading>
         </div>
       }
       sider={
         <div style={{ padding: "16px", borderRight: "1px solid var(--colors-border)", background: "var(--colors-bg-subtle)" }}>
           <Stack direction="vertical" gap="2">
-            <Text size="sm">Overview</Text>
-            <Text size="sm">Reports</Text>
-            <Text size="sm">Settings</Text>
+            <Text size="sm">Analytics Overview</Text>
+            <Text size="sm">Cloud Infrastructure</Text>
           </Stack>
         </div>
       }
-      content={<div style={{ padding: "16px" }}><Text size="sm">Content next to the sider</Text></div>}
+      content={<div style={{ padding: "16px" }}><Text size="sm">Cloud systems are operational. Latency is within normal bounds.</Text></div>}
     />
   </div>
 </DemoPreview>
-
-```tsx
-import { Layout } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Layout
-      header={<SiteHeader />}
-      sider={<Sidenav />}
-      siderWidth="sm"
-      siderHideBelow="md"
-      content={<Article />}
-    />
-  );
-}
-```
-
-## En-tête et côté collants
-
-`stickyHeader` épingle l'en-tête en haut du défilement de la page. `stickySider`
-épingle le sider en dessous et fait défiler son propre débordement - utile pendant une longue période
-nav à côté du contenu court, ou vice versa. `fullHeight` remplit la fenêtre d'affichage
-pour le shell de la page le plus externe.
-
-```tsx
-import { Layout } from "../components/ui";
-
-export default function DocsPage() {
-  return (
-    <Layout
-      fullHeight
-      stickyHeader
-      stickySider
-      header={<SiteHeader />}
-      sider={<DocsSidenav />}
-      siderHideBelow="md"
-      content={<Article />}
-    />
-  );
-}
-```
-
-## Disposition imbriquée
-
-Imbriquer un `<Layout>` à l'intérieur du `content` lorsque l'en-tête/le pied de page s'étend sur toute la longueur
-largeur mais seule une partie de la carrosserie a besoin d'une barrière latérale :
-
-```tsx
-import { Layout } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Layout
-      header={<SiteHeader />}
-      content={
-        <Layout sider={<Sidenav />} content={<Article />} />
-      }
-      footer={<SiteFooter />}
-    />
-  );
-}
-```
-
-## Constructeur de pages CMS
-
-Ce composant est disponible sous forme de bloc « layout » dans le
-[Page Builder](/docs/PageBuilder) (`content/pages/*.json`). 'en-tête',
-`sider`, `content` et `footer` sont chacun une liste de blocs de composants — n'importe lesquels
-le type de bloc fonctionne, y compris une autre « mise en page » pour les shells imbriqués :
 
 ```json
 {
@@ -155,7 +88,7 @@ le type de bloc fonctionne, y compris une autre « mise en page » pour les shel
   "siderWidth": "sm",
   "siderHideBelow": "md",
   "header": [
-    { "type": "heading", "text": "Dashboard", "as": "h3", "size": "lg" }
+    { "type": "heading", "text": "Dashboard System", "as": "h4", "size": "sm" }
   ],
   "sider": [
     {
@@ -163,45 +96,65 @@ le type de bloc fonctionne, y compris une autre « mise en page » pour les shel
       "direction": "vertical",
       "gap": "2",
       "children": [
-        { "type": "link", "text": "Overview", "href": "#" },
-        { "type": "link", "text": "Reports", "href": "#" }
+        { "type": "text", "content": "Analytics Overview", "size": "sm" },
+        { "type": "text", "content": "Cloud Infrastructure", "size": "sm" }
       ]
     }
   ],
   "content": [
-    { "type": "text", "content": "Pick a page from the rail on the left." }
-  ],
-  "footer": [
-    { "type": "text", "size": "sm", "content": "© 2026 Acme" }
+    { "type": "text", "content": "Cloud systems are operational. Latency is within normal bounds." }
   ]
 }
 ```
 
-Laisser la liste d'une pièce vide (ou l'omettre) ignore le wrapper de cette pièce
-élément entièrement — un champ facultatif intact comme `siderWidth`/`siderHideBelow`
-arrive sous la forme `""` du CMS et est traité comme non défini, retombant sur le
-composant par défaut.
+## 3. Composition de layout imbriqué
+
+Les layouts peuvent être imbriqués proprement à l'intérieur d'autres layouts. Cela est utile lorsque vous souhaitez un en-tête et un pied de page de site pleine largeur, mais que seul le contenu du corps central doit inclure une navigation latérale.
+
+```json
+{
+  "type": "layout",
+  "header": [
+    { "type": "heading", "text": "Global Full-Width Header", "as": "h3" }
+  ],
+  "content": [
+    {
+      "type": "layout",
+      "siderWidth": "md",
+      "sider": [
+        { "type": "text", "content": "Nested Sidebar Rail" }
+      ],
+      "content": [
+        { "type": "text", "content": "Nested Content Body" }
+      ]
+    }
+  ],
+  "footer": [
+    { "type": "text", "content": "Global Full-Width Footer", "size": "xs" }
+  ]
+}
+```
+
+***
 
 # Propriétés
 
-## Mise en page
+| Propriété | Type de champ CMS | Défaut | Description / options prises en charge |
+| --- | --- | --- | --- |
+| **Panneau d'en-tête** (`header`) | `list` | - | Collection de blocs visuels (p. ex. logos, titres, boutons) rendus à l'intérieur du `<header>` sémantique supérieur. |
+| **Panneau latéral** (`sider`) | `list` | - | Collection de blocs visuels rendus à l'intérieur du `<aside>` de navigation sémantique gauche. |
+| **Contenu principal** (`content`) | `list` | - | Collection de blocs de corps principal rendus à l'intérieur du conteneur `<main>` sémantique. |
+| **Panneau de pied de page** (`footer`) | `list` | - | Collection de blocs visuels rendus à l'intérieur du `<footer>` sémantique inférieur. |
+| **Pleine hauteur** (`fullHeight`) | `boolean` | `false` | Définit le conteneur le plus externe pour remplir toute la hauteur du viewport (`min-height: 100vh`). |
+| **En-tête épinglé** (`stickyHeader`) | `boolean` | `false` | Épingle l'en-tête du site en haut du viewport pendant le défilement de la page. |
+| **Sider épinglé** (`stickySider`) | `boolean` | `false` | Verrouille le panneau latéral en place afin que seule la région de contenu principal défile. |
+| **Largeur du sider** (`siderWidth`) | `select` | `"md"` | Dimensionnement de la largeur de colonne pour le panneau latéral.<br/>• Options : `"sm"` (14rem), `"md"` (16rem), `"lg"` (18rem). |
+| **Masquage responsif du sider** (`siderHideBelow`) | `select` | - | Réduit et masque la barre latérale sur les viewports plus petits.<br/>• Options : `"sm"`, `"md"`, `"lg"`. |
 
-| Propriété | Type | Description |
-| --- | --- | --- |
-| `header` | \`string \| JSX.Élément\` | Rendered inside a semantic `<header>` above the body. (Shorthand API only) |
-| `sider` | \`string \| JSX.Élément\` | Rendered inside a semantic `<aside>` rail. Its presence switches the body to a row of sider + content. (Shorthand API only) |
-| `content` | \`string \| JSX.Élément\` | Rendered inside a semantic `<main>`. `children` are appended after it. (Shorthand API only) |
-| `footer` | \`string \| JSX.Élément\` | Rendered inside a semantic `<footer>` below the body. (Shorthand API only) |
-| `fullHeight` | `boolean` | Remplissez la hauteur de la fenêtre d'affichage - pour le shell de la page le plus à l'extérieur. |
-| `stickyHeader` | `boolean` | Épinglez l’en-tête en haut du défilement de la page. |
-| `stickySider` | `boolean` | Épinglez le côté sous un en-tête collant ; il défile en interne. |
-| `siderWidth` | \`"sm" \| "md" \| "lg"\` | Sider rail width: sm (14rem), md (16rem, default), lg (18rem). |
-| `siderHideBelow` | \`"sm" \| "md" \| "lg"\` | Hide the sider under this breakpoint. Pair with an in-flow disclosure. |
-| `hasSider` | `boolean` | Forcez manuellement la direction de la présentation vers la ligne. (API composée) |
-| `headerClass` | `string` | Classe supplémentaire pour la partie `<header>`. (API abrégée uniquement) |
-| `siderClass` | `string` | Classe supplémentaire pour la partie `<aside>`. (API abrégée uniquement) |
-| `contentClass` | `string` | Classe supplémentaire pour la partie `<main>`. (API abrégée uniquement) |
-| `footerClass` | `string` | Classe supplémentaire pour la partie `<footer>`. (API abrégée uniquement) |
-| `bodyClass` | `string` | Classe supplémentaire pour le wrapper de ligne autour de sider + content (rendu uniquement lorsque `sider` est défini). |
-| `children` | `any` | Enfants à restituer à l’intérieur du shell de mise en page. |
-| `class` | `string` | Classes CSS personnalisées pour l'élément racine. |
+***
+
+# Notes pour les développeurs et accessibilité
+
+- **Règles d'imbrication et limite de profondeur :** Sveltia CMS applique une limite d'imbrication visuelle d'environ quatre niveaux dans l'interface de l'éditeur. Cette limite de profondeur restreint ce qui peut être construit via l'UI, mais ne limite pas le compilateur de layouts — les modèles JSON rédigés manuellement peuvent imbriquer des layouts aussi profondément que nécessaire.
+- **Cartographie d'éléments sémantiques :** Ce composant correspond directement à des éléments HTML5 valides et sémantiques : `<header>`, `<aside>`, `<main>` et `<footer>`.
+- **Compatibilité de navigation par saut :** Lors de l'utilisation d'en-têtes et de pieds de page personnalisés, assurez-vous que les titres sont séquencés logiquement (p. ex. en commençant par un `h1` sur la page) pour maintenir des scores d'accessibilité élevés.

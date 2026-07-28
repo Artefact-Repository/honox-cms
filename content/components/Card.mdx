@@ -1,7 +1,7 @@
 ---
 title: Card
-hydration: 2
 category: Data Display
+hydration: 2
 ---
 
 import { Card, Button } from "../../app/components/ui";
@@ -9,110 +9,91 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-A flexible container for grouping related content, with optional header, body, footer, image, and avatar slots.
+A highly versatile layout container designed for grouping related information, actions, media, and metadata into a single visually structured module. It includes designated areas for headers, titles, descriptions, body text, avatars, cover imagery, actions, and footers.
+
+The **Card** component is fully integrated as a `card` block in the **Page Builder**, allowing content authors and developers to configure layout structures, surface variations, and responsive formatting directly within the CMS.
+
+***
 
 # Usage
 
-## Basic Card
+These examples illustrate how content editors bind and structure card components.
+
+## 1. Elevated Project Overview Card
+
+A classic elevated profile card complete with title, description, body text, and a primary action button rendered within the footer slot.
 
 <DemoPreview>
   <Card
     variant="elevated"
-    title="Project title"
-    description="A short description of the project."
-    body="Main content of the card goes here."
-    footer={<Button>View</Button>}
+    title="Project Launchpad"
+    description="Accelerate your workflow development"
+    body="Create, configure, and scale multi-platform applications seamlessly. Our cloud-native environment is optimized for high performance, serverless routing, and automatic localized static site generation."
+    footer={<Button>View Project</Button>}
   />
 </DemoPreview>
-
-```tsx
-import { Card, Button } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Card
-      variant="elevated"
-      title="Project title"
-      description="A short description of the project."
-      body="Main content of the card goes here."
-      footer={<Button>View</Button>}
-    />
-  );
-}
-```
-
-## Card with Image
-
-```tsx
-import { Card } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Card
-      image="/cover.png"
-      imagePosition="top"
-      title="Card with image"
-      body="Content beneath the image."
-    />
-  );
-}
-```
-
-## CMS Page Builder
-
-This component is available as a `card` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
 
 ```json
 {
   "type": "card",
-  "title": "Project title",
-  "description": "A short description of the project.",
-  "body": "Main content of the card goes here.",
+  "title": "Project Launchpad",
+  "description": "Accelerate your workflow development",
+  "body": "Create, configure, and scale multi-platform applications seamlessly. Our cloud-native environment is optimized for high performance, serverless routing, and automatic localized static site generation.",
   "variant": "elevated",
   "boxShadow": "lg",
-  "overflow": "visible"
+  "children": [
+    {
+      "type": "button",
+      "text": "View Project",
+      "variant": "solid"
+    }
+  ]
 }
 ```
 
-A CMS card defaults `boxShadow` to `"sm"` even when unset, so setting some
-other layout-style field (e.g. `margin`) doesn't silently zero out the
-recipe's own default shadow. `overflow` overrides the card's default
-`overflow: hidden` (which normally clips the image slot to the border
-radius) — set it to `"visible"` when the card contains an unportaled overlay
-(Popover, Dropdown, Select, DatePicker, ColorPicker, HoverCard) that would
-otherwise be clipped at the card boundary. `boxShadow` and the other shared
-layout-style fields (margin/padding/maxWidth/borderRadius/backgroundColor/
-backgroundImage/backgroundFit/textAlign/opacity) are documented once, for
-every block that supports them, under [Page Builder → Advanced Escape
-Hatches](/docs/PageBuilder#advanced-escape-hatches).
+## 2. Media Rich Cover Card with Top Image
+
+Renders an outlined card featuring a large visual cover image aligned at the top of the content body. Perfect for blog posts, news grids, or product feature highlights.
+
+<DemoPreview>
+  <Card
+    variant="outline"
+    image="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop"
+    imagePosition="top"
+    title="Design Systems in Production"
+    body="Explore optimal architectural patterns for managing multi-variant design tokens, static compilation, and robust hydration frameworks in large engineering organizations."
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "card",
+  "image": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop",
+  "imagePosition": "top",
+  "title": "Design Systems in Production",
+  "body": "Explore optimal architectural patterns for managing multi-variant design tokens, static compilation, and robust hydration frameworks in large engineering organizations.",
+  "variant": "outline"
+}
+```
+
+***
 
 # Props
 
-## Card
+| Property | CMS Field Type | Default | Description / Supported Options |
+| --- | --- | --- | --- |
+| **Card Title** (`title`) | `string` | - | Primary heading displayed inside the card's header area. |
+| **Card Description** (`description`) | `string` | - | Secondary supporting tagline positioned below the title. |
+| **Body Text** (`body`) | `string` | - | Main textual block content rendered inside the card body. |
+| **Cover Image** (`image`) | `image` | - | URL or media path for the companion graphic or photo. |
+| **Image Placement** (`imagePosition`) | `select` | `"top"` | Layout alignment of the cover graphic. <br/>• Options: `"top"`, `"bottom"`, `"left"`, `"right"`. |
+| **Visual Variant** (`variant`) | `select` | `"elevated"` | Border and shadow style. <br/>• Options: `"elevated"`, `"outline"`, `"subtle"`. |
+| **Shadow Depth** (`boxShadow`) | `select` | `"sm"` | Theme shadow applied around the border outer contour. <br/>• Options: `"none"`, `"2xs"`, `"xs"`, `"sm"`, `"md"`, `"lg"`, `"xl"`, `"2xl"`. |
+| **Clipping Bounds** (`overflow`) | `select` | `"hidden"` | Overflow policy. Set to `"visible"` when the card nests unportaled overlay elements (Dropdowns, Popovers, DatePickers) to prevent layout clipping. |
 
-| Prop | Type | Description |
-| --- | --- | --- |
+***
 
-| `title` | \`string \ | JSX.Element\` | The card title. |
-| `description` | \`string \ | JSX.Element\` | The card description. |
-| `body` | \`string \ | JSX.Element\` | The main body content. |
-| `footer` | \`string \ | JSX.Element\` | Footer content. |
+# Developer Notes & Accessibility
 
-| `avatar` | `JSX.Element` | Element shown in the header (e.g. an avatar). |
-| `headerAction` | `JSX.Element` | Element shown at the end of the header (e.g. a menu). |
-
-| `image` | \`string \ | JSX.Element\` | Image source or element. |
-
-| `imagePosition` | \`"top" \ | "bottom" \ | "left" \ | "right"\` | Where the image is placed. Default: `"top"`. |
-
-| `headerClass` | `string` | Custom CSS classes for the header. |
-| `bodyClass` | `string` | Custom CSS classes for the body. |
-| `footerClass` | `string` | Custom CSS classes for the footer. |
-| `imageClass` | `string` | Custom CSS classes for the image. |
-
-| `variant` | \`"elevated" \ | "outline" \ | "subtle"\` | The visual style of the card. |
-
-| `overflow` | `CSS overflow` | Overrides the card's default `overflow: hidden`. CMS-only field — set to `"visible"` for a card containing an unportaled overlay (Popover, Dropdown, ColorPicker, etc). |
-
-| `interactive` | `boolean` | Enable client-side hydration. |
-| `class` | `string` | Custom CSS classes for the root element. |
+- **Hydration Island:** By default, Cards compile down to light, presentational Static-Only elements. However, if they contain active interactive children blocks or explicit state triggers, they hydrate as a conditional Tier-2 island on the client.
+- **WAI-ARIA Compliance:** Cards are structured to enforce logical content reading orders. Use semantic headings (`h2`-`h4`) for title slots. Ensure any decorative cover graphics are supplied with appropriate blank alt tags so screen readers bypass them gracefully.

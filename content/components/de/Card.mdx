@@ -1,7 +1,7 @@
 ---
 title: Card Karte
-hydration: 2
 category: Data Display
+hydration: 2
 ---
 
 import { Card, Button } from "../../../app/components/ui";
@@ -9,94 +9,91 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Einführung
 
-Ein flexibler Container zum Gruppieren zusammengehöriger Inhalte, mit optionalen Slots für Kopfzeile, Inhalt, Fußzeile, Bild und Avatar.
+Ein hochgradig vielseitiger Layout-Container, der darauf ausgelegt ist, verwandte Informationen, Aktionen, Medien und Metadaten in einem einzigen visuell strukturierten Modul zu gruppieren. Er umfasst vorgesehene Bereiche für Kopfzeilen, Titel, Beschreibungen, Fließtext, Avatare, Titelbilder, Aktionen und Fußzeilen.
+
+Die **Card**-Komponente ist vollständig als `card`-Block im **Page Builder** integriert, sodass Inhaltsautoren und Entwickler Layoutstrukturen, Oberflächenvarianten und responsives Format direkt im CMS konfigurieren können.
+
+***
 
 # Verwendung
 
-## Einfache Karte
+Diese Beispiele veranschaulichen, wie Inhaltsredakteure Kartenkomponenten binden und strukturieren.
+
+## 1. Erhöhte Projekt-Übersichtskarte
+
+Eine klassische erhöhte Profilkarte mit Titel, Beschreibung, Fließtext und einer primären Aktionsschaltfläche im Fußzeilen-Slot.
 
 <DemoPreview>
   <Card
     variant="elevated"
-    title="Project title"
-    description="A short description of the project."
-    body="Main content of the card goes here."
-    footer={<Button>View</Button>}
+    title="Project Launchpad"
+    description="Accelerate your workflow development"
+    body="Create, configure, and scale multi-platform applications seamlessly. Our cloud-native environment is optimized for high performance, serverless routing, and automatic localized static site generation."
+    footer={<Button>View Project</Button>}
   />
 </DemoPreview>
-
-```tsx
-import { Card, Button } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Card
-      variant="elevated"
-      title="Project title"
-      description="A short description of the project."
-      body="Main content of the card goes here."
-      footer={<Button>View</Button>}
-    />
-  );
-}
-```
-
-## Karte mit Bild
-
-```tsx
-import { Card } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Card
-      image="/cover.png"
-      imagePosition="top"
-      title="Card with image"
-      body="Content beneath the image."
-    />
-  );
-}
-```
-
-## CMS-Seitenbauer
-
-Diese Komponente ist als `card`-Block im [Seitenbauer](/docs/PageBuilder) (`content/pages/*.json`) verfügbar:
 
 ```json
 {
   "type": "card",
-  "title": "Project title",
-  "description": "A short description of the project.",
-  "body": "Main content of the card goes here.",
-  "variant": "elevated"
+  "title": "Project Launchpad",
+  "description": "Accelerate your workflow development",
+  "body": "Create, configure, and scale multi-platform applications seamlessly. Our cloud-native environment is optimized for high performance, serverless routing, and automatic localized static site generation.",
+  "variant": "elevated",
+  "boxShadow": "lg",
+  "children": [
+    {
+      "type": "button",
+      "text": "View Project",
+      "variant": "solid"
+    }
+  ]
 }
 ```
 
+## 2. Medienreiche Deckbildkarte mit Top-Bild
+
+Rendert eine konturierte Karte mit einem großen visuellen Deckbild, das oben am Inhaltskörper ausgerichtet ist. Perfekt für Blogbeiträge, News-Grids oder Produkt-Highlights.
+
+<DemoPreview>
+  <Card
+    variant="outline"
+    image="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop"
+    imagePosition="top"
+    title="Design Systems in Production"
+    body="Explore optimal architectural patterns for managing multi-variant design tokens, static compilation, and robust hydration frameworks in large engineering organizations."
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "card",
+  "image": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop",
+  "imagePosition": "top",
+  "title": "Design Systems in Production",
+  "body": "Explore optimal architectural patterns for managing multi-variant design tokens, static compilation, and robust hydration frameworks in large engineering organizations.",
+  "variant": "outline"
+}
+```
+
+***
+
 # Eigenschaften
 
-## Karte
+| Eigenschaft | CMS-Feldtyp | Standard | Beschreibung / Unterstützte Optionen |
+| --- | --- | --- | --- |
+| **Kartentitel** (`title`) | `string` | - | Die im Kopfbereich der Karte angezeigte Hauptüberschrift. |
+| **Kartenbeschreibung** (`description`) | `string` | - | Unterstützende Sekundär-Unterzeile unterhalb des Titels. |
+| **Fließtext** (`body`) | `string` | - | Hauptinhalt des Textblocks, der im Kartenkörper gerendert wird. |
+| **Titelbild** (`image`) | `image` | - | URL oder Medienpfad für die begleitende Grafik oder das Foto. |
+| **Bildplatzierung** (`imagePosition`) | `select` | `"top"` | Layout-Ausrichtung der Deckgrafik. <br/>• Optionen: `"top"`, `"bottom"`, `"left"`, `"right"`. |
+| **Visuelle Variante** (`variant`) | `select` | `"elevated"` | Rahmen- und Schattenstil. <br/>• Optionen: `"elevated"`, `"outline"`, `"subtle"`. |
+| **Schattentiefe** (`boxShadow`) | `select` | `"sm"` | Auf den äußeren Rahmen angewandter Theme-Schatten. <br/>• Optionen: `"none"`, `"2xs"`, `"xs"`, `"sm"`, `"md"`, `"lg"`, `"xl"`, `"2xl"`. |
+| **Clip-Grenzen** (`overflow`) | `select` | `"hidden"` | Overflow-Richtlinie. Setzen Sie auf `"visible"`, wenn die Karte nicht portalisierte Overlay-Elemente (Dropdowns, Popovers, DatePicker) verschachtelt, um Layout-Abschneidungen zu verhindern. |
 
-| Eigenschaft | Typ | Beschreibung |
-| --- | --- | --- |
+***
 
-| `title` | \`string \ | JSX.Element\` | Der Kartentitel. |
-| `description` | \`string \ | JSX.Element\` | Die Kartenbeschreibung. |
-| `body` | \`string \ | JSX.Element\` | Der Hauptinhaltsbereich. |
-| `footer` | \`string \ | JSX.Element\` | Fußzeileninhalt. |
+# Entwicklerhinweise & Barrierefreiheit
 
-| `avatar` | `JSX.Element` | Element, das in der Kopfzeile angezeigt wird (z. B. ein Avatar). |
-| `headerAction` | `JSX.Element` | Element, das am Ende der Kopfzeile angezeigt wird (z. B. ein Menü). |
-
-| `image` | \`string \ | JSX.Element\` | Bildquelle oder -element. |
-
-| `imagePosition` | \`"top" \ | "bottom" \ | "left" \ | "right"\` | Wo das Bild platziert wird. Standard: `"top"`. |
-
-| `headerClass` | `string` | Benutzerdefinierte CSS-Klassen für die Kopfzeile. |
-| `bodyClass` | `string` | Benutzerdefinierte CSS-Klassen für den Inhaltsbereich. |
-| `footerClass` | `string` | Benutzerdefinierte CSS-Klassen für die Fußzeile. |
-| `imageClass` | `string` | Benutzerdefinierte CSS-Klassen für das Bild. |
-
-| `variant` | \`"elevated" \ | "outline" \ | "subtle"\` | Der visuelle Stil der Karte. |
-
-| `interactive` | `boolean` | Aktiviert die clientseitige Hydration. |
-| `class` | `string` | Benutzerdefinierte CSS-Klassen für das Wurzelelement. |
+- **Hydration-Insel:** Standardmäßig kompilieren Karten zu leichten, rein präsentativen Statik-Elementen. Enthalten sie jedoch aktive interaktive Kind-Blöcke oder explizite Zustands-Trigger, hydrieren sie clientseitig als bedingte Tier-2-Insel.
+- **WAI-ARIA-Konformität:** Karten sind so strukturiert, dass sie logische Inhalts-Lesereihenfolgen erzwingen. Verwenden Sie semantische Überschriften (`h2`-`h4`) für Titel-Slots. Stellen Sie sicher, dass dekorative Deckbilder mit entsprechenden leeren Alt-Tags versehen sind, damit Screenreader sie elegant überspringen.

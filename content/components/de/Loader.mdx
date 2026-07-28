@@ -1,7 +1,7 @@
 ---
 title: Loader Ladeanzeige
-hydration: 3
 category: Feedback
+hydration: 3
 ---
 
 import { Loader } from "../../../app/components/ui";
@@ -9,58 +9,60 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Einführung
 
-Eine Hilfskomponente, die den visuellen Zustand eines `Spinner` und zugehörigen Texts verwaltet.
+Eine visuelle Lade-Layout-Hilfskomponente, die ein rotierendes `Spinner`-Element mit begleitendem Statusmeldungstext kombiniert. Wird hauptsächlich verwendet, um Benutzererwartungen während Serverabrufen, Dateioperationen, Zustandsübergängen oder Inhaltsverarbeitungszuständen innerhalb von Layout-Blöcken zu verwalten.
+
+Die **Loader**-Komponente ist vollständig als `loader`-Block im **Page Builder** integriert und ermöglicht es Content-Autoren und Entwicklern, visuellen Status text und Spinner-Ausrichtungen direkt innerhalb der CMS-Seitenschemata zu konfigurieren.
+
+***
 
 # Verwendung
 
+Diese Beispiele veranschaulichen, wie Content-Editoren interaktive Loader binden und strukturieren.
+
+## 1. Standard-zentrierter Status-Loader
+
+Ein klassischer Ladeindikator mit Standard-Status text, geeignet für Haupt-Panel-Einträge, Inhaltsaktualisierungen oder lazy-geladene Blöcke.
+
 <DemoPreview>
-  <Loader text="Loading data..." />
+  <Loader text="Loading workspace data..." />
 </DemoPreview>
-
-```tsx
-import { Loader, Spinner } from "../components/ui";
-
-export default function MyPage() {
-  return <Loader text="Loading data..." />;
-}
-```
-
-## Benutzerdefinierter Spinner und Platzierung
-
-```tsx
-import { Loader, Spinner } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Loader
-      spinner={<Spinner size="lg" colorPalette="blue" />}
-      spinnerPlacement="end"
-    >
-      Please wait
-    </Loader>
-  );
-}
-```
-
-## CMS-Seitenbauer
-
-Diese Komponente ist als `loader`-Block im [Seitenbauer](/docs/PageBuilder) (`content/pages/*.json`)
-verfügbar — das CMS-Feld `text` bildet direkt auf die `text`-Eigenschaft von `Loader` ab:
 
 ```json
 {
   "type": "loader",
-  "text": "Checking availability...",
+  "text": "Loading workspace data...",
   "spinnerPlacement": "start"
 }
 ```
 
-# Eigenschaften
+## 2. Loader mit nachgestelltem Spinner (End-Ausrichtung)
 
-| Eigenschaft | Typ | Beschreibung |
-| --- | --- | --- |
-| `children` | `any` | Textinhalt, der neben dem Spinner gerendert wird. |
-| `spinner` | `Child` | Benutzerdefiniertes Spinner-Element. Standardmäßig `<Spinner size="inherit" />`. |
-| `text` | `Child` | Alternative Eigenschaft für Textinhalt. |
+Zeigt den visuellen Spinner nach der Statusnachricht ausgerichtet und bietet so einen alternativen visuellen Fluss für Kartenfußzeilen oder Inline-Button-Aktionen.
 
-| `spinnerPlacement` | \`"start" \ | "end"\` | Wo der Spinner relativ zum Text platziert wird. Standardmäßig `"start"`. |
+<DemoPreview>
+  <Loader text="Please wait while we process your request" spinnerPlacement="end" />
+</DemoPreview>
+
+```json
+{
+  "type": "loader",
+  "text": "Please wait while we process your request",
+  "spinnerPlacement": "end"
+}
+```
+
+***
+
+# Props
+
+| Eigenschaft | CMS-Feldtyp | Standard | Beschreibung / Unterstützte Optionen |
+| --- | --- | --- | --- |
+| **Status text** (`text`) | `string` | - | Der neben dem rotierenden Spinner angezeigte Nachrichtentext. |
+| **Spinner-Platzierung** (`spinnerPlacement`) | `select` | `"start"` | Ausrichtung des Spinners relativ zum begleitenden Text.<br/>• Optionen: `"start"`, `"end"`. |
+
+***
+
+# Entwicklerhinweise & Barrierefreiheit
+
+- **Hydration-Frei (Nur Statisch):** Der Loader ist ein rein präsentationelles Layout-Hilfsmittel, das als rein statische Komponente (`Tier 3`) gekennzeichnet ist. Er kompiliert zu standardmäßigem server-seitigem HTML/CSS-Markup mit absolut null interaktivem clientseitigem JavaScript.
+- **WAI-ARIA-Konformität:** Im Hintergrund ist diese Komponente für assistive Technologien konzipiert und kompiliert mit entsprechenden Live-Region- oder Busy-Container-Parametern (z. B. `aria-busy="true"`, `role="status"` auf übergeordneten Containern), was eine reibungslose Kommunikation laufender Hintergrundaktivitäten sicherstellt.

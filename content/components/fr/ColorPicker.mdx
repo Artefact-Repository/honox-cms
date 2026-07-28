@@ -1,7 +1,7 @@
 ---
 title: ColorPicker Sélecteur de Couleur
-hydration: 2
 category: Forms
+hydration: 2
 ---
 
 import { ColorPicker } from "../../../app/components/ui";
@@ -9,138 +9,93 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introduction
 
-Un sélecteur de couleurs avec une zone de saturation/luminosité, des curseurs de teinte et alpha, des entrées de canal modifiables (HEX/RGBA/HSLA), des échantillons prédéfinis et un déclencheur d'échantillon en option qui ouvre le panneau dans une fenêtre contextuelle. Il suit l'anatomie du sélecteur de couleurs Ark UI / Park UI — chaque partie porte `data-scope="colorPicker"` et une `data-part` correspondante — mais est entièrement implémenté sur Hono JSX et Panda CSS, avec **pas de React et pas de dépendance `@ark-ui/react`**.
+Un contrôle de saisie avancé qui permet aux utilisateurs de sélectionner et de personnaliser des couleurs via une zone de saturation/luminosité, des curseurs de teinte et d'alpha, des entrées de canaux modifiables (HEX, RGBA, HSLA) et des échantillons prédéfinis.
 
-Le composant est divisé de la même manière que le reste de la bibliothèque :
+Le composant **ColorPicker** est entièrement intégré en tant que bloc interactif `colorPicker` dans le **Page Builder**, permettant aux auteurs de contenu et aux développeurs de configurer facilement les libellés, les états par défaut, les modes de déclencheur Popover et les échelles de taille directement dans le CMS.
 
-- `app/components/ui/color-picker-primitive.tsx` — calcul des couleurs, contexte et chaque partie anatomique, tous rendus par le serveur.- `app/islands/color-picker.tsx` — mince enveloppe d'îlot autour de `InteractiveColorPicker`, qui possède l'état et attache des gestionnaires de pointeur/clavier.- `app/theme/recipes/color-picker.ts` — la recette du slot Panda CSS.
-Les couleurs sont conservées en interne sous forme de **HSVA** (`{ h : 0 à 360, s : 0 à 100, v : 0 à 100, a : 0 à 1 }`), le modèle naturel pour une zone de saturation/luminosité, et converties sur les bords.
-
-# Quoi de neuf dans cette révision
-
-- **La sortie HSLA est du vrai HSL.** `hsvaToHslaString` a préalablement marqué les nombres bruts de saturation/valeur HSV dans une chaîne `hsla()`, produisant une couleur différente de celle sélectionnée (par exemple, un rouge pur rendu sous la forme `hsla(0, 100%, 100%, 1)` — blanc). Il convertit désormais correctement HSV → HSL (`hsla(0, 100%, 50%, 1)`).- **La ligne d'entrée HSLA modifie les véritables canaux HSL.** Les entrées de saturation/luminosité utilisées pour afficher les valeurs HSV sous les étiquettes HSL ; les modifications et les valeurs affichées concordent désormais, et un canal « l » dédié mappe les modifications de légèreté dans le modèle HSV.- **Une entrée hexadécimale non valide est rejetée au lieu d'être validée.** La saisie de déchets dans le champ hexadécimal revenait auparavant au blanc et l'émettait sous la forme d'un changement de valeur. Le champ valide désormais `#RGB`, `#RGBA`, `#RRGGBB` et `#RRGGBBAA` (avec ou sans le `#` initial) et ignore tout le reste.- **La sélection du format est étiquetée** pour la technologie d'assistance.
-# Prise en charge du clavier
-
-La zone et les deux curseurs sont focalisables (« Tab ») et utilisables au clavier :
-
-| Key | Area | Hue slider | Alpha slider |
-| --- | --- | --- | --- |
-| <kbd>←</kbd> / <kbd>→</kbd> | Saturation ±1 | Hue ±1° | Alpha ±1% |
-| <kbd>↑</kbd> / <kbd>↓</kbd> | Brightness ±1 | — | — |
-| <kbd>Shift</kbd> + arrows | ±10 steps | ±10° | ±10% |
-| <kbd>Home</kbd> / <kbd>End</kbd> | Min / max corner | 0° / 360° | 0% / 100% |
-
-Avec `trigger`, <kbd>Esc</kbd> et des clics extérieurs ferment le popover.
-
-# Accessibilité
-
-- Les curseurs de zone et de canal exposent `role="slider"` avec `aria-valuemin`/`aria-valuemax`/`aria-valuenow` (la zone signale en outre les deux canaux via `aria-valuetext`).- Les entrées de canal, la sélection de format, les échantillons prédéfinis et le déclencheur de la pipette portent tous un « aria-label » ; l'échantillon prédéfini actif est annoncé via `aria-pressed`.- `disabled` et `readOnly` suppriment les taquets de tabulation interactifs et désactivent les boutons d'échantillon ; l'état est reflété sur « data-disabled » / « data-readonly » sur chaque partie.- Le bouton compte-gouttes est désactivé lorsque l'API `EyeDropper` n'est pas disponible, ce n'est donc jamais un contrôle mort.
-# Emplacements de style
-
-La recette du slot Panda CSS (`app/theme/recipes/color-picker.ts`) stylise les parties répertoriées sous Anatomie. Les états sont déterminés par les attributs de données (`data-disabled`, `data-readonly`, `data-state="checked"` sur l'échantillon actif, `data-channel` sur les parties du curseur), afin que les skins personnalisés puissent les cibler sans toucher à la recette. La variante « taille » met à l'échelle la zone, les échantillons et l'espacement.
+***
 
 # Utilisation
 
+Ces exemples illustrent comment les éditeurs de contenu lient et structurent les composants de sélecteur de couleur.
+
+## 1. Personnalisateur en ligne (valeur hex par défaut standard)
+
+Un sélecteur de couleur en ligne qui occupe un espace au niveau du bloc dans la mise en page de la page, rendant le champ de saturation, les curseurs de teinte et les entrées de canaux immédiatement au chargement.
+
 <DemoPreview>
-  <ColorPicker label="Brand colour" defaultValue="#3b82f6" />
+  <ColorPicker label="Brand Primary Color" defaultValue="#7c3aed" />
 </DemoPreview>
-
-```tsx
-import { ColorPicker } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <>
-      {/* Inline picker, static SSR (no signal, no island) */}
-      <ColorPicker interactive={false} />
-
-      {/* Interactive inline picker */}
-      <ColorPicker
-        label="Brand colour"
-        defaultValue="#3b82f6"
-        onValueChange={({ value }) => console.log(value)}
-      />
-
-      {/* Swatch trigger + popover, custom presets */}
-      <ColorPicker
-        trigger
-        label="Accent"
-        defaultValue="#22c55e"
-        presets={["#ef4444", "#f97316", "#22c55e", "#3b82f6"]}
-        closeOnSelect
-      />
-
-      {/* Inside a native form — submits as `theme` (hex) */}
-      <form method="post" action="/settings">
-        <ColorPicker name="theme" defaultValue="#7c3aed" />
-        <button type="submit">Save</button>
-      </form>
-    </>
-  );
-}
-```
-
-## Constructeur de pages CMS
-
-Ce composant est disponible sous forme de bloc `colorPicker` dans [Page Builder](/docs/PageBuilder) (`content/pages/*.json`) :
 
 ```json
 {
   "type": "colorPicker",
-  "label": "Brand colour",
-  "defaultValue": "#3b82f6"
+  "label": "Brand Primary Color",
+  "defaultValue": "#7c3aed",
+  "interactive": true
 }
 ```
 
+## 2. Déclencheur d'échantillon Popover avec fermeture à la sélection
+
+Une option de conception élégante et économisant de l'espace qui rend un petit déclencheur d'échantillon de couleur. Cliquer sur l'échantillon ouvre le panneau du sélecteur de couleur dans une couche popover, se fermant automatiquement après la sélection d'un échantillon de couleur prédéfini.
+
+<DemoPreview>
+  <ColorPicker
+    trigger
+    label="Choose Theme Accent"
+    defaultValue="#22c55e"
+    closeOnSelect={true}
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "colorPicker",
+  "label": "Choose Theme Accent",
+  "defaultValue": "#22c55e",
+  "trigger": true,
+  "closeOnSelect": true,
+  "interactive": true
+}
+```
+
+## 3. État du sélecteur désactivé
+
+Démontre un personnalisateur de couleur verrouillé ou inactif. Cela désactive tous les curseurs, canaux d'entrée, boutons de sélection d'échantillons et déclencheurs.
+
+<DemoPreview>
+  <ColorPicker disabled label="Accent Tint (Inactive)" defaultValue="#e2e8f0" />
+</DemoPreview>
+
+```json
+{
+  "type": "colorPicker",
+  "label": "Accent Tint (Inactive)",
+  "defaultValue": "#e2e8f0",
+  "disabled": true,
+  "interactive": true
+}
+```
+
+***
+
 # Propriétés
 
-`<ColorPicker />` (le wrapper stylisé) accepte :
+| Propriété | Type de champ CMS | Défaut | Description / Options prises en charge |
+| --- | --- | --- | --- |
+| **Texte du libellé** (`label`) | `string` | - | Texte visuel compagnon optionnel positionné au-dessus de la zone du sélecteur de couleur ou du déclencheur popover. |
+| **Valeur par défaut** (`defaultValue`) | `string` | `"#7c3aed"` | Couleur active initiale. Accepte des chaînes au format hexadécimal (ex. `"#7c3aed"`, `"#3b82f6"`). |
+| **Déclencheur (Popover)** (`trigger`) | `boolean` | `false` | Lorsque true, remplace la disposition complète du sélecteur en ligne par une carte popover flottante ancrée à un bouton d'échantillon de couleur. |
+| **Fermer à la sélection** (`closeOnSelect`) | `boolean` | `false` | Lorsque true, ferme le popover immédiatement après la sélection d'un échantillon prédéfini. (Uniquement applicable lorsque `trigger` est true). |
+| **Désactivé** (`disabled`) | `boolean` | `false` | Gèle tous les curseurs visuels, sélections de préréglages personnalisés, pipettes et champs de saisie. |
+| **Échelle de taille** (`size`) | `select` | `"md"` | Met à l'échelle la largeur et la hauteur du plateau de saturation, des échantillons et des marges. <br/>• Options : `"sm"`, `"md"`, `"lg"`. |
 
-| Propriété | Type | Description |
-| --- | --- | --- |
+***
 
-| `value` | \`string \ | HSVA\` | Current colour (controlled). Strings accept hex (`#rgb`, `#rgba`, `#rrggbb`, `#rrggbbaa`), `rgb()`/`rgba()`, and `hsl()`/`hsla()`. |
-| `defaultValue` | \`string \ | HSVA\` | Initial colour (uncontrolled). Defaults to `#7c3aed`. |
+# Notes pour les développeurs et accessibilité
 
-| `format` | \`"hex" \ | "rgba" \ | "hsla"\` | Active input format (controlled). |
-| `defaultFormat` | \`"hex" \ | "rgba" \ | "hsla"\` | Initial input format (uncontrolled). Defaults to `"hex"`. |
-
-| `onValueChange` | `(details: { value: string; hsva: HSVA }) => void` | Appelé à chaque changement de couleur ; `value` est la chaîne hexadécimale (avec suffixe alpha lorsqu'elle est translucide). |
-| `onFormatChange` | `(details: { format: ColorFormat }) => void` | Appelé lorsque la sélection de format change. |
-| `trigger` | `boolean` | Créez un déclencheur d'échantillon qui ouvre le panneau dans une fenêtre contextuelle plutôt qu'en ligne. |
-| `open` / `defaultOpen` | `boolean` | État popover (contrôlé/non contrôlé) ; n'a de sens qu'avec `trigger`. |
-| `onOpenChange` | `(details: { open: boolean }) => void` | Appelé lorsque le popover s'ouvre ou se ferme. |
-| `closeOnSelect` | `boolean` | Fermez le popover après avoir sélectionné un échantillon prédéfini. La valeur par défaut est « false ». |
-| `presets` | `string[]` | Couleurs d'échantillon prédéfinies. La valeur par défaut est une palette de 14 couleurs organisée ; passez `[]` pour vous cacher. |
-| `name` | `string` | Renvoie une entrée masquée portant la valeur hexadécimale pour la soumission native `<form>`. |
-
-| `label` | \`string \ | JSX.Élément\` | Optional label rendered above the picker. |
-
-| `showArea` / `showSliders` / `showInputs` / `showSwatches` | `boolean` | Basculez les sections individuelles du panneau. Tous sont par défaut « true ». |
-| `disabled` | `boolean` | Désactive toutes les interactions. |
-| `readOnly` | `boolean` | La valeur est visible mais ne peut pas être modifiée. |
-
-| `size` | \`"sm" \ | "md" \ | "lg"\` | Recipe size variant (area height, swatch size, spacing). Defaults to `"md"`. |
-
-| `interactive` | `boolean` | Force (ou supprime) l’hydratation comme une île. |
-
-## Hydratation
-
-Le wrapper s'hydrate automatiquement lorsqu'un signal comportemental est présent — n'importe quel rappel, une « valeur »/« defaultValue », « open »/`defaultOpen » ou « trigger » — et restitue du HTML statique dans le cas contraire. `interactive={false}` se désinscrit toujours ; `interactive` (ou `interactive={true}`) s'engage toujours. La décision passe par l'assistant `shouldHydrate()` partagé, comme chaque île de la bibliothèque.
-
-## Utilitaires de couleur
-
-Exporté depuis la primitive pour réutilisation et test :
-
-| Helper | Description |
-| --- | --- |
-| `parseColor(input)` | Analyse les chaînes hex/rgb(a)/hsl(a), les objets HSVA-ish ou RGB-ish dans un « HSVA » serré. Retombe au blanc. |
-| `hsvToRgb(h, s, v)` / `rgbToHsv(r, g, b)` | Conversion HSV ↔ RVB. |
-| `hsvToHsl(h, s, v)` / `hslToHsv(h, s, l)` | Conversion HSV ↔ HSL (s/v/l de 0 à 100). |
-| `hexToRgb(hex)` | Analyse l'hexadécimal à 3/4/6/8 chiffres en `{ r, g, b, a }` ou `null` en cas de malformation. |
-| `hsvaToHex(c, includeAlpha?)` | Chaîne hexagonale ; ajoute l'octet alpha uniquement lorsque cela est demandé et translucide. |
-| `hsvaToRgbaString(c)` / `hsvaToHslaString(c)` | Chaînes CSS `rgba()` / `hsla()`. |
-
-# Notes de production
-
-- **Aucune nouvelle dépendance.** Tous les calculs de couleurs (conversions HSV/HSL/RVB/hex, analyse) sont implémentés localement et testés unitairement ; rien n'est extrait de `@rc-component`, `@ark-ui` ou React.- **Sûr SSR.** Chaque partie affiche un balisage significatif sur le serveur — la variante statique est un aperçu fidèle et non interactif du même DOM exact que l'île hydrate.- **Contrôlé ou non contrôlé.** `value`/`format`/`open` prennent chacun en charge les deux modes avec les homologues `par défaut*` habituels.- **Précision.** Attribuez des objets `HSVA` (à partir de `details.hsva` de `onValueChange`) plutôt que des chaînes ré-analysées dans des scénarios contrôlés pour éviter la dérive d'arrondi aller-retour entre les formats.- **Prêt pour le formulaire.** La prop `name` restitue une entrée cachée avec la valeur hexadécimale actuelle, synchronisée à chaque modification.
+- **Îlot d'hydratation intelligent :** Pour gérer le glisser de la souris sur la grille de saturation et le positionnement dynamique des curseurs, le ColorPicker s'hydrate automatiquement en tant qu'îlot Preact sur les machines clientes.
+- **Intégration de formulaire :** Il émet une balise native masquée `<input type="hidden">` transportant la valeur de chaîne hex de la couleur active. Cela garantit que les soumissions de formulaires natifs capturent les valeurs actives dès le départ.
+- **Curseurs accessibles Aria :** Tous les champs curseurs, plateaux curseurs et champs de saisie portent des attributs ARIA sémantiques (`role="slider"`, `aria-valuemin`, `aria-valuemax`, `aria-valuenow`). La navigation clavier standard (flèches gauche/droite/haut/bas) est entièrement prise en charge nativement.
+- **Conversions précises :** Les conversions entre les formats HSVA, HSL, RGB et Hex se produisent en interne au niveau du rendu. Cela évite la dérive de couleur et les écarts d'arrondi entre les formats d'entrée sélectionnés.

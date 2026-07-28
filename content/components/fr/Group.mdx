@@ -4,61 +4,114 @@ hydration: 3
 category: Layout
 ---
 
-import { Group, Button } from "../../../app/components/ui";
+import { Group, Button, Input } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introduction
 
-Un composant de mise en page pour regrouper visuellement les éléments associés.
+Un composant d'encapsulation sémantique utilisé pour regrouper visuellement et structurellement plusieurs contrôles associés, tels que des boutons, des bascules ou des entrées, et imposer un espacement, une orientation et des attaches uniformes entre les enfants. Il simplifie la construction de barres d'outils et évite le code répétitif flexbox manuel.
 
-# Utilisation
+Le composant **Group** est entièrement intégré en tant que bloc `group` dans le **Page Builder**, permettant aux auteurs de contenu et aux développeurs de regrouper facilement des contrôles interactifs (comme des boutons d'action ou des combinaisons de saisie) directement dans le CMS.
+
+***
+
+# Utilisation via le CMS Page Builder (JSON)
+
+Ces exemples illustrent comment les éditeurs de contenu lient et structurent des ensembles de contrôles groupés dans les schémas de page JSON (`content/pages/*.json`).
+
+## 1. Barre d'Actions Horizontale
+
+Un regroupement horizontal standard de boutons d'action avec des espaces internes uniformément répartis. Regroupe les opérations contextuelles d'enregistrement et d'édition.
 
 <DemoPreview>
-  <Group attached>
-    <Button>First</Button>
-    <Button>Second</Button>
-    <Button>Third</Button>
+  <Group>
+    <Button>Save</Button>
+    <Button variant="outline">Edit</Button>
+    <Button variant="subtle" colorPalette="red">Delete</Button>
   </Group>
 </DemoPreview>
-
-```tsx
-import { Group } from "../components/ui";
-import { Button } from "../components/ui/button";
-
-export default function MyPage() {
-  return (
-    <Group attached>
-      <Button>First</Button>
-      <Button>Second</Button>
-      <Button>Third</Button>
-    </Group>
-  );
-}
-```
-
-## Constructeur de pages CMS
-
-Ce composant est disponible sous forme de bloc `group` dans [Page Builder](/docs/PageBuilder) (`content/pages/*.json`) :
 
 ```json
 {
   "type": "group",
-  "attached": true,
+  "orientation": "horizontal",
+  "gap": "sm",
+  "attached": false,
   "children": [
-    { "type": "button", "text": "First" },
-    { "type": "button", "text": "Second" }
+    { "type": "button", "text": "Save" },
+    { "type": "button", "text": "Edit", "variant": "outline" },
+    { "type": "button", "text": "Delete", "variant": "subtle", "colorPalette": "red" }
   ]
 }
 ```
 
-# Propriétés
+## 2. Combinaison de Saisie de Recherche Attachée
 
-| Propriété | Type | Description |
-| --- | --- | --- |
-| `children` | `any` | Contenu à restituer à l'intérieur du composant. |
-| `class` | `string` | Classes CSS personnalisées. |
+Utilise la prop `attached` pour créer un unique widget transparent. La saisie et le bouton fusionnent visuellement en un contrôle continu.
 
-| `orientation` | \`"horizontal" \ | "verticale"\` | The orientation of the group. |
+<DemoPreview>
+  <Group attached>
+    <Input placeholder="Search documentation..." />
+    <Button>Search</Button>
+  </Group>
+</DemoPreview>
 
-| `attached` | `boolean` | S'il faut attacher les enfants ensemble. |
-| `grow` | `boolean` | Si les enfants doivent grandir pour occuper l'espace disponible. |
+```json
+{
+  "type": "group",
+  "orientation": "horizontal",
+  "gap": "none",
+  "attached": true,
+  "children": [
+    { "type": "input", "placeholder": "Search documentation..." },
+    { "type": "button", "text": "Search" }
+  ]
+}
+```
+
+## 3. Contrôles Empilés Verticalement
+
+Présente l'orientation verticale pour les contrôles à bascule empilés ou les menus verticaux nécessitant un espacement vertical cohérent.
+
+<DemoPreview>
+  <Group orientation="vertical" gap="md">
+    <Button>Profile</Button>
+    <Button variant="outline">Settings</Button>
+    <Button variant="subtle" colorPalette="red">Logout</Button>
+  </Group>
+</DemoPreview>
+
+```json
+{
+  "type": "group",
+  "orientation": "vertical",
+  "gap": "md",
+  "attached": false,
+  "children": [
+    { "type": "button", "text": "Profile" },
+    { "type": "button", "text": "Settings", "variant": "outline" },
+    { "type": "button", "text": "Logout", "variant": "subtle", "colorPalette": "red" }
+  ]
+}
+```
+
+***
+
+# Référence de Configuration CMS
+
+Ces champs correspondent directement aux propriétés de bloc Sveltia CMS sous `public/admin/config.yml` ou aux configurations du Page Builder :
+
+| Propriété | Type de Champ CMS | Par défaut | Description / Options Prises en Charge |
+| :--- | :--- | :--- | :--- |
+| **Orientation** (`orientation`) | `select` | `"horizontal"` | Disposition de l'axe principal des enfants.<br/>• Options : `"horizontal"`, `"vertical"`. |
+| **Espacement** (`gap`) | `string` | `"sm"` | Espacement de remplissage interne entre les éléments enfants individuels.<br/>• Options : `"none"`, `"sm"`, `"md"`, `"lg"`. |
+| **Mode Attaché** (`attached`) | `boolean` | `false` | Lorsque true, supprime les espaces de remplissage internes et fusionne visuellement les éléments adjacents en un contrôle unique unifié. |
+| **Blocs Enfants** (`children`) | `list` | - | Liste d'éléments interactifs (Boutons, Basculeurs, Saisies) disposés dans la piste du groupe. |
+
+***
+
+# Notes de Développement et Accessibilité
+
+- **Sans Hydratation (Statique Uniquement) :** Group est un composant de mise en page sémantique désigné comme composant Statique Uniquement (`Tier 3`). Il est entièrement rendu en HTML standard côté serveur et est exempt de scripts d'hydratation côté client.
+- **Wrapper de Contexte Structurel :** Pour éviter les décalages de mise en page et un espacement incohérent, le composant Group enveloppe explicitement les composants enfants dans une piste `<div>` interne, garantissant des calculs d'espacement uniformes quelle que soit la complexité du contenu imbriqué.
+- **Réutilisabilité Flexible :** Comme il impose une seule direction flex rigide à tous les enfants, les développeurs peuvent imbriquer plusieurs composants Group (orientations horizontale/verticale mixtes) pour construire des panneaux d'action ressemblant à des grilles complexes avec un minimum d'effort.

@@ -1,7 +1,7 @@
 ---
 title: Card Carte
-hydration: 2
 category: Data Display
+hydration: 2
 ---
 
 import { Card, Button } from "../../../app/components/ui";
@@ -9,94 +9,91 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introduction
 
-Un conteneur flexible pour regrouper le contenu associé, avec des emplacements facultatifs pour l'en-tête, le corps, le pied de page, l'image et l'avatar.
+Un conteneur de mise en page très polyvalent conçu pour regrouper des informations, actions, médias et métadonnées associés dans un seul module visuellement structuré. Il comprend des zones désignées pour les en-têtes, titres, descriptions, texte du corps, avatars, images de couverture, actions et pieds de page.
+
+Le composant **Card** est entièrement intégré en tant que bloc `card` dans le **Page Builder**, permettant aux auteurs de contenu et aux développeurs de configurer les structures de mise en page, les variations de surface et le format responsive directement dans le CMS.
+
+***
 
 # Utilisation
 
-## Carte de base
+Ces exemples illustrent comment les éditeurs de contenu lient et structurent les composants de carte.
+
+## 1. Carte de vue d'ensemble de projet surélevée
+
+Une carte de profil surélevée classique, complète avec titre, description, texte du corps et un bouton d'action principal rendu dans l'emplacement du pied de page.
 
 <DemoPreview>
   <Card
     variant="elevated"
-    title="Project title"
-    description="A short description of the project."
-    body="Main content of the card goes here."
-    footer={<Button>View</Button>}
+    title="Project Launchpad"
+    description="Accelerate your workflow development"
+    body="Create, configure, and scale multi-platform applications seamlessly. Our cloud-native environment is optimized for high performance, serverless routing, and automatic localized static site generation."
+    footer={<Button>View Project</Button>}
   />
 </DemoPreview>
-
-```tsx
-import { Card, Button } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Card
-      variant="elevated"
-      title="Project title"
-      description="A short description of the project."
-      body="Main content of the card goes here."
-      footer={<Button>View</Button>}
-    />
-  );
-}
-```
-
-## Carte avec image
-
-```tsx
-import { Card } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Card
-      image="/cover.png"
-      imagePosition="top"
-      title="Card with image"
-      body="Content beneath the image."
-    />
-  );
-}
-```
-
-## Constructeur de pages CMS
-
-Ce composant est disponible sous forme de bloc `card` dans [Page Builder](/docs/PageBuilder) (`content/pages/*.json`) :
 
 ```json
 {
   "type": "card",
-  "title": "Project title",
-  "description": "A short description of the project.",
-  "body": "Main content of the card goes here.",
-  "variant": "elevated"
+  "title": "Project Launchpad",
+  "description": "Accelerate your workflow development",
+  "body": "Create, configure, and scale multi-platform applications seamlessly. Our cloud-native environment is optimized for high performance, serverless routing, and automatic localized static site generation.",
+  "variant": "elevated",
+  "boxShadow": "lg",
+  "children": [
+    {
+      "type": "button",
+      "text": "View Project",
+      "variant": "solid"
+    }
+  ]
 }
 ```
 
+## 2. Carte de couverture médiatique riche avec image supérieure
+
+Rend une carte en contour présentant une grande image de couverture visuelle alignée en haut du corps de contenu. Parfait pour les articles de blog, les grilles d'actualités ou les mises en avant de produits.
+
+<DemoPreview>
+  <Card
+    variant="outline"
+    image="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop"
+    imagePosition="top"
+    title="Design Systems in Production"
+    body="Explore optimal architectural patterns for managing multi-variant design tokens, static compilation, and robust hydration frameworks in large engineering organizations."
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "card",
+  "image": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop",
+  "imagePosition": "top",
+  "title": "Design Systems in Production",
+  "body": "Explore optimal architectural patterns for managing multi-variant design tokens, static compilation, and robust hydration frameworks in large engineering organizations.",
+  "variant": "outline"
+}
+```
+
+***
+
 # Propriétés
 
-## Carte
+| Propriété | Type de champ CMS | Défaut | Description / Options prises en charge |
+| --- | --- | --- | --- |
+| **Titre de carte** (`title`) | `string` | - | En-tête principal affiché dans la zone d'en-tête de la carte. |
+| **Description de carte** (`description`) | `string` | - | Sous-titre de prise en charge secondaire positionné sous le titre. |
+| **Texte du corps** (`body`) | `string` | - | Contenu principal du bloc de texte rendu dans le corps de la carte. |
+| **Image de couverture** (`image`) | `image` | - | URL ou chemin multimédia pour le graphique ou la photo accompagnant. |
+| **Position de l'image** (`imagePosition`) | `select` | `"top"` | Alignement de mise en page du graphique de couverture. <br/>• Options : `"top"`, `"bottom"`, `"left"`, `"right"`. |
+| **Variante visuelle** (`variant`) | `select` | `"elevated"` | Style de bordure et d'ombre. <br/>• Options : `"elevated"`, `"outline"`, `"subtle"`. |
+| **Profondeur d'ombre** (`boxShadow`) | `select` | `"sm"` | Ombre de thème appliquée autour du contour extérieur de la bordure. <br/>• Options : `"none"`, `"2xs"`, `"xs"`, `"sm"`, `"md"`, `"lg"`, `"xl"`, `"2xl"`. |
+| **Limites de débordement** (`overflow`) | `select` | `"hidden"` | Politique de débordement. Définissez sur `"visible"` lorsque la carte imbrique des éléments superposés non portail (Dropdowns, Popovers, DatePickers) pour éviter la découpe de mise en page. |
 
-| Propriété | Type | Description |
-| --- | --- | --- |
+***
 
-| `title` | \`string \ | JSX.Élément\` | The card title. |
-| `description` | \`string \ | JSX.Élément\` | The card description. |
-| `body` | \`string \ | JSX.Élément\` | The main body content. |
-| `footer` | \`string \ | JSX.Élément\` | Footer content. |
+# Notes pour les développeurs et accessibilité
 
-| `avatar` | `JSX.Element` | Élément affiché dans l'en-tête (par exemple un avatar). |
-| `headerAction` | `JSX.Element` | Élément affiché à la fin de l’en-tête (par exemple un menu). |
-
-| `image` | \`string \ | JSX.Élément\` | Image source or element. |
-
-| `imagePosition` | \`"top" \ | "bas" \ | "left" \ | "right"\` | Where the image is placed. Default: `"top"`. |
-
-| `headerClass` | `string` | Classes CSS personnalisées pour l'en-tête. |
-| `bodyClass` | `string` | Classes CSS personnalisées pour le corps. |
-| `footerClass` | `string` | Classes CSS personnalisées pour le pied de page. |
-| `imageClass` | `string` | Classes CSS personnalisées pour l'image. |
-
-| `variant` | \`"elevated" \ | "contour" \ | "subtle"\` | The visual style of the card. |
-
-| `interactive` | `boolean` | Activez l’hydratation côté client. |
-| `class` | `string` | Classes CSS personnalisées pour l'élément racine. |
+- **Îlot d'hydratation :** Par défaut, les cartes se compilent en éléments statiques légers et purement présentationnels. Cependant, si elles contiennent des blocs enfants interactifs actifs ou des déclencheurs d'état explicites, elles s'hydratent côté client comme un îlot conditionnel de Niveau 2.
+- **Conformité WAI-ARIA :** Les cartes sont structurées pour imposer des ordres de lecture de contenu logiques. Utilisez des en-têtes sémantiques (`h2`-`h4`) pour les emplacements de titre. Assurez-vous que tout graphique de couverture décoratif est fourni avec des balises alt vides appropriées afin que les lecteurs d'écran les ignorent avec grâce.

@@ -1,7 +1,7 @@
 ---
 title: Layout 布局
-hydration: 3
 category: Layout
+hydration: 3
 ---
 
 import { Layout, Heading, Text, Stack } from "../../../app/components/ui";
@@ -9,49 +9,56 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # 简介
 
-将一个 `<Layout>` 嵌套到另一个 `<Layout>` 的 `content` 或嵌套子元素中，以构建组合式外壳，例如：外层 Layout 带页眉/页脚，内层 Layout 承载侧边导航栏。
+`Layout` 组件提供由自定义页眉、侧边导航栏（sider）、主体内容区域与页脚组成的语义化页面结构。它支持自定义侧边栏尺寸、基于断点的显隐控制、吸顶滚动锁定，以及占满视口高度的外层容器。
+
+在页面构建器（Page Builder）CMS 中，内容作者与开发者可将卡片、页眉、堆叠（Stack）与按钮放入专用的插槽数组，从而配置语义化的结构面板。
+
+***
 
 # 用法
 
-## 页眉 + 内容 + 页脚
+以下示例展示了内容编辑者如何绑定并组织语义化的页面模板。
 
-在没有 `sider` 的情况下，各部分在单列中堆叠。
+## 1. 标准页眉、内容与页脚页面外壳
+
+包含语义化顶部页眉与底部页脚面板的文档或文章型布局。
 
 <DemoPreview>
   <div style={{ width: "100%", border: "1px solid var(--colors-border)", borderRadius: "12px", overflow: "hidden" }}>
     <Layout
       header={
         <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--colors-border)", background: "var(--colors-bg-subtle)" }}>
-          <Heading as="h4" size="sm">Header</Heading>
+          <Heading as="h4" size="sm">Site Brand Header</Heading>
         </div>
       }
-      content={<div style={{ padding: "16px" }}><Text size="sm">Content</Text></div>}
+      content={<div style={{ padding: "16px" }}><Text size="sm">Main Article and Interactive Content</Text></div>}
       footer={
         <div style={{ padding: "12px 16px", borderTop: "1px solid var(--colors-border)", background: "var(--colors-bg-subtle)" }}>
-          <Text size="xs">Footer</Text>
+          <Text size="xs">© 2026 Acme Corp. All rights reserved.</Text>
         </div>
       }
     />
   </div>
 </DemoPreview>
 
-```tsx
-import { Layout } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Layout
-      header={<SiteHeader />}
-      content={<Article />}
-      footer={<SiteFooter />}
-    />
-  );
+```json
+{
+  "type": "layout",
+  "header": [
+    { "type": "heading", "text": "Site Brand Header", "as": "h4", "size": "sm" }
+  ],
+  "content": [
+    { "type": "text", "content": "Main Article and Interactive Content" }
+  ],
+  "footer": [
+    { "type": "text", "content": "© 2026 Acme Corp. All rights reserved.", "size": "xs" }
+  ]
 }
 ```
 
-## 页眉 + 侧边栏 + 内容
+## 2. 带侧边导航（Sider）的仪表盘外壳
 
-传入 `sider` 会将其与 `content` 包裹在一行中。`siderWidth` 选择侧边栏宽度（`sm` 14rem，`md` 16rem 默认，`lg` 18rem）；`siderHideBelow` 在断点以下隐藏侧边栏，以适配小屏幕。
+在主内容区域左侧添加导航抽屉或侧栏。Sider 可自定义 sm、md 或 lg 宽度，并可在小屏移动端视口上自动收起。
 
 <DemoPreview>
   <div style={{ width: "100%", border: "1px solid var(--colors-border)", borderRadius: "12px", overflow: "hidden" }}>
@@ -59,84 +66,21 @@ export default function MyPage() {
       siderWidth="sm"
       header={
         <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--colors-border)", background: "var(--colors-bg-subtle)" }}>
-          <Heading as="h4" size="sm">Dashboard</Heading>
+          <Heading as="h4" size="sm">Dashboard System</Heading>
         </div>
       }
       sider={
         <div style={{ padding: "16px", borderRight: "1px solid var(--colors-border)", background: "var(--colors-bg-subtle)" }}>
           <Stack direction="vertical" gap="2">
-            <Text size="sm">Overview</Text>
-            <Text size="sm">Reports</Text>
-            <Text size="sm">Settings</Text>
+            <Text size="sm">Analytics Overview</Text>
+            <Text size="sm">Cloud Infrastructure</Text>
           </Stack>
         </div>
       }
-      content={<div style={{ padding: "16px" }}><Text size="sm">Content next to the sider</Text></div>}
+      content={<div style={{ padding: "16px" }}><Text size="sm">Cloud systems are operational. Latency is within normal bounds.</Text></div>}
     />
   </div>
 </DemoPreview>
-
-```tsx
-import { Layout } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Layout
-      header={<SiteHeader />}
-      sider={<Sidenav />}
-      siderWidth="sm"
-      siderHideBelow="md"
-      content={<Article />}
-    />
-  );
-}
-```
-
-## 吸顶页眉与侧边栏
-
-`stickyHeader` 将页眉固定在页面滚动的顶部。`stickySider` 将其下方的侧边栏固定，并自行滚动其溢出内容 —— 适用于长导航搭配短内容（或反之）的场景。`fullHeight` 则为最外层页面外壳占满视口高度。
-
-```tsx
-import { Layout } from "../components/ui";
-
-export default function DocsPage() {
-  return (
-    <Layout
-      fullHeight
-      stickyHeader
-      stickySider
-      header={<SiteHeader />}
-      sider={<DocsSidenav />}
-      siderHideBelow="md"
-      content={<Article />}
-    />
-  );
-}
-```
-
-## 嵌套 Layout
-
-当页眉/页脚横跨整个宽度，但只有部分主体需要侧边栏时，可在 `content` 内嵌套一个 `<Layout>`：
-
-```tsx
-import { Layout } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Layout
-      header={<SiteHeader />}
-      content={
-        <Layout sider={<Sidenav />} content={<Article />} />
-      }
-      footer={<SiteFooter />}
-    />
-  );
-}
-```
-
-## CMS 页面构建器
-
-该组件可作为 `layout` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用。`header`、`sider`、`content` 与 `footer` 各自都是一个组件区块列表 —— 任何区块类型均可使用，包括用于嵌套外壳的另一个 `layout`：
 
 ```json
 {
@@ -144,7 +88,7 @@ export default function MyPage() {
   "siderWidth": "sm",
   "siderHideBelow": "md",
   "header": [
-    { "type": "heading", "text": "Dashboard", "as": "h3", "size": "lg" }
+    { "type": "heading", "text": "Dashboard System", "as": "h4", "size": "sm" }
   ],
   "sider": [
     {
@@ -152,42 +96,65 @@ export default function MyPage() {
       "direction": "vertical",
       "gap": "2",
       "children": [
-        { "type": "link", "text": "Overview", "href": "#" },
-        { "type": "link", "text": "Reports", "href": "#" }
+        { "type": "text", "content": "Analytics Overview", "size": "sm" },
+        { "type": "text", "content": "Cloud Infrastructure", "size": "sm" }
       ]
     }
   ],
   "content": [
-    { "type": "text", "content": "Pick a page from the rail on the left." }
-  ],
-  "footer": [
-    { "type": "text", "size": "sm", "content": "© 2026 Acme" }
+    { "type": "text", "content": "Cloud systems are operational. Latency is within normal bounds." }
   ]
 }
 ```
 
-将某个部分的列表留空（或省略）会完全跳过该部分的包裹元素 —— 类似 `siderWidth`/`siderHideBelow` 这类未被设置的可选字段，从 CMS 传入时为 `""`，被视为未设置，从而回退到组件的默认值。
+## 3. 嵌套布局组合
+
+布局可以干净地嵌套在其他布局内部。当你希望拥有通栏的站点页眉与页脚，但仅让中间主体内容包含侧边导航时，这种做法非常有用。
+
+```json
+{
+  "type": "layout",
+  "header": [
+    { "type": "heading", "text": "Global Full-Width Header", "as": "h3" }
+  ],
+  "content": [
+    {
+      "type": "layout",
+      "siderWidth": "md",
+      "sider": [
+        { "type": "text", "content": "Nested Sidebar Rail" }
+      ],
+      "content": [
+        { "type": "text", "content": "Nested Content Body" }
+      ]
+    }
+  ],
+  "footer": [
+    { "type": "text", "content": "Global Full-Width Footer", "size": "xs" }
+  ]
+}
+```
+
+***
 
 # 属性
 
-## Layout
+| 属性 | CMS 字段类型 | 默认值 | 描述 / 支持选项 |
+| --- | --- | --- | --- |
+| **页眉面板** (`header`) | `list` | - | 渲染在顶部语义化 `<header>` 内部的视觉区块集合（如 logo、标题、按钮）。 |
+| **侧边面板** (`sider`) | `list` | - | 渲染在左侧语义化导航 `<aside>` 内部的视觉区块集合。 |
+| **主体内容** (`content`) | `list` | - | 渲染在语义化 `<main>` 内容容器内部的主区块集合。 |
+| **页脚面板** (`footer`) | `list` | - | 渲染在底部语义化 `<footer>` 内部的视觉区块集合。 |
+| **占满高度** (`fullHeight`) | `boolean` | `false` | 使最外层容器占满整个视口高度（`min-height: 100vh`）。 |
+| **吸顶页眉** (`stickyHeader`) | `boolean` | `false` | 在页面滚动时将站点页眉固定在视口顶部。 |
+| **吸顶侧栏** (`stickySider`) | `boolean` | `false` | 将侧边面板锁定在原位，仅主体内容区域滚动。 |
+| **侧栏宽度** (`siderWidth`) | `select` | `"md"` | 侧边面板的列宽尺寸。<br/>• 选项：`"sm"`（14rem）、`"md"`（16rem）、`"lg"`（18rem）。 |
+| **侧栏响应式隐藏** (`siderHideBelow`) | `select` | - | 在较小视口上收起并隐藏侧边栏。<br/>• 选项：`"sm"`、`"md"`、`"lg"`。 |
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `header` | \`string \| JSX.Element\` | 渲染在主体上方的语义化 `<header>` 内。（仅速记 API） |
-| `sider` | \`string \| JSX.Element\` | 渲染在语义化 `<aside>` 侧边栏中。它的存在会将主体切换为侧边栏 + 内容的一行布局。（仅速记 API） |
-| `content` | \`string \| JSX.Element\` | 渲染在语义化 `<main>` 内。`children` 会追加在其后。（仅速记 API） |
-| `footer` | \`string \| JSX.Element\` | 渲染在主体下方的语义化 `<footer>` 内。（仅速记 API） |
-| `fullHeight` | `boolean` | 占满视口高度 —— 用于最外层页面外壳。 |
-| `stickyHeader` | `boolean` | 将页眉固定在页面滚动的顶部。 |
-| `stickySider` | `boolean` | 将侧边栏固定在吸顶页眉下方；侧边栏内部自行滚动。 |
-| `siderWidth` | \`"sm" \| "md" \| "lg"\` | 侧边栏宽度：sm（14rem）、md（16rem，默认）、lg（18rem）。 |
-| `siderHideBelow` | \`"sm" \| "md" \| "lg"\` | 在此断点以下隐藏侧边栏。搭配文档流内的展开控件使用。 |
-| `hasSider` | `boolean` | 手动强制布局方向为行。（复合 API） |
-| `headerClass` | `string` | 为 `<header>` 部分添加额外 class。（仅速记 API） |
-| `siderClass` | `string` | 为 `<aside>` 部分添加额外 class。（仅速记 API） |
-| `contentClass` | `string` | 为 `<main>` 部分添加额外 class。（仅速记 API） |
-| `footerClass` | `string` | 为 `<footer>` 部分添加额外 class。（仅速记 API） |
-| `bodyClass` | `string` | 为包裹侧边栏 + 内容的行容器添加额外 class（仅当设置了 `sider` 时渲染）。 |
-| `children` | `any` | 渲染在布局外壳内的子元素。 |
-| `class` | `string` | 根元素的自定义 CSS 类。 |
+***
+
+# 开发者须知与无障碍
+
+- **嵌套规则与深度上限：** Sveltia CMS 在编辑器界面中强制约四层的可视化嵌套上限。此深度限制约束了通过 UI 可构建的内容，但并不会限制布局编译器——手动编写的 JSON 模板可按需任意深度嵌套布局。
+- **语义化元素映射：** 该组件直接映射为合法且语义化的 HTML5 元素：`<header>`、`<aside>`、`<main>` 与 `<footer>`。
+- **跳过导航兼容性：** 使用自定义页眉与页脚时，请确保标题层级逻辑有序（例如页面以 `h1` 开头），以维持较高的无障碍评分。

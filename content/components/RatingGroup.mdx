@@ -1,0 +1,123 @@
+---
+title: RatingGroup
+category: Forms
+hydration: 2
+---
+
+import { RatingGroup } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
+# Introduction
+
+An interactive input control that allows users to view and submit star-based ratings (e.g. product reviews, feedback scores). It features built-in support for hover states, custom icons, fractional half-star precision, and full keyboard navigation.
+
+The **Rating Group** component is fully integrated as a `ratingGroup` block in the **Page Builder**. This allows content authors and developers to easily configure visual stars, default selections, custom scales (counts), half-star precision toggles, and color themes directly within the CMS.
+
+***
+
+# Usage
+
+These examples illustrate how content editors configure and place the rating group component.
+
+## 1. Standard Product Rating
+
+A classic 5-star rating scale starting with 3 pre-selected stars. Used for standard user feedback, feedback lists, or product details.
+
+<DemoPreview>
+  <RatingGroup label="Rate your purchase" defaultValue={3} interactive />
+</DemoPreview>
+
+```json
+{
+  "type": "ratingGroup",
+  "label": "Rate your purchase",
+  "defaultValue": 3,
+  "count": 5,
+  "interactive": true
+}
+```
+
+## 2. High-Precision Score Selector
+
+Features half-star selection precision, a custom 10-star scale, size scale customization, and an energetic orange accent theme. Useful for detailed critic scoring or comprehensive reviews.
+
+<DemoPreview>
+  <RatingGroup
+    label="Product Score"
+    defaultValue={7.5}
+    count={10}
+    allowHalf
+    colorPalette="orange"
+    size="sm"
+    interactive
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "ratingGroup",
+  "label": "Product Score",
+  "defaultValue": 7.5,
+  "count": 10,
+  "allowHalf": true,
+  "colorPalette": "orange",
+  "size": "sm",
+  "interactive": true
+}
+```
+
+## 3. Read-Only Average Rating Display
+
+Designed strictly to visualize aggregated ratings. Hover interactions and click selections are disabled, rendering a clean, read-only display.
+
+<DemoPreview>
+  <RatingGroup
+    label="Community Rating (4.5 / 5)"
+    defaultValue={4.5}
+    allowHalf
+    readOnly
+    colorPalette="amber"
+    interactive
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "ratingGroup",
+  "label": "Community Rating (4.5 / 5)",
+  "defaultValue": 4.5,
+  "allowHalf": true,
+  "readOnly": true,
+  "colorPalette": "amber",
+  "interactive": true
+}
+```
+
+***
+
+# Props
+
+| Property | CMS Field Type | Default | Description / Supported Options |
+| --- | --- | --- | --- |
+| **Label Text** (`label`) | `string` | - | The visual title positioned above the rating items. |
+| **Initial Value** (`defaultValue`) | `number` | `3` | The initial pre-selected score. |
+| **Star Count** (`count`) | `number` | `5` | The total number of items/stars in the rating block scale. |
+| **Allow Half** (`allowHalf`) | `boolean` | `false` | Enables selection of fractional half-value steps (e.g. 3.5 stars) on mouse hover or arrow key presses. |
+| **Read Only** (`readOnly`) | `boolean` | `false` | Renders the rating score as static/view-only, disabling hover highlight states and clicks. |
+| **Disabled** (`disabled`) | `boolean` | `false` | Disables the entire block, applying a dimmed styling layer and blocking any user actions. |
+| **Size Scale** (`size`) | `select` | `"md"` | Controls overall dimensions of each rating star/indicator. <br/>• Options: `"sm"`, `"md"`, `"lg"`. |
+| **Color Theme** (`colorPalette`) | `string` | `"green"` | Visual color theme applied to highlighted items. Supports standard theme tokens (e.g. `green`, `orange`, `amber`, `red`, `blue`, `purple`, `cyan`). |
+| **Force Interactive** (`interactive`) | `boolean` | `true` | Ensures client-side hydration as an interactive island to capture user clicks and hovers instantly. |
+
+***
+
+# Developer Notes & Accessibility
+
+- **Smart Switcher Hydration:** Like this system's other form controls, the Rating Group keeps a zero-JS footprint on initial render. If rendered as read-only or with no values, it is delivered as static SSR. Providing hover handlers, active value changes, or setting `"interactive": true` promotes it to a client-side hydrated island.
+- **WAI-ARIA Accessibility:** Complies with the WAI-ARIA rating widget pattern. It utilizes an accessible hidden input to support standard HTML form submissions, while managing `aria-valuenow`, `aria-valuemin`, and `aria-valuemax` states on the container.
+- **Keyboard Navigation:** Fully supports keyboard focus and navigation. Standard keyboard controls work seamlessly:
+    - `ArrowRight` / `ArrowUp`: Increments score by 1 step (or 0.5 step if `allowHalf` is true).
+    - `ArrowLeft` / `ArrowDown`: Decrements score by 1 step (or 0.5 step if `allowHalf` is true).
+    - `Home`: Sets value to 0.
+    - `End`: Sets value to the maximum configured count.
+- **Roving Focus:** Uses a roving tabIndex to ensure only the active or first rating item remains in the tab sequence, preventing tab trap issues.

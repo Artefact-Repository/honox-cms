@@ -9,72 +9,122 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Einführung
 
-Eine Steuerung, mit der der Benutzer zwischen den Zuständen aktiviert, deaktiviert und unbestimmt wechseln kann.
+Die `Checkbox`-Komponente ist ein Formularsteuerelement, mit dem Benutzer zwischen binären Auswahlen (aktiviert oder deaktiviert) und einem unbestimmten Zustand umschalten können. Vollständig für den Page Builder optimiert, unterstützt die Komponente Standard-Browserverhalten und kann mit Zustandsbedingungen (wie ungültigen und deaktivierten Zuständen) und akzentuierten Design-Themen angepasst werden.
+
+***
 
 # Verwendung
 
+Sie können Checkboxen wie folgt anpassen und strukturieren:
+
+## Einfache Checkbox
+
+Eine Standard-Checkbox mit interaktivem Klick-Label für unkomplizierte Benutzeroptionen.
+
 <DemoPreview>
-  <Checkbox defaultChecked interactive>Accept Terms and Conditions</Checkbox>
+  <Checkbox interactive>Accept Terms and Conditions</Checkbox>
 </DemoPreview>
-
-```tsx
-import { Checkbox } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Checkbox
-      defaultChecked={true}
-      onCheckedChange={(details) => console.log(details.checked)}
-      interactive
-    >
-      Accept Terms and Conditions
-    </Checkbox>
-  );
-}
-```
-
-## Unbestimmter Zustand
-
-```tsx
-import { Checkbox } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Checkbox checked="indeterminate" interactive>
-      Parent Checkbox
-    </Checkbox>
-  );
-}
-```
-
-## CMS-Seitenbauer
-
-Diese Komponente ist als `checkbox`-Block im [Seitenbauer](/docs/PageBuilder) (`content/pages/*.json`) verfügbar:
 
 ```json
 {
-  "type": "checkbox",
-  "label": "Accept Terms and Conditions",
-  "checked": true,
-  "colorPalette": "blue"
+  "blockType": "checkbox",
+  "label": "Accept Terms and Conditions"
 }
 ```
 
+***
+
+## Vorab aktivierte Checkbox
+
+Konfigurieren Sie eine Checkbox, die beim erstmaligen Laden der Seite standardmäßig im aktivierten Zustand gerendert wird.
+
+<DemoPreview>
+  <Checkbox defaultChecked interactive>Subscribe to our newsletter</Checkbox>
+</DemoPreview>
+
+```json
+{
+  "blockType": "checkbox",
+  "label": "Subscribe to our newsletter",
+  "checked": true
+}
+```
+
+***
+
+## Deaktivierte Checkbox
+
+Verhindern Sie Benutzerinteraktionen mit der Checkbox, während der aktuelle visuelle Zustand erhalten bleibt.
+
+<DemoPreview>
+  <Checkbox disabled interactive>Premium feature unlocked</Checkbox>
+  <Checkbox checked={true} disabled interactive>Auto-renew subscription (fixed)</Checkbox>
+</DemoPreview>
+
+```json
+{
+  "blockType": "checkbox",
+  "label": "Auto-renew subscription (fixed)",
+  "checked": true,
+  "disabled": true
+}
+```
+
+***
+
+## Ungültiger Validierungszustand
+
+Zeigt an, dass ein Checkbox-Feld die Validierung nicht bestanden hat. Beispielsweise das Erzwingen eines Hakens zur Akzeptierung verpflichtender Richtlinienbedingungen. Die Eingabe wird mit Fehlergrenzen unter Verwendung der Standard-Status-Tokens des Design-Systems hervorgehoben.
+
+<DemoPreview>
+  <Checkbox invalid interactive>I accept the User Policy Agreement</Checkbox>
+</DemoPreview>
+
+```json
+{
+  "blockType": "checkbox",
+  "label": "I accept the User Policy Agreement",
+  "invalid": true
+}
+```
+
+***
+
+## Akzentuierte Checkbox
+
+Färben Sie aktivierte Zustände und Fokus-Marker mit benutzerdefinierten ästhetischen Akzenten aus der Farbpalette des Design-Systems und skalieren Sie die Größe hoch oder runter.
+
+<DemoPreview>
+  <Checkbox size="lg" colorPalette="purple" defaultChecked interactive>Purple Large Checkbox</Checkbox>
+</DemoPreview>
+
+```json
+{
+  "blockType": "checkbox",
+  "label": "Purple Large Checkbox",
+  "checked": true,
+  "size": "lg",
+  "colorPalette": "purple"
+}
+```
+
+***
+
 # Eigenschaften
 
-| Eigenschaft | Typ | Beschreibung |
-| --- | --- | --- |
-| `children` | `any` | Inhalt der Beschriftung, der neben dem Kontrollkästchen gerendert wird. |
-| `class` | `string` | Benutzerdefinierte CSS-Klassen. |
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | `String` | - | Die neben dem Checkbox-Steuerelement angezeigte Textbeschreibung. Ein Klick auf das Label schaltet ebenfalls den Checkbox-Zustand um. |
+| `checked` | `Boolean` | `false` | Ob die Checkbox anfangs aktiviert ist. (Server-seitig auf `defaultChecked` gemappt, um freies, unkontrolliertes Klicken ohne Sperren des Eingabezustands zu ermöglichen). |
+| `disabled` | `Boolean` | `false` | Deaktiviert Benutzerinteraktionen und visuelle Klick-Reaktionen. |
+| `invalid` | `Boolean` | `false` | Hebt die Komponente mit roten/ungültigen Rahmen hervor, um einen Validierungsfehler zu kennzeichnen. |
+| `size` | `Select` | `md` | Passt die Höhe und Breite des Checkbox-Begrenzungsrahmens an. Optionen: `sm`, `md`, `lg`. |
+| `colorPalette` | `Select` | - | Akzent-Farbthema, das auf den Hintergrund der Checkbox angewendet wird, wenn sie aktiv oder aktiviert ist. Optionen: `blue`, `green`, `red`, `purple`, `orange`, `amber`, `cyan`, `slate`. |
 
-| `checked` | \`boolean \ | "indeterminate"\` | Ob das Kontrollkästchen aktiviert ist (kontrolliert). |
+***
 
-| `defaultChecked` | \`boolean \ | "indeterminate"\` | Der anfängliche Aktivierungszustand (unkontrolliert). |
+# Architektur-Hinweise
 
-| `disabled` | `boolean` | Ob das Kontrollkästchen deaktiviert ist. |
-
-| `onCheckedChange` | \`(details: \{ checked: boolean \ | "indeterminate" \}) => void\` | Rückruf, der ausgelöst wird, wenn sich der Aktivierungszustand ändert. |
-
-| `size` | \`"sm" \ | "md" \ | "lg"\` | Die Größe des Kontrollkästchens. |
-
-| `interactive` | `boolean` | Erzwingt die Hydration als Insel. |
+- **Nicht kontrollierte Standard-Haken:** Um zu verhindern, dass Checkboxen in statischen, datengetriebenen Vorlagen ohne benutzerdefinierte Inline-Handler einfrieren (und Benutzerklicks blockieren), wird das CMS-Feld `checked` in unserer Seiten-Registrierung als `defaultChecked` aufgelöst.
+- **Standard-Formular-Reset:** Die Komponente integriert sich in Standard-HTML-Formular-Resets. Resets stellen die Checkboxen nahtlos auf ihre ursprünglichen `checked`-Zustände zurück, die im JSON-Template konfiguriert wurden.
+- **Nativ fokustastatur:** Fokusindikatoren und Umschalt-Interaktionen (Leertaste-Auslöser) verlassen sich auf Standard-HTML-Eingaben und Browserverhalten. Dies bleibt auf assistierenden Screenreadern hochperformant und zugänglich.

@@ -1,7 +1,7 @@
 ---
 title: Loader Cargador
-hydration: 3
 category: Feedback
+hydration: 3
 ---
 
 import { Loader } from "../../../app/components/ui";
@@ -9,57 +9,60 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introducción
 
-Un componente utilitario que gestiona el estado visual de un `Spinner` y el texto asociado.
+Un componente de utilidad de diseño de carga visual que empareja un elemento `Spinner` giratorio con texto de mensaje de estado acompañante. Se utiliza principalmente para gestionar las expectativas de los usuarios durante obtenciones del servidor, operaciones de archivos, transiciones de estado o estados de procesamiento de contenido dentro de los bloques de diseño.
+
+El componente **Loader** está totalmente integrado como un bloque `loader` en el **Page Builder**, permitiendo a los autores de contenido y desarrolladores configurar fácilmente texto de estado visual y alineaciones del spinner directamente dentro de los esquemas de página del CMS.
+
+***
 
 # Uso
 
+Estos ejemplos ilustran cómo los editores de contenido enlazan y estructuran cargadores interactivos.
+
+## 1. Cargador de Estado Central Estándar
+
+Un indicador de carga clásico con texto de estado estándar, adecuado para entradas de panel principales, actualizaciones de contenido o bloques de carga diferida.
+
 <DemoPreview>
-  <Loader text="Loading data..." />
+  <Loader text="Loading workspace data..." />
 </DemoPreview>
-
-```tsx
-import { Loader, Spinner } from "../components/ui";
-
-export default function MyPage() {
-  return <Loader text="Loading data..." />;
-}
-```
-
-## Spinner y ubicación personalizados
-
-```tsx
-import { Loader, Spinner } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Loader
-      spinner={<Spinner size="lg" colorPalette="blue" />}
-      spinnerPlacement="end"
-    >
-      Please wait
-    </Loader>
-  );
-}
-```
-
-## Constructor de páginas del CMS
-
-Este componente está disponible como un bloque `loader` en el [Constructor de páginas](/docs/PageBuilder) (`content/pages/*.json`) — el campo `text` del CMS se mapea directamente a la propiedad `text` propia de `Loader`:
 
 ```json
 {
   "type": "loader",
-  "text": "Checking availability...",
+  "text": "Loading workspace data...",
   "spinnerPlacement": "start"
 }
 ```
 
-# Propiedades
+## 2. Cargador con Spinner Final (Alineación al Final)
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `children` | `any` | Contenido de texto que se renderiza junto al spinner. |
-| `spinner` | `Child` | Elemento spinner personalizado. Por defecto `<Spinner size="inherit" />`. |
-| `text` | `Child` | Propiedad alternativa para el contenido de texto. |
+Presenta el spinner visual alineado después del mensaje de estado, proporcionando un flujo visual alternativo para pies de tarjeta o acciones de botón en línea.
 
-| `spinnerPlacement` | \`"start" \ | "end"\` | Dónde colocar el spinner en relación con el texto. Por defecto `"start"`. |
+<DemoPreview>
+  <Loader text="Please wait while we process your request" spinnerPlacement="end" />
+</DemoPreview>
+
+```json
+{
+  "type": "loader",
+  "text": "Please wait while we process your request",
+  "spinnerPlacement": "end"
+}
+```
+
+***
+
+# Props
+
+| Propiedad | Tipo de Campo CMS | Predeterminado | Descripción / Opciones Compatibles |
+| --- | --- | --- | --- |
+| **Texto de Estado** (`text`) | `string` | - | El texto del mensaje mostrado junto al spinner giratorio. |
+| **Colocación del Spinner** (`spinnerPlacement`) | `select` | `"start"` | Alineación del spinner relativa al texto acompañante.<br/>• Opciones: `"start"`, `"end"`. |
+
+***
+
+# Notas para Desarrolladores y Accesibilidad
+
+- **Sin Hidratación (Solo Estático):** El Loader es un ayudante de diseño puramente presentacional designado como componente Solo Estático (`Tier 3`). Se compila en marcado HTML/CSS estándar del lado del servidor con cero absoluto de JavaScript interactivo del lado del cliente.
+- **Cumplimiento WAI-ARIA:** En su interior, este componente está diseñado para tecnologías de asistencia, compilando con parámetros de región en vivo o contenedor ocupado apropiados (p. ej., `aria-busy="true"`, `role="status"` en contenedores principales) asegurando una comunicación fluida de las actividades en segundo plano en curso.

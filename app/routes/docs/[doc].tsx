@@ -567,8 +567,7 @@ export default createRoute(
 		const groups = buildDocGroups(docs, config);
 		const flatDocs = flattenDocGroups(groups);
 		const currentIndex = flatDocs.findIndex((d) => d.slug === slug);
-		const prevDoc =
-			currentIndex > 0 ? flatDocs[currentIndex - 1] : undefined;
+		const prevDoc = currentIndex > 0 ? flatDocs[currentIndex - 1] : undefined;
 		const nextDoc =
 			currentIndex >= 0 && currentIndex < flatDocs.length - 1
 				? flatDocs[currentIndex + 1]

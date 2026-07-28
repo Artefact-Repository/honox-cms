@@ -1,7 +1,7 @@
 ---
 title: Breadcrumb Brotkrümel
-hydration: 3
 category: Navigation
+hydration: 3
 ---
 
 import { Breadcrumb } from "../../../app/components/ui";
@@ -9,11 +9,19 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Einführung
 
-Eine Navigationshilfe, die den Standort der aktuellen Seite innerhalb einer Hierarchie mithilfe einer Liste von Links anzeigt.
+Die `Breadcrumb`-Komponente ist eine Navigationshilfe, die den Standort der aktuellen Seite innerhalb einer hierarchischen Struktur der Website anzeigt. Sie hilft Benutzern, ihren Pfad von der Startseite zurück zur aktuellen Position zu verfolgen und sich leicht nach oben durch die Hierarchie zu navigieren.
+
+Der **Breadcrumb** ist vollständig als `breadcrumb`-Block im **Page Builder** integriert, sodass Redakteure und Entwickler visuelle Stile, Trennzeichen und responsive Größen direkt im CMS konfigurieren können.
+
+***
 
 # Verwendung
 
-## Einfacher Brotkrümel
+Diese Beispiele veranschaulichen, wie Redakteure Navigationskomponenten binden und strukturieren.
+
+## 1. Standard-Navigations-Brotkrümel
+
+Eine klassische hierarchische Brotkrümel-Konfiguration, die Startseite, sekundäre Kategorie und terminales Textseiten-Markierung zeigt.
 
 <DemoPreview>
   <Breadcrumb
@@ -25,76 +33,99 @@ Eine Navigationshilfe, die den Standort der aktuellen Seite innerhalb einer Hier
   />
 </DemoPreview>
 
-```tsx
-import { Breadcrumb } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Breadcrumb
-      items={[
-        { label: "Home", href: "/" },
-        { label: "Components", href: "/components" },
-        { label: "Breadcrumb" },
-      ]}
-    />
-  );
-}
-```
-
-## Benutzerdefinierter Trenner
-
-```tsx
-import { Breadcrumb } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Breadcrumb
-      separator="/"
-      items={[
-        { label: "Home", href: "/" },
-        { label: "Breadcrumb" },
-      ]}
-    />
-  );
-}
-```
-
-## CMS-Seitenbauer
-
-Diese Komponente ist als `breadcrumb`-Block im [Seitenbauer](/docs/PageBuilder) (`content/pages/*.json`) verfügbar:
-
 ```json
 {
   "type": "breadcrumb",
   "items": [
     { "label": "Home", "href": "/" },
-    { "label": "Docs", "href": "/docs" },
+    { "label": "Components", "href": "/components" },
     { "label": "Breadcrumb" }
-  ],
-  "variant": "underline",
-  "size": "md"
+  ]
 }
 ```
 
+## 2. Benutzerdefiniertes Trennzeichen (Schrägstrich)
+
+Verwendet ein benutzerdefiniertes Texttrennzeichen (wie einen Schrägstrich `"/"`) zwischen den Navigationspunkten.
+
+<DemoPreview>
+  <Breadcrumb
+    separator="/"
+    items={[
+      { label: "Home", href: "/" },
+      { label: "Library", href: "/library" },
+      { label: "Overview" },
+    ]}
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "breadcrumb",
+  "separator": "/",
+  "items": [
+    { "label": "Home", "href": "/" },
+    { "label": "Library", "href": "/library" },
+    { "label": "Overview" }
+  ]
+}
+```
+
+## 3. Betonte Größe & visueller Stil
+
+Passt die Gesamtgröße auf klein an und wendet einen angepassten visuellen Unterstrich-Stil für ein hervorgehobenes Layoutgefühl an.
+
+<DemoPreview>
+  <Breadcrumb
+    variant="underline"
+    size="sm"
+    items={[
+      { label: "Console", href: "/console" },
+      { label: "Resources", href: "/console/resources" },
+      { label: "Deployments" },
+    ]}
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "breadcrumb",
+  "variant": "underline",
+  "size": "sm",
+  "items": [
+    { "label": "Console", "href": "/console" },
+    { "label": "Resources", "href": "/console/resources" },
+    { "label": "Deployments" }
+  ]
+}
+```
+
+***
+
 # Eigenschaften
 
-## Brotkrümel
+| Eigenschaft | CMS-Feldtyp | Standard | Beschreibung / Unterstützte Optionen |
+| --- | --- | --- | --- |
+| **Trennzeichen** (`separator`) | `string` | `"chevron-right"` | Benutzerdefiniertes Zeichen-Trennzeichen zwischen den Elementen. |
+| **Visueller Stil** (`variant`) | `select` | `"plain"` | Die visuelle Gestaltung der Links. <br/>• Optionen: `"plain"`, `"underline"`. |
+| **Größenstufe** (`size`) | `select` | `"md"` | Steuert Gesamtschrift und Chevron-Skalierung. <br/>• Optionen: `"xs"`, `"sm"`, `"md"`, `"lg"`. |
+| **Navigationselemente** (`items`) | `list` | `[]` | Geordnete Sammlung von Seitenelementen. (Siehe Schema der Brotkrümel-Elemente unten). |
+| **Benutzerdefinierte Klasse** (`class`) | `string` | - | Benutzerdefinierte CSS-Klassenüberschreibungen, direkt auf den Brotkrümel-Container angewendet. |
 
-| Eigenschaft | Typ | Beschreibung |
-| --- | --- | --- |
-| `items` | `BreadcrumbItem[]` | Die zu rendernden Brotkrümel-Einträge. |
-| `separator` | `Child` | Benutzerdefinierter Trenner zwischen den Einträgen. Standard: ein Pfeil-nach-rechts-Symbol. |
+### Schema der Brotkrümel-Elemente
 
-| `variant` | \`"underline" \ | "plain"\` | Der visuelle Stil des Brotkrümels. |
+Jeder Eintrag im `items`-Array akzeptiert folgende Parameter:
 
-| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg"\` | Die Größe des Brotkrümels. |
+| Eigenschaft | CMS-Feldtyp | Erforderlich | Beschreibung |
+| --- | --- | --- | --- |
+| **Anzeigetext** (`label`) | `string` | Ja | Für das Elementsegment gerenderter Label-Text. |
+| **Zielroute** (`href`) | `string` | Nein | Ziel-URL oder Seitenroute. Wenn weggelassen, wird als einfacher Text der aktuellen Seite gerendert. |
+| **Aktuelle Seite** (`current`) | `boolean` | `false` | Markiert das Element als aktive Seite (automatisch true für das letzte Element). |
 
-| `class` | `string` | Benutzerdefinierte CSS-Klassen für das Wurzelelement. |
+***
 
-### BreadcrumbItem
+# Entwicklerhinweise & Barrierefreiheit
 
-| Eigenschaft | Typ | Beschreibung |
-| --- | --- | --- |
-| `label` | `Child` | Anzuzeigender Text oder JSX-Knoten. |
-| `href` | `string` | Wenn vorhanden, als Link gerendert; andernfalls als einfacher Text (aktuelle Seite) gerendert. |
-| `current` | `boolean` | Markiert die aktuelle Seite. Standardmäßig `true` für den letzten Eintrag. |
+- **ARIA-konforme Hierarchie:** Die Komponente wird automatisch innerhalb eines barrierefreien semantischen Navigationselements gerendert (`<nav aria-label="Breadcrumb">`).
+- **Aktuelle Seite ARIA:** Das finale terminale Element (wo `href` weggelassen oder `current` gesetzt ist) erhält automatisch `aria-current="page"`, um den Richtlinien für Screenreader-Barrierefreiheit zu entsprechen.
+- **Micro-Interaction-Styling:** Links erben automatisch Layout-Hover-Auslöser und Übergänge und spiegeln die Akzentfarben der übergeordneten Palette sanft wider.

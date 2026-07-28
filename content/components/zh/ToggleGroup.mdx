@@ -1,7 +1,7 @@
 ---
 title: ToggleGroup 切换组
-hydration: 2
 category: Forms
+hydration: 2
 ---
 
 import { ToggleGroup, Stack } from "../../../app/components/ui";
@@ -9,126 +9,142 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # 简介
 
-一组用于单选或多选（互斥或包容）的切换按钮 —— 例如文本格式化控件（粗体/斜体/下划线）或视图切换器。
+`ToggleGroup` 组件是一组切换按钮，用于单选或多选场景。它常用于让用户选择互斥的布局样式（例如 Grid 与 List 视图切换器），或组合包容性的修饰项（例如粗体、斜体、下划线的文本格式化按钮）。
 
-# 水合
+**ToggleGroup** 已在 **Page Builder** 中作为 `toggleGroup` 区块完整集成，内容编辑者与开发者可直接在 CMS 内轻松配置视觉选项、多选行为以及激活态配色方案。
 
-**第二级 —— 智能自动检测。** `ToggleGroup` 默认渲染为静态 HTML，且不包含任何客户端 JS，除非存在行为信号。传入 `interactive={true}` 强制水合，或 `interactive={false}` 强制静态渲染。
-
-当存在以下**任一**信号（或设置了 `interactive={true}`）时，它会作为岛屿进行水合：
-
-- `value`（受控选择）
-- `defaultValue`（非受控初始选择）
-- `onValueChange`
-
-| `interactive` 属性 | 结果 |
-| --- | --- |
-| 未设置，**无** 信号 | 静态 —— 不加载客户端 JS |
-| 未设置，存在信号 | 作为岛屿水合 |
-| `true` | 作为岛屿水合 |
-| `false` | 静态 —— 不加载客户端 JS |
+***
 
 # 用法
 
+以下示例展示了内容编辑者如何绑定并组织交互式切换按钮。
+
+## 1. 多选文本格式化工具栏
+
+允许多个按钮同时被按下并处于激活态，非常适合多选功能开关或文本编辑器面板。
+
 <DemoPreview>
-  <Stack direction="horizontal" gap="6">
-    <ToggleGroup
-      multiple
-      defaultValue={["bold"]}
-      items={[
-        { label: "B", value: "bold" },
-        { label: "I", value: "italic" },
-        { label: "U", value: "underline" },
-      ]}
-      interactive
-    />
-    <ToggleGroup
-      defaultValue={["list"]}
-      items={[
-        { label: "Grid", value: "grid" },
-        { label: "List", value: "list" },
-      ]}
-      interactive
-    />
-  </Stack>
+  <ToggleGroup
+    multiple
+    defaultValue={["bold"]}
+    items={[
+      { label: "B", value: "bold" },
+      { label: "I", value: "italic" },
+      { label: "U", value: "underline" },
+    ]}
+    interactive
+  />
 </DemoPreview>
 
-```tsx
-import { ToggleGroup } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <ToggleGroup
-      multiple
-      defaultValue={["bold"]}
-      items={[
-        { label: "B", value: "bold" },
-        { label: "I", value: "italic" },
-        { label: "U", value: "underline" },
-      ]}
-    />
-  );
+```json
+{
+  "type": "toggleGroup",
+  "multiple": true,
+  "defaultValue": ["bold"],
+  "items": [
+    { "label": "B", "value": "bold" },
+    { "label": "I", "value": "italic" },
+    { "label": "U", "value": "underline" }
+  ],
+  "interactive": true
 }
 ```
 
-## 自定义组合
+## 2. 单选布局切换器（紫色主题）
 
-传入 `children` 而非 `items`，以完全控制每个按钮的内容：
+演示单选模式，同一时刻仅有一个按钮可激活。激活项使用自定义的紫色主题 token 进行样式修饰。
 
-```tsx
-import { ToggleGroup } from "../components/ui";
+<DemoPreview>
+  <ToggleGroup
+    defaultValue={["list"]}
+    items={[
+      { label: "Grid View", value: "grid" },
+      { label: "List View", value: "list" },
+    ]}
+    colorPalette="purple"
+    interactive
+  />
+</DemoPreview>
 
-export default function MyPage() {
-  return (
-    <ToggleGroup defaultValue={["list"]}>
-      <ToggleGroup.Item value="grid">Grid</ToggleGroup.Item>
-      <ToggleGroup.Item value="list">List</ToggleGroup.Item>
-    </ToggleGroup>
-  );
+```json
+{
+  "type": "toggleGroup",
+  "multiple": false,
+  "defaultValue": ["list"],
+  "items": [
+    { "label": "Grid View", "value": "grid" },
+    { "label": "List View", "value": "list" }
+  ],
+  "colorPalette": "purple",
+  "interactive": true
 }
 ```
+
+## 3. 紧凑型垂直导航组
+
+将切换选项按垂直方向排列，并使用紧凑的尺寸刻度。
+
+<DemoPreview>
+  <ToggleGroup
+    orientation="vertical"
+    defaultValue={["dashboard"]}
+    items={[
+      { label: "Dashboard", value: "dashboard" },
+      { label: "Settings", value: "settings" },
+    ]}
+    size="sm"
+    interactive
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "toggleGroup",
+  "orientation": "vertical",
+  "defaultValue": ["dashboard"],
+  "items": [
+    { "label": "Dashboard", "value": "dashboard" },
+    { "label": "Settings", "value": "settings" }
+  ],
+  "size": "sm",
+  "interactive": true
+}
+```
+
+***
 
 # 属性
 
-## 根组件
+| 属性 | CMS 字段类型 | 默认值 | 说明 / 可选项 |
+| --- | --- | --- | --- |
+| **多选** (`multiple`) | `boolean` | `false` | 允许同时切换激活多个按钮项。 |
+| **初始激活值** (`defaultValue`) | `list` | `[]` | 表示以激活态开始的按钮选项的字符串值列表。 |
+| **激活值** (`value`) | `list` | - | 表示当前激活选项的字符串值列表（受控）。 |
+| **按钮项** (`items`) | `list` | `[]` | 切换按钮的有序集合。（参见下方切换项 schema）。 |
+| **布局流向** (`orientation`) | `select` | `"horizontal"` | 切换选项的排列方式。 <br/>• 选项：`"horizontal"`、`"vertical"`。 |
+| **视觉样式** (`variant`) | `select` | `"outline"` | 结构布局变体。 <br/>• 选项：`"outline"`、`"ghost"`。 |
+| **尺寸刻度** (`size`) | `select` | `"md"` | 控制整体高度、内边距与文本缩放。 <br/>• 选项：`"sm"`、`"md"`、`"lg"`。 |
+| **配色主题** (`colorPalette`) | `select` | `"green"` | 应用于激活按钮的视觉色彩强调。 <br/>• 选项：`blue`、`green`、`red`、`purple`、`orange`、`amber`、`cyan`、`slate`。 |
+| **强制交互** (`interactive`) | `boolean` | `true` | 将组件作为交互式客户端岛屿进行水合，以协调对齐并处理键盘路由。 |
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `value` | `string[]` | 当前按下的取值（受控）。 |
-| `defaultValue` | `string[]` | 初始按下的取值（非受控）。 |
-| `onValueChange` | `(value: string[]) => void` | 选择发生变化时调用。 |
-| `multiple` | `boolean` | 允许同时按下多个项。默认 `false`（单选，可再次切换关闭）。 |
-| `disabled` | `boolean` | 禁用所有项。 |
-| `orientation` | `"horizontal" \| "vertical"` | 布局流向，以及方向键移动的轴向。默认 `"horizontal"`。 |
-| `id` | `string` | 根元素的 id。 |
-| `variant` | `"outline" \| "ghost"` | 视觉样式。默认 `"outline"`。 |
-| `size` | `"sm" \| "md" \| "lg"` | 视觉尺寸。默认 `"md"`。 |
-| `interactive` | `boolean` | 覆盖水合决策（见上文）。 |
-| `class` | `string` | 根元素的自定义 CSS 类。 |
+### 切换组项 Schema
 
-## 默认组合
+`items` 数组中的每个条目都接受以下参数：
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `items` | `ToggleGroupItem[]` | 当省略 `children` 时要渲染的按钮。 |
+| 属性 | CMS 字段类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| **显示文本** (`label`) | `string` | 是 | 渲染在切换按钮内部的标签文本。 |
+| **唯一键** (`value`) | `string` | 是 | 引用该选项激活状态的关键标识符。 |
+| **禁用** (`disabled`) | `boolean` | `false` | 禁用用户交互并淡化该按钮的样式。 |
 
-## ToggleGroupItem
+***
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `value` | `string` | 项的唯一取值。 |
-| `label` | `string \| JSX.Element` | 按钮的显示内容。 |
-| `disabled` | `boolean` | 禁用此按钮。 |
+# 开发者说明与无障碍
 
-## 子组件
-
-| 部分 | 说明 |
-| --- | --- |
-| `ToggleGroup.Item` | 一个切换按钮。需要 `value` 属性；在 `multiple` 模式下渲染 `role="checkbox"`，否则渲染 `role="radio"`。 |
-
-# 无障碍
-
-- 根元素具有 `role="group"`。
-- 项在 `multiple` 模式下渲染 `role="checkbox"` + `aria-pressed`，否则渲染 `role="radio"` + `aria-checked`。
-- 方向键（Right/Down 向前移动，Left/Up 向后移动）在可用项之间漫游焦点；Home/End 跳到第一个/最后一个可用项 —— 与 `orientation` 对应。
-- `data-state`（`on`/`off`）和 `data-disabled` 会镜像到每个项上，用于样式设置。
+- **WAI-ARIA 无障碍模式：** 渲染出健壮的键盘可导航工具栏：
+    - 根容器接收 `role="group"`。
+    - 当 `multiple` 为 true 时，单项渲染为 `role="checkbox"` 并带有 `aria-checked` 状态；否则渲染为 `role="radio"` 并带有 `aria-checked` 状态。
+- **漫游焦点键盘导航：** 支持原生焦点移动：
+    - 方向键（Right/Down 向前移动，Left/Up 向后移动）会根据所选 `orientation` 轴自动在激活按钮间漫游焦点。
+    - Home 与 End 键可立即将焦点跳转到组内第一个与最后一个可用按钮。
+- **表单关联：** 切换选项无缝更新关联的 state 上下文，使父容器或表单钩子能够动态捕获变更。

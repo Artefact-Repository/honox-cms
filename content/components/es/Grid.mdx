@@ -1,7 +1,7 @@
 ---
 title: Grid Cuadrícula
-hydration: 3
 category: Layout
+hydration: 3
 ---
 
 import { Grid } from "../../../app/components/ui";
@@ -123,14 +123,12 @@ Este componente está disponible como un bloque `grid` en el [Constructor de pá
 | --- | --- | --- |
 | `children` | `any` | Contenido a renderizar dentro de la cuadrícula. |
 | `class` | `string` | Clases CSS personalizadas. |
-
-| `columns` | \`Responsive\<number \ | string\>\` | Número de columnas (`repeat(columns, minmax(0, 1fr))`). Tiene prioridad sobre `minChildWidth` si ambos están establecidos. |
-| `rows` | \`Responsive\<number \ | string\>\` | Número de filas (`repeat(rows, minmax(0, 1fr))`). |
-| `minChildWidth` | \`Responsive\<number \ | string\>\` | Autoajusta tantas columnas como quepan, cada una con al menos este ancho (`repeat(auto-fit, minmax(width, 1fr))`). Se ignora cuando se establece `columns`. |
-
-| `gap` | \`string \ | number \ | Responsive\<...\>\` | Espaciado entre celdas. Por defecto `"8px"` a menos que se establezca `columnGap`/`rowGap`. |
-| `columnGap` | \`string \ | number \ | Responsive\<...\>\` | Espaciado solo entre columnas. |
-| `rowGap` | \`string \ | number \ | Responsive\<...\>\` | Espaciado solo entre filas. |
+| `columns` | `number \| string \| Responsive<...>` | Número de columnas (`repeat(columns, minmax(0, 1fr))`). Tiene prioridad sobre `minChildWidth` si ambos están establecidos. |
+| `rows` | `number \| string \| Responsive<...>` | Número de filas (`repeat(rows, minmax(0, 1fr))`). |
+| `minChildWidth` | `number \| string \| Responsive<...>` | Autoajusta tantas columnas como quepan, cada una con al menos este ancho (`repeat(auto-fit, minmax(width, 1fr))`). Se ignora cuando se establece `columns`. |
+| `gap` | `string \| number \| Responsive<...>` | Espaciado entre celdas. Por defecto `"8px"` a menos que se establezca `columnGap`/`rowGap`. |
+| `columnGap` | `string \| number \| Responsive<...>` | Espaciado solo entre columnas. |
+| `rowGap` | `string \| number \| Responsive<...>` | Espaciado solo entre filas. |
 
 `Responsive<T>` acepta un valor plano o un objeto por punto de ruptura,
 por ejemplo `{ base: 1, md: 2, lg: 3 }`, usando los mismos puntos de ruptura que el resto

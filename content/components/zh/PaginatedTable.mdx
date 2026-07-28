@@ -1,52 +1,87 @@
 ---
 title: PaginatedTable 分页表格
-hydration: 2
 category: Data Display
+hydration: 2
 ---
 
 import { PaginatedTable } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-一个高级组件，将 Table 与 Pagination 组合在一起，并在内部管理状态。
+# 简介
 
-## 用法
+`PaginatedTable` 组件是一个高级表格控制器，将表格内容渲染与匹配的 Pagination 孤岛区块无缝融合。专为海量数据集或平台日志而构建，它在客户端机器上自动管理所有活动页面跟踪、数据切片以及上一页/下一页点击。
+
+***
+
+# 用法
+
+您可以按以下方式定位和样式化分页表格：
+
+## 1. 标准分页用户表格
+
+渲染展示用户的默认分页数据视图。列表默认使用设定的页面大小，在下方渲染分页数字以便平滑切换点击。
 
 <DemoPreview>
   <div style={{ width: "100%" }}>
-    <PaginatedTable title="Users" pageSize={5} />
+    <PaginatedTable title="System Users" pageSize={5} />
   </div>
 </DemoPreview>
-
-### CMS 页面构建器
-
-该组件可作为 `paginatedTable` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用：
 
 ```json
 {
   "type": "paginatedTable",
-  "title": "Users",
+  "title": "System Users",
   "pageSize": 5
 }
 ```
 
-## 属性
+***
 
-| 属性 | 类型 | 默认值 | 说明 |
-| --- | --- | --- | --- |
-| `title` | `string` | - | 表格标题。 |
-| `pageSize` | `number` | `10` | 每页条数。 |
+## 2. API 驱动的数据源表格（高级）
 
-## CMS 配置
+连接到自定义的 JSON API 端点（例如你的博客文章源、交易日志或服务器操作列表），并基于客户端点击动态切片和渲染条目。
 
-```yaml
-- label: PaginatedTable
-  name: paginated-table
-  widget: object
-  fields:
-    - { label: Title, name: title, widget: string, required: false }
-    - { label: Page Size, name: pageSize, widget: number, default: 10 }
+```json
+{
+  "type": "paginatedTable",
+  "title": "Platform Activity Logs",
+  "url": "/api/platform-logs.json",
+  "dataKey": "logs",
+  "pageSize": 10,
+  "columns": [
+    { "header": "Timestamp", "key": "timestamp" },
+    { "header": "IP Address", "key": "ip" },
+    { "header": "Activity Description", "key": "description" }
+  ]
+}
 ```
 
-## 水合
+***
 
-第 2 级：始终作为岛屿水合，以管理内部分页状态。
+# 属性
+
+| 属性 | CMS 字段类型 | 默认值 | 描述 / 支持选项 |
+| --- | --- | --- | --- |
+| **标题** (`title`) | `string` | - | 渲染在表格区块上方的描述性标题。 |
+| **API 端点 URL** (`url`) | `string` | - | 指向返回对象源（例如 `{ data: [...] }`）的外部 JSON API 端点的可选路径。如果留空或省略，将自动加载内置演示数据集。 |
+| **数据键映射** (`dataKey`) | `string` | - | 在 JSON 响应中保存行数组的目标属性键（例如 `"users"`、`"logs"`）。 |
+| **页面大小** (`pageSize`) | `number` | `5` | 每个页面切片同时显示的最大数据行数。 |
+| **初始页** (`initialPage`) | `number` | `1` | 区块在客户端首次加载时处于活动状态的默认页面索引。 |
+| **列** (`columns`) | `list` | - | 自定义列映射列表（请参阅下方的列子属性）。 |
+
+### 列列表属性（`columns`）
+
+`columns` 列表参数中的每一项都接受以下字段：
+
+| 子属性 | 类型 | 必填 | 描述 |
+| --- | --- | --- | --- |
+| **列标题** (`header`) | `string` | 是 | 显示在列标题单元格中的标题标签。 |
+| **项数据键** (`key`) | `string` | 是 | JSON 行对象中映射到该单元格的匹配属性键。 |
+
+***
+
+# 架构说明
+
+- **条件客户端水合（Tier 2）：** 由于分页表格需要活动状态跟踪来处理转换、记录切片以及上一页/下一页计算，它会在客户端页面加载时自动以水合为交互式 Preact 孤岛的形式运行。
+- **内置演示数据：** 如果在配置参数中未提供自定义 API 端点 URL，组件会回退加载标准操作数据集用于测试。
+- **兼容表单重置：** 当嵌入交互式面板内时，任何父容器重置都会安全地将活动页面跟踪恢复为其指定的 `initialPage` 值。

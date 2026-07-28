@@ -1,7 +1,7 @@
 ---
 title: Grid Raster
-hydration: 3
 category: Layout
+hydration: 3
 ---
 
 import { Grid } from "../../../app/components/ui";
@@ -121,13 +121,11 @@ Diese Komponente ist als `grid`-Block im [Seitenbauer](/docs/PageBuilder) (`cont
 | --- | --- | --- |
 | `children` | `any` | Innerhalb des Rasters zu rendernder Inhalt. |
 | `class` | `string` | Benutzerdefinierte CSS-Klassen. |
-
-| `columns` | \`Responsive\<number \ | string\>\` | Anzahl der Spalten (`repeat(columns, minmax(0, 1fr))`). Hat Vorrang vor `minChildWidth`, wenn beide gesetzt sind. |
-| `rows` | \`Responsive\<number \ | string\>\` | Anzahl der Zeilen (`repeat(rows, minmax(0, 1fr))`). |
-| `minChildWidth` | \`Responsive\<number \ | string\>\` | Passt automatisch so viele Spalten ein, wie Platz haben, jede mindestens so breit (`repeat(auto-fit, minmax(width, 1fr))`). Wird ignoriert, wenn `columns` gesetzt ist. |
-
-| `gap` | \`string \ | number \ | Responsive\<...\>\` | Abstand zwischen Zellen. Standard `"8px"`, sofern `columnGap`/`rowGap` nicht gesetzt ist. |
-| `columnGap` | \`string \ | number \ | Responsive\<...\>\` | Abstand nur zwischen Spalten. |
-| `rowGap` | \`string \ | number \ | Responsive\<...\>\` | Abstand nur zwischen Zeilen. |
+| `columns` | `number \| string \| Responsive<...>` | Anzahl der Spalten (`repeat(columns, minmax(0, 1fr))`). Hat Vorrang vor `minChildWidth`, wenn beide gesetzt sind. |
+| `rows` | `number \| string \| Responsive<...>` | Anzahl der Zeilen (`repeat(rows, minmax(0, 1fr))`). |
+| `minChildWidth` | `number \| string \| Responsive<...>` | Passt automatisch so viele Spalten ein, wie Platz haben, jede mindestens so breit (`repeat(auto-fit, minmax(width, 1fr))`). Wird ignoriert, wenn `columns` gesetzt ist. |
+| `gap` | `string \| number \| Responsive<...>` | Abstand zwischen Zellen. Standard `"8px"`, sofern `columnGap`/`rowGap` nicht gesetzt ist. |
+| `columnGap` | `string \| number \| Responsive<...>` | Abstand nur zwischen Spalten. |
+| `rowGap` | `string \| number \| Responsive<...>` | Abstand nur zwischen Zeilen. |
 
 `Responsive<T>` akzeptiert entweder einen einfachen Wert oder ein pro-Breakpoint-Objekt, z. B. `{ base: 1, md: 2, lg: 3 }`, mit denselben Breakpoints wie der Rest des Design-Systems (`base`, `sm`, `md`, `lg`, `xl`, `2xl`).

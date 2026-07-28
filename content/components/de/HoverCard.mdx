@@ -4,71 +4,134 @@ hydration: 1
 category: Overlays
 ---
 
-import { HoverCard } from "../../../app/components/ui";
+import { HoverCard, Button, Avatar } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Einführung
 
-Eine Popover, die beim Darüberfahren mit der Maus über einen Auslöser erscheint und nützlich für die Anzeige von Zusatzinformationen ist.
+Ein schwebender, nicht-modaler Popup-Container, der erscheint, wenn ein Benutzer ein angehängtes Auslöserelement mit der Maus überfährt oder fokussiert. Er liefert leichtgewichtige kontextbezogene Informationen, reiche Vorschauen oder schnelle Aktionen, ohne die aktuelle Seite zu verlassen.
 
-# Verwendung
+Die **HoverCard**-Komponente ist vollständig als `hovercard`-Block im **Page Builder** integriert und ermöglicht es Content-Autoren und Entwicklern, Auslöserelemente (wie Schaltflächen oder Textspannen) direkt innerhalb des CMS an detaillierte Vorschaufelder zu binden.
 
-## Einfache HoverCard
+***
+
+# Verwendung über den CMS Page Builder (JSON)
+
+Diese Beispiele veranschaulichen, wie Content-Editoren HoverCard-Vorschaufelder innerhalb von JSON-Seitenschemata (`content/pages/*.json`) binden und strukturieren.
+
+## 1. Standard-Profilvorschau
+
+Umschließt einen Schaltflächen-Auslöser mit einer schwebenden Karte, die eine schnelle Benutzerübersicht anzeigt, einschließlich Avatar, Name und Rolle.
 
 <DemoPreview>
   <HoverCard
-    trigger={<a href="#">Hover me</a>}
-    title="Supplementary information"
-    description="Shown on hover, positioned automatically."
-    showArrow
+    trigger={<Button variant="outline">About the Author</Button>}
+    content={
+      <>
+        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+          <Avatar name="J. Chen" />
+          <div>
+            <strong>Jules Chen</strong>
+            <p style={{ margin: 0, fontSize: "0.85rem", opacity: 0.7 }}>Lead Architect</p>
+          </div>
+        </div>
+      </>
+    }
   />
 </DemoPreview>
 
-```tsx
-import { HoverCard } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <HoverCard.Root>
-      <HoverCard.Trigger>
-        <a href="#">Hover me</a>
-      </HoverCard.Trigger>
-      <HoverCard.Positioner>
-        <HoverCard.Content>
-          Supplementary information shown on hover.
-        </HoverCard.Content>
-      </HoverCard.Positioner>
-    </HoverCard.Root>
-  );
+```json
+{
+  "type": "hovercard",
+  "openDelay": 200,
+  "closeDelay": 150,
+  "positioning": "bottom",
+  "trigger": [
+    {
+      "type": "button",
+      "text": "About the Author",
+      "variant": "outline"
+    }
+  ],
+  "content": [
+    {
+      "type": "avatar",
+      "name": "J. Chen"
+    },
+    {
+      "type": "heading",
+      "level": 4,
+      "text": "Jules Chen"
+    },
+    {
+      "type": "text",
+      "text": "Lead Architect"
+    }
+  ]
 }
 ```
 
-## CMS-Seitenbauer
+## 2. Reicher Link-Kontext
 
-Diese Komponente ist als `hoverCard`-Block im [Seitenbauer](/docs/PageBuilder) (`content/pages/*.json`) verfügbar:
+Nutzt benutzerdefiniertes untergeordnetes JSX, um eine HoverCard an Inline-Text anzuhängen. Zeigt, wie benutzerdefinierter Kopftext und Beschreibungen injiziert werden können.
+
+<DemoPreview>
+  <HoverCard
+    trigger={<span style={{ borderBottom: "1px dotted", cursor: "help" }}>Hono framework</span>}
+    content={
+      <>
+        <strong>Hono</strong>
+        <p style={{ margin: "0.5rem 0 0", fontSize: "0.85rem", opacity: 0.8 }}>Ultrafast web framework for the Edge.</p>
+      </>
+    }
+  />
+</DemoPreview>
 
 ```json
 {
-  "type": "hoverCard",
-  "triggerText": "Hover me",
-  "showArrow": true,
-  "title": "Supplementary information",
-  "description": "Shown on hover."
+  "type": "hovercard",
+  "openDelay": 300,
+  "closeDelay": 100,
+  "positioning": "top",
+  "trigger": [
+    {
+      "type": "text",
+      "text": "Hono framework"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 4,
+      "text": "Hono"
+    },
+    {
+      "type": "text",
+      "text": "Ultrafast web framework for the Edge."
+    }
+  ]
 }
 ```
 
-# Eigenschaften
+***
 
-## HoverCard
+# CMS-Konfigurationsreferenz
 
-| Eigenschaft | Typ | Beschreibung |
-| --- | --- | --- |
-| `interactive` | `boolean` | Aktiviert die clientseitige Hydration. Standard: `true`. |
-| `open` | `boolean` | Gesteuerter Öffnungszustand. |
-| `openDelay` | `number` | Verzögerung in ms vor dem Öffnen beim Darüberfahren. |
-| `closeDelay` | `number` | Verzögerung in ms vor dem Schließen beim Verlassen. |
-| `class` | `string` | Benutzerdefinierte CSS-Klassen für das Wurzelelement. |
+Diese Felder ordnen sich direkt den Sveltia-CMS-Blockeigenschaften unter `public/admin/config.yml` oder den Page-Builder-Konfigurationen zu:
 
-# Unterkomponenten
+| Eigenschaft | CMS-Feldtyp | Standard | Beschreibung / Unterstützte Optionen |
+| :--- | :--- | :--- | :--- |
+| **Auslöserelement** (`trigger`) | `list` | - | Blockelemente (wie Schaltflächen oder Text), die auf der Seite gerendert werden, um die schwebende Karte bei Hover oder Fokus zu aktivieren. |
+| **Hover-Inhalt** (`content`) | `list` | - | Blockelemente (wie Avatar, Text oder Überschrift), die im Körper der schwebenden Vorschaukarte gerendert werden. |
+| **Öffnungsverzögerung** (`openDelay`) | `number` | `200` | Dauer in Millisekunden, die das System nach dem Hover wartet, bevor das Popup gerendert wird. |
+| **Schließverzögerung** (`closeDelay`) | `number` | `150` | Dauer in Millisekunden, die das System nach dem Verlassen mit der Maus wartet, bevor das Popup geschlossen wird. |
+| **Positionierungsstrategie** (`positioning`) | `select` | `"bottom"` | Bevorzugte Kante des Auslösers, an die die Karte angehängt wird.<br/>• Optionen: `"top"`, `"bottom"`, `"left"`, `"right"`. |
+| **Interaktiver Inhalt** (`interactive`) | `boolean` | `false` | Wenn true, hydriert die Karte als Client-Insel und ermöglicht klickbare innere Links und Schaltflächen. |
 
-`HoverCard.Root`, `HoverCard.Trigger`, `HoverCard.Positioner`, `HoverCard.Content`, `HoverCard.Arrow`, `HoverCard.ArrowTip`
+***
+
+# Entwicklerhinweise & Barrierefreiheit
+
+- **Intelligente Verzögerte Hydration:** Standardmäßig werden Auslöser und Karte als statisches HTML gerendert. Die HoverCard hydriert nur dann als Client-Insel, wenn `"interactive": true` bereitgestellt wird, wodurch innere klickbare Links ermöglicht werden.
+- **WAI-ARIA-Konformität:** Im Hintergrund verwendet die Komponente standardmäßige `aria-describedby`-Verbindungen und verwaltet Fokusringe korrekt. Die schwebende Karte schließt korrekt, wenn die Escape-Taste gedrückt wird oder der Fokus die Auslösergrenzen verlässt.
+- **Anmutiges Fokus-Fallback:** Da Hover-Ereignisse für Tastatur- und Screenreader-Benutzer nicht zugänglich sind, aktiviert sich die Karte auch bei Tastaturfokus (Tab) und stellt so Parität für Nicht-Maus-Interaktionen sicher.

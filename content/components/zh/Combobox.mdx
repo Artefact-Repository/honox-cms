@@ -1,7 +1,7 @@
 ---
 title: Combobox 组合框
-hydration: 2
 category: Forms
+hydration: 2
 ---
 
 import { Combobox } from "../../../app/components/ui";
@@ -9,30 +9,19 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # 简介
 
-一个将文本输入框与列表框组合在一起的组件，允许用户从选项列表中进行筛选和选择。
+一个将文本输入框与下拉列表框组合在一起的可自动补全输入控件，允许用户从选项列表中进行筛选和选择。主要用于长选项流、平台筛选、标签以及分类选择。
 
-# 水合
+**Combobox** 组件已作为交互式 `combobox` 区块完全集成到**页面构建器（Page Builder）**中，使内容作者与开发者能够在 CMS 内直接轻松配置输入标签、占位符、预定义项列表以及交互设置。
 
-**Tier 2 — 智能自动检测。** `Combobox` 渲染为静态 HTML，且不发送任何客户端 JS，除非存在行为信号。传入 `interactive={true}` 可强制水合，或传入 `interactive={false}` 可强制静态渲染。
-
-当存在以下**任一**信号（或设置了 `interactive={true}`）时，它会作为岛屿进行水合：
-
-- `open`（受控展开状态）
-- `inputValue`（受控输入值）
-- `onToggle`
-- `onInputChange`
-- `onItemSelect`（项目选择回调——仅选择型组合框会基于此进行水合）
-
-| `interactive` 属性 | 结果 |
-| --- | --- |
-| 省略，**无**信号 | 静态 —— 无客户端 JS |
-| 省略，存在信号 | 作为岛屿水合 |
-| `true` | 作为岛屿水合 |
-| `false` | 静态 —— 无客户端 JS |
-
-库中所有的交互决策都通过 `app/components/ui/island-utils.ts` 中共享的 `shouldHydrate()` 辅助函数路由。
+***
 
 # 用法
+
+以下示例展示了内容编辑者如何绑定并组织交互式组合框组件。
+
+## 1. 标准技术筛选（交互式选择）
+
+一个预加载了选项的标准可搜索组合框，允许用户筛选或直接选择其目标选项。
 
 <DemoPreview>
   <Combobox
@@ -44,71 +33,112 @@ import { DemoPreview } from "../../../app/components/demo-preview";
       { label: "Vue", value: "vue" },
       { label: "Hono", value: "hono" },
     ]}
-    label="Framework"
+    label="Preferred Tech Stack"
     placeholder="Select a Framework"
-    allowClear
   />
 </DemoPreview>
-
-```tsx
-import { Combobox } from "../components/ui";
-
-const items = [
-  { label: "React", value: "react" },
-  { label: "Solid", value: "solid" },
-  { label: "Svelte", value: "svelte" },
-  { label: "Vue", value: "vue" },
-  { label: "Hono", value: "hono" },
-];
-
-export default function MyPage() {
-  return (
-    <Combobox
-      interactive
-      items={items}
-      label="Framework"
-      placeholder="Select a Framework"
-      allowClear
-    />
-  );
-}
-```
-
-## CMS 页面构建器
-
-此组件在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中以 `combobox` 块的形式提供：
 
 ```json
 {
   "type": "combobox",
-  "label": "Framework",
+  "label": "Preferred Tech Stack",
   "placeholder": "Select a Framework",
   "items": [
     { "label": "React", "value": "react" },
+    { "label": "Solid", "value": "solid" },
+    { "label": "Svelte", "value": "svelte" },
+    { "label": "Vue", "value": "vue" },
     { "label": "Hono", "value": "hono" }
-  ]
+  ],
+  "interactive": true
 }
 ```
 
+## 2. 可清除选项搜索（自定义项）
+
+带有一个配套的清除操作，使用户能够通过单击清除已选择的选项。非常适合平台搜索、地区或国家/地区选择列表。
+
+<DemoPreview>
+  <Combobox
+    interactive
+    items={[
+      { label: "United States", value: "us" },
+      { label: "Germany", value: "de" },
+      { label: "France", value: "fr" },
+      { label: "United Kingdom", value: "uk" },
+      { label: "Canada", value: "ca" },
+    ]}
+    label="Country Selection"
+    placeholder="Search countries..."
+    allowClear
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "combobox",
+  "label": "Country Selection",
+  "placeholder": "Search countries...",
+  "items": [
+    { "label": "United States", "value": "us" },
+    { "label": "Germany", "value": "de" },
+    { "label": "France", "value": "fr" },
+    { "label": "United Kingdom", "value": "uk" },
+    { "label": "Canada", "value": "ca" }
+  ],
+  "allowClear": true,
+  "interactive": true
+}
+```
+
+## 3. 禁用输入字段
+
+演示一个临时锁定的自动补全字段。这会保留当前的标签与所选项，但会阻止输入打字、筛选或下拉激活。
+
+<DemoPreview>
+  <Combobox
+    disabled
+    items={[]}
+    label="Select Database Engine"
+    placeholder="Temporarily unavailable"
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "combobox",
+  "label": "Select Database Engine",
+  "placeholder": "Temporarily unavailable",
+  "items": [],
+  "disabled": true,
+  "interactive": true
+}
+```
+
+***
+
 # 属性
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `items` | `ComboboxItem[]` | 要在列表中显示的选项数组。 |
-| `label` | `Child` | 组合框的标签。 |
-| `placeholder` | `string` | 输入框的占位符文本。 |
-| `allowClear` | `boolean` | 是否在输入框中显示清除按钮。 |
-| `interactive` | `boolean` | 强制作为岛屿进行水合。 |
-| `open` | `boolean` | 组合框列表是否展开（受控）。 |
-| `inputValue` | `string` | 输入框的当前值（受控）。 |
-| `onToggle` | `() => void` | 列表切换时触发的回调。 |
-| `onInputChange` | `(value: string) => void` | 输入值变化时触发的回调。 |
-| `onItemSelect` | `(value: string) => void` | 选中某项时触发的回调。 |
+| 属性 | CMS 字段类型 | 默认值 | 描述 / 支持选项 |
+| --- | --- | --- | --- |
+| **标签文本** (`label`) | `string` | - | 位于自动补全搜索框上方的配套视觉文本。 |
+| **占位符** (`placeholder`) | `string` | - | 在未选择任何项时显示在输入框内部。 |
+| **清除按钮** (`allowClear`) | `boolean` | `false` | 为 true 时，在文本输入框内渲染一个右对齐的清除按钮，便于重置选择。 |
+| **禁用** (`disabled`) | `boolean` | `false` | 冻结用户的搜索输入、下拉弹窗与点击激活。 |
+| **项列表** (`items`) | `list` | `[]` | 表示列表选择项的有序对象数组（请参阅下方的列表子属性）。 |
 
-## ComboboxItem
+### 列表项属性 (`items`)
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `label` | `string` | 选项的显示文本。 |
-| `value` | `string` | 选项的唯一值。 |
-| `disabled` | `boolean` | 选项是否禁用。 |
+| 子属性 | 类型 | 必填 | 描述 |
+| --- | --- | --- | --- |
+| **标签** (`label`) | `string` | 是 | 在列表弹窗选项中渲染的显示名称。 |
+| **值** (`value`) | `string` | 是 | 选择选项时在后台捕获的唯一字符串标识符。 |
+| **禁用选项** (`disabled`) | `boolean` | 否 | 在下调列表中淡化/锁定单个选择项。 |
+
+***
+
+# 开发者须知与无障碍
+
+- **智能自适应水合（第 2 级）：** 为优化首屏加载速度，`Combobox` 在服务端加载时编译为静态、零 JS 的 HTML/CSS 标记，仅当提供自定义信号或显式传入 `"interactive": true` 时才会下载交互式 JS 载荷。
+- **可访问的列表框：** 该组件与 WAI-ARIA 组合框无障碍角色完全对齐。焦点跳转、方向键选项选择以及键盘激活均开箱即用地原生发生。
+- **统一的表单提交：** 所选值直接映射到标准表单 POST 请求，开发者无需以编程方式将选择状态关联到全局自定义提交逻辑。

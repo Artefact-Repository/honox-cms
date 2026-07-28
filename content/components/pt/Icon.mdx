@@ -1,7 +1,7 @@
 ---
 title: Icon Ícone
-hydration: 3
 category: Data Display
+hydration: 3
 ---
 
 import { Icon } from "../../../app/components/ui";
@@ -9,105 +9,75 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introdução
 
-Um invólucro leve, consciente do tamanho e da cor, para ícones SVG. Aplica um tamanho
-consistente (`2xs`–`xl`) e herda `currentcolor` para que os ícones combinem por padrão com a
-cor do texto/ícone ao redor, sem exigir nenhuma dependência de biblioteca de ícones.
+Um wrapper leve e ciente de tamanho e cor para formas SVG. Ele aplica dimensões de limite consistentes, herda `currentcolor` para que as formas correspondam automaticamente aos temas de texto adjacentes sem compilar pacotes de ícones externos inchados, e suporta tanto a ocultação decorativa quanto a rotulagem explícita para leitores de tela.
 
-`Icon` se compõe de duas formas, decididas automaticamente a partir de seu `children`:
+O componente **Icon** está totalmente integrado como um bloco `icon` no **Page Builder**, permitindo que os gerentes do Sveltia CMS injetem caminhos vetoriais personalizados, personalizem viewports e alterem configurações de escala diretamente nos layouts de página.
 
-- **Wrap (envolver)** — se `children` for conteúdo SVG puro (`<path>`, `<circle>`, `<g>`, …),
-  texto, ou mais de um elemento, `Icon` renderiza seu próprio `<svg>` ao redor.
-- **Merge (`asChild`, `true` por padrão)** — se `children` for um único elemento que não é
-  conteúdo SVG puro (por exemplo, um `<svg>…</svg>` escrito à mão), `Icon` funde sua class
-  (e quaisquer outras props passadas) diretamente nesse elemento em vez de envolvê-lo em um
-  segundo `<svg>`. Passe `asChild={false}` para forçar o envolvimento mesmo nesse caso.
+***
 
 # Uso
 
-## Caminhos SVG puros (sem necessidade de biblioteca de ícones)
+Essas configurações representam exatamente como os itens de bloco do construtor de páginas são construídos.
+
+## 1. Indicador de Seta Mínimo (Tamanho Médio)
+
+Fornece uma seta vetorial padronizada, útil para alinhar ao lado de cabeçalhos de cartão, listas de links ou botões de formulário.
 
 <DemoPreview>
-  <Icon size="lg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-    <path d="M12 2 2 7l10 5 10-5-10-5z" />
+  <Icon size="md" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    <path d="M5 12h14M12 5l7 7-7 7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
   </Icon>
 </DemoPreview>
-
-```tsx
-import { Icon } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Icon size="lg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-      <path d="M12 2 2 7l10 5 10-5-10-5z" />
-    </Icon>
-  );
-}
-```
-
-## Compondo com um `<svg>` escrito à mão (`asChild`, padrão)
-
-```tsx
-import { Icon } from "../components/ui";
-
-function HeartSvg(props: { class?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
-      <path d="M12 21s-6.7-4.35-9.3-8.1C.8 9.7 2 6 5.4 6c1.9 0 3.2 1 4.6 2.6C11.4 7 12.7 6 14.6 6 18 6 19.2 9.7 17.3 12.9 14.7 16.65 12 21 12 21z" />
-    </svg>
-  );
-}
-
-export default function MyPage() {
-  return (
-    <span style={{ color: "red" }}>
-      <Icon size="sm">
-        <HeartSvg />
-      </Icon>
-    </span>
-  );
-}
-```
-
-A class `icon` (e o tamanho) é fundida no `<svg>` retornado por `HeartSvg`, então não há
-nenhum elemento envolvente extra no markup renderizado. Como a receita do ícone define
-`color: currentcolor`, o ícone assume a cor do texto ao redor (aqui, `red`), desde que suas
-rotas usem `fill="currentColor"` ou `stroke="currentColor"`.
-
-## Ícone rotulado (não decorativo)
-
-```tsx
-<Icon aria-label="Search" viewBox="0 0 24 24">
-  <path d="M10 2a8 8 0 105.3 14.03l4.34 4.34 1.42-1.42-4.34-4.34A8 8 0 0010 2z" />
-</Icon>
-```
-
-## Construtor de páginas do CMS
-
-Este componente está disponível como um bloco `icon` no [Construtor de Páginas](/docs/PageBuilder) (`content/pages/*.json`) — `svg` contém o markup SVG interno bruto:
 
 ```json
 {
   "type": "icon",
-  "svg": "<path d=\"M12 2 2 7l10 5 10-5-10-5z\" />",
+  "svg": "<path d=\"M5 12h14M12 5l7 7-7 7\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" />",
   "viewBox": "0 0 24 24",
+  "fill": "none",
+  "stroke": "currentColor",
+  "size": "md"
+}
+```
+
+## 2. Marcador de Categoria de Função Acenutuado (Escala Grande)
+
+Renderiza um ícone gráfico maior representando uma função, um benefício de plano ou um bloco de categoria de marketing.
+
+<DemoPreview>
+  <Icon size="lg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </Icon>
+</DemoPreview>
+
+```json
+{
+  "type": "icon",
+  "svg": "<path d=\"M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" />",
+  "viewBox": "0 0 24 24",
+  "fill": "none",
+  "stroke": "currentColor",
   "size": "lg"
 }
 ```
 
-# Propriedades
+***
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `children` | `Child` | Conteúdo SVG (`<path>`, etc.) ou um único elemento tipo SVG para renderizar/fundir. |
-| `class` | `string` | Classes CSS personalizadas. |
+# Props
 
-| `size` | \`"2xs" \ | "xs" \ | "sm" \ | "md" \ | "lg" \ | "xl"\` | O tamanho do ícone. Padrão `"md"`. |
+| Propriedade | Tipo de Campo CMS | Padrão | Descrição / Opções Suportadas |
+| --- | --- | --- | --- |
+| **Marcação de Forma Vetorial** (`svg`) | `string` | - | Tags de marcação SVG vetorial interna brutas (ex. `<path d="..." />`, `<circle cx="..." />`). |
+| **Caixa Delimitadora do Viewport** (`viewBox`) | `string` | `"0 0 24 24"` | Informa ao navegador a escala de coordenadas. Normalmente corresponde aos designs SVG de origem. |
+| **Tamanho de Escala** (`size`) | `select` | `"md"` | Escala de dimensões visuais padronizadas.<br/>• Opções: `"2xs"`, `"xs"`, `"sm"`, `"md"`, `"lg"`, `"xl"`. |
+| **Regra de Preenchimento** (`fill`) | `string` | `"currentColor"` | Regra de preenchimento subjacente. Defina como `"none"` se utilizar contornos de linha de traço. |
+| **Cor de Traço** (`stroke`) | `string` | - | Cor do contorno da borda. Defina como `"currentColor"` para herdar o tema de cor da fonte adjacente. |
+| **Rótulo de Descrição Aria** (`aria-label`) | `string` | - | Rótulo para leitores de tela. Se deixado em branco, o ícone é automaticamente ocultado dos leitores de tela (`aria-hidden="true"`). |
 
-| `asChild` | `boolean` | Funde as props no único elemento filho em vez de envolvê-lo em um novo `<svg>`. Padrão `true`. |
-| `viewBox` | `string` | Repassado ao `<svg>` renderizado/fundido. |
-| `xmlns` | `string` | Repassado ao invólucro `<svg>` gerado. Padrão o namespace SVG. |
-| `fill` | `string` | Repassado ao `<svg>` renderizado/fundido. |
-| `stroke` | `string` | Repassado ao `<svg>` renderizado/fundido. |
-| `aria-label` | `string` | Rótulo acessível. Quando fornecido, `aria-hidden` é omitido. |
+***
 
-| `aria-hidden` | \`boolean \ | "true" \ | "false"\` | Padrão `"true"` quando nenhum `aria-label` é fornecido (ícones são decorativos por padrão). |
+# Notas de Acessibilidade e Otimização SVG
+
+- **Aria-Hidden por Padrão:** Como os ícones são comumente usados como realces visuais decorativos (como ícones de marcador ao lado de uma lista de texto), o componente aplica automaticamente `aria-hidden="true"` se nenhum texto `aria-label` descritivo for fornecido.
+- **Mesclagem Inteligente de SVG (`asChild`):** Para layouts personalizados de desenvolvedor, definir `asChild` (padrão true) mescla automaticamente os nomes de classe calculados do componente e os parâmetros de escala diretamente em um único elemento `<svg>` filho escrito manualmente. Isso elimina a renderização de elementos wrapper redundantes no código-fonte HTML de saída.
+- **Herança de Cor:** Como a receita CSS subjacente define `color: currentcolor`, os caminhos vetoriais que utilizam `stroke="currentColor"` ou `fill="currentColor"` herdam perfeitamente os esquemas de cor tipográfica pais.

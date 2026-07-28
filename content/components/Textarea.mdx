@@ -1,7 +1,7 @@
 ---
 title: Textarea
-hydration: 2
 category: Forms
+hydration: 2
 ---
 
 import { Textarea } from "../../app/components/ui";
@@ -9,143 +9,91 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-A multi-line text input component that integrates with the `Field` context. It can be used standalone or as part of a `Field` component.
+A multi-line text input control designed for gathering long-form user feedback, descriptions, biographies, or custom comments. It seamlessly integrates with standard field containers to display visual labels, validation errors, and helper text out of the box.
+
+The **Textarea** component is fully integrated as a `textarea` block in the **Page Builder**, allowing content authors and developers to configure row heights, input placeholders, validation criteria, and layouts directly within Sveltia CMS.
+
+***
 
 # Usage
 
-## Standalone with Field integration
+These configurations represent exactly how page-builder block items are constructed.
 
-`Textarea` automatically wraps itself in a `Field` if you provide `label`, `helperText`, etc.
+## 1. Standalone Biography Input (Standard Layout)
+
+A standard biography text input with descriptive labels, helpful hints, and a default height. Ideal for general profile setups or user registration steps.
 
 <DemoPreview>
-  <div style={{ width: "100%", maxWidth: "320px" }}>
+  <div style={{ width: "100%", maxWidth: "480px" }}>
     <Textarea
-      label="Bio"
-      placeholder="Write here..."
+      label="About Yourself"
+      helperText="Tell us about your background and interests."
+      placeholder="Write a brief biography..."
       rows={4}
-      minLength={10}
       interactive
     />
   </div>
 </DemoPreview>
 
-```tsx
-import { Textarea } from "../components/ui";
+```json
+{
+  "type": "textarea",
+  "label": "About Yourself",
+  "helperText": "Tell us about your background and interests.",
+  "placeholder": "Write a brief biography...",
+  "rows": 4,
+  "interactive": true
+}
+```
 
-export default function MyPage() {
-  return (
+## 2. Character-Restricted Comments (Custom Validator Expression)
+
+Enforces strict input validation constraints on long text blocks. The CMS processes evaluation criteria client-side to instantly flag errors if the input exceeds specific limitations.
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "480px" }}>
     <Textarea
-      label="Bio"
-      placeholder="Write here..."
-      rows={4}
-      minLength={10}
+      label="Campaign Feedback"
+      placeholder="Leave a public comment..."
+      rows={3}
+      validator="(value) => value.length <= 140 || 'Feedback must be 140 characters or less'"
       interactive
     />
-  );
-}
-```
-
-## Variants
-
-```tsx
-import { Stack } from "../design-system/jsx";
-import { Textarea } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Stack gap="4">
-      <Textarea variant="outline" placeholder="Outline" />
-      <Textarea variant="surface" placeholder="Surface" />
-      <Textarea variant="subtle" placeholder="Subtle" />
-      <Textarea variant="flushed" placeholder="Flushed" />
-    </Stack>
-  );
-}
-```
-
-## Sizes
-
-```tsx
-import { Stack } from "../design-system/jsx";
-import { Textarea } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Stack gap="4">
-      <Textarea size="xs" placeholder="Extra Small" />
-      <Textarea size="sm" placeholder="Small" />
-      <Textarea size="md" placeholder="Medium" />
-      <Textarea size="lg" placeholder="Large" />
-      <Textarea size="xl" placeholder="Extra Large" />
-    </Stack>
-  );
-}
-```
-
-## Inside a Field component
-
-You can also use it inside a `Field` component for more complex layouts.
-
-```tsx
-import { Field, Textarea } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Field label="Comments">
-      <Textarea placeholder="Leave a comment..." interactive />
-    </Field>
-  );
-}
-```
-
-## CMS Page Builder
-
-This component is available as a `textarea` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
+  </div>
+</DemoPreview>
 
 ```json
 {
   "type": "textarea",
-  "label": "Bio",
-  "helperText": "Tell us about yourself.",
-  "rows": 4
+  "label": "Campaign Feedback",
+  "placeholder": "Leave a public comment...",
+  "rows": 3,
+  "validator": "(value) => value.length <= 140 || 'Feedback must be 140 characters or less'",
+  "interactive": true
 }
 ```
 
-Like Field, `validator` also accepts a plain string in CMS content — a JS
-expression evaluating to a function, reconstructed client-side via
-`new Function()` (it can't close over any outer variable):
-
-```json
-{
-  "type": "textarea",
-  "label": "Bio",
-  "validator": "(value) => value.length <= 280 || 'Keep it under 280 characters'"
-}
-```
+***
 
 # Props
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `class` | `string` | Custom CSS classes. |
+| Property | CMS Field Type | Default | Description / Supported Options |
+| --- | --- | --- | --- |
+| **Label Text** (`label`) | `string` | - | The descriptive form field header displayed above the textarea input. |
+| **Helper Description** (`helperText`) | `string` | - | Small, secondary hint text rendering beneath the textarea input to guide users. |
+| **Placeholder** (`placeholder`) | `string` | - | Faint help text displayed inside the field before typing begins. |
+| **Row Count** (`rows`) | `number` | `3` | Controls the initial vertical height by defining the number of visible text rows. |
 
-| `variant` | \`"outline" \ | "surface" \ | "subtle" \ | "flushed"\` | The visual style of the textarea. |
+| **Validation Code** (`validator`) | `string` | - | Client-side JS expression evaluating to a function. Returns an error string if validation fails (e.g., \`"(value) => value.length > 10 |  | 'Too short'"\`). |
 
-| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg" \ | "xl"\` | The size of the textarea. |
+| **Visual Variant** (`variant`) | `select` | `"outline"` | Theme border style option. <br/>• `"outline"` — Standard full border outline. <br/>• `"surface"` — Soft filled background. <br/>• `"subtle"` — Tinted gray fill. <br/>• `"flushed"` — Underline style border only. |
+| **Resize Capability** (`resize`) | `select` | `"vertical"` | Controls whether users can drag to stretch the input box. <br/>• Options: `"none"`, `"both"`, `"horizontal"`, `"vertical"`. |
+| **Enable Hydration** (`interactive`) | `boolean` | `true` | When true, hydrates the component as a client-side island to compute live character limits and error validation states. |
 
-| `resize` | \`"none" \ | "both" \ | "horizontal" \ | "vertical"\` | Whether the textarea can be resized. |
+***
 
-| `label` | `string` | The label for the field (when used as a standalone Field). |
-| `helperText` | `string` | The helper text for the field. |
-| `errorText` | `string` | The error text for the field. |
-| `value` | `string` | The current value. |
-| `defaultValue` | `string` | The initial value. |
-| `onValueChange` | `(val: string) => void` | Callback triggered when value changes. |
-| `onInput` | `(e: any) => void` | Event handler for input changes. |
-| `rows` | `number` | Number of visible text lines. |
-| `placeholder` | `string` | Hint text. |
-| `minLength` | `number` | Minimum length validation. |
+# Technical & Accessibility Implementation
 
-| `validator` | \`(val: string) => boolean \ | string\` | Custom validation logic. |
-
-| `interactive` | `boolean` | Forces hydration as an island. |
+- **Seamless Field Wrapping:** If provided with fields like `label` or `helperText`, the component automatically registers itself within the active `Field` context. This coordinates color-coded warnings and helper highlights smoothly.
+- **Client Validation Compilation:** Validator expressions passed via JSON configuration strings are reconstructed safely on the client browser using `new Function()`. This ensures robust, zero-lag inline validation without bloated server endpoints.
+- **Accessibility Attributes:** The text input button automatically binds to companion labels using semantic IDs (`aria-describedby` for help prompts, `aria-invalid` for failing conditions).

@@ -1,7 +1,7 @@
 ---
 title: Alert
-hydration: 3
 category: Feedback
+hydration: 3
 ---
 
 import { Alert, AlertIcon } from "../../app/components/ui";
@@ -15,9 +15,9 @@ The **Alert** component is fully integrated as an `alert` block in the **Page Bu
 
 ***
 
-# Usage via CMS Page Builder (JSON)
+# Usage
 
-These configurations represent exactly how page-builder block items are constructed inside the page schema collections (`content/pages/*.json`).
+These configurations represent exactly how page-builder block items are constructed.
 
 ## 1. Success Message (Subtle Variant)
 
@@ -98,12 +98,10 @@ Informs the user of critical failures, expired credentials, or transaction error
 
 ***
 
-# CMS Configuration Reference
-
-These properties can be mapped directly to Sveltia CMS widget fields under `public/admin/config.yml`:
+# Props
 
 | Property | CMS Field Type | Default | Description / Supported Options |
-| :--- | :--- | :--- | :--- |
+| --- | --- | --- | --- |
 | **Title** (`title`) | `string` | - | Bold header text displayed on the top line of the alert block. |
 | **Description** (`description`) | `string` | - | Detailed body message containing supplementary context or action instructions. |
 | **Severity Status** (`status`) | `select` | `"info"` | Sets the semantic layout color and default indicator icon. <br/>• Options: `"success"`, `"warning"`, `"error"`, `"info"`, `"neutral"`. |

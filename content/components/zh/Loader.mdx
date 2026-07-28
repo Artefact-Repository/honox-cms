@@ -1,7 +1,7 @@
 ---
 title: Loader 加载器
-hydration: 3
 category: Feedback
+hydration: 3
 ---
 
 import { Loader } from "../../../app/components/ui";
@@ -9,57 +9,60 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # 简介
 
-一个用于管理 `Spinner` 及其关联文字视觉状态的工具组件。
+一个可视化的加载布局工具组件，将旋转的 `Spinner` 元素与配套的 status 消息文本配对。主要用于在布局区块内的服务端获取、文件操作、状态转换或内容处理状态期间管理用户预期。
+
+**Loader** 组件已作为 `loader` 区块完全集成到 **Page Builder** 中，使内容作者和开发者能够直接在 CMS 页面模式中轻松配置可视状态文本和加载器对齐方式。
+
+***
 
 # 用法
 
+以下示例展示了内容编辑者如何绑定和构建交互式加载器。
+
+## 1. 标准居中状态加载器
+
+一个带有标准状态文本的经典加载指示器，适用于主要面板条目、内容更新或懒加载区块。
+
 <DemoPreview>
-  <Loader text="Loading data..." />
+  <Loader text="Loading workspace data..." />
 </DemoPreview>
-
-```tsx
-import { Loader, Spinner } from "../components/ui";
-
-export default function MyPage() {
-  return <Loader text="Loading data..." />;
-}
-```
-
-## 自定义 Spinner 与位置
-
-```tsx
-import { Loader, Spinner } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Loader
-      spinner={<Spinner size="lg" colorPalette="blue" />}
-      spinnerPlacement="end"
-    >
-      Please wait
-    </Loader>
-  );
-}
-```
-
-## CMS 页面构建器
-
-该组件可作为 `loader` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用 —— CMS 的 `text` 字段直接映射到 `Loader` 自身的 `text` 属性：
 
 ```json
 {
   "type": "loader",
-  "text": "Checking availability...",
+  "text": "Loading workspace data...",
   "spinnerPlacement": "start"
 }
 ```
 
+## 2. 带尾部加载器（尾部对齐）
+
+将视觉加载器对齐在状态消息之后，为卡片底部或内联按钮操作提供替代的视觉流。
+
+<DemoPreview>
+  <Loader text="Please wait while we process your request" spinnerPlacement="end" />
+</DemoPreview>
+
+```json
+{
+  "type": "loader",
+  "text": "Please wait while we process your request",
+  "spinnerPlacement": "end"
+}
+```
+
+***
+
 # 属性
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `children` | `any` | 与 spinner 一起渲染的文本内容。 |
-| `spinner` | `Child` | 自定义 spinner 元素。默认 `<Spinner size="inherit" />`。 |
-| `text` | `Child` | 用于文本内容的替代属性。 |
+| 属性 | CMS 字段类型 | 默认值 | 描述 / 支持选项 |
+| --- | --- | --- | --- |
+| **状态文本** (`text`) | `string` | - | 显示在旋转加载器旁边的消息文本。 |
+| **加载器位置** (`spinnerPlacement`) | `select` | `"start"` | 加载器相对于伴随文本的对齐方式。<br/>• 选项：`"start"`、`"end"`。 |
 
-| `spinnerPlacement` | \`"start" \ | "end"\` | spinner 相对于文本的位置。默认 `"start"`。 |
+***
+
+# 开发者说明与无障碍
+
+- **免水合（仅静态）：** Loader 是一个纯展示性的布局辅助组件，被指定为仅静态组件（`Tier 3`）。它编译为标准服务端 HTML/CSS 标记，完全不含任何交互式客户端 JavaScript。
+- **WAI-ARIA 合规：** 在底层，该组件专为辅助技术设计，以适当的实时区域或忙碌容器参数编译（例如父容器上的 `aria-busy="true"`、`role="status"`），确保对正在进行的后台活动进行顺畅的播报。

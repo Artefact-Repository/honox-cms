@@ -1,7 +1,7 @@
 ---
 title: Field 表单字段
-hydration: 2
 category: Forms
+hydration: 2
 ---
 
 import { Field } from "../../../app/components/ui";
@@ -9,137 +9,127 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # 简介
 
-一个用于表单字段的基础组件，管理标签、辅助文本、错误消息与校验状态。它遵循“Smart Switcher”模式，在需要时自动以水合形式作为交互式岛屿渲染。
+一个基础输入控件，旨在以清晰且无障碍的方式管理表单。它将输入标签、上下文辅助文本、动态错误验证状态以及基于自定义 JS 的规则检查聚合到一个内聚且对开发者友好的界面中。
+
+**Field** 组件已作为交互式 `field` 区块完全集成到 **Page Builder** 中。这使内容创建者和设计者无需编写布局样板即可直接从 Sveltia CMS 起草字段、放置自定义 HTML 表单输入，并提供即时客户端验证逻辑。
+
+***
 
 # 用法
 
-## 智能自动水合
+以下示例展示了内容编辑者如何绑定和配置表单字段结构。
 
-`Field` 组件会自动判断自身是否应该交互。如果提供了以下任意属性，它就会成为一个岛屿：`interactive`、`onValueChange`、`value`、`defaultValue`、`validator` 或 `minLength`。
+## 1. 标准输入框
 
-## 校验
-
-Field 支持内置与自定义校验。
-
-### 最小长度
-
-使用 `minLength` 会在输入过短时自动显示错误消息。
-
-```tsx
-<Field
-  label="Username"
-  minLength={5}
-  placeholder="Enter at least 5 characters"
-/>
-```
-
-### 自定义验证器
-
-`validator` 属性接受一个函数，返回 `true` 表示有效、返回 `false` 表示无效（使用默认错误消息），或返回一个 `string` 作为自定义错误消息。
-
-```tsx
-<Field
-  label="Email"
-  validator={(value) => {
-    if (!value.includes("@")) return "Must be a valid email";
-    return true;
-  }}
-/>
-```
-
-使用 Field 最简单的方式是使用扁平化的属性。它会自动渲染一个输入框。
+一个标准文本字段，带有配套标签、占位符提示，以及位于输入元素正下方的描述性辅助文本。
 
 <DemoPreview>
   <div style={{ width: "100%", maxWidth: "320px" }}>
     <Field
       label="Username"
-      helperText="Choose a unique username."
-      placeholder="Type here..."
-      minLength={3}
+      placeholder="e.g. jules_architect"
+      helperText="Choose a unique public username."
+      interactive
     />
   </div>
 </DemoPreview>
-
-```tsx
-import { Field } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Field
-      label="Username"
-      helperText="Choose a unique username."
-      placeholder="Type here..."
-      minLength={3}
-    />
-  );
-}
-```
-
-## Fieldset 继承
-
-嵌套在 `Fieldset` 中的 `Field` 会继承该组的 `disabled`/`required` 状态，以及其 `invalid` 状态——但仅当 `Field` 自身没有任何校验时（没有 `validator`/`minLength`，也没有显式的 `invalid` 属性）。`Field` 上的显式属性始终优先于继承值。
-
-```tsx
-<Fieldset legend="Shipping address" disabled>
-  {/* inherits disabled — no need to repeat it */}
-  <Field label="Street" />
-</Fieldset>
-```
-
-注意，原生的 `<fieldset disabled>` 也会在浏览器层面禁用每一个后代表单控件，与这种继承无关——继承的 `disabled` 属性只是让 `Field` 自身的样式/ARIA 与之保持同步，它无法从被禁用的 fieldset 内部被重新启用为可用。
-
-## 组合
-
-如需更多控制，你可以包裹 `Textarea` 或其他自定义输入等其他组件。`Field` 会向它的子元素提供上下文。
-
-```tsx
-import { Field, Textarea } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Field
-      label="Bio"
-      helperText="Tell us about yourself."
-      minLength={10}
-    >
-      <Textarea placeholder="A short bio" />
-    </Field>
-  );
-}
-```
-
-## CMS 页面构建器
-
-该组件在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中作为 `field` 区块提供：
 
 ```json
 {
   "type": "field",
   "label": "Username",
-  "helperText": "Choose a unique username.",
-  "required": true
+  "placeholder": "e.g. jules_architect",
+  "helperText": "Choose a unique public username.",
+  "name": "username",
+  "interactive": true
 }
 ```
 
+## 2. 带客户端验证的动态输入
+
+使用自定义验证逻辑。当用户输入少于 5 个字符或跳过 `@` 符号时，错误消息会自动显示并动态播报。
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <Field
+      label="Email Address"
+      placeholder="architect@domain.com"
+      defaultValue="invalid-email"
+      validator={(value) => value.includes("@") || "Must be a valid email containing '@'"}
+      interactive
+    />
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "field",
+  "label": "Email Address",
+  "placeholder": "architect@domain.com",
+  "defaultValue": "invalid-email",
+  "validator": "(value) => value.includes('@') || 'Must be a valid email containing \'@\''",
+  "name": "email",
+  "interactive": true
+}
+```
+
+## 3. 必填与禁用选项字段
+
+展示标准 HTML 区块状态下的表单字段样式。这有助于内容作者直观地了解字段在必填（星号标记）或因权限锁定时呈现的外观。
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+    <Field
+      label="Secret Key"
+      defaultValue="SUPER_SECURE_TOKEN"
+      readOnly
+      required
+      interactive
+    />
+    <Field
+      label="Legacy Code"
+      placeholder="Not available"
+      disabled
+      interactive
+    />
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "field",
+  "label": "Secret Key",
+  "defaultValue": "SUPER_SECURE_TOKEN",
+  "readOnly": true,
+  "required": true,
+  "interactive": true
+}
+```
+
+***
+
 # 属性
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `children` | `any` | 组件内部要渲染的内容。如果提供，则不渲染内部输入框。 |
-| `class` | `string` | 自定义 CSS 类名。 |
-| `id` | `string` | 唯一标识符。如未提供，则自动生成。 |
-| `label` | `Child` | 字段的标签。 |
-| `helperText` | `Child` | 字段的辅助文本。 |
-| `errorText` | `Child` | 字段的错误文本。如果以字符串形式提供，则作为消息使用。 |
-| `disabled` | `boolean` | 字段是否被禁用。 |
-| `invalid` | `boolean` | 字段是否处于无效状态。 |
-| `required` | `boolean` | 字段是否为必填。 |
-| `readOnly` | `boolean` | 字段是否为只读。 |
-| `value` | `string` | 当前值（强制进入交互模式）。 |
-| `defaultValue` | `string` | 初始值（强制进入交互模式）。 |
-| `onValueChange` | `(val: string) => void` | 值变化时触发的回调（强制进入交互模式）。 |
-| `minLength` | `number` | 最小长度校验（强制进入交互模式）。 |
+| 属性 | CMS 字段类型 | 默认值 | 描述 / 支持选项 |
+| --- | --- | --- | --- |
+| **标签文本** (`label`) | `string` | - | 位于输入元素正上方的视觉标题或描述。 |
+| **名称** (`name`) | `string` | - | 随表单提交一起发送的标准 HTML name 属性。 |
+| **占位符** (`placeholder`) | `string` | - | 当输入完全为空时在输入框内显示的浅色占位符文本。 |
+| **辅助文本** (`helperText`) | `string` | - | 打印在输入字段下方的上下文提示或说明文本。 |
+| **错误文本** (`errorText`) | `string` | - | 手动错误消息覆盖。触发无效样式和屏幕阅读器播报。 |
+| **默认值** (`defaultValue`) | `string` | - | 在页面加载时预填充输入。强制进入客户端交互孤岛模式。 |
+| **必填** (`required`) | `boolean` | `false` | 渲染红色星号标记，表示该输入不得留空。 |
+| **禁用** (`disabled`) | `boolean` | `false` | 阻止所有输入或光标交互，并使整个字段变暗。 |
+| **只读** (`readOnly`) | `boolean` | `false` | 保持值可选且可通过 Tab 聚焦，但阻止编辑文本。 |
+| **无效状态** (`invalid`) | `boolean` | `false` | 显式强制字段进入错误状态，以红色高亮边框。 |
+| **验证器表达式** (`validator`) | `string` | - | 评估字符串输入的高级 JavaScript 函数表达式。通过 `new Function()` 在客户端重建。<br/>*示例：* `(value) => value.includes('@') | 'Invalid email address'` |
+| **强制交互** (`interactive`) | `boolean` | `true` | 确保以交互孤岛的形式进行客户端水合，以支持实时用户验证。 |
 
-| `validator` | \`(val: string) => boolean \ | string\` | 自定义校验函数（强制进入交互模式）。 |
+***
 
-| `interactive` | `boolean` | 强制以水合形式作为岛屿渲染。 |
+# 开发者说明与无障碍
+
+- **智能切换器水合：** 默认情况下，如果该字段是标准静态展示，没有自定义验证触发器或动态绑定，它会保持轻量的静态 SSR 标记。提供 `validator`、`defaultValue` 或 `"interactive": true` 中的任意一项都会自动将该元素提升为完全水合的客户端孤岛。
+- **WAI-ARIA 描述性连接：** 外层包装元素动态管理 aria 连接。输入元素会自动注册 `aria-describedby`，指向辅助文本和错误文本插槽的精确生成 ID。
+- **属性泄漏防护：** `FieldRoot` 原语内置过滤器，可防止标准输入属性（如 `placeholder`、`autocomplete` 或 `name`）泄漏到外层包装 `<div>` 上，确保生成完全有效、干净的 HTML 输出。
+- **组合上下文：** Field 组件支持组合架构。在 Page Builder 中将子元素（如自定义 `Textarea` 或自定义选择元素）嵌套为子项时，它们会自动消费外层 Field 的共享上下文以解析适当的验证属性。

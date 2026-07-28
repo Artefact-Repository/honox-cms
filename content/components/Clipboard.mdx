@@ -1,7 +1,7 @@
 ---
 title: Clipboard
-hydration: 2
 category: Forms
+hydration: 2
 ---
 
 import { Clipboard } from "../../app/components/ui";
@@ -9,13 +9,22 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-A readonly field paired with a copy-to-clipboard trigger, with built-in
-copied/not-copied indicator states.
+The `Clipboard` component is a readonly text container paired with a copy-to-clipboard action trigger. It features responsive, built-in visual indicator status changes (copied/not-copied states) to provide immediate feedback to users copying terminal commands, API keys, tokens, or links.
+
+The **Clipboard** is fully integrated as a `clipboard` block in the **Page Builder**, allowing content authors and developers to easily configure descriptive labels, copy values, action timeouts, and color themes directly within the CMS.
+
+***
 
 # Usage
 
+These examples illustrate how content editors bind and structure copy-to-clipboard elements.
+
+## 1. Standard Code Clone Command
+
+A standard terminal code or Git clone command snippet accompanied by a visual copy trigger.
+
 <DemoPreview>
-  <div style={{ width: "100%", maxWidth: "360px" }}>
+  <div style={{ width: "100%", maxWidth: "480px" }}>
     <Clipboard
       label="Clone Command"
       value="git clone https://github.com/honojs/honox"
@@ -24,88 +33,85 @@ copied/not-copied indicator states.
   </div>
 </DemoPreview>
 
-```tsx
-import { Clipboard } from "../components/ui";
+```json
+{
+  "type": "clipboard",
+  "label": "Clone Command",
+  "value": "git clone https://github.com/honojs/honox",
+  "interactive": true
+}
+```
 
-export default function MyPage() {
-  return (
+## 2. API Key Clipboard with Custom Timeout (Purple Theme)
+
+Demonstrates a custom colored platform configuration with a faster, custom state reset timeout set to 1500 milliseconds.
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "480px" }}>
     <Clipboard
-      label="Clone Command"
-      value="git clone https://github.com/honojs/honox"
+      label="Production API Key"
+      value="pk_live_51HxF4pE2"
+      colorPalette="purple"
+      timeout={1500}
+      interactive
     />
-  );
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "clipboard",
+  "label": "Production API Key",
+  "value": "pk_live_51HxF4pE2",
+  "colorPalette": "purple",
+  "timeout": 1500,
+  "interactive": true
 }
 ```
 
-## Custom Composition
+## 3. Compact Readonly Configuration
 
-Pass `children` to `Clipboard.Trigger` to override the default copy/check
-icon swap, or compose the parts directly for full control:
+Ideal for embedding compact URLs or system IDs in tight dashboard sidebars or compact metadata layouts.
 
-```tsx
-import { Clipboard } from "../components/ui";
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "480px" }}>
+    <Clipboard
+      label="Endpoint URL"
+      value="https://api.acme.com/v1/deploy"
+      size="sm"
+      interactive
+    />
+  </div>
+</DemoPreview>
 
-export default function MyPage() {
-  return (
-    <Clipboard.Root value="npm install honox">
-      <Clipboard.Label>Install Command</Clipboard.Label>
-      <Clipboard.Control>
-        <Clipboard.Input />
-        <Clipboard.Trigger>
-          <Clipboard.CopyText />
-        </Clipboard.Trigger>
-      </Clipboard.Control>
-    </Clipboard.Root>
-  );
+```json
+{
+  "type": "clipboard",
+  "label": "Endpoint URL",
+  "value": "https://api.acme.com/v1/deploy",
+  "size": "sm",
+  "interactive": true
 }
 ```
+
+***
 
 # Props
 
-## Root
+| Property | CMS Field Type | Default | Description / Supported Options |
+| --- | --- | --- | --- |
+| **Label Text** (`label`) | `string` | - | The visual text heading rendered directly above the readonly input field. |
+| **Copy Value** (`value`) | `string` | - | The actual text value copied to the user's system clipboard upon trigger click. |
+| **Timeout delay** (`timeout`) | `number` | `3000` | Duration in milliseconds that the visual "Copied" checkmark state remains active before reverting. |
+| **Color Theme** (`colorPalette`) | `select` | `"green"` | Visual color accent applied to the copy trigger when toggled to active. <br/>• Options: `blue`, `green`, `red`, `purple`, `orange`, `amber`, `cyan`, `slate`. |
+| **Size Scale** (`size`) | `select` | `"md"` | Controls overall height, padding, and text scale. <br/>• Options: `"sm"`, `"md"`, `"lg"`. |
+| **Force Interactive** (`interactive`) | `boolean` | `true` | Ensures client-side hydration as a Preact interactive island so click actions trigger instant copying. |
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `value` | `string` | The text to copy (controlled). |
-| `defaultValue` | `string` | The initial text to copy (uncontrolled). |
-| `disabled` | `boolean` | Disables the trigger. |
-| `timeout` | `number` | Milliseconds the copied state stays active before reverting. Default `3000`. |
-| `translations` | `Partial<ClipboardTranslations>` | Overrides for the trigger's `aria-label`. |
-| `onValueChange` | `(details: { value: string }) => void` | Called when the value changes (e.g. via a custom input). |
-| `onStatusChange` | `(details: { copied: boolean }) => void` | Called when the copied state flips. |
-| `size` | `"sm" \| "md" \| "lg"` | Visual size. Default `"md"`. |
-| `colorPalette` | `string` | The color theme. Default `"green"`. |
-| `interactive` | `boolean` | Forces (or suppresses) hydration as an island. |
-| `class` | `string` | Custom CSS classes for the root element. |
+***
 
-## Default composition
+# Developer Notes & Accessibility
 
-These only apply to the top-level `<Clipboard>` (not `Clipboard.Root`),
-which renders `Label` + `Control` (`Input` + `Trigger`) for you.
-
-| Prop | Type | Description |
-| --- | --- | --- |
-| `label` | `JSX.Element \| string` | Label rendered above the control. |
-| `children` | `JSX.Element` | Custom `Trigger` content, overriding the default copy/check icon swap. |
-
-## Sub-components
-
-| Part | Description |
-| --- | --- |
-| `Clipboard.Label` | `<label>` bound to the readonly input. |
-| `Clipboard.Control` | Wraps `Input` and `Trigger`. |
-| `Clipboard.Input` | Readonly `<input>` showing the current value; selects its text on focus. Manually copying via Ctrl/Cmd+C also triggers the copied state. |
-| `Clipboard.Trigger` | Copies `value` to the clipboard on click. Accepts `asChild` to merge onto a custom child instead of rendering a `<button>`. |
-| `Clipboard.Indicator` | Renders both `children` and a `copied` variant as sibling nodes, toggled via `hidden` — use for custom copied/not-copied icon or text swaps. |
-| `Clipboard.CopyText` | Convenience `Indicator` that swaps between `"Copy"` / `"Copied"` text (override via `children`/`copied` props). |
-| `Clipboard.Context` | Render-prop access to the clipboard context: `<Clipboard.Context>{(ctx) => ...}</Clipboard.Context>`. |
-
-# Accessibility
-
-- `Trigger` gets an `aria-label` from `translations.triggerLabel(copied)`
-  (default `"Copy to clipboard"` / `"Copied to clipboard"`), announcing the
-  state change to assistive tech.
-- `Input` is `readOnly`, not `disabled`, so it stays focusable and its text
-  selectable/copyable via native keyboard shortcuts even without clicking
-  the trigger.
-- `data-copied` is mirrored onto every part for state-based styling.
+- **Accessible Label & State Announcements:** Under the hood, this component handles screen reader accessibility natively:
+    - The copy button trigger receives localized `aria-label` updates (swapping between `"Copy to clipboard"` / `"Copied to clipboard"`), ensuring screen readers announce status changes immediately.
+- **Select-on-Focus & Readonly Inputs:** The input field remains focusable (`readOnly` rather than `disabled`). When focused, it automatically selects its complete inner text so keyboard users can manually copy contents using `Ctrl+C` or `Cmd+C`.
+- **Active State Markers:** A `data-copied` attribute is dynamically mirrored onto the outer container and all descendant parts when active, facilitating custom CSS styling during copying.

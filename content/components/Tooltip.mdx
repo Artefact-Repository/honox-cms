@@ -1,7 +1,7 @@
 ---
 title: Tooltip
-hydration: 1
 category: Overlays
+hydration: 1
 ---
 
 import { Tooltip, Button } from "../../app/components/ui";
@@ -9,42 +9,33 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-A component for displaying contextual information on hover or focus.
+A contextual overlay component used to display descriptive, helpful, or supplementary information when users hover their cursor or move keyboard focus onto an active trigger element. Excellent for explaining dense button icons, clarify system policies, or describing visual charts.
+
+For tooltip that need to show multiline content, use [HoverCard](HoverCard).
+
+***
+
+# Hydration & Interactive Behavior
+
+Because the Tooltip must dynamically calculate its viewport coordinates on hover and track active keyboard focus, it hydrates as an active client-side island by default. If a static, non-interactive layout placeholder is preferred, set `"interactive": false` to suppress client-side javascript loading.
+
+***
 
 # Usage
 
-## High-level wrapper
+These configurations represent exactly how page-builder block items are constructed.
+
+## 1. Information Policy Popover (Top Placement)
+
+An information tooltip useful for explaining company guidelines, cancellation policies, or technical jargon.
 
 <DemoPreview>
-  <Tooltip content="This is the tooltip content" placement="bottom" showArrow asChild>
-    <Button>Hover me</Button>
-  </Tooltip>
-</DemoPreview>
-
-```tsx
-import { Tooltip } from "../components/ui/tooltip";
-import { Button } from "../components/ui/button";
-
-export default function MyPage() {
-  return (
-    <Tooltip content="This is the tooltip content" placement="bottom" showArrow asChild>
-      <Button>Hover me</Button>
+  <div style={{ padding: "2rem 0" }}>
+    <Tooltip content="Free cancellation up to 24 hours before check-in." placement="top" showArrow asChild>
+      <Button>Cancellation Policy</Button>
     </Tooltip>
-  );
-}
-```
-
-Prefer `asChild` when the trigger is already a focusable element (a
-`Button`, a link, …): it merges the tooltip's `aria-describedby`, hover/focus
-listeners, and `data-*` attributes directly onto that element. Without
-`asChild`, the trigger is wrapped in an extra `<div tabindex="0">` — useful
-for wrapping inert content (plain text, an icon) that isn't itself focusable,
-but it adds a second, redundant tab stop when the child is already
-interactive.
-
-## CMS Page Builder
-
-This component is available as a `tooltip` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`). The CMS trigger is a plain `triggerText` string, auto-wrapped in an outline `Button` with `asChild` (the same pattern `Popover`/`HoverCard` use):
+  </div>
+</DemoPreview>
 
 ```json
 {
@@ -56,40 +47,47 @@ This component is available as a `tooltip` block in the [Page Builder](/docs/Pag
 }
 ```
 
+## 2. Helpful Quick-Info Tag (Right Placement)
+
+A compact, accented tooltip pointing to the right of its trigger. Ideal for describing visual icons, settings controls, or metadata terms.
+
+<DemoPreview>
+  <div style={{ padding: "2rem 0" }}>
+    <Tooltip content="Syncs files across workspace nodes instantly." placement="right" showArrow asChild>
+      <Button>Database Sync</Button>
+    </Tooltip>
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "tooltip",
+  "content": "Syncs files across workspace nodes instantly.",
+  "triggerText": "Database Sync",
+  "placement": "right",
+  "showArrow": true
+}
+```
+
+***
+
 # Props
 
-## Tooltip (High-level wrapper)
+| Property | Type | Default | Description / Supported Options |
+| --- | --- | --- | --- |
+| **Trigger Text** (`triggerText`) | `string` | - | The plain-text label of the button rendered on-screen that triggers the tooltip on hover or focus. |
+| **Hover Content** (`content`) | `string` | - | The descriptive help text shown inside the floating tooltip overlay. |
+| **Show Arrow** (`showArrow`) | `boolean` | `true` | When true, renders a small pointing triangle indicator aligning the tooltip card directly to its trigger. |
+| **Preferred Placement** (`placement`) | `select` | `"top"` | Ideal viewport boundary side to render. Flips to opposite side automatically if there is not enough room. <br/>• Options: `"top"`, `"bottom"`, `"left"`, `"right"`. |
+| **Open Delay** (`openDelay`) | `number` | `100` | Delay in milliseconds before showing the tooltip after hovering starts. |
+| **Close Delay** (`closeDelay`) | `number` | `100` | Delay in milliseconds before hiding the tooltip after mouse-out. |
+| **Enable Hydration** (`interactive`) | `boolean` | `true` | When true, hydrates the component as a client island to compute viewport coordinates and manage hover/focus listeners. |
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `children` | `any` | The element that triggers the tooltip. |
-| `content` | `any` | The content to display within the tooltip. |
-| `showArrow` | `boolean` | Whether to show an arrow pointing to the trigger. |
+***
 
-| `placement` | \`"top" \ | "bottom" \ | "left" \ | "right"\` | Which side of the trigger the content opens on. Default `"top"`. Flips to the opposite side automatically if there isn't enough viewport room. |
+# Accessibility & Technical Execution
 
-| `open` | `boolean` | Whether the tooltip is open (controlled). |
-| `defaultOpen` | `boolean` | Initial open state (uncontrolled). Default `false`. |
-| `onOpenChange` | `(details: { open: boolean }) => void` | Called when the tooltip opens or closes. |
-| `openDelay` | `number` | Delay (ms) before showing on hover. Default `100`. |
-| `closeDelay` | `number` | Delay (ms) before hiding on mouse-out. Default `100`. |
-| `closeOnEscape` | `boolean` | Close when Escape is pressed. Default `true`. |
-| `disabled` | `boolean` | Whether the tooltip is disabled. |
-| `interactive` | `boolean` | Forces hydration as an island. Defaults to `true`. |
-| `id` | `string` | Unique identifier for the tooltip. |
-| `asChild` | `boolean` | Whether to merge props onto the immediate child element instead of wrapping in a `div`. |
-
-Hovering onto or focusing the trigger opens the tooltip; moving the pointer
-onto the tooltip's own content (e.g. a link inside it) keeps it open, per
-[WCAG 1.4.13](https://www.w3.org/WAI/WCAG21/Understanding/content-on-hover-or-focus.html).
-Focusing the trigger (keyboard navigation) opens it immediately, and blurring
-closes it immediately — the `openDelay`/`closeDelay` only apply to hover.
-
-# Limitations
-
-The interactive island positions and sizes the tooltip relative to its
-trigger: it flips to the opposite side (e.g. `top` → `bottom`) when the
-requested placement would overflow the viewport, and clamps the cross axis so
-the content never renders off-screen. It does not track scroll containers or
-resize observers the way Floating UI does — repositioning only re-runs when
-the tooltip opens and on window `resize`.
+- **Focus Roving and Keyboard Support:** Tooltips strictly comply with WCAG 1.4.13 guidelines. Focusing the trigger button via keyboard tab immediately displays the overlay card. Moving the pointer over the tooltip's own card content (such as a link inside) keeps it open.
+- **Escape Close Bindings:** Pressing the physical <kbd>Escape</kbd> button on a keyboard immediately dismisses the active tooltip, returning active screen focus cleanly to the trigger button.
+- **Auto-Flipping Geometry:** The interactive layout manager calculates trigger positioning on the fly. If a tooltip is set to `"placement": "top"` but sits near the upper edge of the screen, it automatically flips to `"bottom"` to guarantee it never renders off-screen.
+- **Trigger Element Merging:** With `asChild` enabled, the tooltip merges all its required event listeners, data states, and `aria-describedby` focus fields directly onto the nested child element. Without `asChild`, the trigger is nested inside an accessible `<div tabindex="0">` wrapper.

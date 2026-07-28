@@ -1,7 +1,7 @@
 ---
 title: Breadcrumb Fil d'Ariane
-hydration: 3
 category: Navigation
+hydration: 3
 ---
 
 import { Breadcrumb } from "../../../app/components/ui";
@@ -9,11 +9,19 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introduction
 
-Une aide à la navigation qui affiche l'emplacement de la page actuelle dans une hiérarchie à l'aide d'une liste de liens.
+Le composant `Breadcrumb` est une aide à la navigation qui affiche l'emplacement de la page actuelle dans une structure hiérarchique du site. Il aide les utilisateurs à retracer leur chemin depuis la page d'accueil jusqu'à leur position actuelle et à remonter facilement la hiérarchie.
+
+Le **Breadcrumb** est entièrement intégré en tant que bloc `breadcrumb` dans le **Page Builder**, permettant aux éditeurs de contenu et aux développeurs de configurer facilement les styles visuels, les séparateurs et les tailles responsives directement dans le CMS.
+
+***
 
 # Utilisation
 
-## Fil d'Ariane de base
+Ces exemples illustrent comment les éditeurs de contenu lient et structurent des composants de navigation.
+
+## 1. Fil d'Ariane de navigation standard
+
+Une configuration classique de fil d'Ariane hiérarchique montrant la page d'accueil, la catégorie secondaire et le marqueur de page texte terminal.
 
 <DemoPreview>
   <Breadcrumb
@@ -25,76 +33,99 @@ Une aide à la navigation qui affiche l'emplacement de la page actuelle dans une
   />
 </DemoPreview>
 
-```tsx
-import { Breadcrumb } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Breadcrumb
-      items={[
-        { label: "Home", href: "/" },
-        { label: "Components", href: "/components" },
-        { label: "Breadcrumb" },
-      ]}
-    />
-  );
-}
-```
-
-## Séparateur personnalisé
-
-```tsx
-import { Breadcrumb } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Breadcrumb
-      separator="/"
-      items={[
-        { label: "Home", href: "/" },
-        { label: "Breadcrumb" },
-      ]}
-    />
-  );
-}
-```
-
-## Constructeur de pages CMS
-
-Ce composant est disponible sous forme de bloc « fil d'Ariane » dans [Page Builder](/docs/PageBuilder) (`content/pages/*.json`) :
-
 ```json
 {
   "type": "breadcrumb",
   "items": [
     { "label": "Home", "href": "/" },
-    { "label": "Docs", "href": "/docs" },
+    { "label": "Components", "href": "/components" },
     { "label": "Breadcrumb" }
-  ],
-  "variant": "underline",
-  "size": "md"
+  ]
 }
 ```
 
+## 2. Séparateur personnalisé (diviseur en barre oblique)
+
+Utilise un caractère de séparation de texte personnalisé (comme une barre oblique `"/"`) pour séparer les éléments de navigation.
+
+<DemoPreview>
+  <Breadcrumb
+    separator="/"
+    items={[
+      { label: "Home", href: "/" },
+      { label: "Library", href: "/library" },
+      { label: "Overview" },
+    ]}
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "breadcrumb",
+  "separator": "/",
+  "items": [
+    { "label": "Home", "href": "/" },
+    { "label": "Library", "href": "/library" },
+    { "label": "Overview" }
+  ]
+}
+```
+
+## 3. Taille et style visuel accentués
+
+Ajuste l'échelle globale à petite et applique un style visuel de soulignement personnalisé pour une sensation de mise en page mise en évidence.
+
+<DemoPreview>
+  <Breadcrumb
+    variant="underline"
+    size="sm"
+    items={[
+      { label: "Console", href: "/console" },
+      { label: "Resources", href: "/console/resources" },
+      { label: "Deployments" },
+    ]}
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "breadcrumb",
+  "variant": "underline",
+  "size": "sm",
+  "items": [
+    { "label": "Console", "href": "/console" },
+    { "label": "Resources", "href": "/console/resources" },
+    { "label": "Deployments" }
+  ]
+}
+```
+
+***
+
 # Propriétés
 
-## Fil d'Ariane
+| Propriété | Type de champ CMS | Défaut | Description / Options prises en charge |
+| --- | --- | --- | --- |
+| **Séparateur** (`separator`) | `string` | `"chevron-right"` | Caractère de séparation personnalisé placé entre les éléments. |
+| **Style visuel** (`variant`) | `select` | `"plain"` | Le style visuel des liens. <br/>• Options : `"plain"`, `"underline"`. |
+| **Échelle de taille** (`size`) | `select` | `"md"` | Contrôle l'échelle globale de la police et du chevron. <br/>• Options : `"xs"`, `"sm"`, `"md"`, `"lg"`. |
+| **Éléments de navigation** (`items`) | `list` | `[]` | Collection ordonnée d'éléments de page. (Voir le schéma des éléments de fil d'Ariane ci-dessous). |
+| **Classe personnalisée** (`class`) | `string` | - | Remplacements de classe CSS personnalisés appliqués directement au conteneur de fil d'Ariane. |
 
-| Propriété | Type | Description |
-| --- | --- | --- |
-| `items` | `BreadcrumbItem[]` | Éléments du fil d’Ariane à afficher. |
-| `separator` | `Child` | Séparateur personnalisé entre les éléments. Par défaut : une icône en forme de chevron à droite. |
+### Schéma des éléments de fil d'Ariane
 
-| `variant` | \`"underline" \ | "plaine"\` | The visual style of the breadcrumb. |
+Chaque entrée du tableau `items` accepte les paramètres suivants :
 
-| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg"\` | The size of the breadcrumb. |
+| Propriété | Type de champ CMS | Requis | Description |
+| --- | --- | --- | --- |
+| **Texte affiché** (`label`) | `string` | Oui | Texte de libellé rendu pour le segment de l'élément. |
+| **Route cible** (`href`) | `string` | Non | URL cible ou route de page. Si omis, est rendu sous forme de texte brut de la page actuelle. |
+| **Page actuelle** (`current`) | `boolean` | `false` | Définit l'élément pour désigner la page active (automatiquement vrai pour le dernier élément). |
 
-| `class` | `string` | Classes CSS personnalisées pour l'élément racine. |
+***
 
-### Élément de fil d'Ariane
+# Notes pour les développeurs et accessibilité
 
-| Propriété | Type | Description |
-| --- | --- | --- |
-| `label` | `Child` | Afficher le texte ou le nœud JSX. |
-| `href` | `string` | S'il est présent, s'affiche sous forme de lien ; sinon, il s'affiche sous forme de texte brut (page actuelle). |
-| `current` | `boolean` | Marque la page actuelle. La valeur par défaut est « true » pour le dernier élément. |
+- **Hiérarchie conforme ARIA :** Le composant est automatiquement rendu dans un élément de navigation sémantique accessible (`<nav aria-label="Breadcrumb">`).
+- **ARIA de page active :** L'élément terminal final (où `href` est omis ou `current` est défini) reçoit automatiquement `aria-current="page"` pour se conformer aux directives d'accessibilité des lecteurs d'écran.
+- **Style de micro-interaction :** Les liens héritent automatiquement des déclencheurs et transitions de survol de la mise en page, reflétant harmonieusement les accents de la palette de couleurs parente.

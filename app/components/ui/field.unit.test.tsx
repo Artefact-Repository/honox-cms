@@ -1,6 +1,28 @@
 import { expect, test } from "bun:test";
+import { cx } from "design-system/css";
+import { input } from "design-system/recipes";
 import { Field } from "./field";
-import { Input } from "./input";
+import { useFieldContext } from "./field-primitive";
+
+// Define a local Input component for testing composition
+function Input(props: any) {
+	const context = useFieldContext();
+	const { class: classProp, ...rest } = props;
+	return (
+		<input
+			id={context?.id || props.id}
+			disabled={context?.disabled || props.disabled}
+			required={context?.required || props.required}
+			value={props.value !== undefined ? props.value : context?.value}
+			class={cx(input(), classProp)}
+			onInput={(e) => {
+				context?.onValueChange?.((e.target as HTMLInputElement).value);
+				props.onInput?.(e);
+			}}
+			{...rest}
+		/>
+	);
+}
 
 test("Field - Flattened API renders basic structure", () => {
 	const html = (

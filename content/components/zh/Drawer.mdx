@@ -1,7 +1,7 @@
 ---
 title: Drawer 抽屉
-hydration: 1
 category: Overlays
+hydration: 1
 ---
 
 import { Drawer, Button } from "../../../app/components/ui";
@@ -9,72 +9,108 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # 简介
 
-一个从屏幕边缘滑入的面板，用于在不离开当前页面的情况下展示内容或操作。
+一个从屏幕边缘滑入的覆盖式面板，用于容纳临时内容、表单、设置或多步骤流程。该组件允许用户在完成任务、调整偏好或查看详细信息时不丢失其主要页面视图的上下文。
+
+**Drawer** 组件已作为 `drawer` 区块完全集成到 **Page Builder** 中，使内容作者和开发者能够直接在 CMS 中轻松配置触发按钮、描述性标题和自定义操作底部。
+
+***
 
 # 用法
 
-## 基础抽屉
+以下示例展示了内容编辑者如何绑定和构建抽屉组件。
+
+## 1. 标准设置配置抽屉
+
+一个标准配置面板，包含标题、描述以及主要/次要按钮触发器。
 
 <DemoPreview>
   <Drawer
-    trigger={<Button>Open Drawer</Button>}
-    title="Settings"
-    description="Adjust your preferences."
-    body="Drawer body content goes here."
-    cancel={<Button variant="outline">Close</Button>}
-    confirm={<Button>Save</Button>}
+    trigger={<Button>Open Settings</Button>}
+    title="Workspace Preferences"
+    description="Customize your development workspace configurations."
+    body="Configure default themes, enable telemetry, toggle system status reports, and authorize third-party API hook integrations for your active workspace."
+    cancel={<Button variant="outline">Cancel</Button>}
+    confirm={<Button>Apply Changes</Button>}
   />
 </DemoPreview>
-
-```tsx
-import { Drawer, Button } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Drawer
-      trigger={<Button>Open Drawer</Button>}
-      title="Settings"
-      description="Adjust your preferences."
-      body="Drawer body content goes here."
-      cancel={<Button variant="outline">Close</Button>}
-      confirm={<Button>Save</Button>}
-    />
-  );
-}
-```
-
-## CMS 页面构建器
-
-此组件在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中以 `drawer` 块的形式提供。`trigger` 是一个嵌套的块列表（CMS 始终提交一个数组）：
 
 ```json
 {
   "type": "drawer",
-  "title": "Settings",
-  "description": "Adjust your preferences.",
-  "confirmText": "Save",
-  "cancelText": "Close",
-  "trigger": [{ "type": "button", "text": "Open Drawer" }]
+  "title": "Workspace Preferences",
+  "description": "Customize your development workspace configurations.",
+  "confirmText": "Apply Changes",
+  "cancelText": "Cancel",
+  "trigger": [
+    {
+      "type": "button",
+      "text": "Open Settings",
+      "variant": "outline"
+    }
+  ]
 }
 ```
 
+## 2. 带自定义底部的信息审查抽屉
+
+展示一种替代布局组合，其中在底部数组中与标准控件一起提供自定义操作按钮列表。
+
+<DemoPreview>
+  <Drawer
+    trigger={<Button>Review System Specs</Button>}
+    title="System Diagnostics"
+    description="Real-time node and performance overview."
+    body="All background microservices are reporting healthy statuses. Memory allocation is stable at 42%, and static page routing delivery latency is currently averaging 12ms."
+    cancel={<Button variant="outline">Dismiss</Button>}
+    footer={[
+      <Button variant="subtle" colorPalette="blue" style={{ marginRight: "8px" }}>Refresh Node</Button>
+    ]}
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "drawer",
+  "title": "System Diagnostics",
+  "description": "Real-time node and performance overview.",
+  "cancelText": "Dismiss",
+  "trigger": [
+    {
+      "type": "button",
+      "text": "Review System Specs"
+    }
+  ],
+  "footer": [
+    {
+      "type": "button",
+      "text": "Refresh Node",
+      "variant": "subtle",
+      "colorPalette": "blue"
+    }
+  ]
+}
+```
+
+***
+
 # 属性
 
-## Drawer
+| 属性 | CMS 字段类型 | 默认值 | 描述 / 支持选项 |
+| --- | --- | --- | --- |
+| **抽屉标题** (`title`) | `string` | - | 在滑动抽屉面板顶部突出显示的主要标题。 |
+| **描述** (`description`) | `string` | - | 嵌套在标题下方的辅助副标题信息。 |
+| **主体内容** (`body`) | `string` | - | 显示在抽屉滚动容器内的主要文本内容。 |
+| **触发区块** (`trigger`) | `list` | - | 在页面上渲染以打开抽屉的组件数组（通常为单个按钮）。 |
+| **确认文本** (`confirmText`) | `string` | - | 主操作按钮的自定义标签。省略可隐藏确认控件。 |
+| **取消文本** (`cancelText`) | `string` | - | 次要关闭按钮的自定义标签。省略可隐藏取消控件。 |
+| **底部区块** (`footer`) | `list` | - | 渲染在标准确认/取消操作旁边的辅助按钮区块列表。 |
+| **显示关闭按钮** (`closable`) | `boolean` | `true` | 启用后，在右上角渲染一个标准的视觉关闭“X”图标触发器。 |
+| **强制交互** (`interactive`) | `boolean` | `true` | 立即将抽屉遮罩、过渡层和焦点捕获作为客户端孤岛水合。 |
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `trigger` | `JSX.Element` | 激活时打开抽屉的元素。 |
+***
 
-| `title` | \`string \ | JSX.Element\` | 抽屉标题。 |
-| `description` | \`string \ | JSX.Element\` | 抽屉描述。 |
-| `body` | \`string \ | JSX.Element\` | 主体内容。 |
-| `footer` | \`string \ | JSX.Element\` | 自定义页脚内容。 |
+# 开发者说明与无障碍
 
-| `cancel` | `JSX.Element` | 渲染为关闭（取消）触发器的元素。 |
-| `confirm` | `JSX.Element` | 渲染为操作触发器的元素。 |
-| `closable` | `boolean` | 是否显示关闭按钮。默认：`true`。 |
-| `interactive` | `boolean` | 为交互行为启用客户端水合。 |
-| `class` | `string` | 根元素的自定义 CSS 类。 |
-
-其他属性（例如 `open`、`defaultOpen`、`onOpenChange`、`id`）会转发到底层的抽屉 primitive。
+- **水合孤岛：** 由于滑动面板依赖客户端状态转换、背景遮罩关闭、键盘焦点捕获和触摸交互，它默认以水合为交互式客户端孤岛的形式运行（`"interactive": true`）。
+- **WAI-ARIA 合规：** 在底层，该组件符合覆盖层规范（`role="dialog"`、`aria-modal="true"`、`aria-labelledby`、`aria-describedby`）。打开抽屉会自动将键盘焦点捕获在面板内部。按下 `Escape` 键或点击变暗的背景遮罩层可安全关闭抽屉，并将焦点返回到触发元素。
+- **统一孤岛组合：** 为防止复杂客户端框架内的水合不匹配和覆盖层冲突错误，嵌套元素（包括确认触发器、关闭垫片以及加载旋转器）被打包在单一的统一孤岛环境中。

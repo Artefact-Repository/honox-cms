@@ -1,7 +1,7 @@
 ---
 title: Loader
-hydration: 3
 category: Feedback
+hydration: 3
 ---
 
 import { Loader } from "../../app/components/ui";
@@ -9,57 +9,60 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-A utility component that manages the visual state of a `Spinner` and associated text.
+A visual loading layout utility component that pairs a rotating `Spinner` element with companion status message text. Primarily used to manage user expectations during server fetches, file operations, state transitions, or content processing states within layout blocks.
+
+The **Loader** component is fully integrated as a `loader` block in the **Page Builder**, enabling content authors and developers to easily configure visual status text and spinner alignments directly within the CMS page schemas.
+
+***
 
 # Usage
 
+These examples illustrate how content editors bind and structure interactive loaders.
+
+## 1. Standard Center Status Loader
+
+A classic loading indicator with standard status text, suitable for major panel entries, content updates, or lazy-loaded blocks.
+
 <DemoPreview>
-  <Loader text="Loading data..." />
+  <Loader text="Loading workspace data..." />
 </DemoPreview>
-
-```tsx
-import { Loader, Spinner } from "../components/ui";
-
-export default function MyPage() {
-  return <Loader text="Loading data..." />;
-}
-```
-
-## Custom Spinner and Placement
-
-```tsx
-import { Loader, Spinner } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Loader
-      spinner={<Spinner size="lg" colorPalette="blue" />}
-      spinnerPlacement="end"
-    >
-      Please wait
-    </Loader>
-  );
-}
-```
-
-## CMS Page Builder
-
-This component is available as a `loader` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`) — the CMS `text` field maps directly to `Loader`'s own `text` prop:
 
 ```json
 {
   "type": "loader",
-  "text": "Checking availability...",
+  "text": "Loading workspace data...",
   "spinnerPlacement": "start"
 }
 ```
 
+## 2. Loader with Trailing Spinner (End Alignment)
+
+Features the visual spinner aligned after the status message, providing an alternative visual flow for card footers or inline button actions.
+
+<DemoPreview>
+  <Loader text="Please wait while we process your request" spinnerPlacement="end" />
+</DemoPreview>
+
+```json
+{
+  "type": "loader",
+  "text": "Please wait while we process your request",
+  "spinnerPlacement": "end"
+}
+```
+
+***
+
 # Props
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `children` | `any` | Text content to be rendered alongside the spinner. |
-| `spinner` | `Child` | Custom spinner element. Defaults to `<Spinner size="inherit" />`. |
-| `text` | `Child` | Alternative prop for text content. |
+| Property | CMS Field Type | Default | Description / Supported Options |
+| --- | --- | --- | --- |
+| **Status Text** (`text`) | `string` | - | The message text displayed adjacent to the rotating spinner. |
+| **Spinner Placement** (`spinnerPlacement`) | `select` | `"start"` | Alignment of the spinner relative to the accompanying text. <br/>• Options: `"start"`, `"end"`. |
 
-| `spinnerPlacement` | \`"start" \ | "end"\` | Where to place the spinner relative to the text. Defaults to `"start"`. |
+***
+
+# Developer Notes & Accessibility
+
+- **Hydration Free (Static-Only):** The Loader is a purely presentational layout helper designated as a Static-Only component (`Tier 3`). It compiles down to standard server-side HTML/CSS markup with absolutely zero interactive client-side JavaScript.
+- **WAI-ARIA Compliance:** Under the hood, this component is designed for assistive technologies, compiling with appropriate live-region or busy container parameters (e.g. `aria-busy="true"`, `role="status"` on parent containers) ensuring smooth communication of ongoing background activities.

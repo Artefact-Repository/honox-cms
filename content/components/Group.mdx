@@ -1,7 +1,7 @@
 ---
 title: Group
-hydration: 3
 category: Layout
+hydration: 3
 ---
 
 import { Group, Button } from "../../app/components/ui";
@@ -9,56 +9,102 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-A layout component for grouping related elements visually.
+A visual layout component for grouping related elements, buttons, or controls together. It can attach elements directly to form single composite visual inputs (e.g., button groups) or stretch them evenly across the container.
+
+The **Group** component is fully integrated as a `group` block in the **Page Builder**, allowing content authors and developers to easily construct unified action sets, tab indicators, or custom button toolbars directly within the CMS.
+
+***
 
 # Usage
 
+These examples illustrate how content editors bind and structure _group_ controls.
+
+## 1. Attached Button Toolbar
+
+Attaches elements closely together, sharing borders and rounded corners. Often used to group sequential action triggers or toolbar options.
+
 <DemoPreview>
   <Group attached>
-    <Button>First</Button>
-    <Button>Second</Button>
-    <Button>Third</Button>
+    <Button>Yes</Button>
+    <Button variant="outline">Maybe</Button>
+    <Button variant="outline">No</Button>
   </Group>
 </DemoPreview>
-
-```tsx
-import { Group } from "../components/ui";
-import { Button } from "../components/ui/button";
-
-export default function MyPage() {
-  return (
-    <Group attached>
-      <Button>First</Button>
-      <Button>Second</Button>
-      <Button>Third</Button>
-    </Group>
-  );
-}
-```
-
-## CMS Page Builder
-
-This component is available as a `group` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
 
 ```json
 {
   "type": "group",
   "attached": true,
   "children": [
-    { "type": "button", "text": "First" },
-    { "type": "button", "text": "Second" }
+    { "type": "button", "text": "Yes" },
+    { "type": "button", "text": "Maybe", "variant": "outline" },
+    { "type": "button", "text": "No", "variant": "outline" }
   ]
 }
 ```
 
+## 2. Horizontal Action Bar (Evenly Distributed)
+
+Instructs all inner child items to grow and stretch equally to fill the entire horizontal width of the container.
+
+<DemoPreview>
+  <Group grow style={{ width: "100%" }}>
+    <Button>Save Draft</Button>
+    <Button variant="outline">Publish Page</Button>
+  </Group>
+</DemoPreview>
+
+```json
+{
+  "type": "group",
+  "grow": true,
+  "children": [
+    { "type": "button", "text": "Save Draft" },
+    { "type": "button", "text": "Publish Page", "variant": "outline" }
+  ]
+}
+```
+
+## 3. Vertical Group Control
+
+Groups elements sequentially along the vertical axis (Y-axis).
+
+<DemoPreview>
+  <Group orientation="vertical" attached style={{ width: "160px" }}>
+    <Button>Top Action</Button>
+    <Button variant="outline">Middle Action</Button>
+    <Button variant="outline">Bottom Action</Button>
+  </Group>
+</DemoPreview>
+
+```json
+{
+  "type": "group",
+  "orientation": "vertical",
+  "attached": true,
+  "children": [
+    { "type": "button", "text": "Top Action" },
+    { "type": "button", "text": "Middle Action", "variant": "outline" },
+    { "type": "button", "text": "Bottom Action", "variant": "outline" }
+  ]
+}
+```
+
+***
+
 # Props
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `children` | `any` | Content to be rendered inside the component. |
-| `class` | `string` | Custom CSS classes. |
+| Property | CMS Field Type | Default | Description / Supported Options |
+| --- | --- | --- | --- |
+| **Attached** (`attached`) | `boolean` | `false` | Whether to collapse outer borders and corner radiuses of nested children into a unified group card. |
+| **Stretch Children** (`grow`) | `boolean` | `false` | Instructs child components to flex and stretch evenly to fill all available container width. |
+| **Orientation** (`orientation`) | `select` | `"horizontal"` | Direction along which children are grouped. <br/>• Options: `"horizontal"`, `"vertical"`. |
+| **Children Content** (`children`) | `list` | - | The collection of nested blocks (typically Button, Badge, or Text) inside the group. |
+| **Custom Class** (`class`) | `string` | - | Custom CSS class overrides applied directly to the group container. |
 
-| `orientation` | \`"horizontal" \ | "vertical"\` | The orientation of the group. |
+***
 
-| `attached` | `boolean` | Whether to attach the children together. |
-| `grow` | `boolean` | Whether the children should grow to fill the available space. |
+# Developer Notes & Accessibility
+
+- **Border Collapsing Mechanics:** When `attached` is enabled, border-radiuses are automatically recalculated so that only the outermost corners of the first and last child elements remain rounded, creating a sleek composite button bar.
+- **Visual Group Accessibility:** Ensure that any nested controls maintain logical focus flows. When forming button groups representing single choice controls, consider wrapping the entire structure in an accessible role or fieldset.

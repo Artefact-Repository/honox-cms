@@ -1,135 +1,157 @@
 ---
 title: Fieldset Ensemble de Champs
-hydration: 3
 category: Layout
+hydration: 3
 ---
 
 import { Fieldset, Field } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-## Introduction
+# Introduction
 
-Regroupe les contrôles de formulaire associés sous un `<fieldset>` natif, avec un
-légende, texte d'aide et texte d'erreur. Contrairement à `Field`, il n'a pas de validateur de
-son propre — c'est une primitive de regroupement statique, rendue par le serveur, donc elle ne
-hydrate comme un îlot client. Il fournit son `désactivé`/`invalide`/`obligatoire`
-état comme contexte aux « champs » imbriqués, correspondant au Fieldset d'Ark UI - voir
-[Propagation du contexte](#context-propagation-to-nested-fields).
+Un conteneur de mise en page structurel qui regroupe les contrôles de formulaire associés sous un `<fieldset>` natif, complet avec une légende accessible, un texte d'aide de support et des messages d'erreur de validation. Il sert d'ancre sémantique essentielle pour les formulaires de saisie utilisateur complexes, propageant automatiquement les états désactivé, invalide et requis vers les contrôles de champ imbriqués.
 
-## Utilisation
+Le composant **Fieldset** est entièrement intégré en tant que bloc `fieldset` dans le **Page Builder**, permettant aux auteurs de contenu et aux développeurs de structurer facilement des sections de profil à entrées multiples, des formulaires d'adresse ou des modules de facturation directement dans le CMS.
+
+***
+
+# Utilisation via le CMS Page Builder (JSON)
+
+Ces exemples illustrent comment les éditeurs de contenu lient et structurent des groupes fieldset dans les schémas de page JSON (`content/pages/*.json`).
+
+## 1. Groupe d'Informations de Compte Standard
+
+Un groupe de profil utilisateur standard avec des champs de nom imbriqués obligatoires. Comprend une légende active et un texte d'état d'aide.
 
 <DemoPreview>
-  <div style={{ width: "100%", maxWidth: "320px" }}>
-    <Fieldset legend="User Profile" helperText="Manage your info." required>
-      <Field label="Name" placeholder="Jane Doe" />
+  <div style={{ width: "100%", maxWidth: "360px" }}>
+    <Fieldset legend="Account Information" helperText="Configure your primary account details." required>
+      <Field label="Full Name" placeholder="Jane Doe" interactive />
+      <Field label="Email Address" placeholder="jane@example.com" interactive />
     </Fieldset>
   </div>
 </DemoPreview>
 
-```tsx
-import { Fieldset, Field } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Fieldset
-      legend="User Profile"
-      helperText="Manage your info."
-      required
-      errorText="Something went wrong."
-    >
-      <Field>...</Field>
-    </Fieldset>
-  );
-}
-```
-
-Passer `errorText` suffit à mettre l'ensemble de champs dans son état invalide —
-vous n'avez pas besoin de transmettre également « invalide ». Passez `invalid={false}` explicitement si
-vous souhaitez supprimer le style d'erreur tout en conservant le texte.
-
-### Propagation du contexte vers les champs imbriqués
-
-`Fieldset` expose son état `disabled`/`invalid`/`required` comme contexte.
-Chaque « champ » imbriqué le lit comme une solution de secours pour son propre - donc un niveau de groupe
-« disabled » ou « obligatoire » n'a pas besoin d'être répété dans chaque champ :
-
-```tsx
-<Fieldset legend="Shipping address" disabled required>
-  <Field label="Street" />   {/* renders disabled + required */}
-  <Field label="Apt #" required={false} />  {/* opts back out of required */}
-</Fieldset>
-```
-
-Le propre accessoire d'un « Champ » l'emporte toujours sur celui hérité. Pour « invalide »
-plus précisément, l'héritage ne s'applique que lorsque le « Champ » n'a aucune validation de
-son propre (pas de `validator`, `minLength` ou de prop explicite `invalid`) - un `Field`
-qui valide sa propre valeur n’est jamais silencieusement ignorée par le groupe.
-
-Cette propagation est à un seul niveau : uniquement « Champ » (et tout ce qui est construit dessus,
-comme `Textarea`) consulte le contexte de `Fieldset`. Un simple « Switch » ou « Checkbox »
-placé directement à l'intérieur d'un `Fieldset` - sans emballage `Field` - ne sélectionnera pas
-améliore le style du groupe, bien que le `<fieldset désactivé>` natif bloque toujours
-interaction avec lui indépendamment.
-
-### Composition
-
-« children » est toujours le groupe de contrôles de formulaire réels — « Fieldset » l'enveloppe
-dans un récipient d'espacement pour vous. `legend` / `helperText` / `errorText` accepter
-n'importe quel « enfant », pas seulement des chaînes, donc un contenu riche (une icône, un badge) appartient
-là plutôt que dans « enfants  » :
-
-```tsx
-<Fieldset legend={<>Profile <Badge>New</Badge></>}>
-  <Field>...</Field>
-  <Textarea>...</Textarea>
-</Fieldset>
-```
-
-Ne placez pas `FieldsetLegend` (ou `FieldsetHelperText` / `FieldsetErrorText`)
-à l'intérieur de `children` — `Fieldset` enveloppe `children` dans un `<div>` et les navigateurs
-utilisez uniquement un `<légende>` pour calculer le nom accessible de l'ensemble de champs lorsqu'il s'agit d'un
-enfant direct de `<fieldset>`, pas lorsqu'il est imbriqué dans un wrapper. Le
-sous-composants exportés (`FieldsetLegend`, `FieldsetHelperText`,
-`FieldsetErrorText`, `FieldsetContent`, `FieldsetControl`,
-`FieldsetRequiredIndicator`) existent pour être réutilisés dans un balisage entièrement construit à la main, et non
-comme une autre façon de composer dans `Fieldset` lui-même.
-
-### Constructeur de pages CMS
-
-Ce composant est disponible sous forme de bloc `fieldset` dans [Page Builder](/docs/PageBuilder) (`content/pages/*.json`) :
-
 ```json
 {
   "type": "fieldset",
-  "legend": "User Profile",
-  "helperText": "Manage your info.",
+  "legend": "Account Information",
+  "helperText": "Configure your primary account details.",
   "required": true,
   "children": [
-    { "type": "field", "label": "Name" }
+    {
+      "type": "field",
+      "label": "Full Name",
+      "placeholder": "Jane Doe",
+      "interactive": true
+    },
+    {
+      "type": "field",
+      "label": "Email Address",
+      "placeholder": "jane@example.com",
+      "interactive": true
+    }
   ]
 }
 ```
 
-## Propriétés
+## 2. Groupe Invalide avec Message d'Erreur
 
-| Propriété | Type | Description |
-| --- | --- | --- |
-| `children` | `any` | Contrôles de formulaire à restituer à l’intérieur de l’ensemble de champs. |
-| `class` | `string` | Classes CSS personnalisées. |
-| `id` | `string` | Identifiant unique. Généré automatiquement en cas d'omission. |
-| `disabled` | `boolean` | Désactive l'ensemble de champs. Le `<fieldset désactivé>` natif désactive automatiquement chaque contrôle descendant et les `Field` imbriqués le récupèrent également comme contexte - voir [Propagation du contexte] (#context-propagation-to-nested-fields). |
-| `invalid` | `boolean` | Si l'ensemble de champs est dans un état invalide. La valeur par défaut est « true » chaque fois que « errorText » est défini, vous n'avez donc généralement pas besoin de le transmettre explicitement. |
-| `required` | `boolean` | Marque le groupe comme requis et ajoute un indicateur requis à la légende. |
-| `legend` | `Child` | Le texte de légende pour l'ensemble de champs. Toujours rendu comme un enfant direct de `<fieldset>` — voir [Composition](#composition). |
-| `helperText` | `Child` | Texte d'aide affiché sous la légende. |
-| `errorText` | `Child` | Texte d'erreur affiché lorsque l'ensemble de champs n'est pas valide. |
+Démontre comment le Fieldset affiche les messages d'erreur de validation lorsqu'une exigence de regroupement est violée. La saisie d'un `errorText` déclenche automatiquement des états invalides sur tous les champs enfants.
 
-## Liaisons CMS
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "360px" }}>
+    <Fieldset
+      legend="Billing Credentials"
+      helperText="Enter your card billing details."
+      errorText="A valid postal code is required."
+    >
+      <Field label="Cardholder Name" placeholder="Jane Doe" interactive />
+      <Field label="Postal Code" placeholder="90210" invalid interactive />
+    </Fieldset>
+  </div>
+</DemoPreview>
 
-`legend`, `helperText`, `errorText`, `disabled`, `invalid` et `required`
-sont exposés sous forme de champs modifiables dans `public/admin/config.yml`, plus un
-Liste « enfants » pour imbriquer d'autres blocs - les mêmes accessoires pratiques
-documenté ci-dessus. `id`/`class` et les sous-composants de composition
-(`FieldsetContent`, `FieldsetControl`, `FieldsetRequiredIndicator`, etc.) sont
-non exposé : il s'agit d'une API de niveau JSX pour les développeurs qui créent manuellement des pages, et non
-quelque chose qu'un bloc CMS piloté par JSON peut exprimer.
+```json
+{
+  "type": "fieldset",
+  "legend": "Billing Credentials",
+  "helperText": "Enter your card billing details.",
+  "errorText": "A valid postal code is required.",
+  "children": [
+    {
+      "type": "field",
+      "label": "Cardholder Name",
+      "placeholder": "Jane Doe",
+      "interactive": true
+    },
+    {
+      "type": "field",
+      "label": "Postal Code",
+      "placeholder": "90210",
+      "invalid": true,
+      "interactive": true
+    }
+  ]
+}
+```
+
+## 3. Bloc d'Options de Facturation Désactivé
+
+Démontre une section de paramètres d'expédition entièrement désactivée. La désactivation du Fieldset parent verrouille automatiquement chaque élément imbriqué.
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "360px" }}>
+    <Fieldset legend="Shipping Address" helperText="Unavailable during local holidays." disabled>
+      <Field label="Street" placeholder="123 Main St" interactive />
+      <Field label="Apt #" placeholder="4B" interactive />
+    </Fieldset>
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "fieldset",
+  "legend": "Shipping Address",
+  "helperText": "Unavailable during local holidays.",
+  "disabled": true,
+  "children": [
+    {
+      "type": "field",
+      "label": "Street",
+      "placeholder": "123 Main St",
+      "interactive": true
+    },
+    {
+      "type": "field",
+      "label": "Apt #",
+      "placeholder": "4B",
+      "interactive": true
+    }
+  ]
+}
+```
+
+***
+
+# Référence de Configuration CMS
+
+Ces champs correspondent directement aux propriétés de bloc Sveltia CMS sous `public/admin/config.yml` ou aux configurations du Page Builder :
+
+| Propriété | Type de Champ CMS | Par défaut | Description / Options Prises en Charge |
+| :--- | :--- | :--- | :--- |
+| **Texte de Légende** (`legend`) | `string` | - | En-tête visuel et pour lecteur d'écran principal du groupe de champs. |
+| **Message d'Aide** (`helperText`) | `string` | - | Texte explicatif positionné immédiatement sous la légende. |
+| **Message d'Erreur** (`errorText`) | `string` | - | Message de validation visuel affiché lorsque le groupe est marqué invalide. |
+| **Statut Requis** (`required`) | `boolean` | `false` | Marque le groupe comme obligatoire et ajoute une icône d'indicateur à la légende. |
+| **État Désactivé** (`disabled`) | `boolean` | `false` | Désactive tout le bloc, verrouillant toutes les entrées imbriquées. |
+| **État Invalide** (`invalid`) | `boolean` | `false` | Force le groupe à afficher des bordures d'erreur actives et des alertes. |
+| **Blocs Enfants** (`children`) | `list` | - | Entrées enfants imbriquées (ex. Fields, Textareas) groupées dans la piste du fieldset. |
+
+***
+
+# Notes de Développement et Accessibilité
+
+- **Sans Hydratation (Statique Uniquement) :** Fieldset est un composant de mise en page sémantique désigné comme composant Statique Uniquement (`Tier 3`). Il est entièrement rendu en HTML standard côté serveur et est exempt de scripts d'hydratation côté client.
+- **Propagation de Contexte :** Il utilise des fournisseurs de contexte pour propager les états `disabled`, `invalid` et `required` vers le bas. Les blocs de composants enfants directs (tels que `Field` et `Textarea`) écoutent automatiquement ce contexte et héritent des propriétés du groupe, éliminant les déclarations de clés en double.
+- **Conformité WAI-ARIA :** Fieldset compile strictement vers des conteneurs HTML sémantiques `<fieldset>` contenant des éléments `<legend>` directs, satisfaisant aux exigences de titres accessibles du navigateur.

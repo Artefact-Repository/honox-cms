@@ -1,7 +1,7 @@
 ---
 title: Anchor
-hydration: 3
 category: Navigation
+hydration: 3
 ---
 
 import { Anchor, Stack } from "../../app/components/ui";
@@ -9,92 +9,103 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-A styled `<a>` element for internal and external navigation links, with safe
-defaults for `target="_blank"`.
+The `Anchor` component is a styled hyperlink wrapper (`<a>`) used for smooth internal site routing and safe external web navigation. It automatically manages accessibility security standards (such as appending target safety tags for external links) and coordinates color pallets.
+
+This component is fully integrated as a `link` block inside the **Page Builder**, allowing content writers and CMS administrators to construct, arrange, and style text links, icon links, or call-to-actions directly.
+
+***
 
 # Usage
 
+These configurations represent exactly how page-builder block items are constructed.
+
+## 1. Simple Navigation Link (Underline Variant)
+
+A standard textual hyperlink featuring the default underline indicator style. Ideal for inline copy links, footers, and generic secondary navigation lists.
+
 <DemoPreview>
-  <Stack direction="horizontal" gap="4">
-    <Anchor href="/docs">Docs</Anchor>
-    <Anchor href="/blog" variant="plain">
-      Blog
-    </Anchor>
-    <Anchor href="https://github.com" target="_blank" colorPalette="purple">
-      GitHub ↗
-    </Anchor>
-  </Stack>
+  <Anchor href="/docs">Go to Documentation</Anchor>
 </DemoPreview>
-
-```tsx
-import { Anchor } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Stack direction="horizontal" gap="4">
-      <Anchor href="/docs">Docs</Anchor>
-      <Anchor href="/blog" variant="plain">
-        Blog
-      </Anchor>
-      <Anchor href="https://github.com" target="_blank" colorPalette="purple">
-        GitHub ↗
-      </Anchor>
-    </Stack>
-  );
-}
-```
-
-## Routing composition
-
-Pass `asChild` to merge the anchor's styles and safe-target handling onto a
-single child element instead of rendering an `<a>` — useful for wrapping a
-router's own `<Link />`:
-
-```tsx
-import { Anchor } from "../components/ui";
-
-<Anchor asChild variant="plain">
-  <MyRouterLink to="/dashboard">Dashboard</MyRouterLink>
-</Anchor>;
-```
-
-## CMS Page Builder
-
-This component is available as a `link` block in the
-[Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
 
 ```json
 {
   "blockType": "link",
-  "href": "/pricing",
+  "href": "/docs",
   "variant": "underline",
   "colorPalette": "blue",
-  "children": [{ "blockType": "text", "content": "View Pricing" }]
+  "children": [
+    {
+      "blockType": "text",
+      "content": "Go to Documentation"
+    }
+  ]
 }
 ```
 
-The link's content comes entirely from `children` — a list of nested blocks,
-same convention as every other container block (Stack, Card, ...). A plain
-label is a single `text` leaf; add an `icon` leaf instead (or alongside) for
-a brand-mark/icon-only link, e.g. a GitHub link in a header. Every other
-field passes straight through to `Anchor`.
+## 2. Unstyled Plain Action Link
+
+Renders a link with default text coloring and removes the standard underline style, preserving layout styling for custom menus, header items, or sidebars.
+
+<DemoPreview>
+  <Anchor href="/blog" variant="plain">Read our Blog</Anchor>
+</DemoPreview>
+
+```json
+{
+  "blockType": "link",
+  "href": "/blog",
+  "variant": "plain",
+  "colorPalette": "slate",
+  "children": [
+    {
+      "blockType": "text",
+      "content": "Read our Blog"
+    }
+  ]
+}
+```
+
+## 3. Safe External Tab Link (Purple Accent)
+
+Safely opens external websites in a new browser tab. The underlying engine automatically injects mandatory security attributes to protect the user's browser scope.
+
+<DemoPreview>
+  <Anchor href="https://github.com" target="_blank" colorPalette="purple">
+    Open GitHub Profile ↗
+  </Anchor>
+</DemoPreview>
+
+```json
+{
+  "blockType": "link",
+  "href": "https://github.com",
+  "target": "_blank",
+  "colorPalette": "purple",
+  "children": [
+    {
+      "blockType": "text",
+      "content": "Open GitHub Profile ↗"
+    }
+  ]
+}
+```
+
+***
 
 # Props
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `href` | `string` | The link destination. |
-| `target` | `string` | Standard anchor target, e.g. `"_blank"`. |
-| `rel` | `string` | Standard anchor rel. Auto-filled to `"noopener noreferrer"` when `target="_blank"` and `rel` is otherwise unset. |
-| `as` | `ElementType` | Render as a different element/component instead of `<a>`. |
-| `asChild` | `boolean` | Merge the anchor's styles and safe-target handling onto a single child element instead of rendering a wrapper. |
-| `variant` | `"underline" \| "plain"` | Visual style. Default `"underline"`. |
-| `colorPalette` | `"blue" \| "green" \| "red" \| "orange" \| "gray" \| "cyan" \| "amber" \| "purple"` | The color theme. Default `"blue"`. |
-| `class` | `string` | Custom CSS classes. |
+| Property | CMS Field Type | Default | Description / Supported Options |
+| --- | --- | --- | --- |
+| **Link Destination** (`href`) | `string` | - | The target path, localized route, or fully qualified external URL. |
+| **Link Target** (`target`) | `select` | - | Target window selection. Use `"_blank"` to launch the link destination inside a new browser tab. |
+| **Visual Variant** (`variant`) | `select` | `"underline"` | Controls text styling. <br/>• `"underline"` — Bold text with a color-matched animated bottom border. <br/>• `"plain"` — Inherits parent text layout styling with no default underline. |
+| **Color Theme** (`colorPalette`) | `select` | `"blue"` | Visual theme applied to text coloring and hover outlines. <br/>• Options: `blue`, `green`, `red`, `purple`, `orange`, `amber`, `cyan`, `slate`. |
+| **Child Content** (`children`) | `list` | - | Nested page blocks rendering inside the anchor. Can contain text leaves, icons, or custom sub-blocks. |
 
-# Accessibility
+***
 
-`Anchor` renders a native `<a>` (or, with `as`, whatever element you choose)
-so it's keyboard-focusable and activatable by default with no extra ARIA
-wiring. When linking to a new tab via `target="_blank"`, an explicit `rel`
-is always applied to prevent the opened page from accessing `window.opener`.
+# Developer Notes & Accessibility
+
+- **Safe Target Handling:** When navigating with `target="_blank"`, the component automatically appends `rel="noopener noreferrer"`. This guarantees absolute security against malicious redirection scripts executing in parent window scopes (`window.opener`).
+- **Interactive Router Links:** Under the hood, if `asChild` is enabled, the anchor styles and safe-target properties are automatically merged directly onto custom router components (e.g., framework `<Link>` structures) without rendering unnecessary nesting `<a>` wrapper divs.
+- **Keyboard Access:** Because this renders as a native HTML link, full tab-key navigation, hover outlines, and enter-key trigger clicks operate natively across all clients without additional client-side JS.

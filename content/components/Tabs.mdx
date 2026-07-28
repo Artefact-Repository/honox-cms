@@ -1,7 +1,7 @@
 ---
 title: Tabs
-hydration: 2
 category: Navigation
+hydration: 2
 ---
 
 import { Tabs, Stack, Badge } from "../../app/components/ui";
@@ -9,56 +9,42 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-A navigation or layout element that organizes content into switchable, mutually exclusive panels.
+A visual layout component that organizes dense, related information into multiple, mutually exclusive panels. Users can seamlessly switch between panels without loading new pages or cluttering the layout canvas.
+
+The **Tabs** component is fully integrated as a `tabs` block in the **Page Builder**, allowing content authors and developers to easily construct tabbed views, configure visual properties, and arrange nested blocks directly inside Sveltia CMS page templates.
+
+***
 
 # Usage
 
+These configurations represent exactly how page-builder block items are constructed.
+
+## 1. Classic Horizontal Tabs (Line Variant)
+
+Our standard layout featuring an under-lined trigger indicator and smooth sliding transitions. Perfect for standard product features, details, or documentation sub-menus.
+
 <DemoPreview>
-  <Tabs defaultValue="features" interactive variant="enclosed" size="md">
-    <Tabs.List>
-      <Tabs.Trigger value="features">⚡ Key Features</Tabs.Trigger>
-      <Tabs.Trigger value="pricing">💎 Pricing Plans</Tabs.Trigger>
-      <Tabs.Indicator />
-    </Tabs.List>
-
-    <Tabs.Content value="features">
-      Our Hono/JSX Tabs component supports zero runtime styled-system classes, smooth sliding indicator transitions, and native keyboard interaction.
-    </Tabs.Content>
-
-    <Tabs.Content value="pricing">
-      Flexible subscription pricing for individuals, start-ups, and scaling enterprise workspaces.
-    </Tabs.Content>
-  </Tabs>
+  <div style={{ width: "100%", maxWidth: "600px" }}>
+    <Tabs defaultValue="features" interactive variant="line" size="md">
+      <Tabs.List>
+        <Tabs.Trigger value="features">⚡ Key Features</Tabs.Trigger>
+        <Tabs.Trigger value="pricing">💎 Pricing Plans</Tabs.Trigger>
+        <Tabs.Indicator />
+      </Tabs.List>
+      <Tabs.Content value="features">
+        Our Hono/JSX Tabs component supports zero runtime styled-system classes, smooth sliding indicator transitions, and native keyboard interaction.
+      </Tabs.Content>
+      <Tabs.Content value="pricing">
+        Flexible subscription pricing for individuals, start-ups, and scaling enterprise workspaces.
+      </Tabs.Content>
+    </Tabs>
+  </div>
 </DemoPreview>
-
-```tsx
-import { Tabs } from "../components/ui/tabs";
-
-<Tabs defaultValue="features" interactive variant="enclosed" size="md">
-  <Tabs.List>
-    <Tabs.Trigger value="features">⚡ Key Features</Tabs.Trigger>
-    <Tabs.Trigger value="pricing">💎 Pricing Plans</Tabs.Trigger>
-    <Tabs.Indicator />
-  </Tabs.List>
-
-  <Tabs.Content value="features">
-    Our Hono/JSX Tabs component supports zero-runtime classes, smooth sliding transitions, and native keyboard interaction.
-  </Tabs.Content>
-
-  <Tabs.Content value="pricing">
-    Flexible subscription pricing for individuals, start-ups, and scaling enterprise workspaces.
-  </Tabs.Content>
-</Tabs>;
-```
-
-## CMS Page Builder
-
-This component is available as a `tabs` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`), designed with a clean, flattened API:
 
 ```json
 {
   "type": "tabs",
-  "variant": "enclosed",
+  "variant": "line",
   "size": "md",
   "items": [
     {
@@ -67,7 +53,7 @@ This component is available as a `tabs` block in the [Page Builder](/docs/PageBu
       "content": [
         {
           "type": "text",
-          "content": "Our high-end tabs component is lightning fast."
+          "content": "Our Hono/JSX Tabs component supports zero runtime styled-system classes, smooth sliding indicator transitions, and native keyboard interaction."
         }
       ]
     },
@@ -77,7 +63,7 @@ This component is available as a `tabs` block in the [Page Builder](/docs/PageBu
       "content": [
         {
           "type": "text",
-          "content": "Starting from $0/mo."
+          "content": "Flexible subscription pricing for individuals, start-ups, and scaling enterprise workspaces."
         }
       ]
     }
@@ -85,27 +71,79 @@ This component is available as a `tabs` block in the [Page Builder](/docs/PageBu
 }
 ```
 
+## 2. Enclosed Folder Style (Compact Sizing)
+
+Renders the tabs list with bordered button enclosures resembling folder dividers. Excellent for dashboard menus, interface preferences, or compact settings sections.
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "600px" }}>
+    <Tabs defaultValue="profile" interactive variant="enclosed" size="sm">
+      <Tabs.List>
+        <Tabs.Trigger value="profile">User Profile</Tabs.Trigger>
+        <Tabs.Trigger value="security">Security</Tabs.Trigger>
+        <Tabs.Indicator />
+      </Tabs.List>
+      <Tabs.Content value="profile">
+        Manage personal information, billing details, and customized regional preferences.
+      </Tabs.Content>
+      <Tabs.Content value="security">
+        Configure multi-factor authentication codes, view active sessions, and update credentials.
+      </Tabs.Content>
+    </Tabs>
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "tabs",
+  "variant": "enclosed",
+  "size": "sm",
+  "items": [
+    {
+      "value": "profile",
+      "label": "User Profile",
+      "content": [
+        {
+          "type": "text",
+          "content": "Manage personal information, billing details, and customized regional preferences."
+        }
+      ]
+    },
+    {
+      "value": "security",
+      "label": "Security",
+      "content": [
+        {
+          "type": "text",
+          "content": "Configure multi-factor authentication codes, view active sessions, and update credentials."
+        }
+      ]
+    }
+  ]
+}
+```
+
+***
+
 # Props
 
-## Root
+| Property | CMS Field Type | Default | Description / Supported Options |
+| --- | --- | --- | --- |
+| **Tab Items** (`items`) | `list` | - | Array of tab blocks. Each item requires a unique `value` (for key tracking), `label` text, and a `content` block list containing child layout nodes. |
+| **Visual Variant** (`variant`) | `select` | `"line"` | Visual appearance style. <br/>• `"line"` — Minimal textual triggers with an underlined slide indicator. <br/>• `"subtle"` — Shaded, rounded backdrop tags. <br/>• `"enclosed"` — Traditional bordered folder tab design. |
+| **Size Scale** (`size`) | `select` | `"md"` | Controls paddings, spacing, and trigger label font size. <br/>• Options: `"xs"`, `"sm"`, `"md"`, `"lg"`. |
+| **Orientation** (`orientation`) | `select` | `"horizontal"` | Structural axis direction of the trigger list. Can be `"horizontal"` or `"vertical"`. |
+| **Activation Mode** (`activationMode`) | `select` | `"automatic"` | • `"automatic"` — Panel content switches instantly as triggers receive keyboard focus. <br/>• `"manual"` — Panel contents only update upon explicit pressing of the Spacebar or Enter keys. |
+| **Roving Loop** (`loopFocus`) | `boolean` | `true` | Continues cycling keyboard focus back around to the first item when pressing Arrow keys past the end. |
+| **Lazy Mounting** (`lazyMount`) | `boolean` | `false` | Defers rendering inactive tab panels until their specific trigger button is visited for the first time. |
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `defaultValue` | `string` | The initial selected tab value when rendered (uncontrolled). |
-| `value` | `string` | The controlled selected tab value. |
-| `variant` | \`"line" \ | "subtle" \ | "enclosed"\` | Visual appearance of the tabs list and indicator. Default `"line"`. |
-| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg"\` | The overall height, spacing and padding of tab items. Default `"md"`. |
-| `orientation` | \`"horizontal" \ | "vertical"\` | The layout flow of triggers. Default `"horizontal"`. |
-| `activationMode` | \`"automatic" \ | "manual"\` | In manual mode, triggers are activated on Enter/Space click; in automatic mode, they activate instantly on focus. Default `"automatic"`. |
-| `loopFocus` | `boolean` | Whether keyboard focus loops back to the start or end of the list. Default `true`. |
-| `lazyMount` | `boolean` | Delay rendering of tab content panels until they are first visited. Default `false`. |
-| `unmountOnExit` | `boolean` | Destroy tab panel elements from the DOM when they become inactive. Default `false`. |
-| `onValueChange` | `(details: { value: string }) => void` | Called when the active tab value changes. |
-| `onFocusChange` | `(details: { value: string }) => void` | Called when a different tab trigger receives keyboard or click focus. |
+***
 
-# Accessibility
+# Accessibility & Developer Notes
 
-This component fully complies with the **WAI-ARIA Tabs Design Pattern**:
-- Sets `role="tablist"` on the list container and `aria-orientation` mapped to layout.
-- Sets `role="tab"` on triggers, with `aria-selected` matching active state and `aria-controls` referencing panel IDs.
-- Keyboard support: ArrowRight/ArrowLeft (or ArrowDown/ArrowUp when vertical) navigates triggers with focus-roving tabIndex. Home/End moves focus immediately to endpoints. Enter/Space activates triggers when in manual mode.
+This component complies with the **WAI-ARIA Tabs Design Pattern** out-of-the-box. When hydrated, the component implements the following critical accessibility layers:
+
+- **Semantic Role Assignment:** Sets `role="tablist"` on the list container and `role="tab"` on triggers, with `aria-selected` reflecting active state, and `aria-controls` referencing panel IDs automatically.
+- **Roving Focus Navigation:** Keyboard arrow keys smoothly navigate triggers with focus-roving `tabIndex`. Pressing `Home` or `End` jumps immediately to endpoints.
+- **Dynamic CSS Sliding Indicator:** Features an absolute visual slider indicator. It queries position metrics from the active trigger element to animate translations smoothly without triggering layout thrashing.
+- **Bypassing Hono Reconciler Limits:** In Preact islands wrapping static HTML, the state manager directly manipulates trigger attributes (like `data-selected`, `aria-selected`, `tabindex`, and `hidden`) on events to guarantee performance independent of the reconciler timeline.

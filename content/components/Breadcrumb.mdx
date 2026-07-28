@@ -1,7 +1,7 @@
 ---
 title: Breadcrumb
-hydration: 3
 category: Navigation
+hydration: 3
 ---
 
 import { Breadcrumb } from "../../app/components/ui";
@@ -9,11 +9,19 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-A navigation aid that shows the current page's location within a hierarchy using a list of links.
+The `Breadcrumb` component is a navigation aid that displays the current page's location within an hierarchical structure of the site. It helps users trace their path from the home page back to their current position and navigate back up the hierarchy easily.
+
+The **Breadcrumb** is fully integrated as a `breadcrumb` block in the **Page Builder**, allowing content authors and developers to easily configure visual styles, dividers/separators, and responsive sizing directly within the CMS.
+
+***
 
 # Usage
 
-## Basic Breadcrumb
+These examples illustrate how content editors bind and structure navigation components.
+
+## 1. Standard Navigation Breadcrumb
+
+A classic structural breadcrumb configuration showing home, secondary category, and terminal text page markers.
 
 <DemoPreview>
   <Breadcrumb
@@ -25,76 +33,99 @@ A navigation aid that shows the current page's location within a hierarchy using
   />
 </DemoPreview>
 
-```tsx
-import { Breadcrumb } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Breadcrumb
-      items={[
-        { label: "Home", href: "/" },
-        { label: "Components", href: "/components" },
-        { label: "Breadcrumb" },
-      ]}
-    />
-  );
-}
-```
-
-## Custom Separator
-
-```tsx
-import { Breadcrumb } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Breadcrumb
-      separator="/"
-      items={[
-        { label: "Home", href: "/" },
-        { label: "Breadcrumb" },
-      ]}
-    />
-  );
-}
-```
-
-## CMS Page Builder
-
-This component is available as a `breadcrumb` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
-
 ```json
 {
   "type": "breadcrumb",
   "items": [
     { "label": "Home", "href": "/" },
-    { "label": "Docs", "href": "/docs" },
+    { "label": "Components", "href": "/components" },
     { "label": "Breadcrumb" }
-  ],
-  "variant": "underline",
-  "size": "md"
+  ]
 }
 ```
 
+## 2. Custom Separator (Slash Divider)
+
+Uses a custom text divider character (like a slash `"/"`) to separate navigation items.
+
+<DemoPreview>
+  <Breadcrumb
+    separator="/"
+    items={[
+      { label: "Home", href: "/" },
+      { label: "Library", href: "/library" },
+      { label: "Overview" },
+    ]}
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "breadcrumb",
+  "separator": "/",
+  "items": [
+    { "label": "Home", "href": "/" },
+    { "label": "Library", "href": "/library" },
+    { "label": "Overview" }
+  ]
+}
+```
+
+## 3. Accented Sizing & Visual Style
+
+Adjusts the overall scale to small and applies a customized visual underline style for a highlighted layout feel.
+
+<DemoPreview>
+  <Breadcrumb
+    variant="underline"
+    size="sm"
+    items={[
+      { label: "Console", href: "/console" },
+      { label: "Resources", href: "/console/resources" },
+      { label: "Deployments" },
+    ]}
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "breadcrumb",
+  "variant": "underline",
+  "size": "sm",
+  "items": [
+    { "label": "Console", "href": "/console" },
+    { "label": "Resources", "href": "/console/resources" },
+    { "label": "Deployments" }
+  ]
+}
+```
+
+***
+
 # Props
 
-## Breadcrumb
+| Property | CMS Field Type | Default | Description / Supported Options |
+| --- | --- | --- | --- |
+| **Separator** (`separator`) | `string` | `"chevron-right"` | Custom character divider placed between items. |
+| **Visual Style** (`variant`) | `select` | `"plain"` | The visual styling of links. <br/>• Options: `"plain"`, `"underline"`. |
+| **Size Scale** (`size`) | `select` | `"md"` | Controls overall font and chevron scale. <br/>• Options: `"xs"`, `"sm"`, `"md"`, `"lg"`. |
+| **Navigation Items** (`items`) | `list` | `[]` | Ordered collection of page items. (See breadcrumb items schema below). |
+| **Custom Class** (`class`) | `string` | - | Custom CSS class overrides applied directly to the breadcrumb container. |
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `items` | `BreadcrumbItem[]` | The breadcrumb items to render. |
-| `separator` | `Child` | Custom separator between items. Default: a chevron-right icon. |
+### Breadcrumb Items Schema
 
-| `variant` | \`"underline" \ | "plain"\` | The visual style of the breadcrumb. |
+Every entry inside the `items` array accepts the following parameters:
 
-| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg"\` | The size of the breadcrumb. |
+| Property | CMS Field Type | Required | Description |
+| --- | --- | --- | --- |
+| **Display Text** (`label`) | `string` | Yes | Label text rendered for the item segment. |
+| **Target Route** (`href`) | `string` | No | Target URL or page route. If omitted, renders as plane current-page text. |
+| **Current Page** (`current`) | `boolean` | `false` | Sets the item to denote the active page (automatically true for the last item). |
 
-| `class` | `string` | Custom CSS classes for the root element. |
+***
 
-### BreadcrumbItem
+# Developer Notes & Accessibility
 
-| Property | Type | Description |
-| --- | --- | --- |
-| `label` | `Child` | Display text or JSX node. |
-| `href` | `string` | If present, renders as a link; otherwise renders as plain text (current page). |
-| `current` | `boolean` | Marks the current page. Defaults to `true` for the last item. |
+- **ARlA-Compliant Hierarchy:** The component automatically renders inside an accessible semantic navigation element (`<nav aria-label="Breadcrumb">`).
+- **Active Page ARIA:** The final terminal element (where `href` is omitted or `current` is set) automatically receives `aria-current="page"` to comply with screen reader accessibility guidelines.
+- **Micro-Interaction Styling:** Links automatically inherit layout hover triggers and transitions, reflecting parent color palette accents smoothly.

@@ -1,7 +1,7 @@
 ---
 title: Anchor Link
-hydration: 3
 category: Navigation
+hydration: 3
 ---
 
 import { Anchor, Stack } from "../../../app/components/ui";
@@ -9,81 +9,103 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introdução
 
-Um elemento `<a>` estilizado para links de navegação internos e externos, com valores padrão seguros para `target="_blank"`.
+O componente `Anchor` é um wrapper de hiperlink estilizado (`<a>`) usado para roteamento interno suave do site e navegação web externa segura. Ele gerencia automaticamente os padrões de segurança de acessibilidade (como anexar tags de segurança de destino para links externos) e coordena as paletas de cores.
+
+Este componente está totalmente integrado como um bloco `link` dentro do **Page Builder**, permitindo que redatores de conteúdo e administradores de CMS construam, organizem e estilizem links de texto, links de ícone ou chamadas à ação diretamente.
+
+***
 
 # Uso
 
+Essas configurações representam exatamente como os itens de bloco do page-builder são construídos.
+
+## 1. Link de navegação simples (variante sublinhada)
+
+Um hiperlink textual padrão com o estilo de indicador de sublinhado padrão. Ideal para links de texto inline, rodapés e listas de navegação secundárias genéricas.
+
 <DemoPreview>
-  <Stack direction="horizontal" gap="4">
-    <Anchor href="/docs">Docs</Anchor>
-    <Anchor href="/blog" variant="plain">
-      Blog
-    </Anchor>
-    <Anchor href="https://github.com" target="_blank" colorPalette="purple">
-      GitHub ↗
-    </Anchor>
-  </Stack>
+  <Anchor href="/docs">Go to Documentation</Anchor>
 </DemoPreview>
-
-```tsx
-import { Anchor } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Stack direction="horizontal" gap="4">
-      <Anchor href="/docs">Docs</Anchor>
-      <Anchor href="/blog" variant="plain">
-        Blog
-      </Anchor>
-      <Anchor href="https://github.com" target="_blank" colorPalette="purple">
-        GitHub ↗
-      </Anchor>
-    </Stack>
-  );
-}
-```
-
-## Composição com roteadores
-
-Passe `asChild` para fundir os estilos do anchor e o tratamento seguro de target em um único elemento filho em vez de renderizar um `<a>` — útil para envolver o próprio `<Link />` de um roteador:
-
-```tsx
-import { Anchor } from "../components/ui";
-
-<Anchor asChild variant="plain">
-  <MyRouterLink to="/dashboard">Dashboard</MyRouterLink>
-</Anchor>;
-```
-
-## Construtor de Páginas CMS
-
-Este componente está disponível como um bloco `link` no [Construtor de Páginas](/docs/PageBuilder) (`content/pages/*.json`):
 
 ```json
 {
-  "type": "link",
-  "text": "View Pricing",
-  "href": "/pricing",
+  "blockType": "link",
+  "href": "/docs",
   "variant": "underline",
-  "colorPalette": "blue"
+  "colorPalette": "blue",
+  "children": [
+    {
+      "blockType": "text",
+      "content": "Go to Documentation"
+    }
+  ]
 }
 ```
 
-`text` se torna os filhos do anchor; todos os demais campos são repassados diretamente para `Anchor`.
+## 2. Link de ação sem estilo (tipo plain)
+
+Renderiza um link com a cor de texto padrão e remove o estilo de sublinhado padrão, preservando o estilo de layout para menus personalizados, itens de cabeçalho ou barras laterais.
+
+<DemoPreview>
+  <Anchor href="/blog" variant="plain">Read our Blog</Anchor>
+</DemoPreview>
+
+```json
+{
+  "blockType": "link",
+  "href": "/blog",
+  "variant": "plain",
+  "colorPalette": "slate",
+  "children": [
+    {
+      "blockType": "text",
+      "content": "Read our Blog"
+    }
+  ]
+}
+```
+
+## 3. Link externo seguro em aba (acento roxo)
+
+Abre sites externos com segurança em uma nova aba do navegador. O mecanismo subjacente injeta automaticamente atributos de segurança obrigatórios para proteger o escopo do navegador do usuário.
+
+<DemoPreview>
+  <Anchor href="https://github.com" target="_blank" colorPalette="purple">
+    Open GitHub Profile ↗
+  </Anchor>
+</DemoPreview>
+
+```json
+{
+  "blockType": "link",
+  "href": "https://github.com",
+  "target": "_blank",
+  "colorPalette": "purple",
+  "children": [
+    {
+      "blockType": "text",
+      "content": "Open GitHub Profile ↗"
+    }
+  ]
+}
+```
+
+***
 
 # Propriedades
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `href` | `string` | O destino do link. |
-| `target` | `string` | Target padrão de anchor, ex. `"_blank"`. |
-| `rel` | `string` | Rel padrão de anchor. Preenchido automaticamente com `"noopener noreferrer"` quando `target="_blank"` e `rel` não está definido de outra forma. |
-| `as` | `ElementType` | Renderiza como um elemento/componente diferente em vez de `<a>`. |
-| `asChild` | `boolean` | Funde os estilos do anchor e o tratamento seguro de target em um único elemento filho em vez de renderizar um wrapper. |
-| `variant` | `"underline" \| "plain"` | Estilo visual. Padrão `"underline"`. |
-| `colorPalette` | `"blue" \| "green" \| "red" \| "orange" \| "gray" \| "cyan" \| "amber" \| "purple"` | O tema de cor. Padrão `"blue"`. |
-| `class` | `string` | Classes CSS personalizadas. |
+| Propriedade | Tipo de campo CMS | Padrão | Descrição / Opções suportadas |
+| --- | --- | --- | --- |
+| **Destino do link** (`href`) | `string` | - | O caminho de destino, rota localizada ou URL externa completa. |
+| **Janela de destino** (`target`) | `select` | - | Seleção da janela de destino. Use `"_blank"` para abrir o destino do link em uma nova aba do navegador. |
+| **Variante visual** (`variant`) | `select` | `"underline"` | Controla o estilo do texto. <br/>• `"underline"` — Texto em negrito com uma borda inferior animada na cor correspondente. <br/>• `"plain"` — Herda o estilo de layout de texto do elemento pai sem sublinhado padrão. |
+| **Tema de cor** (`colorPalette`) | `select` | `"blue"` | Tema visual aplicado à cor do texto e aos contornos de hover. <br/>• Opções: `blue`, `green`, `red`, `purple`, `orange`, `amber`, `cyan`, `slate`. |
+| **Conteúdo filho** (`children`) | `list` | - | Blocos de página aninhados renderizados dentro da âncora. Pode conter folhas de texto, ícones ou sub-blocos personalizados. |
 
-# Acessibilidade
+***
 
-`Anchor` renderiza um `<a>` nativo (ou, com `as`, o elemento que você escolher), portanto é focável pelo teclado e ativável por padrão sem cabeamento ARIA extra. Ao vincular a uma nova aba via `target="_blank"`, um `rel` explícito é sempre aplicado para evitar que a página aberta acesse `window.opener`.
+# Notas para desenvolvedores e acessibilidade
+
+- **Tratamento seguro de destino:** Ao navegar com `target="_blank"`, o componente anexa automaticamente `rel="noopener noreferrer"`. Isso garante segurança absoluta contra scripts de redirecionamento maliciosos executados nos escopos da janela pai (`window.opener`).
+- **Links de roteador interativos:** Nos bastidores, se `asChild` estiver habilitado, os estilos da âncora e as propriedades de destino seguro são mesclados automaticamente diretamente sobre componentes de roteador personalizados (por exemplo, estruturas `<Link>` do framework) sem renderizar divisores `<a>` de wrapper desnecessários.
+- **Acesso por teclado:** Como isso é renderizado como um link HTML nativo, a navegação completa pela tecla Tab, os contornos de hover e o acionamento de cliques pela tecla Enter operam nativamente em todos os clientes sem JS adicional do lado do cliente.

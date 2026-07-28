@@ -1,52 +1,87 @@
 ---
 title: PaginatedTable Paginiert Tabelle
-hydration: 2
 category: Data Display
+hydration: 2
 ---
 
 import { PaginatedTable } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-Eine Komponente auf höherer Ebene, die eine Tabelle mit Pagination kombiniert und den Zustand intern verwaltet.
+# Einführung
 
-## Verwendung
+Die `PaginatedTable`-Komponente ist ein hochentwickelter Tabellen-Controller, der die Tabelleninhalts-Rendering nahtlos mit einem passenden Pagination-Insel-Block kombiniert. Speziell für große Datensätze oder Plattform-Logs entwickelt, verwaltet sie auf Client-Maschinen automatisch alle aktiven Seitenverfolgungen, Datenslices und Vor/Zurück-Klicks.
+
+***
+
+# Verwendung
+
+Sie können paginierte Tabellen wie folgt positionieren und gestalten:
+
+## 1. Standard paginierte Benutzertabelle
+
+Rendert die standardmäßige paginierte Datenansicht, die Benutzer zeigt. Die Liste verwendet standardmäßig eine festgelegte Seitengröße und rendert darunter Paginierungszahlen für reibungslose Übergangsklicks.
 
 <DemoPreview>
   <div style={{ width: "100%" }}>
-    <PaginatedTable title="Users" pageSize={5} />
+    <PaginatedTable title="System Users" pageSize={5} />
   </div>
 </DemoPreview>
-
-### CMS-Seitenbauer
-
-Diese Komponente ist als `paginatedTable`-Block im [Seitenbauer](/docs/PageBuilder) (`content/pages/*.json`) verfügbar:
 
 ```json
 {
   "type": "paginatedTable",
-  "title": "Users",
+  "title": "System Users",
   "pageSize": 5
 }
 ```
 
-## Eigenschaften
+***
 
-| Eigenschaft | Typ | Standard | Beschreibung |
-| --- | --- | --- | --- |
-| `title` | `string` | - | Tabellentitel. |
-| `pageSize` | `number` | `10` | Einträge pro Seite. |
+## 2. API-gesteuerte Datenfeed-Tabelle (Fortgeschritten)
 
-## CMS-Konfiguration
+Verbindet sich mit einem benutzerdefinierten JSON-API-Endpunkt (z. B. Ihr Blog-Post-Feed, Transaktionsprotokolle oder Serveroperationsliste) und schneidet und rendert Einträge dynamisch basierend auf Client-seitigen Klicks.
 
-```yaml
-- label: PaginatedTable
-  name: paginated-table
-  widget: object
-  fields:
-    - { label: Title, name: title, widget: string, required: false }
-    - { label: Page Size, name: pageSize, widget: number, default: 10 }
+```json
+{
+  "type": "paginatedTable",
+  "title": "Platform Activity Logs",
+  "url": "/api/platform-logs.json",
+  "dataKey": "logs",
+  "pageSize": 10,
+  "columns": [
+    { "header": "Timestamp", "key": "timestamp" },
+    { "header": "IP Address", "key": "ip" },
+    { "header": "Activity Description", "key": "description" }
+  ]
+}
 ```
 
-## Hydration
+***
 
-Tier-2: Hydriert immer als Insel, um den internen Paginierungszustand zu verwalten.
+# Props
+
+| Eigenschaft | CMS-Feldtyp | Standard | Beschreibung / Unterstützte Optionen |
+| --- | --- | --- | --- |
+| **Titel** (`title`) | `string` | - | Beschreibender Kopf-Titel, der über dem Tabellenblock gerendert wird. |
+| **API-Endpunkt-URL** (`url`) | `string` | - | Optionaler Pfad zu einem externen JSON-API-Endpunkt, der einen Objekt-Feed zurückgibt (z. B. `{ data: [...] }`). Wenn leer oder weggelassen, werden automatisch eingebaute Demo-Datensätze geladen. |
+| **Daten-Schlüssel-Zuordnung** (`dataKey`) | `string` | - | Ziel-Eigenschaftsschlüssel, der das Zeilen-Array innerhalb der JSON-Antwort hält (z. B. `"users"`, `"logs"`). |
+| **Seitengröße** (`pageSize`) | `number` | `5` | Maximale Anzahl gleichzeitig pro Seiten-Slice angezeigter Datenzeilen. |
+| **Initiale Seite** (`initialPage`) | `number` | `1` | Der standardmäßige Seitenindex, der aktiv ist, wenn der Block erstmals auf dem Client lädt. |
+| **Spalten** (`columns`) | `list` | - | Benutzerdefinierte Spalten-Zuordnungsliste (siehe Spalten-Untereigenschaften unten). |
+
+### Spalten-Listeneigenschaften (`columns`)
+
+Jeder Eintrag im `columns`-Listparameter akzeptiert folgende Felder:
+
+| Unter-Eigenschaft | Typ | Erforderlich | Beschreibung |
+| --- | --- | --- | --- |
+| **Spaltenüberschrift** (`header`) | `string` | Ja | Titel-Label, das in der Spaltenkopf-Zelle angezeigt wird. |
+| **Element-Datenschlüssel** (`key`) | `string` | Ja | Passender Eigenschaftsschlüssel im JSON-Zeilenobjekt, der in diese Zelle gemappt wird. |
+
+***
+
+# Architekturhinweise
+
+- **Bedingte Client-Hydration (Tier 2):** Da die paginierte Tabelle aktive Zustandsverfolgung benötigt, um Übergänge, Datenslices und Vor/Zurück-Seitenberechnungen zu handhaben, hydriert sie auf Client-Seitenlasten automatisch als interaktive Preact-Insel.
+- **Eingebaute Demodaten:** Wenn in den Konfigurationsparametern keine benutzerdefinierte API-Endpunkt-URL angegeben ist, fällt die Komponente auf das Laden standardmäßiger Betriebsdatensätze zum Testen zurück.
+- **Formular-Reset-Kompatibel:** Wenn in interaktive Panels eingebettet, stellen alle Resets eines übergeordneten Containers die aktive Seitenverfolgung sicher auf ihren angegebenen `initialPage`-Wert zurück.

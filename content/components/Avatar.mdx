@@ -9,81 +9,103 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-Displays a user's profile image, falling back to their initials or a
-generic user icon when no image is available or the image fails to load.
+An image-based user profile element that displays custom graphical identifiers. It falls back gracefully to formatted name initials or a universal placeholder icon when image sources are omitted, loading, or fail to load. Primarily used for profile navigation triggers, messaging lists, reviews, and community directories.
 
-# Hydration
+The **Avatar** component is fully integrated as an `avatar` block in the **Page Builder**, allowing content authors and developers to easily configure profile paths, sizing scales, and visual themes directly within the CMS.
 
-**Tier 2 — conditional.** `Avatar` renders as static HTML and ships
-no client JS unless a `src` is supplied.
-
-| `interactive` prop | Result |
-| --- | --- |
-| omitted, no `src` | Static — no client JS |
-| omitted, `src` present | Hydrates as an island |
-| `true` | Hydrates as an island |
-| `false` | Static — no client JS (image renders eagerly, with no load-error fallback) |
+***
 
 # Usage
 
+These examples illustrate how content editors bind and structure avatar components.
+
+## 1. High-Fidelity Profile Avatar (With Image Src)
+
+Loads a high-resolution user image. Automatically handles background network loading and animates into view once resolved.
+
 <DemoPreview>
-  <Stack direction="horizontal" gap="4">
-    <Avatar name="Artefact UI" size="sm" variant="solid" colorPalette="blue" />
-    <Avatar
-      src="https://i.pravatar.cc/80"
-      name="Jane Doe"
-      size="md"
-      shape="rounded"
-    />
-    <Avatar size="lg" />
-  </Stack>
+  <Avatar
+    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop"
+    name="Jane Doe"
+    size="lg"
+    interactive
+  />
 </DemoPreview>
 
-```tsx
-import { Avatar } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Avatar
-      src="https://i.pravatar.cc/80"
-      name="Jane Doe"
-      size="md"
-      shape="rounded"
-    />
-  );
+```json
+{
+  "type": "avatar",
+  "src": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop",
+  "name": "Jane Doe",
+  "size": "lg",
+  "interactive": true
 }
 ```
 
+## 2. Accented Initials Fallback (Without Image Src)
+
+When the profile image is absent, the Avatar automatically parses the user's `name` property to calculate and render correct capital initials (e.g., "Jane Doe" -> "JD") over an accented color theme.
+
+<DemoPreview>
+  <Avatar
+    name="Jane Doe"
+    variant="solid"
+    colorPalette="blue"
+    size="md"
+    interactive
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "avatar",
+  "name": "Jane Doe",
+  "variant": "solid",
+  "colorPalette": "blue",
+  "size": "md",
+  "interactive": true
+}
+```
+
+## 3. Rounded Placeholder Avatar
+
+Renders a standard rounded user icon when neither image paths nor usernames are supplied.
+
+<DemoPreview>
+  <Avatar
+    shape="rounded"
+    size="md"
+    interactive
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "avatar",
+  "shape": "rounded",
+  "size": "md",
+  "interactive": true
+}
+```
+
+***
+
 # Props
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `src` | `string` | Image URL. Supplying this is the Tier-2 hydration signal. |
-| `alt` | `string` | Alt text for the image. |
-| `name` | `string` | Used to derive initials (first + last name) when there's no image. |
-| `fallback` | `JSX.Element` | Custom fallback content, overriding the derived initials/icon. |
+| Property | CMS Field Type | Default | Description / Supported Options |
+| --- | --- | --- | --- |
+| **Profile Image** (`src`) | `image` | - | Image URL or relative asset path. Supplying this prompts Tier-2 hydration. |
+| **User Name** (`name`) | `string` | - | Account username. Parses first and last characters into visual initials. |
+| **Alt Details** (`alt`) | `string` | - | Alternative textual descriptions of the photo for screen readers. |
+| **Size Scale** (`size`) | `select` | `"md"` | Controls the avatar's height, width, and initials text scale. <br/>• Options: `"2xs"`, `"xs"`, `"sm"`, `"md"`, `"lg"`, `"xl"`, `"2xl"`. |
+| **Visual Variant** (`variant`) | `select` | `"subtle"` | Style overlay applied to fallback initials background. <br/>• Options: `"solid"`, `"surface"`, `"subtle"`, `"outline"`. |
+| **Corner Shape** (`shape`) | `select` | `"full"` | Curving of avatar boundaries. <br/>• Options: `"square"`, `"rounded"`, `"full"`. |
+| **Color Theme** (`colorPalette`) | `select` | `"blue"` | Accent color used for fallback background themes. <br/>• Options: `blue`, `green`, `red`, `purple`, `orange`, `amber`, `cyan`, `slate`. |
+| **Force Interactive** (`interactive`) | `boolean` | `true` | Ensures immediate client-side load monitoring and smooth transition fallbacks. |
 
-| `status` | \`"idle" \ | "loading" \ | "loaded" \ | "error"\` | The image load state. Managed automatically by the island; only set this by hand on a static render. |
+***
 
-| `size` | \`"full" \ | "2xs" \ | "xs" \ | "sm" \ | "md" \ | "lg" \ | "xl" \ | "2xl"\` | Visual size. Default `"md"`. |
+# Developer Notes & Accessibility
 
-| `variant` | \`"solid" \ | "surface" \ | "subtle" \ | "outline"\` | Visual style. Default `"subtle"`. |
-
-| `shape` | \`"square" \ | "rounded" \ | "full"\` | Corner shape. Default `"full"`. |
-
-| `interactive` | `boolean` | Overrides the hydration decision (see above). |
-| `class` | `string` | Custom CSS classes for the root element. |
-
-## Sub-components
-
-For custom compositions, `Avatar.Root` / `Avatar.Image` / `Avatar.Fallback`
-are exported from the primitive alongside the default component — the same
-parts the default `src`/`name`/`fallback` API renders internally.
-
-# Accessibility
-
-- The fallback renders as a `<span>`; give the image a meaningful `alt` (or
-  omit it for purely decorative avatars) since the fallback itself carries
-  no independent accessible name beyond its visible initials/icon.
-- `data-state` (`idle`/`loading`/`loaded`/`error`) is set on the root,
-  image, and fallback for state-based styling.
+- **Hydration Island:** The Avatar executes as a Tier-2 conditional island. If no image `src` is specified, it compiles directly to light static markup with zero client JS footprint. If a `src` is supplied, it hydrates on the client to automatically manage asynchronous load cycles (`loading` -> `loaded`/`error`).
+- **WAI-ARIA Compliance:** Under the hood, fallback initials and icons operate inside semantic `<span>` tags. If the avatar serves a purely decorative role, ensure the `alt` attribute is omitted or blank so screen readers skip it.

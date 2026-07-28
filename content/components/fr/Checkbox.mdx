@@ -9,71 +9,122 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introduction
 
-Un contrôle qui permet à l'utilisateur de basculer entre les états coché, non coché et indéterminé.
+Le composant `Checkbox` est un contrôle de formulaire qui permet aux utilisateurs de basculer entre des choix binaires (cochés ou décochés) et des états indéterminés. Entièrement optimisé pour le page builder, le composant prend en charge les comportements standard des navigateurs et peut être personnalisé avec des conditions d'état (telles que les états invalides et désactivés) et des thèmes de conception accentués.
+
+***
 
 # Utilisation
 
+Vous pouvez personnaliser et structurer les cases à cocher comme suit :
+
+## Case à cocher de base
+
+Une case à cocher standard avec un libellé cliquable interactif pour des options utilisateur simples.
+
 <DemoPreview>
-  <Checkbox defaultChecked interactive>Accept Terms and Conditions</Checkbox>
+  <Checkbox interactive>Accept Terms and Conditions</Checkbox>
 </DemoPreview>
-
-```tsx
-import { Checkbox } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Checkbox
-      defaultChecked={true}
-      onCheckedChange={(details) => console.log(details.checked)}
-      interactive
-    >
-      Accept Terms and Conditions
-    </Checkbox>
-  );
-}
-```
-
-## État indéterminé
-
-```tsx
-import { Checkbox } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Checkbox checked="indeterminate" interactive>
-      Parent Checkbox
-    </Checkbox>
-  );
-}
-```
-
-## Constructeur de pages CMS
-
-Ce composant est disponible sous forme de bloc `checkbox` dans [Page Builder](/docs/PageBuilder) (`content/pages/*.json`) :
 
 ```json
 {
-  "type": "checkbox",
-  "label": "Accept Terms and Conditions",
-  "checked": true,
-  "colorPalette": "blue"
+  "blockType": "checkbox",
+  "label": "Accept Terms and Conditions"
 }
 ```
 
+***
+
+## Case à cocher pré-cochée
+
+Configurez une case à cocher pour qu'elle s'affiche dans l'état coché par défaut lors du premier chargement de la page.
+
+<DemoPreview>
+  <Checkbox defaultChecked interactive>Subscribe to our newsletter</Checkbox>
+</DemoPreview>
+
+```json
+{
+  "blockType": "checkbox",
+  "label": "Subscribe to our newsletter",
+  "checked": true
+}
+```
+
+***
+
+## Case à cocher désactivée
+
+Empêchez les utilisateurs d'interagir avec la case à cocher tout en préservant son état visuel actuel.
+
+<DemoPreview>
+  <Checkbox disabled interactive>Premium feature unlocked</Checkbox>
+  <Checkbox checked={true} disabled interactive>Auto-renew subscription (fixed)</Checkbox>
+</DemoPreview>
+
+```json
+{
+  "blockType": "checkbox",
+  "label": "Auto-renew subscription (fixed)",
+  "checked": true,
+  "disabled": true
+}
+```
+
+***
+
+## État de validation invalide
+
+Indique qu'un champ de case à cocher a échoué à la validation. Par exemple, forcer une coche pour accepter des conditions de politique obligatoires. L'entrée est surlignée avec des bordures d'erreur à l'aide des jetons d'état par défaut du système de conception.
+
+<DemoPreview>
+  <Checkbox invalid interactive>I accept the User Policy Agreement</Checkbox>
+</DemoPreview>
+
+```json
+{
+  "blockType": "checkbox",
+  "label": "I accept the User Policy Agreement",
+  "invalid": true
+}
+```
+
+***
+
+## Case à cocher à thème accentué
+
+Teintez les états cochés et les marqueurs de focus avec des accents esthétiques personnalisés de la palette de couleurs du système de conception, et augmentez ou réduisez la taille.
+
+<DemoPreview>
+  <Checkbox size="lg" colorPalette="purple" defaultChecked interactive>Purple Large Checkbox</Checkbox>
+</DemoPreview>
+
+```json
+{
+  "blockType": "checkbox",
+  "label": "Purple Large Checkbox",
+  "checked": true,
+  "size": "lg",
+  "colorPalette": "purple"
+}
+```
+
+***
+
 # Propriétés
 
-| Propriété | Type | Description |
-| --- | --- | --- |
-| `children` | `any` | Étiquetez le contenu à afficher à côté de la case à cocher. |
-| `class` | `string` | Classes CSS personnalisées. |
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | `String` | - | La description texte affichée à côté du contrôle de case à cocher. Cliquer sur le libellé bascule également l'état de la case. |
+| `checked` | `Boolean` | `false` | Si la case à cocher est cochée initialement. (Mappé sur `defaultChecked` côté serveur pour permettre un clic libre et non contrôlé sans verrouiller l'état de saisie). |
+| `disabled` | `Boolean` | `false` | Désactive les interactions utilisateur et la réponse visuelle au clic. |
+| `invalid` | `Boolean` | `false` | Met en surbrillance le composant avec des bordures rouges/invalides pour signaler une erreur de validation. |
+| `size` | `Select` | `md` | Ajuste la hauteur et la largeur de la boîte englobante de la case. Options : `sm`, `md`, `lg`. |
+| `colorPalette` | `Select` | - | Thème de couleur d'accent appliqué à l'arrière-plan de la case lorsqu'elle est active ou cochée. Options : `blue`, `green`, `red`, `purple`, `orange`, `amber`, `cyan`, `slate`. |
 
-| `checked` | \`boolean \ | "indéterminé"\` | Whether the checkbox is checked (controlled). |
-| `defaultChecked` | \`boolean \ | "indéterminé"\` | The initial checked state (uncontrolled). |
+***
 
-| `disabled` | `boolean` | Si la case à cocher est désactivée. |
+# Notes d'architecture
 
-| `onCheckedChange` | \`(details: \{ checked: boolean \ | "indéterminé" \}) => vide\` | Callback triggered when the checked state changes. |
-
-| `size` | \`"sm" \ | "md" \ | "lg"\` | The size of the checkbox. |
-
-| `interactive` | `boolean` | Force l’hydratation comme une île. |
+- **Coches par défaut non contrôlées :** Pour empêcher les cases à cocher de se bloquer (empêchant les clics utilisateur) dans des modèles statiques pilotés par données sans gestionnaires inline personnalisés, le champ CMS `checked` est résolu en `defaultChecked` dans notre registre de pages.
+- **Réinitialisation standard de formulaire :** Le composant s'intègre aux réinitialisations de formulaire HTML standard. Les réinitialisations renvoient de manière transparente les cases à cocher à leurs états `checked` originaux configurés dans le modèle JSON.
+- **Focus clavier natif :** Les indicateurs de focus et les interactions de bascule (déclencheurs par la barre d'espacement) s'appuient sur des entrées HTML standard et le comportement du navigateur. Cela reste très performant et accessible sur les lecteurs d'écran assistifs.

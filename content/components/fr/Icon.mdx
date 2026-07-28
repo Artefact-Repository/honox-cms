@@ -1,7 +1,7 @@
 ---
 title: Icon Icône
-hydration: 3
 category: Data Display
+hydration: 3
 ---
 
 import { Icon } from "../../../app/components/ui";
@@ -9,103 +9,75 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introduction
 
-Un wrapper léger, sensible à la taille et aux couleurs pour les icônes SVG. Il applique un dimensionnement cohérent
-(`2xs`–`xl`) et hérite de `currentcolor` afin que les icônes correspondent par défaut au texte/à la couleur de l'icône environnante,
-sans nécessiter aucune dépendance à la bibliothèque d'icônes.
+Un wrapper léger et conscient de la taille et de la couleur pour les formes SVG. Il applique des dimensions de délimitation cohérentes, hérite de `currentcolor` afin que les formes correspondent automatiquement aux thèmes de texte adjacents sans compiler des packages d'icônes externes gonflés, et prend en charge à la fois le masquage décoratif et l'étiquetage explicite pour les lecteurs d'écran.
 
-`Icon` compose de deux manières, décidées automatiquement à partir de ses `enfants` :
+Le composant **Icon** est entièrement intégré en tant que bloc `icon` dans le **Page Builder**, permettant aux gestionnaires Sveltia CMS d'injecter des chemins vectoriels personnalisés, de personnaliser les viewports et de modifier les paramètres d'échelle directement dans les mises en page.
 
-- **Wrap** — si `children` est du contenu SVG nu (`<path>`, `<circle>`, `<g>`, …), du texte ou plus  plus d'un élément, `Icon` restitue son propre `<svg>` autour de lui.
-- **Fusionner (`asChild`, par défaut `true`)** — si `children` est un élément unique qui n'est pas un simple SVG  contenu (par exemple un `<svg>…</svg>` écrit à la main), `Icon` fusionne sa classe (et tout autre passé
-  props) directement sur cet élément au lieu de l'envelopper dans un second `<svg>`. Passer
-  `asChild={false}` pour forcer le retour à la ligne même dans ce cas.
+***
 
 # Utilisation
 
-## Chemins SVG nus (aucune bibliothèque d'icônes requise)
+Ces configurations représentent exactement comment les éléments de bloc du constructeur de pages sont construits.
+
+## 1. Indicateur de Flèche Minimal (Taille Moyenne)
+
+Fournit une flèche vectorielle standardisée, utile pour aligner à côté des en-têtes de carte, des listes de liens ou des boutons de formulaire.
 
 <DemoPreview>
-  <Icon size="lg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-    <path d="M12 2 2 7l10 5 10-5-10-5z" />
+  <Icon size="md" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    <path d="M5 12h14M12 5l7 7-7 7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
   </Icon>
 </DemoPreview>
-
-```tsx
-import { Icon } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Icon size="lg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-      <path d="M12 2 2 7l10 5 10-5-10-5z" />
-    </Icon>
-  );
-}
-```
-
-## Composer avec un `<svg>` écrit à la main (`asChild`, par défaut)
-
-```tsx
-import { Icon } from "../components/ui";
-
-function HeartSvg(props: { class?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
-      <path d="M12 21s-6.7-4.35-9.3-8.1C.8 9.7 2 6 5.4 6c1.9 0 3.2 1 4.6 2.6C11.4 7 12.7 6 14.6 6 18 6 19.2 9.7 17.3 12.9 14.7 16.65 12 21 12 21z" />
-    </svg>
-  );
-}
-
-export default function MyPage() {
-  return (
-    <span style={{ color: "red" }}>
-      <Icon size="sm">
-        <HeartSvg />
-      </Icon>
-    </span>
-  );
-}
-```
-
-La classe `icon` (et la taille) est fusionnée avec le `<svg>` renvoyé par `HeartSvg`, il n'y a donc pas de
-élément d'emballage supplémentaire dans le balisage rendu. Puisque la recette d'icône définit `color: currentcolor`,
-l'icône reprend la couleur du texte environnant (ici, « rouge ») tant que ses chemins utilisent
-`fill="currentColor"` ou `Stroke="currentColor"`.
-
-## Icône étiquetée (non décorative)
-
-```tsx
-<Icon aria-label="Search" viewBox="0 0 24 24">
-  <path d="M10 2a8 8 0 105.3 14.03l4.34 4.34 1.42-1.42-4.34-4.34A8 8 0 0010 2z" />
-</Icon>
-```
-
-## Constructeur de pages CMS
-
-Ce composant est disponible sous forme de bloc `icon` dans [Page Builder](/docs/PageBuilder) (`content/pages/*.json`) — `svg` contient le balisage SVG interne brut :
 
 ```json
 {
   "type": "icon",
-  "svg": "<path d=\"M12 2 2 7l10 5 10-5-10-5z\" />",
+  "svg": "<path d=\"M5 12h14M12 5l7 7-7 7\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" />",
   "viewBox": "0 0 24 24",
+  "fill": "none",
+  "stroke": "currentColor",
+  "size": "md"
+}
+```
+
+## 2. Marqueur de Catégorie de Fonction Accentué (Grande Échelle)
+
+Rend un icône graphique plus grande représentant une fonction, un avantage de plan ou un bloc de catégorie marketing.
+
+<DemoPreview>
+  <Icon size="lg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </Icon>
+</DemoPreview>
+
+```json
+{
+  "type": "icon",
+  "svg": "<path d=\"M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" />",
+  "viewBox": "0 0 24 24",
+  "fill": "none",
+  "stroke": "currentColor",
   "size": "lg"
 }
 ```
 
-# Propriétés
+***
 
-| Propriété | Type | Description |
-| --- | --- | --- |
-| `children` | `Child` | Contenu SVG (`<chemin>`, etc.) ou un seul élément de type SVG à restituer/fusionner. |
-| `class` | `string` | Classes CSS personnalisées. |
+# Props
 
-| `size` | \`"2xs" \ | "xs" \ | "sm" \ | "md" \ | "lg" \ | "xl"\` | The size of the icon. Defaults to `"md"`. |
+| Propriété | Type de Champ CMS | Par défaut | Description / Options Prises en Charge |
+| --- | --- | --- | --- |
+| **Balisage de Forme Vectorielle** (`svg`) | `string` | - | Balises de balisage SVG vectoriel interne brut (ex. `<path d="..." />`, `<circle cx="..." />`). |
+| **Boîte Englobante du Viewport** (`viewBox`) | `string` | `"0 0 24 24"` | Indique au navigateur la mise à l'échelle des coordonnées. Correspond généralement aux conceptions SVG sources. |
+| **Taille d'Échelle** (`size`) | `select` | `"md"` | Échelle de dimensions visuelles standardisées.<br/>• Options : `"2xs"`, `"xs"`, `"sm"`, `"md"`, `"lg"`, `"xl"`. |
+| **Règle de Remplissage** (`fill`) | `string` | `"currentColor"` | Règle de remplissage sous-jacente. Définir sur `"none"` si vous utilisez des contours de trait. |
+| **Couleur de Trait** (`stroke`) | `string` | - | Couleur du contour de bordure. Définir sur `"currentColor"` pour hériter du thème de couleur de police adjacent. |
+| **Libellé de Description Aria** (`aria-label`) | `string` | - | Libellé pour lecteurs d'écran. S'il est laissé vide, l'icône est automatiquement masquée des lecteurs d'écran (`aria-hidden="true"`). |
 
-| `asChild` | `boolean` | Fusionnez sur l'élément enfant unique au lieu de l'envelopper dans un nouveau `<svg>`. La valeur par défaut est « vrai ». |
-| `viewBox` | `string` | Transmis au `<svg>` rendu/fusionné. |
-| `xmlns` | `string` | Transmis au wrapper `<svg>` généré. La valeur par défaut est l'espace de noms SVG. |
-| `fill` | `string` | Transmis au `<svg>` rendu/fusionné. |
-| `stroke` | `string` | Transmis au `<svg>` rendu/fusionné. |
-| `aria-label` | `string` | Etiquette accessible. Lorsqu'il est fourni, « aria-hidden » est omis. |
+***
 
-| `aria-hidden` | \`boolean \ | "vrai" \ | "false"\` | Defaults to `"true"` when no `aria-label` is given (icons are decorative by default). |
+# Notes d'Accessibilité et d'Optimisation SVG
+
+- **Aria-Hidden par Défaut :** Comme les icônes sont couramment utilisées comme mises en évidence visuelles décoratives (telles que des icônes à puces à côté d'une liste de texte), le composant applique automatiquement `aria-hidden="true"` si aucun texte `aria-label` descriptif n'est fourni.
+- **Fusion SVG Intelligente (`asChild`) :** Pour les mises en page personnalisées des développeurs, définir `asChild` (par défaut true) fusionne automatiquement les noms de classe calculés du composant et les paramètres de mise à l'échelle directement sur un seul élément `<svg>` enfant écrit manuellement. Cela élimine le rendu d'éléments wrapper redondants dans le code source HTML de sortie.
+- **Héritage de Couleur :** Étant donné que la recette CSS sous-jacente définit `color: currentcolor`, les chemins vectoriels utilisant `stroke="currentColor"` ou `fill="currentColor"` héritent de manière transparente des schémas de couleur typographique parents.

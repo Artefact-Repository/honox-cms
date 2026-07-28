@@ -4,71 +4,134 @@ hydration: 1
 category: Overlays
 ---
 
-import { HoverCard } from "../../../app/components/ui";
+import { HoverCard, Button, Avatar } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introdução
 
-Um popover que aparece quando o usuário passa o cursor sobre um disparador, útil para mostrar informações complementares.
+Um contêiner pop-up flutuante e não modal que aparece quando um usuário passa o cursor ou foca um elemento gatilho anexado. Ele fornece informações contextuais leves, visualizações prévias ricas ou ações rápidas sem navegar para fora da página atual.
 
-# Uso
+O componente **HoverCard** está totalmente integrado como um bloco `hovercard` no **Page Builder**, permitindo que autores de conteúdo e desenvolvedores vinculem facilmente elementos gatilho (como botões ou trechos de texto) a blocos de visualização detalhados diretamente no CMS.
 
-## HoverCard básico
+***
+
+# Uso via CMS Page Builder (JSON)
+
+Estes exemplos ilustram como os editores de conteúdo vinculam e estruturam blocos de visualização hovercard dentro dos esquemas de página JSON (`content/pages/*.json`).
+
+## 1. Visualização de Perfil Padrão
+
+Envolve um botão gatilho com um cartão flutuante exibindo um instantâneo rápido do usuário, incluindo avatar, nome e função.
 
 <DemoPreview>
   <HoverCard
-    trigger={<a href="#">Hover me</a>}
-    title="Supplementary information"
-    description="Shown on hover, positioned automatically."
-    showArrow
+    trigger={<Button variant="outline">About the Author</Button>}
+    content={
+      <>
+        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+          <Avatar name="J. Chen" />
+          <div>
+            <strong>Jules Chen</strong>
+            <p style={{ margin: 0, fontSize: "0.85rem", opacity: 0.7 }}>Lead Architect</p>
+          </div>
+        </div>
+      </>
+    }
   />
 </DemoPreview>
 
-```tsx
-import { HoverCard } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <HoverCard.Root>
-      <HoverCard.Trigger>
-        <a href="#">Hover me</a>
-      </HoverCard.Trigger>
-      <HoverCard.Positioner>
-        <HoverCard.Content>
-          Supplementary information shown on hover.
-        </HoverCard.Content>
-      </HoverCard.Positioner>
-    </HoverCard.Root>
-  );
+```json
+{
+  "type": "hovercard",
+  "openDelay": 200,
+  "closeDelay": 150,
+  "positioning": "bottom",
+  "trigger": [
+    {
+      "type": "button",
+      "text": "About the Author",
+      "variant": "outline"
+    }
+  ],
+  "content": [
+    {
+      "type": "avatar",
+      "name": "J. Chen"
+    },
+    {
+      "type": "heading",
+      "level": 4,
+      "text": "Jules Chen"
+    },
+    {
+      "type": "text",
+      "text": "Lead Architect"
+    }
+  ]
 }
 ```
 
-## Construtor de páginas do CMS
+## 2. Contexto de Link Rico
 
-Este componente está disponível como um bloco `hoverCard` no [Construtor de páginas](/docs/PageBuilder) (`content/pages/*.json`):
+Usa JSX filho personalizado para anexar um HoverCard a texto em linha. Mostra como texto de cabeçalho e descrições personalizados podem ser injetados.
+
+<DemoPreview>
+  <HoverCard
+    trigger={<span style={{ borderBottom: "1px dotted", cursor: "help" }}>Hono framework</span>}
+    content={
+      <>
+        <strong>Hono</strong>
+        <p style={{ margin: "0.5rem 0 0", fontSize: "0.85rem", opacity: 0.8 }}>Ultrafast web framework for the Edge.</p>
+      </>
+    }
+  />
+</DemoPreview>
 
 ```json
 {
-  "type": "hoverCard",
-  "triggerText": "Hover me",
-  "showArrow": true,
-  "title": "Supplementary information",
-  "description": "Shown on hover."
+  "type": "hovercard",
+  "openDelay": 300,
+  "closeDelay": 100,
+  "positioning": "top",
+  "trigger": [
+    {
+      "type": "text",
+      "text": "Hono framework"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 4,
+      "text": "Hono"
+    },
+    {
+      "type": "text",
+      "text": "Ultrafast web framework for the Edge."
+    }
+  ]
 }
 ```
 
-# Propriedades
+***
 
-## HoverCard
+# Referência de Configuração CMS
 
-| Prop | Tipo | Descrição |
-| --- | --- | --- |
-| `interactive` | `boolean` | Habilita a hidratação no cliente. Padrão: `true`. |
-| `open` | `boolean` | Estado de abertura controlado. |
-| `openDelay` | `number` | Atraso em ms antes de abrir ao passar o cursor. |
-| `closeDelay` | `number` | Atraso em ms antes de fechar ao sair. |
-| `class` | `string` | Classes CSS personalizadas para o elemento raiz. |
+Esses campos mapeiam diretamente para as propriedades de bloco do Sveltia CMS em `public/admin/config.yml` ou as configurações do Page Builder:
 
-# Subcomponentes
+| Propriedade | Tipo de Campo CMS | Padrão | Descrição / Opções Suportadas |
+| :--- | :--- | :--- | :--- |
+| **Elemento Acionador** (`trigger`) | `list` | - | Itens de bloco (como Botões ou Texto) renderizados na página para ativar o cartão flutuante ao passar o cursor ou focar. |
+| **Conteúdo Flutuante** (`content`) | `list` | - | Itens de bloco (como Avatar, Texto ou Cabeçalho) renderizados dentro do corpo do cartão de visualização flutuante. |
+| **Atraso de Abertura** (`openDelay`) | `number` | `200` | Duração em milissegundos que o sistema aguarda após o hover antes de renderizar o popup. |
+| **Atraso de Fechamento** (`closeDelay`) | `number` | `150` | Duração em milissegundos que o sistema aguarda após sair com o mouse antes de descartar o popup. |
+| **Estratégia de Posicionamento** (`positioning`) | `select` | `"bottom"` | Borda preferida do gatilho à qual o cartão se anexa.<br/>• Opções: `"top"`, `"bottom"`, `"left"`, `"right"`. |
+| **Conteúdo Interativo** (`interactive`) | `boolean` | `false` | Quando true, hidrata o cartão como uma ilha do lado do cliente, permitindo que links e botões internos sejam clicáveis. |
 
-`HoverCard.Root`, `HoverCard.Trigger`, `HoverCard.Positioner`, `HoverCard.Content`, `HoverCard.Arrow`, `HoverCard.ArrowTip`
+***
+
+# Notas do Desenvolvedor e Acessibilidade
+
+- **Hidratação Atrasada Inteligente:** Por padrão, o gatilho e o cartão são renderizados como HTML estático. A HoverCard só é hidratada como uma ilha do lado do cliente quando `"interactive": true` é fornecido, permitindo links internos clicáveis.
+- **Conformidade WAI-ARIA:** Nos bastidores, o componente usa conexões padrão `aria-describedby` e gerencia corretamente os anéis de foco. O cartão flutuante é descartado corretamente quando a tecla escape é pressionada ou o foco sai dos limites do gatilho.
+- **Fallback de Foco Elegante:** Como os eventos de hover são inacessíveis para usuários de teclado e leitores de tela, o cartão também é ativado no foco do teclado (tab), garantindo paridade para interações sem mouse.

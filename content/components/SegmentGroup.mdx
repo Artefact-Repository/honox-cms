@@ -1,7 +1,7 @@
 ---
 title: SegmentGroup
-hydration: 2
 category: Forms
+hydration: 2
 ---
 
 import { SegmentGroup } from "../../app/components/ui";
@@ -15,9 +15,9 @@ The **SegmentGroup** component is fully integrated as an interactive `segmentGro
 
 ***
 
-# Usage via CMS Page Builder (JSON)
+# Usage
 
-These examples illustrate how content editors bind and structure interactive segment group components inside the JSON page schemas (`content/pages/*.json`).
+These examples illustrate how content editors bind and structure segment group components.
 
 ## 1. Standard View Layout Selector (Fitted & Horizontal)
 
@@ -116,12 +116,10 @@ Demonstrates a vertical arrangement with custom item constraints. Useful for sid
 
 ***
 
-# CMS Configuration Reference
-
-These fields map directly to Sveltia CMS block properties under `public/admin/config.yml` or the Page Builder configurations:
+# Props
 
 | Property | CMS Field Type | Default | Description / Supported Options |
-| :--- | :--- | :--- | :--- |
+| --- | --- | --- | --- |
 | **Label Text** (`label`) | `string` | - | Optional group label positioned above the segmented controller track. |
 | **Default Value** (`defaultValue`) | `string` | - | The value of the option that should be active by default upon initial render. |
 | **Items List** (`items`) | `list` | - | Array of selection options containing `label` (text), `value` (ID), and optional `disabled` status. |

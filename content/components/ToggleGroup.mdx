@@ -1,7 +1,7 @@
 ---
 title: ToggleGroup
-hydration: 2
 category: Forms
+hydration: 2
 ---
 
 import { ToggleGroup, Stack } from "../../app/components/ui";
@@ -9,137 +9,142 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-A set of toggle buttons for single- or multiple-selection, exclusive or
-inclusive — e.g. text-formatting controls (bold/italic/underline) or a
-view-switcher.
+The `ToggleGroup` component is a set of toggle buttons designed for single or multiple selection. It is widely used to let users choose mutually exclusive layout styles (e.g. view-switchers for Grid vs. List) or group inclusive modifiers (e.g. text formatting buttons for Bold, Italic, and Underline).
 
-# Hydration
+The **ToggleGroup** is fully integrated as a `toggleGroup` block in the **Page Builder**, allowing content authors and developers to easily configure visual options, multi-select behaviors, and active color palettes directly within the CMS.
 
-**Tier 2 — conditional.** A `ToggleGroup` renders as static HTML and
-ships no client JS unless a behavioral signal is present. Pass
-`interactive={true}` to force hydration, or `interactive={false}` to force
-a static render.
-
-It hydrates as an island when **any** of the following signals is present
-(or `interactive={true}` is set):
-
-- `value` (controlled selection)
-- `defaultValue` (uncontrolled initial selection)
-- `onValueChange`
-
-| `interactive` prop | Result |
-| --- | --- |
-| omitted, **no** signal | Static — no client JS |
-| omitted, a signal present | Hydrates as an island |
-| `true` | Hydrates as an island |
-| `false` | Static — no client JS |
+***
 
 # Usage
 
+These examples illustrate how content editors bind and structure interactive toggle buttons.
+
+## 1. Multiple-Selection Text Formatting Toolbar
+
+Allows multiple items to be pressed and active at the same time. Excellent for multi-select feature switches or text editor panels.
+
 <DemoPreview>
-  <Stack direction="horizontal" gap="6">
-    <ToggleGroup
-      multiple
-      defaultValue={["bold"]}
-      items={[
-        { label: "B", value: "bold" },
-        { label: "I", value: "italic" },
-        { label: "U", value: "underline" },
-      ]}
-      interactive
-    />
-    <ToggleGroup
-      defaultValue={["list"]}
-      items={[
-        { label: "Grid", value: "grid" },
-        { label: "List", value: "list" },
-      ]}
-      interactive
-    />
-  </Stack>
+  <ToggleGroup
+    multiple
+    defaultValue={["bold"]}
+    items={[
+      { label: "B", value: "bold" },
+      { label: "I", value: "italic" },
+      { label: "U", value: "underline" },
+    ]}
+    interactive
+  />
 </DemoPreview>
 
-```tsx
-import { ToggleGroup } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <ToggleGroup
-      multiple
-      defaultValue={["bold"]}
-      items={[
-        { label: "B", value: "bold" },
-        { label: "I", value: "italic" },
-        { label: "U", value: "underline" },
-      ]}
-    />
-  );
+```json
+{
+  "type": "toggleGroup",
+  "multiple": true,
+  "defaultValue": ["bold"],
+  "items": [
+    { "label": "B", "value": "bold" },
+    { "label": "I", "value": "italic" },
+    { "label": "U", "value": "underline" }
+  ],
+  "interactive": true
 }
 ```
 
-## Custom Composition
+## 2. Single-Selection Layout Switcher (Purple Theme)
 
-Pass `children` instead of `items` for full control over each button's
-content:
+Demonstrates single-selection mode where only one item can be active at a time. Active choices are styled with custom accented purple theme tokens.
 
-```tsx
-import { ToggleGroup } from "../components/ui";
+<DemoPreview>
+  <ToggleGroup
+    defaultValue={["list"]}
+    items={[
+      { label: "Grid View", value: "grid" },
+      { label: "List View", value: "list" },
+    ]}
+    colorPalette="purple"
+    interactive
+  />
+</DemoPreview>
 
-export default function MyPage() {
-  return (
-    <ToggleGroup defaultValue={["list"]}>
-      <ToggleGroup.Item value="grid">Grid</ToggleGroup.Item>
-      <ToggleGroup.Item value="list">List</ToggleGroup.Item>
-    </ToggleGroup>
-  );
+```json
+{
+  "type": "toggleGroup",
+  "multiple": false,
+  "defaultValue": ["list"],
+  "items": [
+    { "label": "Grid View", "value": "grid" },
+    { "label": "List View", "value": "list" }
+  ],
+  "colorPalette": "purple",
+  "interactive": true
 }
 ```
+
+## 3. Compact Vertical Navigation Group
+
+Arranges the toggle choices vertically instead of horizontally, styled in a compact size scale.
+
+<DemoPreview>
+  <ToggleGroup
+    orientation="vertical"
+    defaultValue={["dashboard"]}
+    items={[
+      { label: "Dashboard", value: "dashboard" },
+      { label: "Settings", value: "settings" },
+    ]}
+    size="sm"
+    interactive
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "toggleGroup",
+  "orientation": "vertical",
+  "defaultValue": ["dashboard"],
+  "items": [
+    { "label": "Dashboard", "value": "dashboard" },
+    { "label": "Settings", "value": "settings" }
+  ],
+  "size": "sm",
+  "interactive": true
+}
+```
+
+***
 
 # Props
 
-## Root
+| Property | CMS Field Type | Default | Description / Supported Options |
+| --- | --- | --- | --- |
+| **Multiple Selection** (`multiple`) | `boolean` | `false` | Allows more than one button item to be toggled active simultaneously. |
+| **Initial Active Values** (`defaultValue`) | `list` | `[]` | List of string values representing button choices that begin in the active state. |
+| **Active Values** (`value`) | `list` | - | List of string values representing active choices (controlled). |
+| **Button Items** (`items`) | `list` | `[]` | Ordered collection of toggle buttons. (See toggle items schema below). |
+| **Layout Flow** (`orientation`) | `select` | `"horizontal"` | Arrangement of toggle choices. <br/>• Options: `"horizontal"`, `"vertical"`. |
+| **Visual Style** (`variant`) | `select` | `"outline"` | Structural layout variant. <br/>• Options: `"outline"`, `"ghost"`. |
+| **Size Scale** (`size`) | `select` | `"md"` | Controls overall height, padding, and text scale. <br/>• Options: `"sm"`, `"md"`, `"lg"`. |
+| **Color Theme** (`colorPalette`) | `select` | `"green"` | Visual color accent applied to active buttons. <br/>• Options: `blue`, `green`, `red`, `purple`, `orange`, `amber`, `cyan`, `slate`. |
+| **Force Interactive** (`interactive`) | `boolean` | `true` | Hydrates the component as an interactive client-side island to coordinate alignments and handle keyboard routing. |
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `value` | `string[]` | The currently pressed values (controlled). |
-| `defaultValue` | `string[]` | The initially pressed values (uncontrolled). |
-| `onValueChange` | `(value: string[]) => void` | Called when the selection changes. |
-| `multiple` | `boolean` | Allow more than one item pressed at once. Default `false` (single, toggleable-off selection). |
-| `disabled` | `boolean` | Disables every item. |
-| `orientation` | `"horizontal" \| "vertical"` | Layout flow, and the axis Arrow keys roam. Default `"horizontal"`. |
-| `id` | `string` | The root element's id. |
-| `variant` | `"outline" \| "ghost"` | Visual style. Default `"outline"`. |
-| `size` | `"sm" \| "md" \| "lg"` | Visual size. Default `"md"`. |
-| `interactive` | `boolean` | Overrides the hydration decision (see above). |
-| `class` | `string` | Custom CSS classes for the root element. |
+### Toggle Group Items Schema
 
-## Default composition
+Every entry inside the `items` array accepts the following parameters:
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `items` | `ToggleGroupItem[]` | Buttons to render when `children` is omitted. |
+| Property | CMS Field Type | Required | Description |
+| --- | --- | --- | --- |
+| **Display Text** (`label`) | `string` | Yes | Label text rendered inside the toggle button. |
+| **Unique Key** (`value`) | `string` | Yes | Key identifier referencing the active state of this option. |
+| **Disabled** (`disabled`) | `boolean` | `false` | Disables user interaction and dims the styling of this button. |
 
-## ToggleGroupItem
+***
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `value` | `string` | The item's unique value. |
-| `label` | `string \| JSX.Element` | The button's display content. |
-| `disabled` | `boolean` | Disables this button. |
+# Developer Notes & Accessibility
 
-## Sub-components
-
-| Part | Description |
-| --- | --- |
-| `ToggleGroup.Item` | One toggle button. Requires a `value` prop; renders `role="checkbox"` in `multiple` mode or `role="radio"` otherwise. |
-
-# Accessibility
-
-- The root has `role="group"`.
-- Items render `role="checkbox"` + `aria-pressed` when `multiple`, or
-  `role="radio"` + `aria-checked` otherwise.
-- Arrow keys (Right/Down to move forward, Left/Up to move back) roam focus
-  between enabled items; Home/End jump to the first/last enabled item —
-  matching `orientation`.
-- `data-state` (`on`/`off`) and `data-disabled` are mirrored onto each item
-  for styling.
+- **WAI-ARIA Accessibility Patterns:** Renders a robust keyboard-navigable toolbar:
+    - The root container receives `role="group"`.
+    - Individual items render as `role="checkbox"` with `aria-checked` states when `multiple` is true, or `role="radio"` with `aria-checked` states otherwise.
+- **Roving Focus Keyboard Navigation:** Supports native focus movement:
+    - Arrow keys (Right/Down to move forward, Left/Up to move backward) automatically roam focus between active buttons, matching the chosen `orientation` axis.
+    - Home and End keyboard keys jump focus instantly to the first and last enabled buttons in the group.
+- **Form Association:** Toggle choices seamlessly update associated state context, allowing parent containers or form hooks to capture changes dynamically.

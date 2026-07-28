@@ -1,7 +1,7 @@
 ---
 title: HoverCard
-hydration: 1
 category: Overlays
+hydration: 1
 ---
 
 import { HoverCard } from "../../app/components/ui";
@@ -9,66 +9,84 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-A popover that appears when the user hovers over a trigger, useful for showing supplementary information.
+The `HoverCard` component is an interactive overlay that displays supplementary details, preview cards, or profile previews when a user hovers over a trigger element. It serves as a visual bridge for sharing contextual details without interrupting the user's focus on the main workspace.
+
+The **HoverCard** is fully integrated as a `hoverCard` block in the **Page Builder**, allowing content authors and developers to easily configure hover delays, indicators, and detailed metadata titles directly within the CMS.
+
+***
 
 # Usage
 
-## Basic HoverCard
+These examples illustrate how content editors bind and structure overlay components.
+
+## 1. Supplementary Information Hover Card
+
+A classic hover card configuration showing additional, helpful contextual descriptions, with a visual arrow pointing to the anchor.
 
 <DemoPreview>
   <HoverCard
-    trigger={<a href="#">Hover me</a>}
-    title="Supplementary information"
-    description="Shown on hover, positioned automatically."
+    trigger={<span style={{ cursor: "pointer", textDecoration: "underline", textDecorationStyle: "dotted" }}>Supplementary Information</span>}
+    title="Profile Summary"
+    description="Active contributor since 2024. Focused on developer relations and technical documentation workflows."
     showArrow
   />
 </DemoPreview>
 
-```tsx
-import { HoverCard } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <HoverCard.Root>
-      <HoverCard.Trigger>
-        <a href="#">Hover me</a>
-      </HoverCard.Trigger>
-      <HoverCard.Positioner>
-        <HoverCard.Content>
-          Supplementary information shown on hover.
-        </HoverCard.Content>
-      </HoverCard.Positioner>
-    </HoverCard.Root>
-  );
+```json
+{
+  "type": "hoverCard",
+  "triggerText": "Supplementary Information",
+  "title": "Profile Summary",
+  "description": "Active contributor since 2024. Focused on developer relations and technical documentation workflows.",
+  "showArrow": true
 }
 ```
 
-## CMS Page Builder
+## 2. Fast-Trigger Overlay
 
-This component is available as a `hoverCard` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
+Decreases the open and close delays for immediate responsiveness when a user moves their pointer over the trigger.
+
+<DemoPreview>
+  <HoverCard
+    trigger={<span style={{ cursor: "pointer", textDecoration: "underline", textDecorationStyle: "dotted" }}>Fast Hover</span>}
+    title="Immediate Detail View"
+    description="This overlay displays quickly due to customized opening delay milliseconds parameters."
+    openDelay={200}
+    closeDelay={100}
+    showArrow
+  />
+</DemoPreview>
 
 ```json
 {
   "type": "hoverCard",
-  "triggerText": "Hover me",
-  "showArrow": true,
-  "title": "Supplementary information",
-  "description": "Shown on hover."
+  "triggerText": "Fast Hover",
+  "title": "Immediate Detail View",
+  "description": "This overlay displays quickly due to customized opening delay milliseconds parameters.",
+  "openDelay": 200,
+  "closeDelay": 100,
+  "showArrow": true
 }
 ```
 
+***
+
 # Props
 
-## HoverCard
+| Property | CMS Field Type | Default | Description / Supported Options |
+| --- | --- | --- | --- |
+| **Trigger Text** (`triggerText`) | `string` | - | The visual text link or label that users hover over to activate the overlay. |
+| **Title** (`title`) | `string` | - | Bold header text displayed at the top of the popped visual container. |
+| **Description** (`description`) | `string` | - | Descriptive body text or secondary meta details inside the popped container. |
+| **Show Arrow** (`showArrow`) | `boolean` | `false` | Renders a small visual pointer arrow pointing back to the trigger link. |
+| **Open Delay** (`openDelay`) | `number` | `700` | Delay time in milliseconds before opening the overlay upon mouse enter. |
+| **Close Delay** (`closeDelay`) | `number` | `300` | Delay time in milliseconds before closing the overlay upon mouse leave. |
+| **Force Interactive** (`interactive`) | `boolean` | `true` | Hydrates the component as an interactive client-side island to compute alignments and handle hover listeners. |
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `interactive` | `boolean` | Enable client-side hydration. Default: `true`. |
-| `open` | `boolean` | Controlled open state. |
-| `openDelay` | `number` | Delay in ms before opening on hover. |
-| `closeDelay` | `number` | Delay in ms before closing on leave. |
-| `class` | `string` | Custom CSS classes for the root element. |
+***
 
-# Sub-components
+# Developer Notes & Accessibility
 
-`HoverCard.Root`, `HoverCard.Trigger`, `HoverCard.Positioner`, `HoverCard.Content`, `HoverCard.Arrow`, `HoverCard.ArrowTip`
+- **Responsive Viewport Clamping:** The interactive island absolute-positions the popped card relative to its relative-positioned trigger wrapper. If the card would exceed screen boundaries, it automatically flips (e.g. from top to bottom) and clamps onto the cross axis to prevent layout overflow.
+- **WAI-ARIA Pattern:** Adheres to semantic aria layouts, using appropriate relative role associations. It ensures screen readers are updated correctly when absolute elements display or collapse.
+- **Scroll Synchronization:** Because the container uses absolute coordinate alignments nested directly under the trigger container context, scrolling the page keeps the popped card securely synchronized with the cursor's target.

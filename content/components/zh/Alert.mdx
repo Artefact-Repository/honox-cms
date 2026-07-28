@@ -1,7 +1,7 @@
 ---
 title: Alert 警告
-hydration: 3
 category: Feedback
+hydration: 3
 ---
 
 import { Alert, AlertIcon } from "../../../app/components/ui";
@@ -9,59 +9,111 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # 简介
 
-以吸引用户注意但不打断其任务的方式，显示简短而重要的消息。
+显示简短、重要且高度醒目的消息，让用户及时了解系统事件、成功状态、警告或错误，同时不打断当前工作流，也无需立即占用布局空间。
 
-# 用法
+**Alert** 组件已作为 `alert` 区块完全集成进**页面构建器**，使内容编辑者与管理员能够直接在 Sveltia CMS 页面模板中快速配置布局、文案、图标指示器与严重程度状态。
+
+***
+
+# 通过 CMS 页面构建器使用（JSON）
+
+以下配置精确对应页面模式集合（`content/pages/*.json`）中页面构建器区块的构建方式。
+
+## 1. 成功消息（Subtle 变体）
+
+用于通知用户正向事件、完成状态或已成功处理的表单（例如「账户已创建」「更改已保存」）。
 
 <DemoPreview>
-  <Alert
-    status="success"
-    title="Success"
-    description="Your changes have been saved."
-    indicator={<AlertIcon />}
-  />
-</DemoPreview>
-
-```tsx
-import { Alert, AlertIcon } from "../components/ui";
-
-export default function MyPage() {
-  return (
+  <div style={{ width: "100%", maxWidth: "600px" }}>
     <Alert
       status="success"
-      title="Success"
-      description="Your changes have been saved."
+      title="Changes Saved"
+      description="Your profile changes and document uploads have been successfully processed."
       indicator={<AlertIcon />}
     />
-  );
-}
-```
-
-## CMS 页面构建器
-
-该组件在 [页面构建器](/docs/PageBuilder) (`content/pages/*.json`) 中作为 `alert` 区块提供：
+  </div>
+</DemoPreview>
 
 ```json
 {
   "type": "alert",
   "status": "success",
-  "title": "Success",
-  "description": "Your changes have been saved.",
-  "variant": "subtle"
+  "variant": "subtle",
+  "title": "Changes Saved",
+  "description": "Your profile changes and document uploads have been successfully processed."
 }
 ```
 
-# 属性
+## 2. 动态警告提示（Solid 变体）
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `title` | `string` | alert 的标题。 |
-| `description` | `string` | alert 的描述。 |
-| `indicator` | `Child` | 作为指示器渲染的图标或元素。 |
-| `children` | `Child` | 组件内部渲染的额外内容。 |
-| `class` | `string` | 自定义 CSS 类。 |
+吸引用户对潜在问题或需要谨慎处理的操作的注意（例如「套餐即将到期」「已排定系统维护」）。
 
-| `status` | \`"info" \ | "success" \ | "warning" \ | "error" \ | "neutral"\` | alert 的状态色彩方案。 |
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "600px" }}>
+    <Alert
+      status="warning"
+      variant="solid"
+      title="Approaching Storage Limit"
+      description="Your workspace has used 85% of allocated file capacity. Upgrade plan to avoid system freezes."
+      indicator={<AlertIcon />}
+    />
+  </div>
+</DemoPreview>
 
-| `variant` | \`"subtle" \ | "solid" \ | "outline"\` | alert 的视觉样式。 |
-| `aria-live` | \`"polite" \ | "assertive" \ | "off"\` | alert 的 aria-live 设置。默认为 "polite"。 |
+```json
+{
+  "type": "alert",
+  "status": "warning",
+  "variant": "solid",
+  "title": "Approaching Storage Limit",
+  "description": "Your workspace has used 85% of allocated file capacity. Upgrade plan to avoid system freezes."
+}
+```
+
+## 3. 高优先级错误 / 失败（Outline 变体）
+
+告知用户阻断进度的严重故障、过期凭据或交易错误。
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "600px" }}>
+    <Alert
+      status="error"
+      variant="outline"
+      title="Connection Terminated"
+      description="The analytics engine timed out while pulling data. Check database credentials and try again."
+      indicator={<AlertIcon />}
+    />
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "alert",
+  "status": "error",
+  "variant": "outline",
+  "title": "Connection Terminated",
+  "description": "The analytics engine timed out while pulling data. Check database credentials and try again."
+}
+```
+
+***
+
+# CMS 配置参考
+
+这些属性可直接映射到 `public/admin/config.yml` 下的 Sveltia CMS 控件字段：
+
+| 属性 | CMS 字段类型 | 默认值 | 说明 / 可选值 |
+| :--- | :--- | :--- | :--- |
+| **标题** (`title`) | `string` | - | 显示在 alert 区块首行的加粗标题文本。 |
+| **描述** (`description`) | `string` | - | 包含补充上下文或操作说明的详细正文消息。 |
+| **严重程度状态** (`status`) | `select` | `"info"` | 设置语义化布局颜色与默认指示器图标。 <br/>• 可选值：`"success"`、`"warning"`、`"error"`、`"info"`、`"neutral"`。 |
+| **视觉变体** (`variant`) | `select` | `"subtle"` | 控制布局边框与容器背景密度。 <br/>• `"subtle"` — 浅色半透明背景色（最适合通用内容）。 <br/>• `"solid"` — 浓密、不透明、高饱和度的背景。 <br/>• `"outline"` — 透明背景搭配细且与颜色匹配的边框。 |
+| **Aria Live 设置** (`aria-live`) | `select` | `"polite"` | 屏幕阅读器的播报优先级模式。 <br/>• `"polite"` — 用户空闲时才播报消息。 <br/>• `"assertive"` — 立即打断屏幕阅读器活动（错误场景请谨慎使用）。 |
+
+***
+
+# 开发者说明与无障碍
+
+- **服务端渲染图标：** 为避免 hydration 不匹配警告并优化资源交付，`AlertIcon` 语义图标会根据所选 `status` 属性动态编译为内联、高度优化的 SVG。
+- **WAI-ARIA 无障碍：** Alert 在挂载时自动带有 `role="alert"` 属性以通知辅助技术。默认 `aria-live` 参数设为 `"polite"`，以确保用户任务不会被强制打断。
+- **布局流集成：** 设计为块级容器布局。若嵌套在灵活的网格目录中，alert 容器会自动水平扩展，平滑贴合已有的列边界。

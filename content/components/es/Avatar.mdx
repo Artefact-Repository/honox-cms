@@ -9,74 +9,103 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introducción
 
-Muestra la imagen de perfil de un usuario, recurriendo a sus iniciales o a un icono de usuario genérico cuando no hay ninguna imagen disponible o la imagen no se puede cargar.
+Un elemento de perfil de usuario basado en imágenes que muestra identificadores gráficos personalizados. Si las fuentes de imagen se omiten, están cargando o fallan al cargar, retrocede con elegancia a iniciales de nombre formateadas o a un icono de marcador de posición universal. Se utiliza principalmente para disparadores de navegación de perfil, listas de mensajes, reseñas y directorios de comunidad.
 
-# Hidratación
+El componente **Avatar** está totalmente integrado como un bloque `avatar` en el **Page Builder**, lo que permite a los autores de contenido y desarrolladores configurar fácilmente rutas de perfil, escalas de tamaño y temas visuales directamente en el CMS.
 
-**Nivel 2 — auto-detección inteligente.** `Avatar` se renderiza como HTML estático y no envía JS del cliente a menos que se proporcione un `src`.
-
-| `interactive` prop | Result |
-| --- | --- |
-| omitted, no `src` | Estático — sin JS del cliente |
-| omitted, `src` present | Se hidrata como isla |
-| `true` | Se hidrata como isla |
-| `false` | Estático — sin JS del cliente (la imagen se renderiza de forma inmediata, sin retorno alternativo por error de carga) |
+***
 
 # Uso
 
+Estos ejemplos ilustran cómo los editores de contenido enlazan y estructuran componentes de avatar.
+
+## 1. Avatar de perfil de alta fidelidad (con fuente de imagen)
+
+Carga una imagen de usuario de alta resolución. Maneja automáticamente la carga de red en segundo plano y se anima a la vista una vez resuelta.
+
 <DemoPreview>
-  <Stack direction="horizontal" gap="4">
-    <Avatar name="Artefact UI" size="sm" variant="solid" colorPalette="blue" />
-    <Avatar
-      src="https://i.pravatar.cc/80"
-      name="Jane Doe"
-      size="md"
-      shape="rounded"
-    />
-    <Avatar size="lg" />
-  </Stack>
+  <Avatar
+    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop"
+    name="Jane Doe"
+    size="lg"
+    interactive
+  />
 </DemoPreview>
 
-```tsx
-import { Avatar } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Avatar
-      src="https://i.pravatar.cc/80"
-      name="Jane Doe"
-      size="md"
-      shape="rounded"
-    />
-  );
+```json
+{
+  "type": "avatar",
+  "src": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop",
+  "name": "Jane Doe",
+  "size": "lg",
+  "interactive": true
 }
 ```
 
+## 2. Retroceso de iniciales acentuadas (sin fuente de imagen)
+
+Cuando la imagen de perfil está ausente, el Avatar analiza automáticamente la propiedad `name` del usuario para calcular y renderizar las iniciales en mayúsculas correctas (por ejemplo, "Jane Doe" -> "JD") sobre un tema de color acentuado.
+
+<DemoPreview>
+  <Avatar
+    name="Jane Doe"
+    variant="solid"
+    colorPalette="blue"
+    size="md"
+    interactive
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "avatar",
+  "name": "Jane Doe",
+  "variant": "solid",
+  "colorPalette": "blue",
+  "size": "md",
+  "interactive": true
+}
+```
+
+## 3. Avatar de marcador de posición redondeado
+
+Renderiza un icono de usuario redondeado estándar cuando no se proporcionan ni rutas de imagen ni nombres de usuario.
+
+<DemoPreview>
+  <Avatar
+    shape="rounded"
+    size="md"
+    interactive
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "avatar",
+  "shape": "rounded",
+  "size": "md",
+  "interactive": true
+}
+```
+
+***
+
 # Propiedades
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `src` | `string` | URL de la imagen. Proporcionar esto es la señal de hidratación de Nivel 2. |
-| `alt` | `string` | Texto alternativo para la imagen. |
-| `name` | `string` | Se usa para derivar las iniciales (nombre + apellido) cuando no hay imagen. |
-| `fallback` | `JSX.Element` | Contenido de reserva personalizado, que sobrescribe las iniciales/icono derivados. |
+| Propiedad | Tipo de campo CMS | Predeterminado | Descripción / Opciones admitidas |
+| --- | --- | --- | --- |
+| **Imagen de perfil** (`src`) | `image` | - | URL de imagen o ruta de recurso relativa. Proporcionar esto activa la hidratación de Nivel 2. |
+| **Nombre de usuario** (`name`) | `string` | - | Nombre de cuenta de usuario. Analiza los primeros y últimos caracteres en iniciales visuales. |
+| **Detalles alternativos** (`alt`) | `string` | - | Descripciones de texto alternativas de la foto para lectores de pantalla. |
+| **Escala de tamaño** (`size`) | `select` | `"md"` | Controla la altura, el ancho y la escala de texto de las iniciales del avatar. <br/>• Opciones: `"2xs"`, `"xs"`, `"sm"`, `"md"`, `"lg"`, `"xl"`, `"2xl"`. |
+| **Variante visual** (`variant`) | `select` | `"subtle"` | Superposición de estilo aplicada al fondo de iniciales de retroceso. <br/>• Opciones: `"solid"`, `"surface"`, `"subtle"`, `"outline"`. |
+| **Forma de esquina** (`shape`) | `select` | `"full"` | Curvatura de los límites del avatar. <br/>• Opciones: `"square"`, `"rounded"`, `"full"`. |
+| **Tema de color** (`colorPalette`) | `select` | `"blue"` | Color de acento utilizado para temas de fondo de retroceso. <br/>• Opciones: `blue`, `green`, `red`, `purple`, `orange`, `amber`, `cyan`, `slate`. |
+| **Forzar interactivo** (`interactive`) | `boolean` | `true` | Garantiza monitoreo de carga del lado del cliente inmediato y transiciones de retroceso suaves. |
 
-| `status` | \`"idle" \ | "loading" \ | "loaded" \ | "error"\` | El estado de carga de la imagen. Gestionado automáticamente por la isla; solo se debe establecer manualmente en un renderizado estático. |
+***
 
-| `size` | \`"full" \ | "2xs" \ | "xs" \ | "sm" \ | "md" \ | "lg" \ | "xl" \ | "2xl"\` | Tamaño visual. Por defecto `"md"`. |
+# Notas para desarrolladores y accesibilidad
 
-| `variant` | \`"solid" \ | "surface" \ | "subtle" \ | "outline"\` | Estilo visual. Por defecto `"subtle"`. |
-
-| `shape` | \`"square" \ | "rounded" \ | "full"\` | Forma de las esquinas. Por defecto `"full"`. |
-
-| `interactive` | `boolean` | Anula la decisión de hidratación (ver arriba). |
-| `class` | `string` | Clases CSS personalizadas para el elemento raíz. |
-
-## Subcomponentes
-
-Para composiciones personalizadas, `Avatar.Root` / `Avatar.Image` / `Avatar.Fallback` se exportan desde el primitivo junto con el componente por defecto — las mismas partes que la API `src`/`name`/`fallback` por defecto renderiza internamente.
-
-# Accesibilidad
-
-- El contenido de reserva se renderiza como un `<span>`; proporciona a la imagen un `alt` significativo (u omítelo para avatares puramente decorativos), ya que el contenido de reserva en sí no lleva un nombre accesible independiente más allá de sus iniciales/icono visibles.
-- `data-state` (`idle`/`loading`/`loaded`/`error`) se establece en la raíz, la imagen y el contenido de reserva para el estilizado basado en estado.
+- **Isla de hidratación:** El Avatar se ejecuta como una isla condicional de Nivel 2. Si no se especifica una imagen `src`, se compila directamente en un marcado estático ligero con huella de JS del cliente cero. Si se proporciona una `src`, se hidrata en el cliente para gestionar automáticamente los ciclos de carga asíncrona (`loading` -> `loaded`/`error`).
+- **Cumplimiento WAI-ARIA:** En segundo plano, las iniciales y los iconos de retroceso operan dentro de etiquetas semánticas `<span>`. Si el avatar tiene un papel puramente decorativo, asegúrese de que el atributo `alt` se omita o quede en blanco para que los lectores de pantalla lo omitan.

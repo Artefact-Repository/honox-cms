@@ -1,7 +1,7 @@
 ---
 title: Layout Diseño
-hydration: 3
 category: Layout
+hydration: 3
 ---
 
 import { Layout, Heading, Text, Stack } from "../../../app/components/ui";
@@ -9,53 +9,56 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introducción
 
-Anida un `<Layout>` dentro del `content` u otros hijos anidados de otro `<Layout>` para construir
-estructuras compuestas, por ejemplo: un Layout externo con un encabezado/pie de página y un
-Layout interno que aloja un riel de navegación lateral.
+El componente `Layout` proporciona una estructura de página semántica compuesta por encabezados personalizados, barras de navegación laterales (siders), regiones de contenido principal y pies de página. Admite dimensiones personalizadas de la barra lateral, visibilidad basada en puntos de quiebre, bloqueo de desplazamiento fijo (sticky) y contenedores que llenan el viewport.
+
+Dentro del CMS Page Builder, los autores de contenido y los desarrolladores pueden configurar paneles estructurales semánticos colocando tarjetas, encabezados, stacks y botones en matrices de ranuras dedicadas.
+
+***
 
 # Uso
 
-## Encabezado + Contenido + Pie de página
+Estos ejemplos ilustran cómo los editores de contenido enlazan y estructuran plantillas de página semánticas.
 
-Sin `sider`, las partes se apilan en una sola columna.
+## 1. Carcasa de página estándar con encabezado, contenido y pie de página
+
+Un diseño de documento o artículo estándar con encabezados semánticos superiores y un panel de pie de página inferior.
 
 <DemoPreview>
   <div style={{ width: "100%", border: "1px solid var(--colors-border)", borderRadius: "12px", overflow: "hidden" }}>
     <Layout
       header={
         <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--colors-border)", background: "var(--colors-bg-subtle)" }}>
-          <Heading as="h4" size="sm">Header</Heading>
+          <Heading as="h4" size="sm">Site Brand Header</Heading>
         </div>
       }
-      content={<div style={{ padding: "16px" }}><Text size="sm">Content</Text></div>}
+      content={<div style={{ padding: "16px" }}><Text size="sm">Main Article and Interactive Content</Text></div>}
       footer={
         <div style={{ padding: "12px 16px", borderTop: "1px solid var(--colors-border)", background: "var(--colors-bg-subtle)" }}>
-          <Text size="xs">Footer</Text>
+          <Text size="xs">© 2026 Acme Corp. All rights reserved.</Text>
         </div>
       }
     />
   </div>
 </DemoPreview>
 
-```tsx
-import { Layout } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Layout
-      header={<SiteHeader />}
-      content={<Article />}
-      footer={<SiteFooter />}
-    />
-  );
+```json
+{
+  "type": "layout",
+  "header": [
+    { "type": "heading", "text": "Site Brand Header", "as": "h4", "size": "sm" }
+  ],
+  "content": [
+    { "type": "text", "content": "Main Article and Interactive Content" }
+  ],
+  "footer": [
+    { "type": "text", "content": "© 2026 Acme Corp. All rights reserved.", "size": "xs" }
+  ]
 }
 ```
 
-## Encabezado + Barra lateral + Contenido
+## 2. Carcasa de panel con navegación lateral (Sider)
 
-Pasar `sider` lo envuelve junto con `content` en una fila. `siderWidth` selecciona el ancho del
-riel (`sm` 14rem, `md` 16rem por defecto, `lg` 18rem); `siderHideBelow` oculta el riel por debajo
-de un punto de quiebre para pantallas pequeñas.
+Añade un cajón o riel de navegación a la izquierda de la región de contenido principal. Los siders pueden tener anchos personalizados sm, md o lg y configurarse para colapsar automáticamente en viewports móviles pequeños.
 
 <DemoPreview>
   <div style={{ width: "100%", border: "1px solid var(--colors-border)", borderRadius: "12px", overflow: "hidden" }}>
@@ -63,91 +66,21 @@ de un punto de quiebre para pantallas pequeñas.
       siderWidth="sm"
       header={
         <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--colors-border)", background: "var(--colors-bg-subtle)" }}>
-          <Heading as="h4" size="sm">Dashboard</Heading>
+          <Heading as="h4" size="sm">Dashboard System</Heading>
         </div>
       }
       sider={
         <div style={{ padding: "16px", borderRight: "1px solid var(--colors-border)", background: "var(--colors-bg-subtle)" }}>
           <Stack direction="vertical" gap="2">
-            <Text size="sm">Overview</Text>
-            <Text size="sm">Reports</Text>
-            <Text size="sm">Settings</Text>
+            <Text size="sm">Analytics Overview</Text>
+            <Text size="sm">Cloud Infrastructure</Text>
           </Stack>
         </div>
       }
-      content={<div style={{ padding: "16px" }}><Text size="sm">Content next to the sider</Text></div>}
+      content={<div style={{ padding: "16px" }}><Text size="sm">Cloud systems are operational. Latency is within normal bounds.</Text></div>}
     />
   </div>
 </DemoPreview>
-
-```tsx
-import { Layout } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Layout
-      header={<SiteHeader />}
-      sider={<Sidenav />}
-      siderWidth="sm"
-      siderHideBelow="md"
-      content={<Article />}
-    />
-  );
-}
-```
-
-## Encabezado y barra lateral fijos
-
-`stickyHeader` fija el encabezado en la parte superior del desplazamiento de la página.
-`stickySider` fija la barra lateral debajo de él y desplaza su propio contenido desbordante —
-útil para una navegación larga junto a un contenido corto, o viceversa. `fullHeight` ocupa todo
-el viewport para la estructura de página más externa.
-
-```tsx
-import { Layout } from "../components/ui";
-
-export default function DocsPage() {
-  return (
-    <Layout
-      fullHeight
-      stickyHeader
-      stickySider
-      header={<SiteHeader />}
-      sider={<DocsSidenav />}
-      siderHideBelow="md"
-      content={<Article />}
-    />
-  );
-}
-```
-
-## Layout anidado
-
-Anida un `<Layout>` dentro de `content` cuando el encabezado/pie de página abarcan todo el ancho
-pero solo una parte del cuerpo necesita un riel lateral:
-
-```tsx
-import { Layout } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Layout
-      header={<SiteHeader />}
-      content={
-        <Layout sider={<Sidenav />} content={<Article />} />
-      }
-      footer={<SiteFooter />}
-    />
-  );
-}
-```
-
-## Constructor de páginas del CMS
-
-Este componente está disponible como un bloque `layout` en el
-[Constructor de páginas](/docs/PageBuilder) (`content/pages/*.json`). `header`,
-`sider`, `content` y `footer` son cada uno una lista de bloques de componentes — cualquier tipo de
-bloque funciona, incluyendo otro `layout` para estructuras anidadas:
 
 ```json
 {
@@ -155,7 +88,7 @@ bloque funciona, incluyendo otro `layout` para estructuras anidadas:
   "siderWidth": "sm",
   "siderHideBelow": "md",
   "header": [
-    { "type": "heading", "text": "Dashboard", "as": "h3", "size": "lg" }
+    { "type": "heading", "text": "Dashboard System", "as": "h4", "size": "sm" }
   ],
   "sider": [
     {
@@ -163,44 +96,65 @@ bloque funciona, incluyendo otro `layout` para estructuras anidadas:
       "direction": "vertical",
       "gap": "2",
       "children": [
-        { "type": "link", "text": "Overview", "href": "#" },
-        { "type": "link", "text": "Reports", "href": "#" }
+        { "type": "text", "content": "Analytics Overview", "size": "sm" },
+        { "type": "text", "content": "Cloud Infrastructure", "size": "sm" }
       ]
     }
   ],
   "content": [
-    { "type": "text", "content": "Pick a page from the rail on the left." }
-  ],
-  "footer": [
-    { "type": "text", "size": "sm", "content": "© 2026 Acme" }
+    { "type": "text", "content": "Cloud systems are operational. Latency is within normal bounds." }
   ]
 }
 ```
 
-Dejar la lista de una parte vacía (u omitirla) omite por completo el elemento envolvente de esa
-parte — un campo opcional sin modificar como `siderWidth`/`siderHideBelow` llega como `""` desde
-el CMS y se trata como no establecido, recurriendo al valor por defecto del componente.
+## 3. Composición de layout anidado
+
+Los layouts se pueden anidar limpiamente dentro de otros layouts. Esto es útil cuando desea un encabezado y pie de página de sitio de ancho completo, pero quiere que solo el contenido del cuerpo central incluya navegación lateral.
+
+```json
+{
+  "type": "layout",
+  "header": [
+    { "type": "heading", "text": "Global Full-Width Header", "as": "h3" }
+  ],
+  "content": [
+    {
+      "type": "layout",
+      "siderWidth": "md",
+      "sider": [
+        { "type": "text", "content": "Nested Sidebar Rail" }
+      ],
+      "content": [
+        { "type": "text", "content": "Nested Content Body" }
+      ]
+    }
+  ],
+  "footer": [
+    { "type": "text", "content": "Global Full-Width Footer", "size": "xs" }
+  ]
+}
+```
+
+***
 
 # Propiedades
 
-## Layout
+| Propiedad | Tipo de campo CMS | Predeterminado | Descripción / opciones admitidas |
+| --- | --- | --- | --- |
+| **Panel de encabezado** (`header`) | `list` | - | Colección de bloques visuales (p. ej., logos, títulos, botones) renderizados dentro del `<header>` semántico superior. |
+| **Panel lateral** (`sider`) | `list` | - | Colección de bloques visuales renderizados dentro del `<aside>` de navegación semántico izquierdo. |
+| **Contenido principal** (`content`) | `list` | - | Colección de bloques del cuerpo principal renderizados dentro del contenedor `<main>` semántico. |
+| **Panel de pie de página** (`footer`) | `list` | - | Colección de bloques visuales renderizados dentro del `<footer>` semántico inferior. |
+| **Altura completa** (`fullHeight`) | `boolean` | `false` | Hace que el contenedor más externo llene toda la altura del viewport (`min-height: 100vh`). |
+| **Encabezado fijo** (`stickyHeader`) | `boolean` | `false` | Fija el encabezado del sitio en la parte superior del viewport durante el desplazamiento. |
+| **Sider fijo** (`stickySider`) | `boolean` | `false` | Bloquea el panel lateral en su lugar para que solo se desplace la región de contenido principal. |
+| **Ancho del sider** (`siderWidth`) | `select` | `"md"` | Dimensionamiento del ancho de columna para el panel lateral.<br/>• Opciones: `"sm"` (14rem), `"md"` (16rem), `"lg"` (18rem). |
+| **Ocultar sider responsivo** (`siderHideBelow`) | `select` | - | Colapsa y oculta la barra lateral en viewports más pequeños.<br/>• Opciones: `"sm"`, `"md"`, `"lg"`. |
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `header` | \`string \| JSX.Element\` | Renderizado dentro de un `<header>` semántico encima del cuerpo. (Solo API abreviada) |
-| `sider` | \`string \| JSX.Element\` | Renderizado dentro de un riel `<aside>` semántico. Su presencia cambia el cuerpo a una fila de barra lateral + contenido. (Solo API abreviada) |
-| `content` | \`string \| JSX.Element\` | Renderizado dentro de un `<main>` semántico. `children` se añade después de él. (Solo API abreviada) |
-| `footer` | \`string \| JSX.Element\` | Renderizado dentro de un `<footer>` semántico debajo del cuerpo. (Solo API abreviada) |
-| `fullHeight` | `boolean` | Ocupa la altura del viewport — para la estructura de página más externa. |
-| `stickyHeader` | `boolean` | Fija el encabezado en la parte superior del desplazamiento de la página. |
-| `stickySider` | `boolean` | Fija la barra lateral debajo de un encabezado fijo; se desplaza internamente. |
-| `siderWidth` | \`"sm" \| "md" \| "lg"\` | Ancho del riel lateral: sm (14rem), md (16rem, por defecto), lg (18rem). |
-| `siderHideBelow` | \`"sm" \| "md" \| "lg"\` | Oculta la barra lateral por debajo de este punto de quiebre. Combínalo con un control de despliegue en el flujo. |
-| `hasSider` | `boolean` | Fuerza manualmente la dirección del layout a fila. (API compuesta) |
-| `headerClass` | `string` | Clase extra para la parte `<header>`. (Solo API abreviada) |
-| `siderClass` | `string` | Clase extra para la parte `<aside>`. (Solo API abreviada) |
-| `contentClass` | `string` | Clase extra para la parte `<main>`. (Solo API abreviada) |
-| `footerClass` | `string` | Clase extra para la parte `<footer>`. (Solo API abreviada) |
-| `bodyClass` | `string` | Clase extra para el contenedor de fila alrededor de barra lateral + contenido (solo se renderiza cuando se establece `sider`). |
-| `children` | `any` | Hijos a renderizar dentro de la estructura del layout. |
-| `class` | `string` | Clases CSS personalizadas para el elemento raíz. |
+***
+
+# Notas para desarrolladores y accesibilidad
+
+- **Reglas de anidamiento y límite de profundidad:** Sveltia CMS impone un límite visual de anidamiento de aproximadamente cuatro niveles en la interfaz del editor. Este límite de profundidad restringe lo que se puede construir mediante la UI, pero no limita al compilador de layouts: las plantillas JSON creadas manualmente pueden anidar layouts tan profundamente como sea necesario.
+- **Asignación de elementos semánticos:** Este componente se asigna directamente a elementos HTML5 válidos y semánticos: `<header>`, `<aside>`, `<main>` y `<footer>`.
+- **Compatibilidad con omitir navegación:** Al usar encabezados y pies de página personalizados, asegúrese de que los encabezados se secuencian lógicamente (p. ej., comenzando con un `h1` en la página) para mantener puntuaciones de accesibilidad altas.

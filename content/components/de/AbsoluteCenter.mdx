@@ -4,59 +4,116 @@ category: Layout
 hydration: 3
 ---
 
-import { AbsoluteCenter } from "../../../app/components/ui";
+import { AbsoluteCenter, Badge } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Einführung
 
-Eine Hilfskomponente zum Zentrieren von Inhalten innerhalb ihres übergeordneten Containers.
+Eine Hilfs-Container-Komponente, die ihre Kindelemente absolut innerhalb ihres nächsten relativ positionierten Elterncontainers zentriert. Hervorragend geeignet für Overlay-Inhalte, Lade-Skelette, mittig angeheftete Badges, Callout-Karten und Landing-Banner-Highlights.
+
+Die **AbsoluteCenter**-Komponente ist als `absoluteCenter`-Block vollständig im **Page Builder** integriert und erlaubt es Content-Autoren und Entwicklern, visuelle Layouts, Ausrichtungsachsen und Abstände direkt im CMS zu konfigurieren.
+
+***
 
 # Verwendung
 
+Diese Beispiele veranschaulichen, wie Content-Editoren zentrierte absolute Container binden und strukturieren.
+
+## 1. Zentrierung auf beiden Achsen
+
+Zentriert verschachtelte Elemente perfekt horizontal und vertikal innerhalb des Elternkontexts. Ideal für zentralisierte Call-to-Action-Badges oder Fortschrittslade-Overlays.
+
 <DemoPreview>
-  <div style={{ position: "relative", height: "140px", width: "260px", border: "1px solid var(--colors-border)" }}>
-    <AbsoluteCenter axis="both">Centered Content</AbsoluteCenter>
+  <div style={{ position: "relative", height: "140px", width: "100%", maxWidth: "320px", border: "1px dashed var(--colors-border)", borderRadius: "8px" }}>
+    <AbsoluteCenter axis="both">
+      <Badge colorPalette="purple" variant="solid">Centered Content</Badge>
+    </AbsoluteCenter>
   </div>
 </DemoPreview>
 
-```tsx
-import { AbsoluteCenter } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <div
-      style={{
-        position: "relative",
-        height: "200px",
-        width: "200px",
-        border: "1px solid black",
-      }}
-    >
-      <AbsoluteCenter axis="both">Centered Content</AbsoluteCenter>
-    </div>
-  );
-}
-```
-
-## CMS-Seitenbauer
-
-Diese Komponente ist als `absoluteCenter`-Block im [Seitenbauer](/docs/PageBuilder) (`content/pages/*.json`) verfügbar:
-
-```markdown
+```json
 {
   "type": "absoluteCenter",
   "axis": "both",
   "children": [
-    { "type": "badge", "text": "Centered Badge", "colorPalette": "purple", "variant": "solid" }
+    {
+      "type": "badge",
+      "text": "Centered Content",
+      "colorPalette": "purple",
+      "variant": "solid"
+    }
   ]
 }
 ```
 
+## 2. Nur horizontale Ausrichtung
+
+Heftet die Elemente zur horizontalen Zentrierung (entlang der X-Achse) fest, während die vertikale Position unverändert bleibt.
+
+<DemoPreview>
+  <div style={{ position: "relative", height: "120px", width: "100%", maxWidth: "320px", border: "1px dashed var(--colors-border)", borderRadius: "8px" }}>
+    <AbsoluteCenter axis="horizontal">
+      <Badge colorPalette="blue" variant="outline">Horizontal Only</Badge>
+    </AbsoluteCenter>
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "absoluteCenter",
+  "axis": "horizontal",
+  "children": [
+    {
+      "type": "badge",
+      "text": "Horizontal Only",
+      "colorPalette": "blue",
+      "variant": "outline"
+    }
+  ]
+}
+```
+
+## 3. Nur vertikale Ausrichtung
+
+Heftet die Elemente zur vertikalen Zentrierung (entlang der Y-Achse) fest, während die horizontale Position unverändert bleibt.
+
+<DemoPreview>
+  <div style={{ position: "relative", height: "120px", width: "100%", maxWidth: "320px", border: "1px dashed var(--colors-border)", borderRadius: "8px" }}>
+    <AbsoluteCenter axis="vertical">
+      <Badge colorPalette="green" variant="subtle">Vertical Only</Badge>
+    </AbsoluteCenter>
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "absoluteCenter",
+  "axis": "vertical",
+  "children": [
+    {
+      "type": "badge",
+      "text": "Vertical Only",
+      "colorPalette": "green",
+      "variant": "subtle"
+    }
+  ]
+}
+```
+
+***
+
 # Eigenschaften
 
-| Eigenschaft | Typ | Beschreibung |
-| --- | --- | --- |
-| `children` | `any` | Inhalt, der innerhalb der Komponente gerendert wird. |
-| `class` | `string` | Benutzerdefinierte CSS-Klassen. |
+| Eigenschaft | CMS-Feldtyp | Standard | Beschreibung / Unterstützte Optionen |
+| --- | --- | --- | --- |
+| **Ausrichtungsachse** (`axis`) | `select` | `"both"` | Die Layout-Koordinatenachsen für die Zentrierungsberechnung. <br/>• Optionen: `"both"`, `"horizontal"`, `"vertical"`. |
+| **Kinderinhalte** (`children`) | `list` | - | Die Sammlung der verschachtelten Komponenten-Blöcke, die im absoluten Kontext ausgerichtet werden. |
+| **Benutzerdefinierte Klasse** (`class`) | `string` | - | Benutzerdefinierte CSS-Klassen-Overrides, die direkt auf den absoluten Wrapper angewendet werden. |
 
-| `axis` | \`"horizontal" \ | "vertical" \ | "both"\` | Die Achse, auf der der Inhalt zentriert wird. |
+***
+
+# Entwickler-Hinweise & Barrierefreiheit
+
+- **Relatives Elternziel:** Damit AbsoluteCenter korrekt funktioniert, muss sein unmittelbarer Elterncontainer oder Layout-Wrapper `position: relative` (oder eine andere nicht-statische Positionierung) besitzen.
+- **Hardware-beschleunigte Positionierung:** Im Hintergrund verwendet diese Komponente hocheffiziente CSS-Transformationsregeln (`transform: translate(-50%, -50%)`), um Subpixel-Render-Unschärfe oder Schrift-Skalierungsprobleme über verschiedene Bildschirm-Pixeldichten hinweg zu vermeiden.
+- **Zugängliche Baum-Reihenfolge:** Die Komponente behält die native DOM-Lesereihenfolge für Screenreader bei. Sie verändert weder die Tastaturnavigations-Tabs noch die Barrierefreiheits-Konturhervorhebungen des inneren Kindschaftsinhalts.

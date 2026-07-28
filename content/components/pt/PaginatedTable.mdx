@@ -1,52 +1,87 @@
 ---
 title: PaginatedTable Tabela Paginada
-hydration: 2
 category: Data Display
+hydration: 2
 ---
 
 import { PaginatedTable } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-Um componente de alto nível que combina uma Table com Pagination, gerenciando o estado internamente.
+# Introdução
 
-## Uso
+O componente `PaginatedTable` é um controlador de tabela de alto nível que combina perfeitamente a renderização de conteúdo de tabela com um bloco de ilha de paginação correspondente. Construído especificamente para conjuntos de dados de grande volume ou registros de plataforma, ele gerencia automaticamente todo o rastreamento de páginas ativas, fatias de dados e cliques anterior/próximo nas máquinas do lado do cliente.
+
+***
+
+# Uso
+
+Você pode posicionar e estilizar tabelas paginadas da seguinte maneira:
+
+## 1. Tabela de Usuários Paginada Padrão
+
+Renderiza a visualização de dados paginada padrão que exibe usuários. A lista usa por padrão um tamanho de página definido, renderizando números de paginação abaixo para cliques de transição suaves.
 
 <DemoPreview>
   <div style={{ width: "100%" }}>
-    <PaginatedTable title="Users" pageSize={5} />
+    <PaginatedTable title="System Users" pageSize={5} />
   </div>
 </DemoPreview>
-
-### Construtor de páginas do CMS
-
-Este componente está disponível como um bloco `paginatedTable` no [Construtor de Páginas](/docs/PageBuilder) (`content/pages/*.json`):
 
 ```json
 {
   "type": "paginatedTable",
-  "title": "Users",
+  "title": "System Users",
   "pageSize": 5
 }
 ```
 
-## Propriedades
+***
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `title` | `string` | - | Título da tabela. |
-| `pageSize` | `number` | `10` | Itens por página. |
+## 2. Tabela de Feed de Dados Baseada em API (Avançado)
 
-## Configuração do CMS
+Conecta-se a um endpoint de API JSON personalizado (ex. seu feed de postagens de blog, registros de transações ou lista de operações do servidor) e fatia e renderiza entradas dinamicamente com base em cliques do lado do cliente.
 
-```yaml
-- label: PaginatedTable
-  name: paginated-table
-  widget: object
-  fields:
-    - { label: Title, name: title, widget: string, required: false }
-    - { label: Page Size, name: pageSize, widget: number, default: 10 }
+```json
+{
+  "type": "paginatedTable",
+  "title": "Platform Activity Logs",
+  "url": "/api/platform-logs.json",
+  "dataKey": "logs",
+  "pageSize": 10,
+  "columns": [
+    { "header": "Timestamp", "key": "timestamp" },
+    { "header": "IP Address", "key": "ip" },
+    { "header": "Activity Description", "key": "description" }
+  ]
+}
 ```
 
-## Hidratação
+***
 
-Nível 2: sempre se hidrata como ilha para gerenciar o estado interno de paginação.
+# Props
+
+| Propriedade | Tipo de Campo CMS | Padrão | Descrição / Opções Suportadas |
+| --- | --- | --- | --- |
+| **Título** (`title`) | `string` | - | Título de cabeçalho descritivo renderizado acima do bloco de tabela. |
+| **URL do Endpoint da API** (`url`) | `string` | - | Caminho opcional para um endpoint de API JSON externo que retorna um feed de objetos (ex. `{ data: [...] }`). Se vazio ou omitido, conjuntos de dados de demonstração integrados são carregados automaticamente. |
+| **Mapeamento de Chave de Dados** (`dataKey`) | `string` | - | Chave de propriedade de destino que contém o array de linhas dentro da resposta JSON (ex. `"users"`, `"logs"`). |
+| **Tamanho da Página** (`pageSize`) | `number` | `5` | Número máximo de linhas de dados exibidas simultaneamente por fatia de página. |
+| **Página Inicial** (`initialPage`) | `number` | `1` | O índice de página padrão ativo quando o bloco carrega pela primeira vez no cliente. |
+| **Colunas** (`columns`) | `list` | - | Lista de mapeamento de colunas personalizadas (veja as subpropriedades de coluna abaixo). |
+
+### Propriedades da Lista de Colunas (`columns`)
+
+Cada entrada no parâmetro de lista `columns` aceita os seguintes campos:
+
+| Sub-Propriedade | Tipo | Obrigatório | Descrição |
+| --- | --- | --- | --- |
+| **Título da Coluna** (`header`) | `string` | Sim | Rótulo de título exibido na célula de cabeçalho da coluna. |
+| **Chave de Dados do Item** (`key`) | `string` | Sim | Chave de propriedade correspondente no objeto de linha JSON para mapear nesta célula. |
+
+***
+
+# Notas de Arquitetura
+
+- **Hidratação Condicional do Cliente (Tier 2):** Como a tabela paginada requer rastreamento de estado ativo para lidar com transições, fatiar registros e cálculos de página anterior/próxima, ela é hidratada automaticamente como uma ilha Preact interativa nas cargas de página do cliente.
+- **Dados de Demonstração Integrados:** Se nenhuma URL de endpoint de API personalizada for fornecida nos parâmetros de configuração, o componente recorre ao carregamento de conjuntos de dados operacionais padrão para testes.
+- **Compatível com Redefinição de Formulário:** Quando incorporado dentro de painéis interativos, qualquer redefinição do contêiner pai retorna com segurança o rastreamento de página ativo ao seu valor `initialPage` especificado.

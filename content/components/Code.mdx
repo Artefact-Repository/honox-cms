@@ -1,7 +1,7 @@
 ---
 title: Code
-hydration: 3
 category: Typography
+hydration: 3
 ---
 
 import { Code, Stack } from "../../app/components/ui";
@@ -9,47 +9,66 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-An inline `<code>` element for short snippets of code or monospace text
-within a line of prose.
+An inline, monospace typographic component used to showcase short program snippets, console commands, or API paths directly inside paragraph prose.
+
+The **Code** component is fully integrated as a `code` block inside the **Page Builder**, enabling Sveltia CMS authors to configure outline borders, color themes, font sizing, and code text directly within CMS layout nodes.
+
+***
 
 # Usage
 
+These configurations represent exactly how page-builder block items are constructed.
+
+## 1. Minimal Installation Command (Subtle Variant)
+
+A standard inline code block rendering a short installation command. Ideal for setting a clean monospace background without dominating focus.
+
 <DemoPreview>
-  <Stack direction="horizontal" gap="4" align="center">
-    <Code>npm install</Code>
-    <Code variant="solid" colorPalette="blue">
-      const x = 5;
-    </Code>
-    <Code variant="outline" size="lg">
-      GET /api/users
-    </Code>
-  </Stack>
+  <Code>npm install @park-ui/hono</Code>
 </DemoPreview>
 
-```tsx
-import { Code } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <p>
-      Run <Code>npm install</Code> to install dependencies.
-    </p>
-  );
+```json
+{
+  "type": "code",
+  "text": "npm install @park-ui/hono",
+  "variant": "subtle",
+  "size": "md"
 }
 ```
 
+## 2. API Method Path (Outline Variant / Large Sizing)
+
+An outlined, color-themed monospace label suitable for listing API endpoints, status codes, or route URLs in technical documentation guides.
+
+<DemoPreview>
+  <Code variant="outline" size="lg" colorPalette="blue">GET /api/v1/workspace</Code>
+</DemoPreview>
+
+```json
+{
+  "type": "code",
+  "text": "GET /api/v1/workspace",
+  "variant": "outline",
+  "size": "lg",
+  "colorPalette": "blue"
+}
+```
+
+***
+
 # Props
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `children` | `Child` | The code content. |
-| `variant` | `"solid" \| "surface" \| "subtle" \| "outline" \| "plain"` | Visual style. Default `"subtle"`. |
-| `size` | `"sm" \| "md" \| "lg" \| "xl"` | Font/padding size. Default `"md"`. |
-| `colorPalette` | `"blue" \| "green" \| "red" \| "purple" \| "orange" \| "cyan" \| "yellow" \| "pink" \| "teal" \| "indigo" \| "gray" \| "success" \| "error" \| "warning"` | The color theme. |
-| `class` | `string` | Custom CSS classes. |
+| Property | CMS Field Type | Default | Description / Supported Options |
+| --- | --- | --- | --- |
+| **Monospace Text** (`text`) | `string` | - | The raw code text or command to render on-screen. |
+| **Visual Variant** (`variant`) | `select` | `"subtle"` | Background tint style. <br/>• `"subtle"` — Standard soft gray backdrop. <br/>• `"solid"` — Saturated, opaque contrast background. <br/>• `"outline"` — Transparent background paired with a thin outer border. <br/>• `"surface"` — Modern card shaded style. |
+| **Size Scale** (`size`) | `select` | `"md"` | Controls font size and horizontal padding. <br/>• Options: `"sm"`, `"md"`, `"lg"`, `"xl"`. |
+| **Color Theme** (`colorPalette`) | `select` | - | Visual color theme applied to text, borders, and backgrounds. <br/>• Options: `blue`, `green`, `red`, `purple`, `orange`, `amber`, `cyan`, `slate`. |
 
-# Accessibility
+***
 
-`Code` renders a native `<code>` element, so screen readers announce it as
-code content with no extra ARIA wiring needed. For multi-line code blocks,
-wrap a `<pre>` around it yourself — `Code` only styles the inline case.
+# Developer Notes & Accessibility
+
+- **Semantic HTML Element:** Automatically compiles to a semantic `<code>` HTML element on the server. This signals search engine bots and assistive devices that the text is program source content.
+- **Single-Line Limitation:** Designed exclusively for short, inline single-line snippets of text. For multi-line, formatted blocks of code, wrap the output inside a standard HTML `<pre>` container block manually.
+- **Panda CSS Monospace Font Stack:** Font families map directly to optimized local monospace configurations (such as SFMono-Regular, Consolas, or Liberation Mono) to guarantee clean, proportional alignment across all devices.

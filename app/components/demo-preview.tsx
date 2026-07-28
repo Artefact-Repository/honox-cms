@@ -24,6 +24,14 @@ const unstyledPanelClass = css({
 	borderRadius: "0",
 });
 
+// Splitter's panel recipe sets `overflow: auto`, which clips popover content
+// (e.g. a date picker's calendar flyout, per the same non-portaled-overlay
+// constraint noted in page-registry.tsx's card `overflow` prop) that
+// intentionally renders outside the preview panel's bounds. An inline style
+// reliably beats the recipe class's specificity; overridden for the preview
+// side only — the code panel keeps `auto` so long lines/lists still scroll.
+const visiblePanelStyle = { overflow: "visible" };
+
 export interface DemoPreviewProps extends PropsWithChildren {
 	/**
 	 * Explicit source to show in the code panel, for cases where the MDX
@@ -89,6 +97,7 @@ export function DemoPreview({
 						id: "preview",
 						content: <div class={previewBoxClass}>{preview}</div>,
 						class: unstyledPanelClass,
+						style: visiblePanelStyle,
 					},
 				]}
 				defaultSize={[

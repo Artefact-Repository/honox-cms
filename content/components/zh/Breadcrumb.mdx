@@ -1,7 +1,7 @@
 ---
 title: Breadcrumb 面包屑
-hydration: 3
 category: Navigation
+hydration: 3
 ---
 
 import { Breadcrumb } from "../../../app/components/ui";
@@ -9,11 +9,19 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # 简介
 
-一种导航辅助元素，通过链接列表展示当前页面在层级结构中的位置。
+`Breadcrumb` 组件是一种导航辅助元素，用于展示当前页面在站点层级结构中的位置。它能帮助用户从主页追溯其访问路径回到当前位置，并轻松向上回溯层级。
+
+**Breadcrumb** 已在 **Page Builder** 中作为 `breadcrumb` 区块完整集成，内容编辑者与开发者可直接在 CMS 内轻松配置视觉样式、分隔符，以及响应式尺寸。
+
+***
 
 # 用法
 
-## 基础面包屑
+以下示例展示了内容编辑者如何绑定并组织导航组件。
+
+## 1. 标准导航面包屑
+
+经典的层级面包屑配置，展示主页、二级分类与末级文本页面标记。
 
 <DemoPreview>
   <Breadcrumb
@@ -25,76 +33,99 @@ import { DemoPreview } from "../../../app/components/demo-preview";
   />
 </DemoPreview>
 
-```tsx
-import { Breadcrumb } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Breadcrumb
-      items={[
-        { label: "Home", href: "/" },
-        { label: "Components", href: "/components" },
-        { label: "Breadcrumb" },
-      ]}
-    />
-  );
-}
-```
-
-## 自定义分隔符
-
-```tsx
-import { Breadcrumb } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Breadcrumb
-      separator="/"
-      items={[
-        { label: "Home", href: "/" },
-        { label: "Breadcrumb" },
-      ]}
-    />
-  );
-}
-```
-
-## CMS 页面构建器
-
-该组件在 [页面构建器](/docs/PageBuilder) (`content/pages/*.json`) 中作为 `breadcrumb` 区块提供：
-
 ```json
 {
   "type": "breadcrumb",
   "items": [
     { "label": "Home", "href": "/" },
-    { "label": "Docs", "href": "/docs" },
+    { "label": "Components", "href": "/components" },
     { "label": "Breadcrumb" }
-  ],
-  "variant": "underline",
-  "size": "md"
+  ]
 }
 ```
 
+## 2. 自定义分隔符（斜杠分隔）
+
+使用自定义文本分隔字符（如斜杠 `"/"`）来分隔导航项。
+
+<DemoPreview>
+  <Breadcrumb
+    separator="/"
+    items={[
+      { label: "Home", href: "/" },
+      { label: "Library", href: "/library" },
+      { label: "Overview" },
+    ]}
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "breadcrumb",
+  "separator": "/",
+  "items": [
+    { "label": "Home", "href": "/" },
+    { "label": "Library", "href": "/library" },
+    { "label": "Overview" }
+  ]
+}
+```
+
+## 3. 强调尺寸与视觉样式
+
+将整体缩放调整为 small，并应用自定义的视觉下划线样式，营造高亮布局观感。
+
+<DemoPreview>
+  <Breadcrumb
+    variant="underline"
+    size="sm"
+    items={[
+      { label: "Console", href: "/console" },
+      { label: "Resources", href: "/console/resources" },
+      { label: "Deployments" },
+    ]}
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "breadcrumb",
+  "variant": "underline",
+  "size": "sm",
+  "items": [
+    { "label": "Console", "href": "/console" },
+    { "label": "Resources", "href": "/console/resources" },
+    { "label": "Deployments" }
+  ]
+}
+```
+
+***
+
 # 属性
 
-## Breadcrumb
+| 属性 | CMS 字段类型 | 默认值 | 说明 / 可选项 |
+| --- | --- | --- | --- |
+| **分隔符** (`separator`) | `string` | `"chevron-right"` | 置于各项之间的自定义字符分隔符。 |
+| **视觉样式** (`variant`) | `select` | `"plain"` | 链接的视觉样式。 <br/>• 选项：`"plain"`、`"underline"`。 |
+| **尺寸刻度** (`size`) | `select` | `"md"` | 控制整体字体与 chevron 缩放。 <br/>• 选项：`"xs"`、`"sm"`、`"md"`、`"lg"`。 |
+| **导航项** (`items`) | `list` | `[]` | 页面项的有序集合。（参见下方面包屑项 schema）。 |
+| **自定义类** (`class`) | `string` | - | 直接应用于面包屑容器的自定义 CSS 类覆盖。 |
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `items` | `BreadcrumbItem[]` | 要渲染的面包屑项。 |
-| `separator` | `Child` | 各项之间的自定义分隔符。默认：chevron-right 图标。 |
+### 面包屑项 Schema
 
-| `variant` | \`"underline" \ | "plain"\` | 面包屑的视觉样式。 |
+`items` 数组中的每个条目都接受以下参数：
 
-| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg"\` | 面包屑的尺寸。 |
+| 属性 | CMS 字段类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| **显示文本** (`label`) | `string` | 是 | 渲染为该条目片段的标签文本。 |
+| **目标路由** (`href`) | `string` | 否 | 目标 URL 或页面路由。若省略，则渲染为纯文本当前页。 |
+| **当前页面** (`current`) | `boolean` | `false` | 将该项标记为当前活动页面（最后一项会自动为 true）。 |
 
-| `class` | `string` | 根元素的自定义 CSS 类。 |
+***
 
-### BreadcrumbItem
+# 开发者说明与无障碍
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `label` | `Child` | 显示文本或 JSX 节点。 |
-| `href` | `string` | 如果存在，则渲染为链接；否则渲染为纯文本（当前页面）。 |
-| `current` | `boolean` | 标记当前页面。最后一项默认 `true`。 |
+- **符合 ARIA 的层级：** 组件会自动渲染在可访问的语义化导航元素内（`<nav aria-label="Breadcrumb">`）。
+- **当前页面 ARIA：** 末端节点元素（省略 `href` 或设置了 `current` 的项）会自动接收 `aria-current="page"`，以符合屏幕阅读器的无障碍规范。
+- **微交互样式：** 链接会自动继承布局悬停触发器与过渡效果，平滑地反映父级配色强调色。

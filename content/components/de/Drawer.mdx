@@ -1,7 +1,7 @@
 ---
 title: Drawer Schublade
-hydration: 1
 category: Overlays
+hydration: 1
 ---
 
 import { Drawer, Button } from "../../../app/components/ui";
@@ -9,72 +9,108 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Einführung
 
-Ein Panel, das vom Rand des Bildschirms einfährt, um Inhalte oder Aktionen darzustellen, ohne die aktuelle Seite zu verlassen.
+Ein überlagerndes Panel, das vom Rand des Bildschirms hereinschiebt und temporäre Inhalte, Formulare, Einstellungen oder mehrstufige Abläufe aufnimmt. Diese Komponente ermöglicht es Benutzern, Aufgaben auszuführen, Präferenzen anzupassen oder detaillierte Informationen zu überprüfen, ohne den Kontext ihrer primären Seitenansichten zu verlieren.
+
+Die **Drawer**-Komponente ist vollständig als `drawer`-Block in den **Page Builder** integriert und ermöglicht es Content-Autoren und Entwicklern, Auslöseschaltflächen, beschreibende Kopfzeilen und benutzerdefinierte Aktionsfußzeilen direkt innerhalb des CMS zu konfigurieren.
+
+***
 
 # Verwendung
 
-## Einfache Schublade
+Diese Beispiele veranschaulichen, wie Content-Editoren Drawer-Komponenten binden und strukturieren.
+
+## 1. Standard-Einstellungskonfigurations-Drawer
+
+Ein Standard-Konfigurationspanel, das einen Titel, eine Beschreibung und primäre/sekundäre Schaltflächenauslöser umfasst.
 
 <DemoPreview>
   <Drawer
-    trigger={<Button>Open Drawer</Button>}
-    title="Settings"
-    description="Adjust your preferences."
-    body="Drawer body content goes here."
-    cancel={<Button variant="outline">Close</Button>}
-    confirm={<Button>Save</Button>}
+    trigger={<Button>Open Settings</Button>}
+    title="Workspace Preferences"
+    description="Customize your development workspace configurations."
+    body="Configure default themes, enable telemetry, toggle system status reports, and authorize third-party API hook integrations for your active workspace."
+    cancel={<Button variant="outline">Cancel</Button>}
+    confirm={<Button>Apply Changes</Button>}
   />
 </DemoPreview>
-
-```tsx
-import { Drawer, Button } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Drawer
-      trigger={<Button>Open Drawer</Button>}
-      title="Settings"
-      description="Adjust your preferences."
-      body="Drawer body content goes here."
-      cancel={<Button variant="outline">Close</Button>}
-      confirm={<Button>Save</Button>}
-    />
-  );
-}
-```
-
-## CMS-Seitenbauer
-
-Diese Komponente ist als `drawer`-Block im [Seitenbauer](/docs/PageBuilder) (`content/pages/*.json`) verfügbar: `trigger` ist eine verschachtelte Blockliste (der CMS übergibt immer ein Array):
 
 ```json
 {
   "type": "drawer",
-  "title": "Settings",
-  "description": "Adjust your preferences.",
-  "confirmText": "Save",
-  "cancelText": "Close",
-  "trigger": [{ "type": "button", "text": "Open Drawer" }]
+  "title": "Workspace Preferences",
+  "description": "Customize your development workspace configurations.",
+  "confirmText": "Apply Changes",
+  "cancelText": "Cancel",
+  "trigger": [
+    {
+      "type": "button",
+      "text": "Open Settings",
+      "variant": "outline"
+    }
+  ]
 }
 ```
 
-# Eigenschaften
+## 2. Informationsprüfungs-Drawer mit Benutzerdefiniertem Fuß
 
-## Schublade
+Zeigt eine alternative Layout-Komposition, bei der eine benutzerdefinierte Aktionsschaltflächenliste innerhalb des Fuß-Arrays neben Standardsteuerelementen bereitgestellt wird.
 
-| Eigenschaft | Typ | Beschreibung |
-| --- | --- | --- |
-| `trigger` | `JSX.Element` | Element, das die Schublade beim Aktivieren öffnet. |
+<DemoPreview>
+  <Drawer
+    trigger={<Button>Review System Specs</Button>}
+    title="System Diagnostics"
+    description="Real-time node and performance overview."
+    body="All background microservices are reporting healthy statuses. Memory allocation is stable at 42%, and static page routing delivery latency is currently averaging 12ms."
+    cancel={<Button variant="outline">Dismiss</Button>}
+    footer={[
+      <Button variant="subtle" colorPalette="blue" style={{ marginRight: "8px" }}>Refresh Node</Button>
+    ]}
+  />
+</DemoPreview>
 
-| `title` | \`string \ | JSX.Element\` | Der Titel der Schublade. |
-| `description` | \`string \ | JSX.Element\` | Die Beschreibung der Schublade. |
-| `body` | \`string \ | JSX.Element\` | Der Hauptinhaltsbereich. |
-| `footer` | \`string \ | JSX.Element\` | Benutzerdefinierter Inhalt für die Fußzeile. |
+```json
+{
+  "type": "drawer",
+  "title": "System Diagnostics",
+  "description": "Real-time node and performance overview.",
+  "cancelText": "Dismiss",
+  "trigger": [
+    {
+      "type": "button",
+      "text": "Review System Specs"
+    }
+  ],
+  "footer": [
+    {
+      "type": "button",
+      "text": "Refresh Node",
+      "variant": "subtle",
+      "colorPalette": "blue"
+    }
+  ]
+}
+```
 
-| `cancel` | `JSX.Element` | Element, das als Schließen- (Abbrechen-)Auslöser gerendert wird. |
-| `confirm` | `JSX.Element` | Element, das als Aktionsauslöser gerendert wird. |
-| `closable` | `boolean` | Legt fest, ob die Schließen-Schaltfläche angezeigt wird. Standard: `true`. |
-| `interactive` | `boolean` | Aktiviert die clientseitige Hydration für interaktives Verhalten. |
-| `class` | `string` | Benutzerdefinierte CSS-Klassen für das Wurzelelement. |
+***
 
-Zusätzliche Props (z. B. `open`, `defaultOpen`, `onOpenChange`, `id`) werden an das zugrunde liegende Schubladen-Primitive weitergeleitet.
+# Props
+
+| Eigenschaft | CMS-Feldtyp | Standard | Beschreibung / Unterstützte Optionen |
+| --- | --- | --- | --- |
+| **Drawer-Titel** (`title`) | `string` | - | Primäre Überschrift, die oben auf dem gleitenden Drawer-Panel prominent angezeigt wird. |
+| **Beschreibung** (`description`) | `string` | - | Unterstützende Untertitelnachricht, die unter dem Titel verschachtelt ist. |
+| **Hauptinhalt** (`body`) | `string` | - | Haupttextinhalt, der im Scroll-Container des Drawers angezeigt wird. |
+| **Auslöserblöcke** (`trigger`) | `list` | - | Array von Komponenten (typischerweise eine einzelne Schaltfläche), die auf der Seite gerendert werden, um den Drawer zu öffnen. |
+| **Bestätigungstext** (`confirmText`) | `string` | - | Benutzerdefiniertes Label für die primäre Aktionsschaltfläche. Weglassen, um die Bestätigungssteuerung auszublenden. |
+| **Abbruchtext** (`cancelText`) | `string` | - | Benutzerdefiniertes Label für die sekundäre Schließen-Schaltfläche. Weglassen, um die Abbruchsteuerung auszublenden. |
+| **Fußzeilenblöcke** (`footer`) | `list` | - | Liste von Hilfsschaltflächenblöcken, die neben den standardmäßigen Bestätigen/Abbrechen-Aktionen gerendert werden. |
+| **Schließen-Button anzeigen** (`closable`) | `boolean` | `true` | Wenn aktiviert, wird oben in der Ecke ein standardmäßiges visuelles Schließen-„X“-Symbol als Auslöser gerendert. |
+| **Interaktion erzwingen** (`interactive`) | `boolean` | `true` | Hydriert die Drawer-Überlagerung, Übergangsebenen und den Fokus-Trap sofort als Client-Insel. |
+
+***
+
+# Entwicklerhinweise & Barrierefreiheit
+
+- **Hydration-Insel:** Da sich das gleitende Panel auf clientseitige Zustandsänderungen, Hintergrund-Overlay-Schließungen, Tastatur-Fokus-Traps und Touch-Interaktionen verlässt, hydriert es standardmäßig als interaktive Client-Insel (`"interactive": true`).
+- **WAI-ARIA-Konformität:** Im Hintergrund erfüllt diese Komponente die Overlay-Spezifikationen (`role="dialog"`, `aria-modal="true"`, `aria-labelledby`, `aria-describedby`). Das Öffnen des Drawers fängt die Tastaturfokus automatisch im Panel ein. Durch Drücken der `Escape`-Taste oder Klicken auf die abgedunkelte Hintergrund-Overlay-Ebene wird der Drawer sicher geschlossen und der Fokus zurück zum Auslöserelement gebracht.
+- **Einheitliche Insel-Komposition:** Um Hydration-Inkonsistenzen und Overlay-Kollisionsfehler in komplexen Client-Frames zu verhindern, werden verschachtelte Elemente (einschließlich Bestätigungsauslösern, Schließungs-Shims und Ladespinnern) in einer einzigen einheitlichen Inselumgebung gebündelt.

@@ -1,7 +1,7 @@
 ---
 title: Splitter Divisor
-hydration: 1
 category: Layout
+hydration: 1
 ---
 
 import { Splitter } from "../../../app/components/ui";
@@ -9,86 +9,115 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introducción
 
-Un componente de diseño que divide el contenido en paneles redimensionables separados por controladores de arrastre.
+Un componente de diseño estructural que divide el espacio en múltiples áreas de contenido distintas separadas por divisores visuales de alto contraste. Está diseñado para agrupar subsecciones complejas o barras laterales de forma ordenada dentro de un bloque contenedor unificado.
+
+El componente **Splitter** está totalmente integrado como un bloque `splitter` en el **Page Builder**. Esto permite a los editores de contenido y desarrolladores estructurar fácilmente diseños en paneles horizontales uno al lado del otro o apilados verticalmente directamente en el CMS.
+
+***
 
 # Uso
 
-## Splitter básico
+Estos ejemplos ilustran cómo los editores de contenido configuran y estructuran contenedores divisores redimensionables.
+
+## 1. Divisor de panel horizontal
+
+Divide el diseño en una barra de navegación/información izquierda y un área de contenido principal derecha. Ideal para diseños de espacios de trabajo, páginas de documentación técnica o exhibiciones de productos uno al lado del otro.
 
 <DemoPreview>
-  <div style={{ width: "100%", height: "180px" }}>
+  <div style={{ width: "100%", height: "180px", border: "1px solid var(--colors-border)", borderRadius: "8px", overflow: "hidden" }}>
     <Splitter
       orientation="horizontal"
       panels={[
-        { id: "left", content: <div style={{ padding: "1rem" }}>Sidebar</div> },
-        { id: "right", content: <div style={{ padding: "1rem" }}>Content</div> },
+        { id: "left", content: <div style={{ padding: "1rem", background: "var(--colors-bg-subtle)", height: "100%" }}>Left Panel (Sidebar)</div> },
+        { id: "right", content: <div style={{ padding: "1rem", height: "100%" }}>Right Panel (Main Content)</div> }
       ]}
     />
   </div>
 </DemoPreview>
-
-```tsx
-import { Splitter } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Splitter
-      orientation="horizontal"
-      panels={[
-        { id: "left", content: <aside>Sidebar</aside> },
-        { id: "right", content: <main>Content</main> },
-      ]}
-    />
-  );
-}
-```
-
-## Constructor de páginas CMS
-
-Este componente está disponible como un bloque `splitter` en el [Constructor de páginas](/docs/PageBuilder) (`content/pages/*.json`). **Siempre se renderiza de forma estática** (`interactive={false}`, sin redimensionado por arrastre) — el `content` de un panel es JSX anidado arbitrario, que no puede cruzar el límite de serialización de propiedades del island de la misma forma que `children`:
 
 ```json
 {
   "type": "splitter",
   "orientation": "horizontal",
   "panels": [
-    { "id": "left", "content": [{ "type": "text", "content": "Left panel" }] },
-    { "id": "right", "content": [{ "type": "text", "content": "Right panel" }] }
+    {
+      "id": "left",
+      "content": [
+        {
+          "blockType": "text",
+          "content": "Left Panel (Sidebar)"
+        }
+      ]
+    },
+    {
+      "id": "right",
+      "content": [
+        {
+          "blockType": "text",
+          "content": "Right Panel (Main Content)"
+        }
+      ]
+    }
   ]
 }
 ```
 
+## 2. Divisor apilado vertical
+
+Apila las áreas de contenido verticalmente, separadas por una línea divisoria horizontal. Ideal para dividir áreas de juego de código, fuentes de contenido apiladas o secciones de panel con vista previa y editor.
+
+<DemoPreview>
+  <div style={{ width: "100%", height: "220px", border: "1px solid var(--colors-border)", borderRadius: "8px", overflow: "hidden" }}>
+    <Splitter
+      orientation="vertical"
+      panels={[
+        { id: "top", content: <div style={{ padding: "1rem", background: "var(--colors-bg-subtle)", height: "100%" }}>Top Section (Code / Editor)</div> },
+        { id: "bottom", content: <div style={{ padding: "1rem", height: "100%" }}>Bottom Section (Live Preview)</div> }
+      ]}
+    />
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "splitter",
+  "orientation": "vertical",
+  "panels": [
+    {
+      "id": "top",
+      "content": [
+        {
+          "blockType": "text",
+          "content": "Top Section (Code / Editor)"
+        }
+      ]
+    },
+    {
+      "id": "bottom",
+      "content": [
+        {
+          "blockType": "text",
+          "content": "Bottom Section (Live Preview)"
+        }
+      ]
+    }
+  ]
+}
+```
+
+***
+
 # Propiedades
 
-## Splitter
+| Propiedad | Tipo de campo CMS | Predeterminado | Descripción / Opciones admitidas |
+| --- | --- | --- | --- |
+| **Orientación** (`orientation`) | `select` | `"horizontal"` | Orientación visual de los paneles del divisor. <br/>• Opciones: `"horizontal"` (uno al lado del otro), `"vertical"` (apilado). |
+| **Paneles** (`panels`) | `list` | - | Lista de bloques de configuración de paneles anidados. Cada panel contiene:<br/>• **ID** (`id`): Cadena de identificador único para el panel.<br/>• **Contenido** (`content`): Lista de bloques de página anidables. |
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `panels` | `PanelConfig[]` | Los paneles a renderizar (obligatorio). |
+***
 
-| `orientation` | \`"horizontal" \ | "vertical"\` | Dirección de diseño de los paneles. |
+# Notas para desarrolladores y accesibilidad
 
-| `interactive` | `boolean` | Habilita el redimensionado por arrastre en el cliente. |
-
-| `defaultSize` | \`\{ id: string \ | number; size: number \}[]\` | Tamaños iniciales (modo interactivo). |
-| `size` | \`\{ id: string \ | number; size: number \}[]\` | Tamaños controlados (modo interactivo). |
-| `onSizeChange` | \`(sizes: \{ id: string \ | number; size: number \}[]) => void\` | Callback cuando cambian los tamaños. |
-
-| `resizeTriggerClass` | `string` | Clases CSS personalizadas para los controladores de redimensionado. |
-| `class` | `string` | Clases CSS personalizadas para el elemento raíz. |
-
-| `style` | \`Record\<string, string \ | number\>\` | Estilos en línea para el elemento raíz. |
-
-| `id` | `string` | Id personalizado para el elemento raíz. |
-
-### PanelConfig
-
-| Property | Type | Description |
-| --- | --- | --- |
-
-| `id` | \`string \ | number\` | Identificador único del panel. |
-| `content` | \`JSX.Element \ | string\` | Contenido renderizado dentro del panel. |
-
-| `class` | `string` | Clases CSS personalizadas para el panel. |
-
-| `style` | \`Record\<string, string \ | number\>\` | Estilos en línea para el panel. |
+- **Compilación de contenido estático:** Para garantizar una latencia de hidratación nula y un rendimiento máximo, el bloque Splitter compilado a través del CMS Page Builder siempre se renderiza en **modo de presentación estática** (`interactive={false}`). Dado que el `content` de un panel contiene elementos de bloque JSX anidados arbitrarios, mantenerlo estático evita los problemas de límite de serialización que ocurren durante la hidratación de la isla.
+- **Flexbox de diseño CSS puro:** Los diseños Splitter estáticos se compilan como filas o columnas Flexbox CSS puras y ligeras. Esto elimina la necesidad de cualquier ejecución de diseño JavaScript al cargar, evitando por completo el cambio de diseño (CLS).
+- **Roles de diseño WAI-ARIA:** Genera atributos de diseño semánticos que señalan claramente las agrupaciones de paneles. Las líneas divisoras horizontales y verticales se compilan en separadores estándar (`role="separator"`), ayudando a los usuarios de lectores de pantalla a comprender las transiciones de diseño.

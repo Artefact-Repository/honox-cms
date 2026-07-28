@@ -1,7 +1,7 @@
 ---
 title: Heading
-hydration: 3
 category: Typography
+hydration: 3
 ---
 
 import { Heading } from "../../app/components/ui";
@@ -9,45 +9,64 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-A polymorphic component for displaying titles and headings with consistent styling.
+A versatile, polymorphic typographic component used to render page titles, section subtitles, and nested headers with standardized scaling, margins, weights, and color tokens.
+
+The **Heading** component is fully integrated as a `heading` block in the **Page Builder**, allowing Sveltia CMS writers and administrators to easily manage heading levels, sizing, and text copy directly within page builder templates.
+
+***
 
 # Usage
 
+These configurations represent exactly how page-builder block items are constructed.
+
+## 1. Primary Page Title (H1 Level / Extra Large)
+
+The main heading of a page. Must be used exactly once per layout page for optimal search engine indexing.
+
 <DemoPreview>
-  <Heading as="h1" size="3xl">Page Title</Heading>
+  <Heading as="h1" size="3xl">Welcome to our Platform</Heading>
 </DemoPreview>
-
-```tsx
-import { Heading } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Heading as="h1" size="3xl">
-      Page Title
-    </Heading>
-  );
-}
-```
-
-## CMS Page Builder
-
-This component is available as a `heading` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
 
 ```json
 {
   "type": "heading",
-  "text": "Page Title",
+  "text": "Welcome to our Platform",
   "as": "h1",
   "size": "3xl"
 }
 ```
 
+## 2. Section Subtitle (H2 Level / Medium Size)
+
+Used to divide page layouts into secondary logical sections. Inherits a smaller sizing footprint.
+
+<DemoPreview>
+  <Heading as="h2" size="xl">Product Offerings</Heading>
+</DemoPreview>
+
+```json
+{
+  "type": "heading",
+  "text": "Product Offerings",
+  "as": "h2",
+  "size": "xl"
+}
+```
+
+***
+
 # Props
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `children` | `any` | The text or content. |
-| `class` | `string` | Custom CSS classes. |
-| `as` | `string` | The HTML element to render (e.g., "h1", "h2"). Defaults to "h2". |
-| `size` | `string` | The font size variant. |
-| `interactive` | `boolean` | Whether to enable client-side hydration. |
+| Property | CMS Field Type | Default | Description / Supported Options |
+| --- | --- | --- | --- |
+| **Heading Text** (`text`) | `string` | - | The plain-text title string to render on-screen. |
+| **HTML Tag Element** (`as`) | `select` | `"h2"` | The semantic HTML element written to the page output. <br/>• Options: `"h1"`, `"h2"`, `"h3"`, `"h4"`, `"h5"`, `"h6"`, `"span"`, `"div"`. |
+| **Size Scaling** (`size`) | `select` | `"xl"` | Font dimension preset mapping directly to theme tokens. <br/>• Options: `"xs"`, `"sm"`, `"md"`, `"lg"`, `"xl"`, `"2xl"`, `"3xl"`, `"4xl"`, `"5xl"`. |
+| **Enable Hydration** (`interactive`) | `boolean` | `false` | When true, hydrates the component as a client island. Typographic elements are static by default. |
+
+***
+
+# Technical & SEO Implementation
+
+- **Polymorphic Rendering:** The tag assigned to the `as` property determines the semantic HTML tag generated on the server (e.g., `<h1>` vs `<h3>`), while styling is strictly driven by the `size` property. This allows developers to maintain perfect heading tag structures for search engine crawlers (SEO) while configuring visual sizing independently.
+- **Zero Runtime Style Inflation:** The styling classes are compiled pre-build using Panda CSS. It injects consistent font weights, letter spacing, and line heights matched automatically for each text scale.

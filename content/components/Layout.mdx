@@ -1,7 +1,7 @@
 ---
 title: Layout
-hydration: 3
 category: Layout
+hydration: 3
 ---
 
 import { Layout, Heading, Text, Stack } from "../../app/components/ui";
@@ -9,53 +9,56 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-Nest a `<Layout>` inside another `<Layout>`'s `content` or nested children to build composite
-shells, e.g. an outer Layout with a page header/footer and an inner Layout
-holding a sidenav rail.
+The `Layout` component provides a semantic page structure consisting of custom headers, side navigation bars (siders), main content regions, and footers. It supports custom sidebar sizing, breakpoint-based visibility, sticky pin scroll locks, and viewport-filling containers.
+
+Within the Page Builder CMS, content authors and developers can configure semantic structural panels by placing cards, headers, stacks, and buttons into dedicated slot arrays.
+
+***
 
 # Usage
 
-## Header + Content + Footer
+These examples illustrate how content editors bind and structure semantic page templates.
 
-With no `sider`, the parts stack in a single column.
+## 1. Standard Header, Content, and Footer Page Shell
+
+A standard document or article layout with semantic top headers and bottom footer panels.
 
 <DemoPreview>
   <div style={{ width: "100%", border: "1px solid var(--colors-border)", borderRadius: "12px", overflow: "hidden" }}>
     <Layout
       header={
         <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--colors-border)", background: "var(--colors-bg-subtle)" }}>
-          <Heading as="h4" size="sm">Header</Heading>
+          <Heading as="h4" size="sm">Site Brand Header</Heading>
         </div>
       }
-      content={<div style={{ padding: "16px" }}><Text size="sm">Content</Text></div>}
+      content={<div style={{ padding: "16px" }}><Text size="sm">Main Article and Interactive Content</Text></div>}
       footer={
         <div style={{ padding: "12px 16px", borderTop: "1px solid var(--colors-border)", background: "var(--colors-bg-subtle)" }}>
-          <Text size="xs">Footer</Text>
+          <Text size="xs">© 2026 Acme Corp. All rights reserved.</Text>
         </div>
       }
     />
   </div>
 </DemoPreview>
 
-```tsx
-import { Layout } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Layout
-      header={<SiteHeader />}
-      content={<Article />}
-      footer={<SiteFooter />}
-    />
-  );
+```json
+{
+  "type": "layout",
+  "header": [
+    { "type": "heading", "text": "Site Brand Header", "as": "h4", "size": "sm" }
+  ],
+  "content": [
+    { "type": "text", "content": "Main Article and Interactive Content" }
+  ],
+  "footer": [
+    { "type": "text", "content": "© 2026 Acme Corp. All rights reserved.", "size": "xs" }
+  ]
 }
 ```
 
-## Header + Sider + Content
+## 2. Dashboard Shell with Side Navigation (Sider)
 
-Passing `sider` wraps it and `content` in a row. `siderWidth` picks a rail
-width (`sm` 14rem, `md` 16rem default, `lg` 18rem); `siderHideBelow` hides
-the rail under a breakpoint for small screens.
+Adds a navigation drawer or rail to the left of the main content region. Siders can have custom sm, md, or lg widths and be configured to collapse automatically on small mobile viewports.
 
 <DemoPreview>
   <div style={{ width: "100%", border: "1px solid var(--colors-border)", borderRadius: "12px", overflow: "hidden" }}>
@@ -63,176 +66,95 @@ the rail under a breakpoint for small screens.
       siderWidth="sm"
       header={
         <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--colors-border)", background: "var(--colors-bg-subtle)" }}>
-          <Heading as="h4" size="sm">Dashboard</Heading>
+          <Heading as="h4" size="sm">Dashboard System</Heading>
         </div>
       }
       sider={
         <div style={{ padding: "16px", borderRight: "1px solid var(--colors-border)", background: "var(--colors-bg-subtle)" }}>
           <Stack direction="vertical" gap="2">
-            <Text size="sm">Overview</Text>
-            <Text size="sm">Reports</Text>
-            <Text size="sm">Settings</Text>
+            <Text size="sm">Analytics Overview</Text>
+            <Text size="sm">Cloud Infrastructure</Text>
           </Stack>
         </div>
       }
-      content={<div style={{ padding: "16px" }}><Text size="sm">Content next to the sider</Text></div>}
+      content={<div style={{ padding: "16px" }}><Text size="sm">Cloud systems are operational. Latency is within normal bounds.</Text></div>}
     />
   </div>
 </DemoPreview>
 
-```tsx
-import { Layout } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Layout
-      header={<SiteHeader />}
-      sider={<Sidenav />}
-      siderWidth="sm"
-      siderHideBelow="md"
-      content={<Article />}
-    />
-  );
+```json
+{
+  "type": "layout",
+  "siderWidth": "sm",
+  "siderHideBelow": "md",
+  "header": [
+    { "type": "heading", "text": "Dashboard System", "as": "h4", "size": "sm" }
+  ],
+  "sider": [
+    {
+      "type": "stack",
+      "direction": "vertical",
+      "gap": "2",
+      "children": [
+        { "type": "text", "content": "Analytics Overview", "size": "sm" },
+        { "type": "text", "content": "Cloud Infrastructure", "size": "sm" }
+      ]
+    }
+  ],
+  "content": [
+    { "type": "text", "content": "Cloud systems are operational. Latency is within normal bounds." }
+  ]
 }
 ```
 
-## Sticky header and sider
+## 3. Nested Layout Composition
 
-`stickyHeader` pins the header to the top of the page scroll. `stickySider`
-pins the sider below it and scrolls its own overflow — useful for a long
-nav next to short content, or vice versa. `fullHeight` fills the viewport
-for the outermost page shell.
+Layouts can be cleanly nested inside other layouts. This is useful when you want a full-width site header and footer, but want only the middle body content to include side navigation.
 
-```tsx
-import { Layout } from "../components/ui";
-
-export default function DocsPage() {
-  return (
-    <Layout
-      fullHeight
-      stickyHeader
-      stickySider
-      header={<SiteHeader />}
-      sider={<DocsSidenav />}
-      siderHideBelow="md"
-      content={<Article />}
-    />
-  );
+```json
+{
+  "type": "layout",
+  "header": [
+    { "type": "heading", "text": "Global Full-Width Header", "as": "h3" }
+  ],
+  "content": [
+    {
+      "type": "layout",
+      "siderWidth": "md",
+      "sider": [
+        { "type": "text", "content": "Nested Sidebar Rail" }
+      ],
+      "content": [
+        { "type": "text", "content": "Nested Content Body" }
+      ]
+    }
+  ],
+  "footer": [
+    { "type": "text", "content": "Global Full-Width Footer", "size": "xs" }
+  ]
 }
 ```
 
-## Nested Layout
-
-Nest a `<Layout>` inside `content` when the header/footer span the full
-width but only part of the body needs a sider rail:
-
-```tsx
-import { Layout } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Layout
-      header={<SiteHeader />}
-      content={
-        <Layout sider={<Sidenav />} content={<Article />} />
-      }
-      footer={<SiteFooter />}
-    />
-  );
-}
-```
-
-## CMS Page Builder
-
-This component is available as a `layout` block in the
-[Page Builder](/docs/PageBuilder) (`content/pages/*.json`). `header`,
-`sider`, `content`, and `footer` are each a list of component blocks — but
-which block types are offered depends on how deep the `layout` itself sits,
-same as any other container in the CMS's \~4-level nesting cap:
-
-- **Root-level** — a `layout` placed directly in a page's top-level
-  `content` — accepts any block type in these four parts, including
-  containers (Stack, Card, …) and another nested `layout`:
-
-  ```json
-  {
-    "type": "layout",
-    "siderWidth": "sm",
-    "siderHideBelow": "md",
-    "header": [
-      { "type": "heading", "text": "Dashboard", "as": "h3", "size": "lg" }
-    ],
-    "sider": [
-      {
-        "type": "stack",
-        "direction": "vertical",
-        "gap": "2",
-        "children": [
-          { "type": "link", "text": "Overview", "href": "#" },
-          { "type": "link", "text": "Reports", "href": "#" }
-        ]
-      }
-    ],
-    "content": [
-      { "type": "text", "content": "Pick a page from the rail on the left." }
-    ],
-    "footer": [
-      { "type": "text", "size": "sm", "content": "© 2026 Acme" }
-    ]
-  }
-  ```
-
-- **Nested one level deeper** — a `layout` placed inside another
-  container's children (e.g. a Stack or Card) — restricts `header`/`sider`/
-  `content`/`footer` to leaf components only (Button, Badge, Text, Link,
-  Icon, …): the CMS editing UI's nesting cap bottoms out there, so it can't
-  offer another container inside them:
-
-  ```json
-  {
-    "type": "stack",
-    "children": [
-      {
-        "type": "layout",
-        "header": [
-          { "type": "heading", "text": "Card sub-panel", "as": "h4", "size": "sm" }
-        ],
-        "content": [
-          { "type": "text", "content": "Leaf blocks only at this depth." }
-        ]
-      }
-    ]
-  }
-  ```
-
-Leaving a part's list empty (or omitting it) skips that part's wrapper
-element entirely — an untouched optional field like `siderWidth`/`siderHideBelow`
-arrives as `""` from the CMS and is treated as unset, falling back to the
-component default. This depth limit is a constraint of the CMS _editing UI_
-only — `app/components/page-registry.tsx`'s renderer itself has no depth
-limit, so a hand-edited JSON file can nest a `layout` (or anything else)
-arbitrarily deep and it will still render correctly.
+***
 
 # Props
 
-## Layout
+| Property | CMS Field Type | Default | Description / Supported Options |
+| --- | --- | --- | --- |
+| **Header Panel** (`header`) | `list` | - | Collection of visual blocks (e.g., logos, titles, buttons) rendered inside the top semantic `<header>`. |
+| **Sider Panel** (`sider`) | `list` | - | Collection of visual blocks rendered inside the left semantic navigation `<aside>`. |
+| **Main Content** (`content`) | `list` | - | Collection of main body blocks rendered inside the semantic `<main>` content container. |
+| **Footer Panel** (`footer`) | `list` | - | Collection of visual blocks rendered inside the bottom semantic `<footer>`. |
+| **Full Height** (`fullHeight`) | `boolean` | `false` | Sets the outermost container to fill the full viewport height (`min-height: 100vh`). |
+| **Sticky Header** (`stickyHeader`) | `boolean` | `false` | Pin the site header to the top of the viewport during page scrolling. |
+| **Sticky Sider** (`stickySider`) | `boolean` | `false` | Lock the sider panel in place so only the main content region scrolls. |
+| **Sider Width** (`siderWidth`) | `select` | `"md"` | Column width sizing for the side panel. <br/>• Options: `"sm"` (14rem), `"md"` (16rem), `"lg"` (18rem). |
+| **Sider Responsive Hide** (`siderHideBelow`) | `select` | - | Collapses and hides the sidebar on smaller viewports. <br/>• Options: `"sm"`, `"md"`, `"lg"`. |
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `header` | \`string \| JSX.Element\` | Rendered inside a semantic `<header>` above the body. (Shorthand API only) |
-| `sider` | \`string \| JSX.Element\` | Rendered inside a semantic `<aside>` rail. Its presence switches the body to a row of sider + content. (Shorthand API only) |
-| `content` | \`string \| JSX.Element\` | Rendered inside a semantic `<main>`. `children` are appended after it. (Shorthand API only) |
-| `footer` | \`string \| JSX.Element\` | Rendered inside a semantic `<footer>` below the body. (Shorthand API only) |
-| `fullHeight` | `boolean` | Fill the viewport height — for the outermost page shell. |
-| `stickyHeader` | `boolean` | Pin the header to the top of the page scroll. |
-| `stickySider` | `boolean` | Pin the sider below a sticky header; it scrolls internally. |
-| `siderWidth` | \`"sm" \| "md" \| "lg"\` | Sider rail width: sm (14rem), md (16rem, default), lg (18rem). |
-| `siderHideBelow` | \`"sm" \| "md" \| "lg"\` | Hide the sider under this breakpoint. Pair with an in-flow disclosure. |
-| `hasSider` | `boolean` | Manually force layout direction to row. (Compound API) |
-| `headerClass` | `string` | Extra class for the `<header>` part. (Shorthand API only) |
-| `siderClass` | `string` | Extra class for the `<aside>` part. (Shorthand API only) |
-| `contentClass` | `string` | Extra class for the `<main>` part. (Shorthand API only) |
-| `footerClass` | `string` | Extra class for the `<footer>` part. (Shorthand API only) |
-| `bodyClass` | `string` | Extra class for the row wrapper around sider + content (only rendered when `sider` is set). |
-| `children` | `any` | Children to render inside the layout shell. |
-| `class` | `string` | Custom CSS classes for the root element. |
+***
+
+# Developer Notes & Accessibility
+
+- **Nesting Rules & Depth Cap:** Sveltia CMS enforces a visual nesting cap of roughly four levels in the editor interface. This depth limit restricts what can be built via the UI, but does not limit the layout compiler—manually authored JSON templates can nest layouts as deeply as necessary.
+- **Semantic Element Mapping:** This component maps directly to valid, semantic HTML5 elements: `<header>`, `<aside>`, `<main>`, and `<footer>`.
+- **Skip Navigation Compatibility:** When using custom headers and footers, ensure headings are sequenced logically (e.g., starting with an `h1` on the page) to maintain high accessibility scores.

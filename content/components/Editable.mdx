@@ -1,7 +1,7 @@
 ---
 title: Editable
-hydration: 2
 category: Forms
+hydration: 2
 ---
 
 import { Editable, Stack } from "../../app/components/ui";
@@ -9,132 +9,105 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-An inline text field that displays as plain text until activated (by
-focus, click, or double-click), then swaps to an editable input with
-submit/cancel controls.
+An inline text field that displays as plain text until activated (via focus, click, or double-click), then swaps into a fully editable text input with submit and cancel triggers. Perfect for inline detail editors, document renamers, and settings lists.
+
+***
 
 # Usage
 
+These examples illustrate how content editors bind and structure interactive editable fields.
+
+## 1. Standard Focus Activation
+
+The field activates immediately when focused (tabbed to) or clicked, enabling smooth and fast tabbing across multi-row preference configurations.
+
 <DemoPreview>
-  <Stack direction="vertical" gap="4" style={{ width: "100%", maxWidth: "320px" }}>
-    <Editable label="Project name" defaultValue="Artefact UI Suite" interactive />
-    <Editable label="Description" placeholder="Add a description…" interactive />
-  </Stack>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <Editable label="Project Name" defaultValue="Artefact UI Suite" interactive />
+  </div>
 </DemoPreview>
-
-```tsx
-import { Editable } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Editable label="Project name" defaultValue="Artefact UI Suite" />
-  );
-}
-```
-
-## Custom Composition
-
-Pass `children` for full control over the preview/input/controls layout:
-
-```tsx
-import { Editable } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Editable defaultValue="Untitled" activationMode="dblclick">
-      <Editable.Label>Title</Editable.Label>
-      <Editable.Area>
-        <Editable.Preview />
-        <Editable.Input />
-      </Editable.Area>
-      <Editable.Control>
-        <Editable.EditTrigger>Edit</Editable.EditTrigger>
-        <Editable.SubmitTrigger>Save</Editable.SubmitTrigger>
-        <Editable.CancelTrigger>Cancel</Editable.CancelTrigger>
-      </Editable.Control>
-    </Editable>
-  );
-}
-```
-
-## CMS Page Builder
-
-This component is available as an `editable` block in the
-[Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
 
 ```json
 {
   "type": "editable",
-  "label": "Project name",
+  "label": "Project Name",
   "defaultValue": "Artefact UI Suite",
-  "placeholder": "Untitled",
+  "placeholder": "Enter project name...",
   "size": "md",
   "activationMode": "focus",
-  "submitMode": "both"
+  "submitMode": "both",
+  "interactive": true
 }
 ```
 
-It always renders `interactive` in the Page Builder.
+## 2. Double-Click Title Customizer
+
+Replicates standard filesystem behavior. The label displays as static bold text and only swaps into an input field upon double-clicking. Ideal for page headers or document file titles.
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <Editable
+      label="Document Title"
+      defaultValue="Annual_Report_2025"
+      activationMode="dblclick"
+      interactive
+    />
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "editable",
+  "label": "Document Title",
+  "defaultValue": "Annual_Report_2025",
+  "placeholder": "Untitled document",
+  "size": "lg",
+  "activationMode": "dblclick",
+  "submitMode": "enter",
+  "interactive": true
+}
+```
+
+## 3. Dense Layout Value Field (Extra-Small Scale)
+
+Demonstrates a highly compact size scale designed for dense tabular data grids, sidebar metadata listings, or secondary attributes.
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <Editable label="Port Config" defaultValue="8080" size="xs" interactive />
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "editable",
+  "label": "Port Config",
+  "defaultValue": "8080",
+  "placeholder": "Set port...",
+  "size": "xs",
+  "activationMode": "click",
+  "submitMode": "blur",
+  "interactive": true
+}
+```
+
+***
 
 # Props
 
-## Root
+| Property | CMS Field Type | Default | Description / Supported Options |
+| --- | --- | --- | --- |
+| **Label Text** (`label`) | `string` | - | Descriptive visual label rendered above the editable value preview. |
+| **Default Value** (`defaultValue`) | `string` | - | The initial text content loaded inside the field. |
+| **Placeholder** (`placeholder`) | `string` | - | Light placeholder text shown in the preview when the value is left empty. |
+| **Size Scale** (`size`) | `select` | `"md"` | Overall height, padding, and text size scaling. <br/>• Options: `"2xs"`, `"xs"`, `"sm"`, `"md"`, `"lg"`. |
+| **Activation Trigger** (`activationMode`) | `select` | `"focus"` | Specifies how the user activates the inline preview into edit mode. <br/>• Options: `"focus"` (on focus/click), `"click"` (single click), `"dblclick"` (double click), `"none"` (requires trigger click). |
+| **Submit Handler** (`submitMode`) | `select` | `"both"` | Specifies which interaction commits the changes back to state. <br/>• Options: `"enter"` (Enter key), `"blur"` (blur focus), `"both"` (both enter and blur), `"none"` (requires manual submit click). |
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `value` | `string` | The current value (controlled). |
-| `defaultValue` | `string` | The initial value (uncontrolled). |
-| `edit` | `boolean` | Whether edit mode is active (controlled). |
-| `defaultEdit` | `boolean` | The initial edit-mode state (uncontrolled). |
-| `activationMode` | `"focus" \| "dblclick" \| "click" \| "none"` | How the preview enters edit mode. Default `"focus"`. |
-| `submitMode` | `"enter" \| "blur" \| "both" \| "none"` | Which interactions commit the value. Default `"both"`. |
-| `selectOnFocus` | `boolean` | Whether the input's text is selected when it's focused. Default `true`. |
-| `autoResize` | `boolean` | Keep the preview visible (sized to content) while editing instead of hiding it. |
-| `disabled` | `boolean` | Disables all interaction. |
-| `readOnly` | `boolean` | Prevents entering edit mode while still allowing focus. |
-| `required` | `boolean` | Marks the underlying input required. |
-| `invalid` | `boolean` | Marks the field invalid. |
-| `placeholder` | `string \| { edit: string; preview: string }` | Placeholder text, optionally different between the input and the preview. |
-| `maxLength` | `number` | Maximum input length. |
-| `name` | `string` | Name of the underlying input, for native form submission. |
-| `form` | `string` | Associates the input with a `<form>` by id. |
-| `translations` | `Partial<EditableTranslations>` | Overrides for the edit/submit/cancel/input ARIA strings. |
-| `size` | `"2xs" \| "xs" \| "sm" \| "md" \| "lg"` | Visual size. Default `"md"`. |
-| `onValueChange` | `(details: { value: string }) => void` | Called as the input value changes. |
-| `onValueCommit` | `(details: { value: string }) => void` | Called when the value is submitted. |
-| `onValueRevert` | `(details: { value: string }) => void` | Called when editing is cancelled. |
-| `onEditChange` | `(details: { edit: boolean }) => void` | Called when edit mode toggles. |
-| `interactive` | `boolean` | Forces (or suppresses) hydration as an island. |
-| `class` | `string` | Custom CSS classes for the root element. |
+***
 
-## Default composition
+# Developer Notes & Accessibility
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `label` | `JSX.Element \| string` | Label rendered above the field. |
-| `children` | `JSX.Element` | Extra content appended after the default preview/input/controls. |
-
-## Sub-components
-
-| Part | Description |
-| --- | --- |
-| `Editable.Label` | `<label>` bound to the input; clicking it focuses the preview. |
-| `Editable.Area` | Wraps `Preview` and `Input` in the same layout slot. |
-| `Editable.Preview` | The read-only display shown when not editing; `role="button"`, keyboard-activatable per `activationMode`. |
-| `Editable.Input` | The `<input>` shown while editing; handles Escape-to-cancel and Enter/blur-to-submit per `submitMode`. |
-| `Editable.Control` | Wraps the edit/submit/cancel triggers. |
-| `Editable.EditTrigger` | Enters edit mode. Hidden while already editing. |
-| `Editable.SubmitTrigger` | Commits the value and exits edit mode. Hidden while not editing. |
-| `Editable.CancelTrigger` | Discards changes and exits edit mode. Hidden while not editing. |
-| `Editable.Context` | Render-prop access to the editable context: `<Editable.Context>{(ctx) => ...}</Editable.Context>`. |
-
-# Accessibility
-
-- `Preview` is keyboard-operable (`tabIndex={0}`, Enter/Space) whenever
-  `activationMode` is `"click"` or `"dblclick"`; with `"focus"` mode,
-  simply tabbing to it opens edit mode.
-- `EditTrigger` / `SubmitTrigger` / `CancelTrigger` get `aria-label`s from
-  `translations`, and are hidden (not just visually, via the `hidden`
-  attribute) when not applicable to the current mode.
-- `Input` carries `aria-invalid` when `invalid` is set and `aria-label`
-  from `translations.input`.
+- **Smart Interactive Hydration:** Since switching layout states requires dynamic element swapping and keydown interception, the Editable component hydrates as a Preact island on client machines by default.
+- **Accessible Inputs:** The preview element acts as a semantic button (`role="button"`, `tabIndex={0}`) when inactive, allowing screen-readers to focus and activate edit mode via the keyboard.
+- **Form-Ready Submissions:** To easily integrate with post forms, the component syncs its active values to a native hidden form input, ensuring native form submissions capture committed edits correctly.

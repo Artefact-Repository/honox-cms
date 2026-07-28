@@ -1,7 +1,7 @@
 ---
 title: Badge 徽标
-hydration: 3
 category: Feedback
+hydration: 3
 ---
 
 import { Badge } from "../../../app/components/ui";
@@ -9,51 +9,99 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # 简介
 
-一个用于为内容添加标签或进行分类的小型视觉元素。
+`Badge` 组件是一个小巧且用途广泛的视觉元素，用于标记、分类或突出显示内容元数据。它通常用于展示状态（例如"成功"或"待定"）、标签或数字计数。
+
+通过 Page Builder CMS，内容作者可以快速配置徽章变体、尺寸和配色方案，以完美契合其布局规范。
+
+***
 
 # 用法
 
+您可以使用视觉样式、自定义颜色和响应式尺寸来自定义徽章的外观。
+
+## 样式变体
+
+该组件支持多种视觉展示样式，有助于建立视觉层级。
+
 <DemoPreview>
-  <Badge colorPalette="blue" variant="solid">New</Badge>
-  <Badge colorPalette="green" variant="subtle">Active</Badge>
-  <Badge colorPalette="red" variant="outline">Error</Badge>
+  <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+    <Badge colorPalette="blue" variant="solid">Solid</Badge>
+    <Badge colorPalette="blue" variant="subtle">Subtle</Badge>
+    <Badge colorPalette="blue" variant="surface">Surface</Badge>
+    <Badge colorPalette="blue" variant="outline">Outline</Badge>
+  </div>
 </DemoPreview>
-
-```tsx
-import { Badge } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Badge colorPalette="blue" variant="solid">
-      New
-    </Badge>
-  );
-}
-```
-
-## CMS 页面构建器
-
-该组件在 [页面构建器](/docs/PageBuilder) (`content/pages/*.json`) 中作为 `badge` 区块提供：
 
 ```json
 {
   "type": "badge",
-  "text": "New",
-  "colorPalette": "blue",
-  "variant": "solid"
+  "text": "New Feature",
+  "variant": "solid",
+  "colorPalette": "blue"
 }
 ```
 
+***
+
+## 配色方案
+
+从丰富的主题强调色中选择，以传达语义含义。
+
+<DemoPreview>
+  <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
+    <Badge colorPalette="green" variant="solid">Success</Badge>
+    <Badge colorPalette="red" variant="solid">Error</Badge>
+    <Badge colorPalette="amber" variant="solid">Warning</Badge>
+    <Badge colorPalette="purple" variant="solid">Special</Badge>
+    <Badge colorPalette="gray" variant="solid">Draft</Badge>
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "badge",
+  "text": "Error Detected",
+  "variant": "solid",
+  "colorPalette": "red"
+}
+```
+
+***
+
+## 尺寸选项
+
+将徽章从紧凑的元数据胶囊缩放到更大的标注标签。
+
+<DemoPreview>
+  <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
+    <Badge size="sm" colorPalette="blue">Small</Badge>
+    <Badge size="md" colorPalette="blue">Medium</Badge>
+    <Badge size="lg" colorPalette="blue">Large</Badge>
+    <Badge size="xl" colorPalette="blue">Extra Large</Badge>
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "badge",
+  "text": "Large Label",
+  "size": "lg",
+  "colorPalette": "blue",
+  "variant": "subtle"
+}
+```
+
+***
+
 # 属性
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `children` | `any` | 组件内部渲染的内容。 |
-| `class` | `string` | 自定义 CSS 类。 |
-| `colorPalette` | `string` | badge 的色彩主题。 |
+在 [Page Builder](/docs/PageBuilder) 架构（`content/pages/*.json`）中添加 `badge` 区块时，可使用以下配置参数：
 
-| `variant` | \`"solid" \ | "subtle" \ | "surface" \ | "outline"\` | 视觉样式。 |
-
-| `size` | \`"sm" \ | "md" \ | "lg" \ | "xl" \ | "2xl"\` | badge 的尺寸。 |
-
-| `interactive` | `boolean` | 是否启用客户端水合。 |
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `type` | `String` | - | 区块标识符。必须设置为 `"badge"`。 |
+| `text` | `String` | - | 渲染在徽章内部的文本标签内容。 |
+| `variant` | `Select` | `"subtle"` | 视觉样式处理。选项：`"solid"`、`"subtle"`、`"surface"`、`"outline"`。 |
+| `colorPalette` | `Select` | `"green"` | 语义主题颜色强调。选项：`"blue"`、`"green"`、`"red"`、`"purple"`、`"orange"`、`"amber"`、`"cyan"`、`"slate"`、`"gray"`。 |
+| `size` | `Select` | `"md"` | 徽章的物理尺寸。选项：`"sm"`、`"md"`、`"lg"`、`"xl"`、`"2xl"`。 |
+| `class` | `String` | - | 直接应用于徽章的自定义 CSS 类覆盖。 |

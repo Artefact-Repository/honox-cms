@@ -1,7 +1,7 @@
 ---
 title: ToggleGroup Umschaltgruppe
-hydration: 2
 category: Forms
+hydration: 2
 ---
 
 import { ToggleGroup, Stack } from "../../../app/components/ui";
@@ -9,126 +9,142 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Einführung
 
-Eine Gruppe von Umschalt-Schaltflächen für Einzel- oder Mehrfachauswahl, exklusiv oder inklusiv – z. B. Textformatierungs-Steuerelemente (Fett/Kursiv/Unterstrichen) oder ein Ansichts-Umschalter.
+Die `ToggleGroup`-Komponente ist eine Gruppe von Umschalt-Schaltflächen für Einzel- oder Mehrfachauswahl. Sie wird häufig verwendet, um Benutzern die Wahl exklusiver Layout-Stile (z. B. Ansichts-Umschalter für Raster vs. Liste) oder inklusiver Modifikatoren (z. B. Textformatierungs-Schaltflächen für Fett, Kursiv und Unterstrichen) zu ermöglichen.
 
-# Hydration
+Die **ToggleGroup** ist vollständig als `toggleGroup`-Block im **Page Builder** integriert, sodass Redakteure und Entwickler visuelle Optionen, Mehrfachauswahl-Verhalten und aktive Farbpaletten direkt im CMS konfigurieren können.
 
-**Stufe 2 – intelligente Auto-Erkennung.** Eine `Umschaltgruppe` wird als statisches HTML gerendert und liefert kein Client-JS, sofern kein Verhaltenssignal vorhanden ist. Übergeben Sie `interactive={true}` zum Erzwingen der Hydration oder `interactive={false}` zum Erzwingen eines statischen Renderns.
-
-Sie hydratisiert als Insel, wenn **eines** der folgenden Signale vorhanden ist (oder `interactive={true}` gesetzt ist):
-
-- `value` (gesteuerte Auswahl)
-- `defaultValue` (ungesteuerte Anfangsauswahl)
-- `onValueChange`
-
-| `interactive`-Eigenschaft | Ergebnis |
-| --- | --- |
-| weggelassen, **kein** Signal | Statisch – kein Client-JS |
-| weggelassen, Signal vorhanden | Hydratisiert als Insel |
-| `true` | Hydratisiert als Insel |
-| `false` | Statisch – kein Client-JS |
+***
 
 # Verwendung
 
+Diese Beispiele veranschaulichen, wie Redakteure interaktive Umschalt-Schaltflächen binden und strukturieren.
+
+## 1. Mehrfachauswahl-Textformatierungsleiste
+
+Erlaubt, dass mehrere Elemente gleichzeitig gedrückt und aktiv sind. Hervorragend geeignet für Mehrfachauswahl-Feature-Schalter oder Texteditor-Panels.
+
 <DemoPreview>
-  <Stack direction="horizontal" gap="6">
-    <ToggleGroup
-      multiple
-      defaultValue={["bold"]}
-      items={[
-        { label: "B", value: "bold" },
-        { label: "I", value: "italic" },
-        { label: "U", value: "underline" },
-      ]}
-      interactive
-    />
-    <ToggleGroup
-      defaultValue={["list"]}
-      items={[
-        { label: "Grid", value: "grid" },
-        { label: "List", value: "list" },
-      ]}
-      interactive
-    />
-  </Stack>
+  <ToggleGroup
+    multiple
+    defaultValue={["bold"]}
+    items={[
+      { label: "B", value: "bold" },
+      { label: "I", value: "italic" },
+      { label: "U", value: "underline" },
+    ]}
+    interactive
+  />
 </DemoPreview>
 
-```tsx
-import { ToggleGroup } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <ToggleGroup
-      multiple
-      defaultValue={["bold"]}
-      items={[
-        { label: "B", value: "bold" },
-        { label: "I", value: "italic" },
-        { label: "U", value: "underline" },
-      ]}
-    />
-  );
+```json
+{
+  "type": "toggleGroup",
+  "multiple": true,
+  "defaultValue": ["bold"],
+  "items": [
+    { "label": "B", "value": "bold" },
+    { "label": "I", "value": "italic" },
+    { "label": "U", "value": "underline" }
+  ],
+  "interactive": true
 }
 ```
 
-## Benutzerdefinierte Zusammensetzung
+## 2. Einzelauswahl-Layout-Umschalter (Lila-Thema)
 
-Übergeben Sie `children` anstelle von `items` für volle Kontrolle über den Inhalt jeder Schaltfläche:
+Zeigt den Einzelauswahl-Modus, bei dem jeweils nur ein Element aktiv sein kann. Aktive Auswahlen werden mit benutzerdefinierten lila Akzent-Thementokens gestaltet.
 
-```tsx
-import { ToggleGroup } from "../components/ui";
+<DemoPreview>
+  <ToggleGroup
+    defaultValue={["list"]}
+    items={[
+      { label: "Grid View", value: "grid" },
+      { label: "List View", value: "list" },
+    ]}
+    colorPalette="purple"
+    interactive
+  />
+</DemoPreview>
 
-export default function MyPage() {
-  return (
-    <ToggleGroup defaultValue={["list"]}>
-      <ToggleGroup.Item value="grid">Grid</ToggleGroup.Item>
-      <ToggleGroup.Item value="list">List</ToggleGroup.Item>
-    </ToggleGroup>
-  );
+```json
+{
+  "type": "toggleGroup",
+  "multiple": false,
+  "defaultValue": ["list"],
+  "items": [
+    { "label": "Grid View", "value": "grid" },
+    { "label": "List View", "value": "list" }
+  ],
+  "colorPalette": "purple",
+  "interactive": true
 }
 ```
+
+## 3. Kompakte vertikale Navigationsgruppe
+
+Ordnet die Umschalt-Optionen vertikal statt horizontal an und verwendet eine kompakte Größenstufe.
+
+<DemoPreview>
+  <ToggleGroup
+    orientation="vertical"
+    defaultValue={["dashboard"]}
+    items={[
+      { label: "Dashboard", value: "dashboard" },
+      { label: "Settings", value: "settings" },
+    ]}
+    size="sm"
+    interactive
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "toggleGroup",
+  "orientation": "vertical",
+  "defaultValue": ["dashboard"],
+  "items": [
+    { "label": "Dashboard", "value": "dashboard" },
+    { "label": "Settings", "value": "settings" }
+  ],
+  "size": "sm",
+  "interactive": true
+}
+```
+
+***
 
 # Eigenschaften
 
-## Wurzel
+| Eigenschaft | CMS-Feldtyp | Standard | Beschreibung / Unterstützte Optionen |
+| --- | --- | --- | --- |
+| **Mehrfachauswahl** (`multiple`) | `boolean` | `false` | Erlaubt, dass mehr als ein Schaltflächen-Element gleichzeitig aktiv geschaltet wird. |
+| **Anfängliche aktive Werte** (`defaultValue`) | `list` | `[]` | Liste von Zeichenfolgenwerten, die Schaltflächen darstellen, die anfangs aktiv sind. |
+| **Aktive Werte** (`value`) | `list` | - | Liste von Zeichenfolgenwerten der aktiven Auswahlen (gesteuert). |
+| **Schaltflächen-Elemente** (`items`) | `list` | `[]` | Geordnete Sammlung von Umschalt-Schaltflächen. (Siehe Schema der Umschalt-Elemente unten). |
+| **Layoutfluss** (`orientation`) | `select` | `"horizontal"` | Anordnung der Umschalt-Optionen. <br/>• Optionen: `"horizontal"`, `"vertical"`. |
+| **Visueller Stil** (`variant`) | `select` | `"outline"` | Strukturelle Layout-Variante. <br/>• Optionen: `"outline"`, `"ghost"`. |
+| **Größenstufe** (`size`) | `select` | `"md"` | Steuert Gesamthöhe, Innenabstand und Textskalierung. <br/>• Optionen: `"sm"`, `"md"`, `"lg"`. |
+| **Farbthema** (`colorPalette`) | `select` | `"green"` | Visueller Farbakzent, der auf aktive Schaltflächen angewendet wird. <br/>• Optionen: `blue`, `green`, `red`, `purple`, `orange`, `amber`, `cyan`, `slate`. |
+| **Interaktiv erzwingen** (`interactive`) | `boolean` | `true` | Hydratisiert die Komponente als interaktive Client-seitige Insel, um Ausrichtungen zu koordinieren und Tastatur-Routing zu verarbeiten. |
 
-| Eigenschaft | Typ | Beschreibung |
-| --- | --- | --- |
-| `value` | `string[]` | Die aktuell gedrückten Werte (gesteuert). |
-| `defaultValue` | `string[]` | Die anfänglich gedrückten Werte (ungesteuert). |
-| `onValueChange` | `(value: string[]) => void` | Wird aufgerufen, wenn sich die Auswahl ändert. |
-| `multiple` | `boolean` | Erlaubt mehr als ein gleichzeitig gedrücktes Element. Standard `false` (einfach, abwählbare Auswahl). |
-| `disabled` | `boolean` | Deaktiviert jedes Element. |
-| `orientation` | `"horizontal" | "vertical"` | Layoutfluss und die Achse, auf der die Pfeiltasten wandern. Standard `"horizontal"`. |
-| `id` | `string` | Die id des Wurzelelements. |
-| `variant` | `"outline" | "ghost"` | Visueller Stil. Standard `"outline"`. |
-| `size` | `"sm" | "md" | "lg"` | Visuelle Größe. Standard `"md"`. |
-| `interactive` | `boolean` | Überschreibt die Hydrationsentscheidung (siehe oben). |
-| `class` | `string` | Benutzerdefinierte CSS-Klassen für das Wurzelelement. |
+### Schema der Umschaltgruppen-Elemente
 
-## Standardzusammensetzung
+Jeder Eintrag im `items`-Array akzeptiert folgende Parameter:
 
-| Eigenschaft | Typ | Beschreibung |
-| --- | --- | --- |
-| `items` | `ToggleGroupItem[]` | Zu rendernde Schaltflächen, wenn `children` weggelassen wird. |
+| Eigenschaft | CMS-Feldtyp | Erforderlich | Beschreibung |
+| --- | --- | --- | --- |
+| **Anzeigetext** (`label`) | `string` | Ja | In der Umschalt-Schaltfläche gerenderter Label-Text. |
+| **Eindeutiger Schlüssel** (`value`) | `string` | Ja | Schlüsselbezeichner, der auf den aktiven Zustand dieser Option verweist. |
+| **Deaktiviert** (`disabled`) | `boolean` | `false` | Deaktiviert die Benutzerinteraktion und dimmt die Gestaltung dieser Schaltfläche. |
 
-## ToggleGroupItem
+***
 
-| Eigenschaft | Typ | Beschreibung |
-| --- | --- | --- |
-| `value` | `string` | Der eindeutige Wert des Elements. |
-| `label` | `string | JSX.Element` | Der Anzeigeinhalt der Schaltfläche. |
-| `disabled` | `boolean` | Deaktiviert diese Schaltfläche. |
+# Entwicklerhinweise & Barrierefreiheit
 
-## Unterkomponenten
-
-| Teil | Beschreibung |
-| --- | --- |
-| `ToggleGroup.Item` | Eine Umschalt-Schaltfläche. Benötigt ein `value`-Prop; rendert `role="checkbox"` im `multiple`-Modus bzw. `role="radio"` sonst. |
-
-# Barrierefreiheit
-
-- Das Wurzelelement hat `role="group"`.
-- Elemente rendern `role="checkbox"` + `aria-pressed` bei `multiple` bzw. `role="radio"` + `aria-checked` sonst.
-- Pfeiltasten (Rechts/Runter zum Vorwärtsgehen, Links/Hoch zum Zurückgehen) wandern den Fokus zwischen aktivierten Elementen; Pos1/Ende springen zum ersten/letzten aktivierten Element – passend zu `orientation`.
-- `data-state` (`on`/`off`) und `data-disabled` werden für das Styling auf jedes Element gespiegelt.
+- **WAI-ARIA-Barrierefreiheitsmuster:** Rendert eine robuste, tastaturnavigierbare Symbolleiste:
+    - Der Wurzel-Container erhält `role="group"`.
+    - Einzelne Elemente werden als `role="checkbox"` mit `aria-checked`-Zuständen gerendert, wenn `multiple` true ist, bzw. als `role="radio"` mit `aria-checked`-Zuständen sonst.
+- **Roaming-Fokus-Tastaturnavigation:** Unterstützt native Fokusbewegung:
+    - Pfeiltasten (Rechts/Runter vorwärts, Links/Hoch rückwärts) wandern den Fokus automatisch zwischen aktiven Schaltflächen und passen sich der gewählten `orientation`-Achse an.
+    - Die Tasten Home und End springen den Fokus sofort auf die erste bzw. letzte aktivierte Schaltfläche in der Gruppe.
+- **Formular-Verknüpfung:** Umschalt-Optionen aktualisieren nahtlos den zugehörigen State-Kontext, sodass übergeordnete Container oder Formular-Hooks Änderungen dynamisch erfassen können.

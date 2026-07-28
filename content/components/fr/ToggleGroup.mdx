@@ -1,7 +1,7 @@
 ---
 title: ToggleGroup Groupe de Boutons Bascules
-hydration: 2
 category: Forms
+hydration: 2
 ---
 
 import { ToggleGroup, Stack } from "../../../app/components/ui";
@@ -9,130 +9,142 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introduction
 
-Un ensemble de boutons à bascule pour une sélection unique ou multiple, exclusive ou
-inclusif — par ex. contrôles de mise en forme du texte (gras/italique/souligné) ou un
-sélecteur de vue.
+Le composant `ToggleGroup` est un ensemble de boutons à bascule conçus pour une sélection unique ou multiple. Il est largement utilisé pour permettre aux utilisateurs de choisir des styles de mise en page mutuellement exclusifs (par ex. des commutateurs de vue Grille vs Liste) ou de regrouper des modificateurs inclusifs (par ex. des boutons de mise en forme de texte pour Gras, Italique et Souligné).
 
-# Hydratation
+Le **ToggleGroup** est entièrement intégré en tant que bloc `toggleGroup` dans le **Page Builder**, permettant aux éditeurs de contenu et aux développeurs de configurer facilement les options visuelles, les comportements de sélection multiple et les palettes de couleurs actives directement dans le CMS.
 
-**Niveau 2 — détection automatique intelligente.** Un `ToggleGroup` s'affiche au format HTML statique et
-ne livre aucun client JS à moins qu'un signal comportemental ne soit présent. Passer
-`interactive={true}` pour forcer l'hydratation, ou `interactive={false}` pour forcer
-un rendu statique.
-
-Il s'hydrate comme une île lorsque **l'un** des signaux suivants est présent
-(ou `interactive={true}` est défini) :
-
-- `valeur` (sélection contrôlée)- `defaultValue` (sélection initiale non contrôlée)- `onValueChange`
-| `interactive` prop | Résultat |
-| --- | --- |
-| omitted, **no** signal | Static — no client JS |
-| omitted, a signal present | Hydrates as an island |
-| `true` | Hydrates as an island |
-| `false` | Static — no client JS |
+***
 
 # Utilisation
 
+Ces exemples illustrent comment les éditeurs de contenu lient et structurent des boutons à bascule interactifs.
+
+## 1. Barre de mise en forme de texte à sélection multiple
+
+Permet de maintenir plusieurs éléments enfoncés et actifs simultanément. Idéal pour les interrupteurs de fonctionnalités à sélection multiple ou les panneaux d'édition de texte.
+
 <DemoPreview>
-  <Stack direction="horizontal" gap="6">
-    <ToggleGroup
-      multiple
-      defaultValue={["bold"]}
-      items={[
-        { label: "B", value: "bold" },
-        { label: "I", value: "italic" },
-        { label: "U", value: "underline" },
-      ]}
-      interactive
-    />
-    <ToggleGroup
-      defaultValue={["list"]}
-      items={[
-        { label: "Grid", value: "grid" },
-        { label: "List", value: "list" },
-      ]}
-      interactive
-    />
-  </Stack>
+  <ToggleGroup
+    multiple
+    defaultValue={["bold"]}
+    items={[
+      { label: "B", value: "bold" },
+      { label: "I", value: "italic" },
+      { label: "U", value: "underline" },
+    ]}
+    interactive
+  />
 </DemoPreview>
 
-```tsx
-import { ToggleGroup } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <ToggleGroup
-      multiple
-      defaultValue={["bold"]}
-      items={[
-        { label: "B", value: "bold" },
-        { label: "I", value: "italic" },
-        { label: "U", value: "underline" },
-      ]}
-    />
-  );
+```json
+{
+  "type": "toggleGroup",
+  "multiple": true,
+  "defaultValue": ["bold"],
+  "items": [
+    { "label": "B", "value": "bold" },
+    { "label": "I", "value": "italic" },
+    { "label": "U", "value": "underline" }
+  ],
+  "interactive": true
 }
 ```
 
-## Composition personnalisée
+## 2. Commutateur de mise en page à sélection unique (thème violet)
 
-Passez « enfants » au lieu de « éléments » pour un contrôle total sur chaque bouton
-contenu:
+Démontre le mode de sélection unique où un seul élément peut être actif à la fois. Les choix actifs sont stylisés avec des jetons de thème violet accentué personnalisé.
 
-```tsx
-import { ToggleGroup } from "../components/ui";
+<DemoPreview>
+  <ToggleGroup
+    defaultValue={["list"]}
+    items={[
+      { label: "Grid View", value: "grid" },
+      { label: "List View", value: "list" },
+    ]}
+    colorPalette="purple"
+    interactive
+  />
+</DemoPreview>
 
-export default function MyPage() {
-  return (
-    <ToggleGroup defaultValue={["list"]}>
-      <ToggleGroup.Item value="grid">Grid</ToggleGroup.Item>
-      <ToggleGroup.Item value="list">List</ToggleGroup.Item>
-    </ToggleGroup>
-  );
+```json
+{
+  "type": "toggleGroup",
+  "multiple": false,
+  "defaultValue": ["list"],
+  "items": [
+    { "label": "Grid View", "value": "grid" },
+    { "label": "List View", "value": "list" }
+  ],
+  "colorPalette": "purple",
+  "interactive": true
 }
 ```
+
+## 3. Groupe de navigation vertical compact
+
+Dispose les options à bascule verticalement plutôt qu'horizontalement, avec une échelle de taille compacte.
+
+<DemoPreview>
+  <ToggleGroup
+    orientation="vertical"
+    defaultValue={["dashboard"]}
+    items={[
+      { label: "Dashboard", value: "dashboard" },
+      { label: "Settings", value: "settings" },
+    ]}
+    size="sm"
+    interactive
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "toggleGroup",
+  "orientation": "vertical",
+  "defaultValue": ["dashboard"],
+  "items": [
+    { "label": "Dashboard", "value": "dashboard" },
+    { "label": "Settings", "value": "settings" }
+  ],
+  "size": "sm",
+  "interactive": true
+}
+```
+
+***
 
 # Propriétés
 
-## Racine
+| Propriété | Type de champ CMS | Défaut | Description / Options prises en charge |
+| --- | --- | --- | --- |
+| **Sélection multiple** (`multiple`) | `boolean` | `false` | Autorise l'activation simultanée de plusieurs éléments de bouton. |
+| **Valeurs actives initiales** (`defaultValue`) | `list` | `[]` | Liste de valeurs de chaîne représentant les choix de boutons qui démarrent à l'état actif. |
+| **Valeurs actives** (`value`) | `list` | - | Liste de valeurs de chaîne représentant les choix actifs (contrôlé). |
+| **Éléments de bouton** (`items`) | `list` | `[]` | Collection ordonnée de boutons à bascule. (Voir le schéma des éléments de bascule ci-dessous). |
+| **Flux de mise en page** (`orientation`) | `select` | `"horizontal"` | Disposition des options à bascule. <br/>• Options : `"horizontal"`, `"vertical"`. |
+| **Style visuel** (`variant`) | `select` | `"outline"` | Variante de mise en page structurelle. <br/>• Options : `"outline"`, `"ghost"`. |
+| **Échelle de taille** (`size`) | `select` | `"md"` | Contrôle la hauteur globale, le remplissage et l'échelle du texte. <br/>• Options : `"sm"`, `"md"`, `"lg"`. |
+| **Thème de couleur** (`colorPalette`) | `select` | `"green"` | Accent de couleur visuel appliqué aux boutons actifs. <br/>• Options : `blue`, `green`, `red`, `purple`, `orange`, `amber`, `cyan`, `slate`. |
+| **Forcer interactif** (`interactive`) | `boolean` | `true` | Hydrate le composant en tant qu'îlot interactif côté client pour coordonner les alignements et gérer le routage au clavier. |
 
-| Propriété | Type | Description |
-| --- | --- | --- |
-| `value` | `string[]` | Les valeurs actuellement enfoncées (contrôlées). |
-| `defaultValue` | `string[]` | Les valeurs initialement pressées (non contrôlées). |
-| `onValueChange` | `(value: string[]) => void` | Appelé lorsque la sélection change. |
-| `multiple` | `boolean` | Autoriser plusieurs éléments à être pressés à la fois. Par défaut `false` (sélection unique, désactivable). |
-| `disabled` | `boolean` | Désactive chaque élément. |
-| `orientation` | `"horizontal" \| "verticale" | Layout flow, and the axis Arrow keys roam. Default `"horizontal"`. |
-| `id` | `string` | L'identifiant de l'élément racine. |
-| `variant` | `"outline" \| "fantôme" | Visual style. Default `"outline"`. |
-| `size` | `"sm" \| "md" \| "lg"` | Visual size. Default `"md"`. |
-| `interactive` | `boolean` | Annule la décision d’hydratation (voir ci-dessus). |
-| `class` | `string` | Classes CSS personnalisées pour l'élément racine. |
+### Schéma des éléments du groupe de bascule
 
-## Composition par défaut
+Chaque entrée du tableau `items` accepte les paramètres suivants :
 
-| Propriété | Type | Description |
-| --- | --- | --- |
-| `items` | `ToggleGroupItem[]` | Boutons à afficher lorsque « enfants » est omis. |
+| Propriété | Type de champ CMS | Requis | Description |
+| --- | --- | --- | --- |
+| **Texte affiché** (`label`) | `string` | Oui | Texte de libellé rendu à l'intérieur du bouton à bascule. |
+| **Clé unique** (`value`) | `string` | Oui | Identifiant clé faisant référence à l'état actif de cette option. |
+| **Désactivé** (`disabled`) | `boolean` | `false` | Désactive l'interaction utilisateur et atténue le style de ce bouton. |
 
-## Basculer un élément de groupe
+***
 
-| Propriété | Type | Description |
-| --- | --- | --- |
-| `value` | `string` | La valeur unique de l'objet. |
-| `label` | `string \| JSX.Élément` | The button's display content. |
-| `disabled` | `boolean` | Désactive ce bouton. |
+# Notes pour les développeurs et accessibilité
 
-## Sous-composants
-
-| Partie | Description |
-| --- | --- |
-| `ToggleGroup.Item` | Un bouton bascule. Nécessite un accessoire `value` ; rend `role="checkbox"` en mode `multiple` ou `role="radio"` sinon. |
-
-# Accessibilité
-
-- La racine a `role="group"`.- Les éléments s'affichent `role="checkbox"` + `aria-pressed` lorsqu'ils sont `multiple`, ou  `role="radio"` + `aria-checked` sinon.
-- Les touches fléchées (Droite/Bas pour avancer, Gauche/Haut pour reculer) parcourent le focus  entre les éléments activés ; Accueil/Fin passer au premier/dernier élément activé –
-  correspondant à «l'orientation».
-- `data-state` (`on`/`off`) et `data-disabled` sont reflétés sur chaque élément  pour le style.
+- **Modèles d'accessibilité WAI-ARIA :** Rend une barre d'outils robuste navigable au clavier :
+    - Le conteneur racine reçoit `role="group"`.
+    - Les éléments individuels sont rendus en `role="checkbox"` avec des états `aria-checked` lorsque `multiple` est vrai, ou en `role="radio"` avec des états `aria-checked` sinon.
+- **Navigation au clavier à focus vagabond (Roving Focus) :** Prend en charge le déplacement de focus natif :
+    - Les touches fléchées (Droite/Bas pour avancer, Gauche/Haut pour reculer) parcourent automatiquement le focus entre les boutons actifs, en suivant l'axe `orientation` choisi.
+    - Les touches Accueil et Fin déplacent instantanément le focus vers le premier et le dernier bouton activés du groupe.
+- **Association de formulaire :** Les options de bascule mettent à jour de façon transparente le contexte d'état associé, permettant aux conteneurs parents ou aux hooks de formulaire de capturer les changements dynamiquement.

@@ -1,7 +1,7 @@
 ---
 title: RadioCardGroup
-hydration: 2
 category: Forms
+hydration: 2
 ---
 
 import { RadioCardGroup, Stack } from "../../app/components/ui";
@@ -9,175 +9,129 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-A radio group presented as a set of selectable cards, for exclusive
-choices that need more visual weight than plain radio buttons — pricing
-tiers, shipping speeds, and similar.
+An option-selector control presented as a rich group of selectable cards. Primarily used for highlighting choices that carry higher visual priority, detailed descriptive labels, or secondary indicators—such as pricing subscription tiers, billing intervals, shipping methods, and package configurations.
 
-# Hydration
-
-**Tier 2 — conditional.** A `RadioCardGroup` renders as static HTML
-and ships no client JS unless a behavioral signal is present. Pass
-`interactive={true}` to force hydration, or `interactive={false}` to force
-a static render.
-
-It hydrates as an island when **any** of the following signals is present
-(or `interactive={true}` is set):
-
-- `value` (controlled selection)
-- `defaultValue` (uncontrolled initial selection)
-- `onValueChange`
-
-| `interactive` prop | Result |
-| --- | --- |
-| omitted, **no** signal | Static — no client JS |
-| omitted, a signal present | Hydrates as an island |
-| `true` | Hydrates as an island |
-| `false` | Static — no client JS |
+***
 
 # Usage
 
+These examples illustrate how content editors bind and structure interactive radio card groups.
+
+## 1. Standard Plan Tier Selector
+
+A typical pricing plan layout with multiple rich cards. Ideal for subscription flows, onboarding paths, or product tier pickers.
+
 <DemoPreview>
-  <Stack gap="6" style={{ width: "100%" }}>
-    <RadioCardGroup
-      label="Plan"
-      defaultValue="pro"
-      items={[
-        { label: "Hobby", value: "hobby" },
-        { label: "Pro", value: "pro" },
-        { label: "Enterprise", value: "enterprise" },
-      ]}
-      interactive
-    />
-    <RadioCardGroup
-      label="Billing"
-      variant="subtle"
-      defaultValue="monthly"
-      items={[
-        { label: "Monthly", value: "monthly" },
-        { label: "Yearly", value: "yearly" },
-      ]}
-      interactive
-    />
-  </Stack>
+  <RadioCardGroup
+    label="Hosting Plan"
+    defaultValue="pro"
+    items={[
+      { label: "Hobby — $0/month", value: "hobby" },
+      { label: "Pro — $20/month", value: "pro" },
+      { label: "Enterprise — Custom", value: "enterprise" },
+    ]}
+    interactive
+  />
 </DemoPreview>
-
-```tsx
-import { RadioCardGroup } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <RadioCardGroup
-      label="Plan"
-      defaultValue="pro"
-      items={[
-        { label: "Hobby", value: "hobby" },
-        { label: "Pro", value: "pro" },
-        { label: "Enterprise", value: "enterprise" },
-      ]}
-    />
-  );
-}
-```
-
-## Custom Composition
-
-Pass `children` for full control over each card's contents instead of the
-`items` array:
-
-```tsx
-import { RadioCardGroup } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <RadioCardGroup label="Plan" defaultValue="pro">
-      <RadioCardGroup.Item value="hobby">
-        <RadioCardGroup.ItemText>Hobby — $0/mo</RadioCardGroup.ItemText>
-        <RadioCardGroup.ItemControl />
-        <RadioCardGroup.ItemHiddenInput />
-      </RadioCardGroup.Item>
-      <RadioCardGroup.Item value="pro">
-        <RadioCardGroup.ItemText>Pro — $20/mo</RadioCardGroup.ItemText>
-        <RadioCardGroup.ItemControl />
-        <RadioCardGroup.ItemHiddenInput />
-      </RadioCardGroup.Item>
-      <RadioCardGroup.Indicator />
-    </RadioCardGroup>
-  );
-}
-```
-
-## CMS Page Builder
-
-This component is available as a `radioCardGroup` block in the
-[Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
 
 ```json
 {
   "type": "radioCardGroup",
-  "label": "Plan",
+  "label": "Hosting Plan",
   "defaultValue": "pro",
-  "variant": "outline",
+  "interactive": true,
   "items": [
-    { "label": "Hobby", "value": "hobby" },
-    { "label": "Pro", "value": "pro" },
-    { "label": "Enterprise", "value": "enterprise", "disabled": true }
+    { "label": "Hobby — $0/month", "value": "hobby" },
+    { "label": "Pro — $20/month", "value": "pro" },
+    { "label": "Enterprise — Custom", "value": "enterprise" }
   ]
 }
 ```
 
-It always renders `interactive` in the Page Builder.
+## 2. Subtle Billing Interval Toggle (Subtle Variant)
+
+Demonstrates a smaller, less prominent billing interval card selection rendered with a custom visual `subtle` variant.
+
+<DemoPreview>
+  <RadioCardGroup
+    label="Billing Frequency"
+    variant="subtle"
+    defaultValue="monthly"
+    items={[
+      { label: "Monthly Billing", value: "monthly" },
+      { label: "Yearly Billing (Save 20%)", value: "yearly" },
+    ]}
+    interactive
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "radioCardGroup",
+  "label": "Billing Frequency",
+  "defaultValue": "monthly",
+  "variant": "subtle",
+  "interactive": true,
+  "items": [
+    { "label": "Monthly Billing", "value": "monthly" },
+    { "label": "Yearly Billing (Save 20%)", "value": "yearly" }
+  ]
+}
+```
+
+## 3. Accent Themed Option Picker with Disabled Card
+
+Shows an accented color theme (purple) alongside a deactivated or restricted choice, clearly communicating unavailable tier selections.
+
+<DemoPreview>
+  <RadioCardGroup
+    label="Select Priority Server"
+    colorPalette="purple"
+    defaultValue="us-east"
+    items={[
+      { label: "US East (N. Virginia)", value: "us-east" },
+      { label: "EU West (Frankfurt)", value: "eu-west", disabled: true },
+      { label: "AP East (Tokyo)", value: "ap-east" },
+    ]}
+    interactive
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "radioCardGroup",
+  "label": "Select Priority Server",
+  "colorPalette": "purple",
+  "defaultValue": "us-east",
+  "interactive": true,
+  "items": [
+    { "label": "US East (N. Virginia)", "value": "us-east" },
+    { "label": "EU West (Frankfurt)", "value": "eu-west", "disabled": true },
+    { "label": "AP East (Tokyo)", "value": "ap-east" }
+  ]
+}
+```
+
+***
 
 # Props
 
-## Root
+| Property | CMS Field Type | Default | Description / Supported Options |
+| --- | --- | --- | --- |
+| **Label Text** (`label`) | `string` | - | Descriptive heading positioned immediately above the set of radio cards. |
+| **Default Value** (`defaultValue`) | `string` | - | The value of the option card that starts selected initially (uncontrolled). |
+| **Items List** (`items`) | `list` | - | Array of options cards containing `label` (text), `value` (ID), and optional `disabled` toggle. |
+| **Visual Variant** (`variant`) | `select` | `"outline"` | Theme style applied to background track, borders, and selected active indicator. <br/>• Options: `"outline"`, `"subtle"`, `"surface"`, `"solid"`. |
+| **Color Theme** (`colorPalette`) | `select` | `"blue"` | Visual theme applied to highlight active checked states. <br/>• Options: `blue`, `green`, `red`, `purple`, `orange`, `amber`, `cyan`, `slate`, `gray`. |
+| **Size Scale** (`size`) | `select` | `"md"` | Controls overall spacing, margin, and font scale. <br/>• Options: `"md"`. |
+| **Form Name** (`name`) | `string` | - | Standard HTML name attribute used to bundle native values during form submissions. |
+| **Disabled** (`disabled`) | `boolean` | `false` | When checked, deactivates every card, preventing selections. |
+| **Force Interactive** (`interactive`) | `boolean` | `true` | Hydrates the radio cards as a client-side interactive island to instantly animate sliding triggers on click. |
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `value` | `string` | The currently selected value (controlled). |
-| `defaultValue` | `string` | The initially selected value (uncontrolled). |
-| `onValueChange` | `(details: { value: string }) => void` | Called when the selection changes. |
-| `id` | `string` | The root element's id. |
-| `name` | `string` | Name of the underlying radio inputs, for native form submission. |
-| `disabled` | `boolean` | Disables every item. |
-| `readOnly` | `boolean` | Prevents selection changes while still allowing focus. |
-| `variant` | `"subtle" \| "outline" \| "surface" \| "solid"` | Visual style. Default `"outline"`. |
-| `size` | `"md"` | Visual size. |
-| `colorPalette` | `"blue" \| "green" \| "red" \| "purple" \| "orange" \| "amber" \| "cyan" \| "slate" \| "gray"` | The color theme. |
-| `interactive` | `boolean` | Overrides the hydration decision (see above). |
-| `class` | `string` | Custom CSS classes for the root element. |
+***
 
-## Default composition
+# Developer Notes & Accessibility
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `items` | `(string \| RadioCardGroupItem)[]` | Cards to render. A plain string is shorthand for `{ value, label: value }`. |
-| `label` | `string \| JSX.Element` | Label rendered above the cards. |
-
-## RadioCardGroupItem
-
-| Prop | Type | Description |
-| --- | --- | --- |
-| `value` | `string` | The item's unique value. |
-| `label` | `string \| JSX.Element` | The card's display content. |
-| `disabled` | `boolean` | Disables this card. |
-| `invalid` | `boolean` | Marks this card invalid. |
-
-## Sub-components
-
-| Part | Description |
-| --- | --- |
-| `RadioCardGroup.Label` | The group's label (`<span>`). |
-| `RadioCardGroup.Item` | One selectable card. `role="radio"`, requires a `value` prop. |
-| `RadioCardGroup.ItemText` | The card's display text/content. |
-| `RadioCardGroup.ItemControl` | The card's visual radio indicator wrapper. |
-| `RadioCardGroup.ItemHiddenInput` | The visually-hidden native `<input type="radio">` that holds the selection for form submission. |
-| `RadioCardGroup.Indicator` | A shared sliding indicator element for the checked state. |
-
-# Accessibility
-
-- The root has `role="radiogroup"`; each item has `role="radio"` with
-  `aria-checked` reflecting selection.
-- Items use roving `tabIndex` — only the checked (or first enabled) item is
-  in the tab sequence, matching native radio-group keyboard behavior.
-- `data-state` (`checked`/`unchecked`) and `data-disabled` are mirrored
-  onto items and their text/control parts for styling.
+- **Hydration Island:** While RadioCardGroup can render static HTML safely on load, configuring dynamic options, sliding indicator lines, or custom change hooks will initiate hydration as an interactive island on client machines.
+- **WAI-ARIA Compliance:** The component maps fully to the accessibility specification. The parent container behaves as a `role="radiogroup"` while individual cards act as interactive options (`role="radio"`, `aria-checked`, `aria-disabled`). Standard keyboard arrows (Up, Down, Left, Right) automatically cycle focus and selections.
+- **Form Integration:** It outputs native, visually-hidden `<input type="radio">` components associated with each option card. This ensures standard HTTP POST form submissions accurately capture selected card values without auxiliary JS synchronization.

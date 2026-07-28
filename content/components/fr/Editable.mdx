@@ -1,7 +1,7 @@
 ---
 title: Editable Modifiable
-hydration: 2
 category: Forms
+hydration: 2
 ---
 
 import { Editable, Stack } from "../../../app/components/ui";
@@ -9,129 +9,109 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introduction
 
-Un champ de texte en ligne qui s'affiche sous forme de texte brut jusqu'à ce qu'il soit activé (par
-focus, cliquez ou double-cliquez), puis passe à une entrée modifiable avec
-soumettre/annuler les contrôles.
+Un champ de texte en ligne qui s'affiche sous forme de texte simple jusqu'à ce qu'il soit activé (via le focus, le clic ou le double-clic), puis bascule vers un champ de saisie de texte entièrement éditable avec des déclencheurs d'envoi et d'annulation. Parfait pour les éditeurs de détails en ligne, les renommeurs de documents et les listes de paramètres.
 
-# Utilisation
+Le composant **Editable** est entièrement intégré en tant que bloc interactif `editable` dans le **Page Builder**, permettant aux auteurs de contenu et aux développeurs de configurer des libellés descriptifs, des espaces réservés, des tailles, des modes de déclenchement et des règles d'envoi directement dans le CMS.
+
+***
+
+# Utilisation via le CMS Page Builder (JSON)
+
+Ces exemples illustrent comment les éditeurs de contenu lient et structurent des champs editables interactifs dans les schémas de page JSON (`content/pages/*.json`).
+
+## 1. Activation par Focus Standard
+
+Le champ s'active immédiatement lorsqu'il reçoit le focus (via tabulation) ou qu'on clique dessus, permettant une tabulation fluide et rapide à travers les configurations de préférences multi-lignes.
 
 <DemoPreview>
-  <Stack direction="vertical" gap="4" style={{ width: "100%", maxWidth: "320px" }}>
-    <Editable label="Project name" defaultValue="Artefact UI Suite" interactive />
-    <Editable label="Description" placeholder="Add a description…" interactive />
-  </Stack>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <Editable label="Project Name" defaultValue="Artefact UI Suite" interactive />
+  </div>
 </DemoPreview>
-
-```tsx
-import { Editable } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Editable label="Project name" defaultValue="Artefact UI Suite" />
-  );
-}
-```
-
-## Composition personnalisée
-
-Passez « enfants » pour un contrôle total sur la disposition aperçu/entrée/contrôles :
-
-```tsx
-import { Editable } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Editable defaultValue="Untitled" activationMode="dblclick">
-      <Editable.Label>Title</Editable.Label>
-      <Editable.Area>
-        <Editable.Preview />
-        <Editable.Input />
-      </Editable.Area>
-      <Editable.Control>
-        <Editable.EditTrigger>Edit</Editable.EditTrigger>
-        <Editable.SubmitTrigger>Save</Editable.SubmitTrigger>
-        <Editable.CancelTrigger>Cancel</Editable.CancelTrigger>
-      </Editable.Control>
-    </Editable>
-  );
-}
-```
-
-## Constructeur de pages CMS
-
-Ce composant est disponible sous forme de bloc « éditable » dans le
-[Page Builder](/docs/PageBuilder) (`content/pages/*.json`) :
 
 ```json
 {
   "type": "editable",
-  "label": "Project name",
+  "label": "Project Name",
   "defaultValue": "Artefact UI Suite",
-  "placeholder": "Untitled",
+  "placeholder": "Enter project name...",
   "size": "md",
   "activationMode": "focus",
-  "submitMode": "both"
+  "submitMode": "both",
+  "interactive": true
 }
 ```
 
-Il rend toujours « interactif » dans Page Builder.
+## 2. Personnalisateur de Titre au Double-Clic
 
-# Propriétés
+Réplique le comportement standard des systèmes de fichiers. Le libellé s'affiche sous forme de texte gras statique et ne bascule vers un champ de saisie qu'au double-clic. Idéal pour les en-têtes de page ou les titres de fichiers de documents.
 
-## Racine
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <Editable
+      label="Document Title"
+      defaultValue="Annual_Report_2025"
+      activationMode="dblclick"
+      interactive
+    />
+  </div>
+</DemoPreview>
 
-| Propriété | Type | Description |
-| --- | --- | --- |
-| `value` | `string` | La valeur actuelle (contrôlée). |
-| `defaultValue` | `string` | La valeur initiale (non contrôlée). |
-| `edit` | `boolean` | Si le mode édition est actif (contrôlé). |
-| `defaultEdit` | `boolean` | L'état initial du mode d'édition (non contrôlé). |
-| `activationMode` | `"focus" \| "double clic" \| "click" \| "none"` | How the preview enters edit mode. Default `"focus"`. |
-| `submitMode` | `"enter" \| "se brouiller" \| "both" \| "none"` | Which interactions commit the value. Default `"both"`. |
-| `selectOnFocus` | `boolean` | Indique si le texte de l'entrée est sélectionné lorsqu'il est ciblé. Par défaut « vrai ». |
-| `autoResize` | `boolean` | Gardez l'aperçu visible (dimensionné en fonction du contenu) lors de la modification au lieu de le masquer. |
-| `disabled` | `boolean` | Désactive toutes les interactions. |
-| `readOnly` | `boolean` | Empêche d'entrer en mode édition tout en permettant la mise au point. |
-| `required` | `boolean` | Marque l’entrée sous-jacente requise. |
-| `invalid` | `boolean` | Marque le champ comme invalide. |
-| `placeholder` | `string \| { modifier : chaîne ; aperçu : chaîne }` | Placeholder text, optionally different between the input and the preview. |
-| `maxLength` | `number` | Longueur d'entrée maximale. |
-| `name` | `string` | Nom de l’entrée sous-jacente, pour la soumission de formulaire natif. |
-| `form` | `string` | Associe l'entrée à un `<form>` par identifiant. |
-| `translations` | `Partial<EditableTranslations>` | Remplacements pour les chaînes ARIA d'édition/soumission/annulation/entrée. |
-| `size` | `"2xs" \| "xs" \| "sm" \| "md" \| "lg"` | Visual size. Default `"md"`. |
-| `onValueChange` | `(details: { value: string }) => void` | Appelé lorsque la valeur d’entrée change. |
-| `onValueCommit` | `(details: { value: string }) => void` | Appelé lorsque la valeur est soumise. |
-| `onValueRevert` | `(details: { value: string }) => void` | Appelé lorsque l'édition est annulée. |
-| `onEditChange` | `(details: { edit: boolean }) => void` | Appelé lorsque le mode édition bascule. |
-| `interactive` | `boolean` | Force (ou supprime) l’hydratation comme une île. |
-| `class` | `string` | Classes CSS personnalisées pour l'élément racine. |
+```json
+{
+  "type": "editable",
+  "label": "Document Title",
+  "defaultValue": "Annual_Report_2025",
+  "placeholder": "Untitled document",
+  "size": "lg",
+  "activationMode": "dblclick",
+  "submitMode": "enter",
+  "interactive": true
+}
+```
 
-## Composition par défaut
+## 3. Champ de Valeur à Mise en Page Dense (Échelle Extra-Petite)
 
-| Propriété | Type | Description |
-| --- | --- | --- |
-| `label` | `JSX.Element \| chaîne` | Label rendered above the field. |
-| `children` | `JSX.Element` | Contenu supplémentaire ajouté après l'aperçu/entrée/contrôles par défaut. |
+Démontre une échelle de taille très compacte conçue pour les grilles de données tabulaires denses, les listes de métadonnées de barre latérale ou les attributs secondaires.
 
-## Sous-composants
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <Editable label="Port Config" defaultValue="8080" size="xs" interactive />
+  </div>
+</DemoPreview>
 
-| Partie | Description |
-| --- | --- |
-| `Editable.Label` | `<label>` lié à l'entrée ; cliquer dessus focalise l'aperçu. |
-| `Editable.Area` | Encapsule « Aperçu » et « Input » dans le même emplacement de mise en page. |
-| `Editable.Preview` | L'affichage en lecture seule affiché lorsqu'il n'y a pas d'édition ; `role="button"`, activable au clavier par `activationMode`. |
-| `Editable.Input` | Le `<input>` affiché lors de l'édition ; gère Escape-to-cancel et Enter/blur-to-submit par `submitMode`. |
-| `Editable.Control` | Encapsule les déclencheurs d'édition/soumission/annulation. |
-| `Editable.EditTrigger` | Passe en mode édition. Masqué lors de l'édition déjà. |
-| `Editable.SubmitTrigger` | Valide la valeur et quitte le mode édition. Masqué pendant la non-édition. |
-| `Editable.CancelTrigger` | Annule les modifications et quitte le mode édition. Masqué pendant la non-édition. |
-| `Editable.Context` | Accès Render-prop au contexte modifiable : `<Editable.Context>{(ctx) => ...}</Editable.Context>`. |
+```json
+{
+  "type": "editable",
+  "label": "Port Config",
+  "defaultValue": "8080",
+  "placeholder": "Set port...",
+  "size": "xs",
+  "activationMode": "click",
+  "submitMode": "blur",
+  "interactive": true
+}
+```
 
-# Accessibilité
+***
 
-- `Aperçu` est utilisable au clavier (`tabIndex={0}`, Entrée/Espace) à chaque fois  `activationMode` est `"click"` ou `"dblclick"` ; avec le mode `"focus"`,
-  il suffit de cliquer dessus pour ouvrir le mode édition.
-- `EditTrigger` / `SubmitTrigger` / `CancelTrigger` récupère les `aria-label` de  `traductions`, et sont masquées (pas seulement visuellement, via le
-  attribut) lorsqu’il n’est pas applicable au mode actuel.
-- `Input` porte `aria-invalid` lorsque `invalid` est défini et `aria-label`  à partir de `translations.input`.
+# Référence de Configuration CMS
+
+Ces champs correspondent directement aux propriétés de bloc Sveltia CMS sous le schéma d'objet `editable` déclaré dans `public/admin/config.yml`.
+
+| Propriété | Type de Champ CMS | Par défaut | Description / Options Prises en Charge |
+| :--- | :--- | :--- | :--- |
+| **Texte de Libellé** (`label`) | `string` | - | Libellé visual descriptif rendu au-dessus de l'aperçu de valeur éditable. |
+| **Valeur Par Défaut** (`defaultValue`) | `string` | - | Le contenu textuel initial chargé dans le champ. |
+| **Espace Réservé** (`placeholder`) | `string` | - | Texte d'espace réservé léger affiché dans l'aperçu lorsque la valeur est laissée vide. |
+| **Échelle de Taille** (`size`) | `select` | `"md"` | Mise à l'échelle globale de la hauteur, du remplissage et de la taille du texte.<br/>• Options : `"2xs"`, `"xs"`, `"sm"`, `"md"`, `"lg"`. |
+| **Déclencheur d'Activation** (`activationMode`) | `select` | `"focus"` | Spécifie comment l'utilisateur active l'aperçu en ligne en mode édition.<br/>• Options : `"focus"` (au focus/clic), `"click"` (clic simple), `"dblclick"` (double-clic), `"none"` (nécessite un clic sur le déclencheur). |
+| **Gestionnaire d'Envoi** (`submitMode`) | `select` | `"both"` | Spécifie quelle interaction valide les modifications vers l'état.<br/>• Options : `"enter"` (touche Entrée), `"blur"` (perte de focus), `"both"` (entrée et blur), `"none"` (nécessite un clic d'envoi manuel). |
+
+***
+
+# Notes de Développement et Accessibilité
+
+- **Hydratation Interactive Intelligente :** Étant donné que le changement d'états de mise en page nécessite un échange dynamique d'éléments et une interception de touches, le composant Editable s'hydrate par défaut en tant qu'îlot Preact sur les machines clientes.
+- **Entrées Accessibles :** L'élément d'aperçu agit comme un bouton sémantique (`role="button"`, `tabIndex={0}`) lorsqu'il est inactif, permettant aux lecteurs d'écran de focaliser et d'activer le mode édition via le clavier.
+- **Soumissions Prêtes pour les Formulaires :** Pour s'intégrer facilement aux formulaires POST, le composant synchronise ses valeurs actives vers une entrée de formulaire native masquée, garantissant que les soumissions de formulaires natifs capturent correctement les éditions validées.

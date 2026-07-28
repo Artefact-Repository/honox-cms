@@ -9,71 +9,122 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introdução
 
-Um controle que permite ao usuário alternar entre os estados marcado, desmarcado e indeterminado.
+O componente `Checkbox` é um controle de formulário que permite aos usuários alternar entre escolhas binárias (marcadas ou desmarcadas) e estados indeterminados. Totalmente otimizado para o page builder, o componente suporta comportamentos padrão de navegador e pode ser personalizado com condições de estado (como estados inválidos e desabilitados) e temas de design com acentos.
+
+***
 
 # Uso
 
+Você pode personalizar e estruturar as caixas de seleção da seguinte forma:
+
+## Caixa de seleção básica
+
+Uma caixa de seleção padrão com um rótulo de clique interativo para opções de usuário diretas.
+
 <DemoPreview>
-  <Checkbox defaultChecked interactive>Accept Terms and Conditions</Checkbox>
+  <Checkbox interactive>Accept Terms and Conditions</Checkbox>
 </DemoPreview>
-
-```tsx
-import { Checkbox } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Checkbox
-      defaultChecked={true}
-      onCheckedChange={(details) => console.log(details.checked)}
-      interactive
-    >
-      Accept Terms and Conditions
-    </Checkbox>
-  );
-}
-```
-
-## Estado indeterminado
-
-```tsx
-import { Checkbox } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Checkbox checked="indeterminate" interactive>
-      Parent Checkbox
-    </Checkbox>
-  );
-}
-```
-
-## Construtor de Páginas CMS
-
-Este componente está disponível como um bloco `checkbox` no [Construtor de Páginas](/docs/PageBuilder) (`content/pages/*.json`):
 
 ```json
 {
-  "type": "checkbox",
-  "label": "Accept Terms and Conditions",
-  "checked": true,
-  "colorPalette": "blue"
+  "blockType": "checkbox",
+  "label": "Accept Terms and Conditions"
 }
 ```
 
+***
+
+## Caixa de seleção pré-marcada
+
+Configure uma caixa de seleção para ser renderizada no estado marcado por padrão quando a página carrega pela primeira vez.
+
+<DemoPreview>
+  <Checkbox defaultChecked interactive>Subscribe to our newsletter</Checkbox>
+</DemoPreview>
+
+```json
+{
+  "blockType": "checkbox",
+  "label": "Subscribe to our newsletter",
+  "checked": true
+}
+```
+
+***
+
+## Caixa de seleção desabilitada
+
+Impede que os usuários interajam com a caixa de seleção enquanto preserva seu estado visual atual.
+
+<DemoPreview>
+  <Checkbox disabled interactive>Premium feature unlocked</Checkbox>
+  <Checkbox checked={true} disabled interactive>Auto-renew subscription (fixed)</Checkbox>
+</DemoPreview>
+
+```json
+{
+  "blockType": "checkbox",
+  "label": "Auto-renew subscription (fixed)",
+  "checked": true,
+  "disabled": true
+}
+```
+
+***
+
+## Estado de validação inválido
+
+Indica que um campo de caixa de seleção falhou na validação. Por exemplo, forçar uma marcação para aceitar termos de política obrigatórios. A entrada é destacada com bordas de erro usando os tokens de estado padrão do sistema de design.
+
+<DemoPreview>
+  <Checkbox invalid interactive>I accept the User Policy Agreement</Checkbox>
+</DemoPreview>
+
+```json
+{
+  "blockType": "checkbox",
+  "label": "I accept the User Policy Agreement",
+  "invalid": true
+}
+```
+
+***
+
+## Caixa de seleção com tema de acento
+
+Tinte os estados marcados e os marcadores de foco com acentos estéticos personalizados da paleta de cores do sistema de design, e aumente ou diminua os tamanhos.
+
+<DemoPreview>
+  <Checkbox size="lg" colorPalette="purple" defaultChecked interactive>Purple Large Checkbox</Checkbox>
+</DemoPreview>
+
+```json
+{
+  "blockType": "checkbox",
+  "label": "Purple Large Checkbox",
+  "checked": true,
+  "size": "lg",
+  "colorPalette": "purple"
+}
+```
+
+***
+
 # Propriedades
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `children` | `any` | Conteúdo do rótulo a ser renderizado ao lado do checkbox. |
-| `class` | `string` | Classes CSS personalizadas. |
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | `String` | - | A descrição de texto exibida ao lado do controle da caixa de seleção. Clicar no rótulo também alterna o estado da caixa. |
+| `checked` | `Boolean` | `false` | Se a caixa de seleção está marcada inicialmente. (Mapeado para `defaultChecked` no lado do servidor para permitir cliques livres e não controlados sem bloquear o estado de entrada). |
+| `disabled` | `Boolean` | `false` | Desabilita interações do usuário e resposta visual ao clique. |
+| `invalid` | `Boolean` | `false` | Destaca o componente com bordas vermelhas/inválidas para sinalizar um erro de validação. |
+| `size` | `Select` | `md` | Ajusta a altura e a largura da caixa delimitadora da caixa. Opções: `sm`, `md`, `lg`. |
+| `colorPalette` | `Select` | - | Tema de cor de acento aplicado ao fundo da caixa quando ativa ou marcada. Opções: `blue`, `green`, `red`, `purple`, `orange`, `amber`, `cyan`, `slate`. |
 
-| `checked` | \`boolean \ | "indeterminate"\` | Se o checkbox está marcado (controlado). |
-| `defaultChecked` | \`boolean \ | "indeterminate"\` | O estado de marcação inicial (não controlado). |
+***
 
-| `disabled` | `boolean` | Se o checkbox está desabilitado. |
+# Notas de arquitetura
 
-| `onCheckedChange` | \`(details: \{ checked: boolean \ | "indeterminate" \}) => void\` | Callback disparado quando o estado de marcação muda. |
-
-| `size` | \`"sm" \ | "md" \ | "lg"\` | O tamanho do checkbox. |
-
-| `interactive` | `boolean` | Força a hidratação como uma ilha. |
+- **Marcações padrão não controladas:** Para evitar que as caixas de seleção travem (impedindo cliques do usuário) em modelos estáticos e orientados por dados sem manipuladores inline personalizados, o campo CMS `checked` é resolvido como `defaultChecked` em nosso registro de páginas.
+- **Redefinição padrão de formulário:** O componente integra-se com redefinições de formulário HTML padrão. As redefinições retornam perfeitamente as caixas de seleção aos seus estados `checked` originais configurados no modelo JSON.
+- **Foco de teclado nativo:** Indicadores de foco e interações de alternância (gatilhos com a barra de espaço) dependem de entradas HTML padrão e do comportamento do navegador. Isso permanece altamente performático e acessível em leitores de tela assistivos.

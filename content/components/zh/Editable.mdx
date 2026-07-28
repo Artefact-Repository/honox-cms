@@ -1,7 +1,7 @@
 ---
 title: Editable 可编辑文本
-hydration: 2
 category: Forms
+hydration: 2
 ---
 
 import { Editable, Stack } from "../../../app/components/ui";
@@ -9,124 +9,109 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # 简介
 
-一种内联文本字段，在激活前（通过聚焦、点击或双击）显示为纯文本，随后切换为带提交/取消控件的可编辑输入框。
+一个内联文本字段，在激活前（通过聚焦、单击或双击）以纯文本显示，随后切换为带有提交和取消触发器的完全可编辑文本输入框。非常适合内联详情编辑器、文档重命名器和设置列表。
 
-# 用法
+**Editable** 组件已作为交互式 `editable` 区块完全集成到 **Page Builder** 中，使内容作者和开发者能够在 CMS 中直接配置描述性标签、占位符、尺寸、触发模式和提交规则。
+
+***
+
+# 通过 CMS 页面构建器使用（JSON）
+
+以下示例展示了内容编辑者如何在 JSON 页面模式（`content/pages/*.json`）中绑定和构建交互式可编辑字段。
+
+## 1. 标准聚焦激活
+
+该字段在获得焦点（通过 Tab 切换）或单击时立即激活，从而可在多行偏好配置之间实现流畅快速的 Tab 切换。
 
 <DemoPreview>
-  <Stack direction="vertical" gap="4" style={{ width: "100%", maxWidth: "320px" }}>
-    <Editable label="Project name" defaultValue="Artefact UI Suite" interactive />
-    <Editable label="Description" placeholder="Add a description…" interactive />
-  </Stack>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <Editable label="Project Name" defaultValue="Artefact UI Suite" interactive />
+  </div>
 </DemoPreview>
-
-```tsx
-import { Editable } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Editable label="Project name" defaultValue="Artefact UI Suite" />
-  );
-}
-```
-
-## 自定义组合
-
-传入 `children` 以完全控制预览/输入/控件布局：
-
-```tsx
-import { Editable } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Editable defaultValue="Untitled" activationMode="dblclick">
-      <Editable.Label>Title</Editable.Label>
-      <Editable.Area>
-        <Editable.Preview />
-        <Editable.Input />
-      </Editable.Area>
-      <Editable.Control>
-        <Editable.EditTrigger>Edit</Editable.EditTrigger>
-        <Editable.SubmitTrigger>Save</Editable.SubmitTrigger>
-        <Editable.CancelTrigger>Cancel</Editable.CancelTrigger>
-      </Editable.Control>
-    </Editable>
-  );
-}
-```
-
-## CMS 页面构建器
-
-该组件在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中作为 `editable` 区块提供：
 
 ```json
 {
   "type": "editable",
-  "label": "Project name",
+  "label": "Project Name",
   "defaultValue": "Artefact UI Suite",
-  "placeholder": "Untitled",
+  "placeholder": "Enter project name...",
   "size": "md",
   "activationMode": "focus",
-  "submitMode": "both"
+  "submitMode": "both",
+  "interactive": true
 }
 ```
 
-它在页面构建器中始终以 `interactive` 渲染。
+## 2. 双击标题自定义器
 
-# 属性
+复刻标准文件系统的行为。标签以静态粗体文本显示，仅在双击时切换为输入框。非常适合页面标题或文档文件标题。
 
-## Root
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <Editable
+      label="Document Title"
+      defaultValue="Annual_Report_2025"
+      activationMode="dblclick"
+      interactive
+    />
+  </div>
+</DemoPreview>
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `value` | `string` | 当前值（受控）。 |
-| `defaultValue` | `string` | 初始值（非受控）。 |
-| `edit` | `boolean` | 编辑模式是否激活（受控）。 |
-| `defaultEdit` | `boolean` | 初始编辑模式状态（非受控）。 |
-| `activationMode` | `"focus" \| "dblclick" \| "click" \| "none"` | 预览进入编辑模式的方式。默认 `"focus"`。 |
-| `submitMode` | `"enter" \| "blur" \| "both" \| "none"` | 哪些交互会提交值。默认 `"both"`。 |
-| `selectOnFocus` | `boolean` | 聚焦时是否选中输入框中的文本。默认 `true`。 |
-| `autoResize` | `boolean` | 编辑时保持预览可见（按内容调整尺寸），而非隐藏它。 |
-| `disabled` | `boolean` | 禁用所有交互。 |
-| `readOnly` | `boolean` | 阻止进入编辑模式，同时仍允许聚焦。 |
-| `required` | `boolean` | 标记底层输入为必填。 |
-| `invalid` | `boolean` | 标记字段为无效。 |
-| `placeholder` | `string \| { edit: string; preview: string }` | 占位符文本，输入与预览可分别不同。 |
-| `maxLength` | `number` | 最大输入长度。 |
-| `name` | `string` | 底层输入的 name，用于原生表单提交。 |
-| `form` | `string` | 通过 id 将输入与 `<form>` 关联。 |
-| `translations` | `Partial<EditableTranslations>` | 对编辑/提交/取消/输入的 ARIA 字符串的覆盖。 |
-| `size` | `"2xs" \| "xs" \| "sm" \| "md" \| "lg"` | 视觉尺寸。默认 `"md"`。 |
-| `onValueChange` | `(details: { value: string }) => void` | 输入值变化时调用。 |
-| `onValueCommit` | `(details: { value: string }) => void` | 值被提交时调用。 |
-| `onValueRevert` | `(details: { value: string }) => void` | 编辑被取消时调用。 |
-| `onEditChange` | `(details: { edit: boolean }) => void` | 编辑模式切换时调用。 |
-| `interactive` | `boolean` | 强制（或抑制）以水合形式作为岛屿渲染。 |
-| `class` | `string` | 根元素的自定义 CSS 类名。 |
+```json
+{
+  "type": "editable",
+  "label": "Document Title",
+  "defaultValue": "Annual_Report_2025",
+  "placeholder": "Untitled document",
+  "size": "lg",
+  "activationMode": "dblclick",
+  "submitMode": "enter",
+  "interactive": true
+}
+```
 
-## 默认组合
+## 3. 密集布局值字段（超小尺寸）
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `label` | `JSX.Element \| string` | 渲染在字段上方的标签。 |
-| `children` | `JSX.Element` | 追加在默认预览/输入/控件之后的额外内容。 |
+展示一种高度紧凑的尺寸比例，专为密集的表格数据网格、侧边栏元数据列表或次要属性而设计。
 
-## 子组件
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <Editable label="Port Config" defaultValue="8080" size="xs" interactive />
+  </div>
+</DemoPreview>
 
-| 部件 | 说明 |
-| --- | --- |
-| `Editable.Label` | 绑定到输入的 `<label>`；点击它会使预览获得焦点。 |
-| `Editable.Area` | 在同一布局槽中包裹 `Preview` 和 `Input`。 |
-| `Editable.Preview` | 非编辑时显示的只读内容；`role="button"`，可按 `activationMode` 用键盘激活。 |
-| `Editable.Input` | 编辑时显示的 `<input>`；按 `submitMode` 处理 Esc 取消与 Enter/失焦提交。 |
-| `Editable.Control` | 包裹编辑/提交/取消触发器。 |
-| `Editable.EditTrigger` | 进入编辑模式。编辑中时隐藏。 |
-| `Editable.SubmitTrigger` | 提交值并退出编辑模式。非编辑时隐藏。 |
-| `Editable.CancelTrigger` | 丢弃修改并退出编辑模式。非编辑时隐藏。 |
-| `Editable.Context` | 以渲染属性（render-prop）方式访问可编辑上下文：`<Editable.Context>{(ctx) => ...}</Editable.Context>`。 |
+```json
+{
+  "type": "editable",
+  "label": "Port Config",
+  "defaultValue": "8080",
+  "placeholder": "Set port...",
+  "size": "xs",
+  "activationMode": "click",
+  "submitMode": "blur",
+  "interactive": true
+}
+```
 
-# 无障碍
+***
 
-- `Preview` 在 `activationMode` 为 `"click"` 或 `"dblclick"` 时可用键盘操作（`tabIndex={0}`、Enter/Space）；在 `"focus"` 模式下，仅用 Tab 键聚焦它即可打开编辑模式。
-- `EditTrigger` / `SubmitTrigger` / `CancelTrigger` 的 `aria-label` 取自 `translations`，并且在当前模式不适用时会被隐藏（不仅是视觉上，而是通过 `hidden` 属性）。
-- `Input` 在设置了 `invalid` 时携带 `aria-invalid`，并携带来自 `translations.input` 的 `aria-label`。
+# CMS 配置参考
+
+这些字段直接映射到 `public/admin/config.yml` 中声明的 `editable` 对象模式下的 Sveltia CMS 区块属性。
+
+| 属性 | CMS 字段类型 | 默认值 | 描述 / 支持选项 |
+| :--- | :--- | :--- | :--- |
+| **标签文本** (`label`) | `string` | - | 渲染在可编辑值预览上方描述性视觉标签。 |
+| **默认值** (`defaultValue`) | `string` | - | 字段内加载的初始文本内容。 |
+| **占位符** (`placeholder`) | `string` | - | 当值留空时在预览中显示的浅色占位符文本。 |
+| **尺寸比例** (`size`) | `select` | `"md"` | 整体高度、内边距和文本大小缩放。<br/>• 选项：`"2xs"`、`"xs"`、`"sm"`、`"md"`、`"lg"`。 |
+| **激活触发器** (`activationMode`) | `select` | `"focus"` | 指定用户如何将内联预览激活为编辑模式。<br/>• 选项：`"focus"`（聚焦/单击时）、`"click"`（单击）、`"dblclick"`（双击）、`"none"`（需触发点击）。 |
+| **提交处理器** (`submitMode`) | `select` | `"both"` | 指定将更改提交回状态的交互方式。<br/>• 选项：`"enter"`（回车键）、`"blur"`（失焦）、`"both"`（回车与失焦）、`"none"`（需手动提交点击）。 |
+
+***
+
+# 开发者说明与无障碍
+
+- **智能交互式水合：** 由于切换布局状态需要动态元素交换和按键拦截，Editable 组件默认在客户端机器上以水合为 Preact 孤岛的形式运行。
+- **无障碍输入框：** 预览元素在非激活状态下充当语义按钮（`role="button"`、`tabIndex={0}`），允许屏幕阅读器聚焦并通过键盘激活编辑模式。
+- **表单就绪提交：** 为便于与 POST 表单集成，组件将其活动值同步到一个原生隐藏表单输入，确保原生表单提交能正确捕获已提交的编辑内容。

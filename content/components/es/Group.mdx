@@ -4,61 +4,114 @@ hydration: 3
 category: Layout
 ---
 
-import { Group, Button } from "../../../app/components/ui";
+import { Group, Button, Input } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introducción
 
-Un componente de layout para agrupar visualmente elementos relacionados.
+Un componente contenedor semántico utilizado para agrupar visual y estructuralmente múltiples controles relacionados, como botones, conmutadores o entradas, y aplicar un espaciado de separación, orientación y conexiones uniformes entre los hijos. Simplifica la construcción de barras de herramientas y evita el código repetitivo de flexbox manual.
 
-# Uso
+El componente **Group** está totalmente integrado como un bloque `group` en el **Page Builder**, permitiendo a los autores de contenido y desarrolladores agrupar fácilmente controles interactuantes (como botones de acción o combinaciones de entrada) directamente dentro del CMS.
+
+***
+
+# Uso a través del CMS Page Builder (JSON)
+
+Estos ejemplos ilustran cómo los editores de contenido enlazan y estructuran conjuntos de controles agrupados dentro de los esquemas de página JSON (`content/pages/*.json`).
+
+## 1. Barra de Herramientas de Acción Horizontal
+
+Una agrupación horizontal estándar de botones de acción con separaciones internas distribuidas uniformemente. Agrupa operaciones contextuales de guardado y edición.
 
 <DemoPreview>
-  <Group attached>
-    <Button>First</Button>
-    <Button>Second</Button>
-    <Button>Third</Button>
+  <Group>
+    <Button>Save</Button>
+    <Button variant="outline">Edit</Button>
+    <Button variant="subtle" colorPalette="red">Delete</Button>
   </Group>
 </DemoPreview>
-
-```tsx
-import { Group } from "../components/ui";
-import { Button } from "../components/ui/button";
-
-export default function MyPage() {
-  return (
-    <Group attached>
-      <Button>First</Button>
-      <Button>Second</Button>
-      <Button>Third</Button>
-    </Group>
-  );
-}
-```
-
-## Constructor de páginas CMS
-
-Este componente está disponible como un bloque `group` en el [Constructor de páginas](/docs/PageBuilder) (`content/pages/*.json`):
 
 ```json
 {
   "type": "group",
-  "attached": true,
+  "orientation": "horizontal",
+  "gap": "sm",
+  "attached": false,
   "children": [
-    { "type": "button", "text": "First" },
-    { "type": "button", "text": "Second" }
+    { "type": "button", "text": "Save" },
+    { "type": "button", "text": "Edit", "variant": "outline" },
+    { "type": "button", "text": "Delete", "variant": "subtle", "colorPalette": "red" }
   ]
 }
 ```
 
-# Propiedades
+## 2. Combinación de Entrada de Búsqueda Acoplada
 
-| Prop | Tipo | Descripción |
-| --- | --- | --- |
-| `children` | `any` | Contenido a renderizar dentro del componente. |
-| `class` | `string` | Clases CSS personalizadas. |
+Utiliza la propiedad `attached` para crear un único widget sin costuras. La entrada y el botón se fusionan visualmente en un control continuo.
 
-| `orientation` | \`"horizontal" \ | "vertical"\` | La orientación del grupo. |
+<DemoPreview>
+  <Group attached>
+    <Input placeholder="Search documentation..." />
+    <Button>Search</Button>
+  </Group>
+</DemoPreview>
 
-| `attached` | `boolean` | Si se deben adjuntar los hijos entre sí. |
-| `grow` | `boolean` | Si los hijos deben crecer para llenar el espacio disponible. |
+```json
+{
+  "type": "group",
+  "orientation": "horizontal",
+  "gap": "none",
+  "attached": true,
+  "children": [
+    { "type": "input", "placeholder": "Search documentation..." },
+    { "type": "button", "text": "Search" }
+  ]
+}
+```
+
+## 3. Controles Apilados Verticalmente
+
+Presenta orientación vertical para controles de conmutación apilados o menús verticales que requieren espaciado vertical consistente.
+
+<DemoPreview>
+  <Group orientation="vertical" gap="md">
+    <Button>Profile</Button>
+    <Button variant="outline">Settings</Button>
+    <Button variant="subtle" colorPalette="red">Logout</Button>
+  </Group>
+</DemoPreview>
+
+```json
+{
+  "type": "group",
+  "orientation": "vertical",
+  "gap": "md",
+  "attached": false,
+  "children": [
+    { "type": "button", "text": "Profile" },
+    { "type": "button", "text": "Settings", "variant": "outline" },
+    { "type": "button", "text": "Logout", "variant": "subtle", "colorPalette": "red" }
+  ]
+}
+```
+
+***
+
+# Referencia de Configuración CMS
+
+Estos campos se asignan directamente a las propiedades de bloque de Sveltia CMS bajo `public/admin/config.yml` o las configuraciones del Page Builder:
+
+| Propiedad | Tipo de Campo CMS | Predeterminado | Descripción / Opciones Compatibles |
+| :--- | :--- | :--- | :--- |
+| **Orientación** (`orientation`) | `select` | `"horizontal"` | Disposición del eje principal de los hijos.<br/>• Opciones: `"horizontal"`, `"vertical"`. |
+| **Espaciado** (`gap`) | `string` | `"sm"` | Separación de relleno interno entre elementos hijos individuales.<br/>• Opciones: `"none"`, `"sm"`, `"md"`, `"lg"`. |
+| **Modo Acoplado** (`attached`) | `boolean` | `false` | Cuando es true, elimina las separaciones de relleno internas y fusiona visualmente los elementos adyacentes en un control único unificado. |
+| **Bloques Secundarios** (`children`) | `list` | - | Lista de elementos interactivos (Botones, Conmutadores, Entradas) dispuestos dentro de la pista del grupo. |
+
+***
+
+# Notas para Desarrolladores y Accesibilidad
+
+- **Sin Hidratación (Solo Estático):** Group es un componente de diseño semántico designado como componente Solo Estático (`Tier 3`). Se renderiza completamente como HTML estándar del lado del servidor y está exento de scripts de hidratación del lado del cliente.
+- **Contenedor de Contexto Estructural:** Para evitar desplazamientos de diseño y espaciado inconsistente, el componente Group envuelve explícitamente los componentes secundarios en una pista `<div>` interna, asegurando cálculos de separación uniformes independientemente de la complejidad del contenido anidado.
+- **Reutilización Flexible:** Dado que impone una única dirección flex rígida en todos los hijos, los desarrolladores pueden anidar múltiples componentes Group (orientaciones horizontal/vertical mixtas) para construir complejos paneles de acción tipo cuadrícula con mínimo esfuerzo.

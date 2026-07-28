@@ -4,59 +4,116 @@ category: Layout
 hydration: 3
 ---
 
-import { AbsoluteCenter } from "../../../app/components/ui";
+import { AbsoluteCenter, Badge } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introducción
 
-Un componente utilitario para centrar contenido dentro de su contenedor padre.
+Un componente contenedor de utilidad que centra sus elementos hijos de forma absoluta dentro de su contenedor padre posicionado relativamente más cercano. Excelente para contenido superpuesto, esqueletos de carga, insignias fijadas en el centro, tarjetas de llamada y resaltados de banner de aterrizaje.
+
+El componente **AbsoluteCenter** está totalmente integrado como un bloque `absoluteCenter` en el **Page Builder**, lo que permite a los autores de contenido y desarrolladores configurar fácilmente diseños visuales, ejes de alineación y comportamientos de espaciado directamente dentro del CMS.
+
+***
 
 # Uso
 
+Estos ejemplos ilustran cómo los editores de contenido enlazan y estructuran contenedores absolutos centrados.
+
+## 1. Centrado en ambos ejes
+
+Centra los elementos anidados perfectamente de forma horizontal y vertical dentro del contexto padre. Ideal para insignias de llamada a la acción centralizadas o superposiciones de carga de progreso.
+
 <DemoPreview>
-  <div style={{ position: "relative", height: "140px", width: "260px", border: "1px solid var(--colors-border)" }}>
-    <AbsoluteCenter axis="both">Centered Content</AbsoluteCenter>
+  <div style={{ position: "relative", height: "140px", width: "100%", maxWidth: "320px", border: "1px dashed var(--colors-border)", borderRadius: "8px" }}>
+    <AbsoluteCenter axis="both">
+      <Badge colorPalette="purple" variant="solid">Centered Content</Badge>
+    </AbsoluteCenter>
   </div>
 </DemoPreview>
 
-```tsx
-import { AbsoluteCenter } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <div
-      style={{
-        position: "relative",
-        height: "200px",
-        width: "200px",
-        border: "1px solid black",
-      }}
-    >
-      <AbsoluteCenter axis="both">Centered Content</AbsoluteCenter>
-    </div>
-  );
-}
-```
-
-## Constructor de Páginas CMS
-
-Este componente está disponible como un bloque `absoluteCenter` en el [Constructor de Páginas](/docs/PageBuilder) (`content/pages/*.json`):
-
-```markdown
+```json
 {
   "type": "absoluteCenter",
   "axis": "both",
   "children": [
-    { "type": "badge", "text": "Centered Badge", "colorPalette": "purple", "variant": "solid" }
+    {
+      "type": "badge",
+      "text": "Centered Content",
+      "colorPalette": "purple",
+      "variant": "solid"
+    }
   ]
 }
 ```
 
+## 2. Alineación solo horizontal
+
+Fija los elementos para centrarlos horizontalmente (a lo largo del eje X) dejando la posición vertical sin modificar.
+
+<DemoPreview>
+  <div style={{ position: "relative", height: "120px", width: "100%", maxWidth: "320px", border: "1px dashed var(--colors-border)", borderRadius: "8px" }}>
+    <AbsoluteCenter axis="horizontal">
+      <Badge colorPalette="blue" variant="outline">Horizontal Only</Badge>
+    </AbsoluteCenter>
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "absoluteCenter",
+  "axis": "horizontal",
+  "children": [
+    {
+      "type": "badge",
+      "text": "Horizontal Only",
+      "colorPalette": "blue",
+      "variant": "outline"
+    }
+  ]
+}
+```
+
+## 3. Alineación solo vertical
+
+Fija los elementos para centrarlos verticalmente (a lo largo del eje Y) dejando la posición horizontal sin modificar.
+
+<DemoPreview>
+  <div style={{ position: "relative", height: "120px", width: "100%", maxWidth: "320px", border: "1px dashed var(--colors-border)", borderRadius: "8px" }}>
+    <AbsoluteCenter axis="vertical">
+      <Badge colorPalette="green" variant="subtle">Vertical Only</Badge>
+    </AbsoluteCenter>
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "absoluteCenter",
+  "axis": "vertical",
+  "children": [
+    {
+      "type": "badge",
+      "text": "Vertical Only",
+      "colorPalette": "green",
+      "variant": "subtle"
+    }
+  ]
+}
+```
+
+***
+
 # Propiedades
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `children` | `any` | Contenido que se renderiza dentro del componente. |
-| `class` | `string` | Clases CSS personalizadas. |
+| Propiedad | Tipo de campo CMS | Predeterminado | Descripción / Opciones admitidas |
+| --- | --- | --- | --- |
+| **Eje de alineación** (`axis`) | `select` | `"both"` | Los ejes de coordenadas del diseño donde aplicar los cálculos de centrado. <br/>• Opciones: `"both"`, `"horizontal"`, `"vertical"`. |
+| **Contenido hijo** (`children`) | `list` | - | La colección de bloques de componentes anidados a alinear dentro del contexto absoluto. |
+| **Clase personalizada** (`class`) | `string` | - | Anulaciones de clase CSS personalizadas aplicadas directamente al contenedor absoluto. |
 
-| `axis` | \`"horizontal" \ | "vertical" \ | "both"\` | El eje sobre el cual centrar el contenido. |
+***
+
+# Notas para desarrolladores y accesibilidad
+
+- **Objetivo de padre relativo:** Para que AbsoluteCenter funcione correctamente, su contenedor padre inmediato o envoltura de diseño debe tener `position: relative` (u otro posicionamiento no estático) aplicado.
+- **Posicionamiento acelerado por hardware:** En segundo plano, este componente usa reglas de transformación CSS de alta eficiencia (`transform: translate(-50%, -50%)`) para evitar cualquier desenfoque de renderizado sub-píxel o problemas de escalado de fuentes en diferentes densidades de píxeles de pantalla.
+- **Orden de árbol accesible:** El componente mantiene el orden de lectura DOM nativo para lectores de pantalla. No altera las pestañas de navegación por teclado ni los resaltados de esquema de accesibilidad del contenido hijo interno.

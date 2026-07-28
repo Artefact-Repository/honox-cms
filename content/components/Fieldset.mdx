@@ -1,135 +1,153 @@
 ---
 title: Fieldset
-hydration: 3
 category: Layout
+hydration: 3
 ---
 
 import { Fieldset, Field } from "../../app/components/ui";
 import { DemoPreview } from "../../app/components/demo-preview";
 
-## Introduction
+# Introduction
 
-Groups related form controls under a native `<fieldset>`, with an accessible
-legend, helper text, and error text. Unlike `Field`, it has no validator of
-its own — it's a static, server-rendered grouping primitive, so it never
-hydrates as a client island. It provides its `disabled`/`invalid`/`required`
-state as context to nested `Field`s, matching Ark UI's Fieldset — see
-[Context propagation](#context-propagation-to-nested-fields).
+A structural layout container that groups related form controls under a native `<fieldset>`, complete with an accessible legend, supporting helper text, and validation error messages. It serves as an essential semantic anchor for complex user input forms, automatically propagating disabled, invalid, and required statuses down to nested field controls.
 
-## Usage
+***
+
+# Usage
+
+These examples illustrate how content editors bind and structure fieldset groups.
+
+## 1. Standard Account Information Group
+
+A standard user profile group with mandatory nested name fields. Features an active legend and helper status text.
 
 <DemoPreview>
-  <div style={{ width: "100%", maxWidth: "320px" }}>
-    <Fieldset legend="User Profile" helperText="Manage your info." required>
-      <Field label="Name" placeholder="Jane Doe" />
+  <div style={{ width: "100%", maxWidth: "360px" }}>
+    <Fieldset legend="Account Information" helperText="Configure your primary account details." required>
+      <Field label="Full Name" placeholder="Jane Doe" interactive />
+      <Field label="Email Address" placeholder="jane@example.com" interactive />
     </Fieldset>
   </div>
 </DemoPreview>
 
-```tsx
-import { Fieldset, Field } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Fieldset
-      legend="User Profile"
-      helperText="Manage your info."
-      required
-      errorText="Something went wrong."
-    >
-      <Field>...</Field>
-    </Fieldset>
-  );
-}
-```
-
-Passing `errorText` is enough to put the fieldset into its invalid state —
-you don't need to also pass `invalid`. Pass `invalid={false}` explicitly if
-you want to suppress the error styling while still keeping the text around.
-
-### Context propagation to nested Fields
-
-`Fieldset` exposes its `disabled`/`invalid`/`required` state as context.
-Every nested `Field` reads it as a fallback for its own — so a group-level
-`disabled` or `required` doesn't need to be repeated on each field:
-
-```tsx
-<Fieldset legend="Shipping address" disabled required>
-  <Field label="Street" />   {/* renders disabled + required */}
-  <Field label="Apt #" required={false} />  {/* opts back out of required */}
-</Fieldset>
-```
-
-A `Field`'s own prop always wins over the inherited one. For `invalid`
-specifically, inheritance only applies when the `Field` has no validation of
-its own (no `validator`, `minLength`, or explicit `invalid` prop) — a `Field`
-that validates its own value is never silently overridden by the group.
-
-This propagation is one level: only `Field` (and anything built on top of it,
-like `Textarea`) consults `Fieldset`'s context. A bare `Switch` or `Checkbox`
-placed directly inside a `Fieldset` — with no wrapping `Field` — won't pick
-up the group's styling, though native `<fieldset disabled>` still blocks
-interaction with it regardless.
-
-### Composition
-
-`children` is always the group of actual form controls — `Fieldset` wraps it
-in a spacing container for you. `legend` / `helperText` / `errorText` accept
-any `Child`, not just strings, so rich content (an icon, a badge) belongs
-there rather than in `children`:
-
-```tsx
-<Fieldset legend={<>Profile <Badge>New</Badge></>}>
-  <Field>...</Field>
-  <Textarea>...</Textarea>
-</Fieldset>
-```
-
-Don't place `FieldsetLegend` (or `FieldsetHelperText` / `FieldsetErrorText`)
-inside `children` — `Fieldset` wraps `children` in a `<div>`, and browsers
-only use a `<legend>` to compute the fieldset's accessible name when it's a
-direct child of `<fieldset>`, not when it's nested inside a wrapper. The
-exported sub-components (`FieldsetLegend`, `FieldsetHelperText`,
-`FieldsetErrorText`, `FieldsetContent`, `FieldsetControl`,
-`FieldsetRequiredIndicator`) exist for reuse in fully hand-built markup, not
-as an alternate way to compose within `Fieldset` itself.
-
-### CMS Page Builder
-
-This component is available as a `fieldset` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
-
 ```json
 {
   "type": "fieldset",
-  "legend": "User Profile",
-  "helperText": "Manage your info.",
+  "legend": "Account Information",
+  "helperText": "Configure your primary account details.",
   "required": true,
   "children": [
-    { "type": "field", "label": "Name" }
+    {
+      "type": "field",
+      "label": "Full Name",
+      "placeholder": "Jane Doe",
+      "interactive": true
+    },
+    {
+      "type": "field",
+      "label": "Email Address",
+      "placeholder": "jane@example.com",
+      "interactive": true
+    }
   ]
 }
 ```
 
-## Props
+## 2. Invalid Group with Error Message
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `children` | `any` | Form controls to render inside the fieldset. |
-| `class` | `string` | Custom CSS classes. |
-| `id` | `string` | Unique identifier. Auto-generated if omitted. |
-| `disabled` | `boolean` | Disables the fieldset. Native `<fieldset disabled>` automatically disables every descendant control, and nested `Field`s pick it up as context too — see [Context propagation](#context-propagation-to-nested-fields). |
-| `invalid` | `boolean` | Whether the fieldset is in an invalid state. Defaults to `true` whenever `errorText` is set, so you usually don't need to pass this explicitly. |
-| `required` | `boolean` | Marks the group as required and appends a required indicator to the legend. |
-| `legend` | `Child` | The legend text for the fieldset. Always rendered as a direct child of `<fieldset>` — see [Composition](#composition). |
-| `helperText` | `Child` | Helper text shown below the legend. |
-| `errorText` | `Child` | Error text shown when the fieldset is invalid. |
+Showcases how the Fieldset displays validation error messages when a grouping requirement is violated. Entering an `errorText` automatically triggers invalid states on all child fields.
 
-## CMS bindings
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "360px" }}>
+    <Fieldset
+      legend="Billing Credentials"
+      helperText="Enter your card billing details."
+      errorText="A valid postal code is required."
+    >
+      <Field label="Cardholder Name" placeholder="Jane Doe" interactive />
+      <Field label="Postal Code" placeholder="90210" invalid interactive />
+    </Fieldset>
+  </div>
+</DemoPreview>
 
-`legend`, `helperText`, `errorText`, `disabled`, `invalid`, and `required`
-are exposed as editable fields in `public/admin/config.yml`, plus a
-`children` list for nesting other blocks — the same convenience props
-documented above. `id`/`class` and the composition sub-components
-(`FieldsetContent`, `FieldsetControl`, `FieldsetRequiredIndicator`, etc.) are
-not exposed: they're a JSX-level API for developers hand-authoring pages, not
-something a JSON-driven CMS block can express.
+```json
+{
+  "type": "fieldset",
+  "legend": "Billing Credentials",
+  "helperText": "Enter your card billing details.",
+  "errorText": "A valid postal code is required.",
+  "children": [
+    {
+      "type": "field",
+      "label": "Cardholder Name",
+      "placeholder": "Jane Doe",
+      "interactive": true
+    },
+    {
+      "type": "field",
+      "label": "Postal Code",
+      "placeholder": "90210",
+      "invalid": true,
+      "interactive": true
+    }
+  ]
+}
+```
+
+## 3. Disabled Billing Options Block
+
+Demonstrates a fully disabled shipping parameters section. Deactivating the parent Fieldset automatically locks every nested element.
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "360px" }}>
+    <Fieldset legend="Shipping Address" helperText="Unavailable during local holidays." disabled>
+      <Field label="Street" placeholder="123 Main St" interactive />
+      <Field label="Apt #" placeholder="4B" interactive />
+    </Fieldset>
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "fieldset",
+  "legend": "Shipping Address",
+  "helperText": "Unavailable during local holidays.",
+  "disabled": true,
+  "children": [
+    {
+      "type": "field",
+      "label": "Street",
+      "placeholder": "123 Main St",
+      "interactive": true
+    },
+    {
+      "type": "field",
+      "label": "Apt #",
+      "placeholder": "4B",
+      "interactive": true
+    }
+  ]
+}
+```
+
+***
+
+# Props
+
+| Property | CMS Field Type | Default | Description / Supported Options |
+| --- | --- | --- | --- |
+| **Legend Text** (`legend`) | `string` | - | Primary visual and screen-reader heading for the field group. |
+| **Helper Message** (`helperText`) | `string` | - | Explanatory text positioned immediately below the legend. |
+| **Error Message** (`errorText`) | `string` | - | Visual validation message displayed when the group is marked invalid. |
+| **Required Status** (`required`) | `boolean` | `false` | Marks the group as mandatory and appends an indicator icon to the legend. |
+| **Disabled State** (`disabled`) | `boolean` | `false` | Disables the entire block, locking all nested inputs. |
+| **Invalid State** (`invalid`) | `boolean` | `false` | Forces the group to show active error borders and alerts. |
+| **Child Blocks** (`children`) | `list` | - | Nested child inputs (e.g., Fields, Textareas) grouped inside the fieldset track. |
+
+***
+
+# Developer Notes & Accessibility
+
+- **Hydration Free (Static-Only):** Fieldset is a semantic layout component designated as a Static-Only component (`Tier 3`). It renders entirely as standard server-side HTML and is exempt from client-side hydration scripts.
+- **Context Propagation:** It utilizes context providers to propagate `disabled`, `invalid`, and `required` states downward. Direct child component blocks (such as `Field` and `Textarea`) automatically listen to this context and inherits group properties, eliminating duplicate key declarations.
+- **WAI-ARIA Compliance:** Fieldset compiles strictly to semantic HTML `<fieldset>` containers containing direct `<legend>` elements, satisfying accessible browser heading requirements.

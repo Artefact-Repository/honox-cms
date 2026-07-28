@@ -1,7 +1,7 @@
 ---
 title: Icon 图标
-hydration: 3
 category: Data Display
+hydration: 3
 ---
 
 import { Icon } from "../../../app/components/ui";
@@ -9,96 +9,75 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # 简介
 
-一个轻量级、可感知尺寸与颜色的 SVG 图标封装组件。它应用一致的尺寸（`2xs`–`xl`），并继承 `currentcolor`，使图标默认与周围文字/图标颜色保持一致，且无需依赖任何图标库。
+一个轻量级的、可识别尺寸与颜色的 SVG 图形包装器。它强制统一的外包围尺寸，并继承 `currentcolor`，使图形无需编译臃肿的外部图标包即可自动匹配相邻文本主题，同时支持装饰性隐藏和面向屏幕阅读器的显式标注。
 
-`Icon` 通过两种方式组合，由其 `children` 自动决定：
+**Icon** 组件已作为 `icon` 区块完全集成到 **Page Builder** 中，使 Sveltia CMS 管理者能够直接在页面布局中注入自定义矢量路径、自定义视口并更改缩放设置。
 
-- **Wrap（包裹）** —— 如果 `children` 是裸 SVG 内容（`<path>`、`<circle>`、`<g>` 等）、文本，或多个元素，`Icon` 会在其外层渲染自己的 `<svg>`。
-- **Merge（`asChild`，默认 `true`）** —— 如果 `children` 是单个非裸 SVG 内容的元素（例如手写的 `<svg>…</svg>`），`Icon` 会将其 class（以及传入的其他属性）直接合并到该元素上，而不是用第二层 `<svg>` 包裹它。传入 `asChild={false}` 可强制包裹，即使在此情况下也是如此。
+***
 
 # 用法
 
-## 裸 SVG 路径（无需图标库）
+以下配置精确展示了页面构建器区块条目是如何构建的。
+
+## 1. 极简箭头指示器（中号）
+
+提供一个标准化的矢量箭头，适用于在卡片标题、链接列表或表单按钮旁对齐。
 
 <DemoPreview>
-  <Icon size="lg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-    <path d="M12 2 2 7l10 5 10-5-10-5z" />
+  <Icon size="md" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    <path d="M5 12h14M12 5l7 7-7 7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
   </Icon>
 </DemoPreview>
-
-```tsx
-import { Icon } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Icon size="lg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-      <path d="M12 2 2 7l10 5 10-5-10-5z" />
-    </Icon>
-  );
-}
-```
-
-## 与手写的 `<svg>` 组合（`asChild`，默认）
-
-```tsx
-import { Icon } from "../components/ui";
-
-function HeartSvg(props: { class?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
-      <path d="M12 21s-6.7-4.35-9.3-8.1C.8 9.7 2 6 5.4 6c1.9 0 3.2 1 4.6 2.6C11.4 7 12.7 6 14.6 6 18 6 19.2 9.7 17.3 12.9 14.7 16.65 12 21 12 21z" />
-    </svg>
-  );
-}
-
-export default function MyPage() {
-  return (
-    <span style={{ color: "red" }}>
-      <Icon size="sm">
-        <HeartSvg />
-      </Icon>
-    </span>
-  );
-}
-```
-
-该 `icon` class（及尺寸）会被合并到 `HeartSvg` 返回的 `<svg>` 上，因此渲染后的标记中不会有多余的包裹元素。由于图标配方设置了 `color: currentcolor`，只要其路径使用 `fill="currentColor"` 或 `stroke="currentColor"`，图标就会采用周围文字的颜色（此处为 `red`）。
-
-## 带标签的（非装饰性）图标
-
-```tsx
-<Icon aria-label="Search" viewBox="0 0 24 24">
-  <path d="M10 2a8 8 0 105.3 14.03l4.34 4.34 1.42-1.42-4.34-4.34A8 8 0 0010 2z" />
-</Icon>
-```
-
-## CMS 页面构建器
-
-该组件可作为 `icon` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用 —— `svg` 保存原始的 SVG 内部标记：
 
 ```json
 {
   "type": "icon",
-  "svg": "<path d=\"M12 2 2 7l10 5 10-5-10-5z\" />",
+  "svg": "<path d=\"M5 12h14M12 5l7 7-7 7\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" />",
   "viewBox": "0 0 24 24",
+  "fill": "none",
+  "stroke": "currentColor",
+  "size": "md"
+}
+```
+
+## 2. 强调型功能分类标记（大号）
+
+渲染一个更大的图形图标，代表功能、套餐权益或营销分类区块。
+
+<DemoPreview>
+  <Icon size="lg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </Icon>
+</DemoPreview>
+
+```json
+{
+  "type": "icon",
+  "svg": "<path d=\"M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" />",
+  "viewBox": "0 0 24 24",
+  "fill": "none",
+  "stroke": "currentColor",
   "size": "lg"
 }
 ```
 
+***
+
 # 属性
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `children` | `Child` | SVG 内容（`<path>` 等），或用于渲染/合并的单个类 SVG 元素。 |
-| `class` | `string` | 自定义 CSS 类。 |
+| 属性 | CMS 字段类型 | 默认值 | 描述 / 支持选项 |
+| --- | --- | --- | --- |
+| **矢量形状标记** (`svg`) | `string` | - | 原始矢量内部 SVG 标记标签（例如 `<path d="..." />`、`<circle cx="..." />`）。 |
+| **视口包围盒** (`viewBox`) | `string` | `"0 0 24 24"` | 告知浏览器坐标缩放。通常与源 SVG 设计匹配。 |
+| **缩放尺寸** (`size`) | `select` | `"md"` | 标准化的视觉尺寸比例。<br/>• 选项：`"2xs"`、`"xs"`、`"sm"`、`"md"`、`"lg"`、`"xl"`。 |
+| **填充规则** (`fill`) | `string` | `"currentColor"` | 背景填充规则。如果使用描边轮廓线，请设置为 `"none"`。 |
+| **描边颜色** (`stroke`) | `string` | - | 边框轮廓颜色。设置为 `"currentColor"` 以继承相邻的字体颜色主题。 |
+| **ARIA 描述标签** (`aria-label`) | `string` | - | 屏幕阅读器标签。留空时，图标会自动对屏幕阅读器隐藏（`aria-hidden="true"`）。 |
 
-| `size` | \`"2xs" \ | "xs" \ | "sm" \ | "md" \ | "lg" \ | "xl"\` | 图标的尺寸。默认 `"md"`。 |
+***
 
-| `asChild` | `boolean` | 将属性合并到单个子元素上，而不是用新的 `<svg>` 包裹它。默认 `true`。 |
-| `viewBox` | `string` | 透传到渲染/合并后的 `<svg>`。 |
-| `xmlns` | `string` | 透传到生成的 `<svg>` 包裹元素。默认为 SVG 命名空间。 |
-| `fill` | `string` | 透传到渲染/合并后的 `<svg>`。 |
-| `stroke` | `string` | 透传到渲染/合并后的 `<svg>`。 |
-| `aria-label` | `string` | 无障碍标签。提供后，`aria-hidden` 会被省略。 |
+# 无障碍与 SVG 优化说明
 
-| `aria-hidden` | \`boolean \ | "true" \ | "false"\` | 未提供 `aria-label` 时默认为 `"true"`（图标默认是装饰性的）。 |
+- **默认 Aria-Hidden：** 由于图标通常用作装饰性视觉强调（例如文本列表旁的子弹图标），如果没有提供描述性的 `aria-label` 文本，组件会自动应用 `aria-hidden="true"`。
+- **智能 SVG 合并（`asChild`）：** 对于自定义开发者布局，设置 `asChild`（默认 true）会自动将组件计算出的类名和缩放参数直接合并到单个手写子 `<svg>` 元素上。这消除了在输出 HTML 源码中渲染冗余包装元素的情况。
+- **颜色继承：** 由于底层 CSS 配方设置了 `color: currentcolor`，使用 `stroke="currentColor"` 或 `fill="currentColor"` 的矢量路径会无缝继承父级的排版配色方案。

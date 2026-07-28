@@ -1,7 +1,7 @@
 ---
 title: ToggleGroup Grupo de Alternancia
-hydration: 2
 category: Forms
+hydration: 2
 ---
 
 import { ToggleGroup, Stack } from "../../../app/components/ui";
@@ -9,126 +9,142 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introducción
 
-Un conjunto de botones de alternancia para selección única o múltiple, excluyente o incluyente — por ejemplo, controles de formato de texto (negrita/cursiva/subrayado) o un selector de vista.
+El componente `ToggleGroup` es un conjunto de botones de alternancia diseñados para selección única o múltiple. Se usa ampliamente para permitir a los usuarios elegir estilos de diseño mutuamente excluyentes (p. ej. conmutadores de vista de Cuadrícula vs. Lista) o agrupar modificadores inclusivos (p. ej. botones de formato de texto para Negrita, Cursiva y Subrayado).
 
-# Hidratación
+El **ToggleGroup** está totalmente integrado como un bloque `toggleGroup` en el **Page Builder**, lo que permite a editores de contenido y desarrolladores configurar fácilmente opciones visuales, comportamientos de multiselección y paletas de color activas directamente en el CMS.
 
-**Nivel 2 — detección automática inteligente.** Un `ToggleGroup` se renderiza como HTML estático y no envía JS del cliente a menos que esté presente una señal de comportamiento. Pasa `interactive={true}` para forzar la hidratación, o `interactive={false}` para forzar un renderizado estático.
-
-Se hidrata como island cuando está presente **cualquiera** de las siguientes señales (o se establece `interactive={true}`):
-
-- `value` (selección controlada)
-- `defaultValue` (selección inicial no controlada)
-- `onValueChange`
-
-| `interactive` prop | Result |
-| --- | --- |
-| omitido, **sin** señal | Estático — sin JS del cliente |
-| omitido, señal presente | Se hidrata como island |
-| `true` | Se hidrata como island |
-| `false` | Estático — sin JS del cliente |
+***
 
 # Uso
 
+Estos ejemplos ilustran cómo los editores de contenido enlazan y estructuran botones de alternancia interactivos.
+
+## 1. Barra de formato de texto de selección múltiple
+
+Permite que varios elementos se mantengan pulsados y activos al mismo tiempo. Excelente para interruptores de funciones de multiselección o paneles de edición de texto.
+
 <DemoPreview>
-  <Stack direction="horizontal" gap="6">
-    <ToggleGroup
-      multiple
-      defaultValue={["bold"]}
-      items={[
-        { label: "B", value: "bold" },
-        { label: "I", value: "italic" },
-        { label: "U", value: "underline" },
-      ]}
-      interactive
-    />
-    <ToggleGroup
-      defaultValue={["list"]}
-      items={[
-        { label: "Grid", value: "grid" },
-        { label: "List", value: "list" },
-      ]}
-      interactive
-    />
-  </Stack>
+  <ToggleGroup
+    multiple
+    defaultValue={["bold"]}
+    items={[
+      { label: "B", value: "bold" },
+      { label: "I", value: "italic" },
+      { label: "U", value: "underline" },
+    ]}
+    interactive
+  />
 </DemoPreview>
 
-```tsx
-import { ToggleGroup } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <ToggleGroup
-      multiple
-      defaultValue={["bold"]}
-      items={[
-        { label: "B", value: "bold" },
-        { label: "I", value: "italic" },
-        { label: "U", value: "underline" },
-      ]}
-    />
-  );
+```json
+{
+  "type": "toggleGroup",
+  "multiple": true,
+  "defaultValue": ["bold"],
+  "items": [
+    { "label": "B", "value": "bold" },
+    { "label": "I", "value": "italic" },
+    { "label": "U", "value": "underline" }
+  ],
+  "interactive": true
 }
 ```
 
-## Composición personalizada
+## 2. Conmutador de diseño de selección única (tema púrpura)
 
-Pasa `children` en lugar de `items` para tener control total sobre el contenido de cada botón:
+Demuestra el modo de selección única donde solo un elemento puede estar activo a la vez. Las opciones activas se estilizan con tokens de tema púrpura acentuado personalizado.
 
-```tsx
-import { ToggleGroup } from "../components/ui";
+<DemoPreview>
+  <ToggleGroup
+    defaultValue={["list"]}
+    items={[
+      { label: "Grid View", value: "grid" },
+      { label: "List View", value: "list" },
+    ]}
+    colorPalette="purple"
+    interactive
+  />
+</DemoPreview>
 
-export default function MyPage() {
-  return (
-    <ToggleGroup defaultValue={["list"]}>
-      <ToggleGroup.Item value="grid">Grid</ToggleGroup.Item>
-      <ToggleGroup.Item value="list">List</ToggleGroup.Item>
-    </ToggleGroup>
-  );
+```json
+{
+  "type": "toggleGroup",
+  "multiple": false,
+  "defaultValue": ["list"],
+  "items": [
+    { "label": "Grid View", "value": "grid" },
+    { "label": "List View", "value": "list" }
+  ],
+  "colorPalette": "purple",
+  "interactive": true
 }
 ```
+
+## 3. Grupo de navegación vertical compacto
+
+Organiza las opciones de alternancia verticalmente en lugar de horizontalmente, con una escala de tamaño compacto.
+
+<DemoPreview>
+  <ToggleGroup
+    orientation="vertical"
+    defaultValue={["dashboard"]}
+    items={[
+      { label: "Dashboard", value: "dashboard" },
+      { label: "Settings", value: "settings" },
+    ]}
+    size="sm"
+    interactive
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "toggleGroup",
+  "orientation": "vertical",
+  "defaultValue": ["dashboard"],
+  "items": [
+    { "label": "Dashboard", "value": "dashboard" },
+    { "label": "Settings", "value": "settings" }
+  ],
+  "size": "sm",
+  "interactive": true
+}
+```
+
+***
 
 # Propiedades
 
-## Root
+| Propiedad | Tipo de campo CMS | Predeterminado | Descripción / Opciones admitidas |
+| --- | --- | --- | --- |
+| **Selección múltiple** (`multiple`) | `boolean` | `false` | Permite que más de un elemento de botón se active simultáneamente. |
+| **Valores activos iniciales** (`defaultValue`) | `list` | `[]` | Lista de valores de cadena que representan las opciones de botón que comienzan en estado activo. |
+| **Valores activos** (`value`) | `list` | - | Lista de valores de cadena que representan las opciones activas (controlado). |
+| **Elementos de botón** (`items`) | `list` | `[]` | Colección ordenada de botones de alternancia. (Ver esquema de elementos de alternancia abajo). |
+| **Flujo de diseño** (`orientation`) | `select` | `"horizontal"` | Disposición de las opciones de alternancia. <br/>• Opciones: `"horizontal"`, `"vertical"`. |
+| **Estilo visual** (`variant`) | `select` | `"outline"` | Variante de diseño estructural. <br/>• Opciones: `"outline"`, `"ghost"`. |
+| **Escala de tamaño** (`size`) | `select` | `"md"` | Controla la altura general, el relleno y la escala del texto. <br/>• Opciones: `"sm"`, `"md"`, `"lg"`. |
+| **Tema de color** (`colorPalette`) | `select` | `"green"` | Acento de color visual aplicado a los botones activos. <br/>• Opciones: `blue`, `green`, `red`, `purple`, `orange`, `amber`, `cyan`, `slate`. |
+| **Forzar interactivo** (`interactive`) | `boolean` | `true` | Hidrata el componente como una isla interactiva del lado del cliente para coordinar alineaciones y gestionar el enrutado por teclado. |
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `value` | `string[]` | Los valores actualmente presionados (controlado). |
-| `defaultValue` | `string[]` | Los valores inicialmente presionados (no controlado). |
-| `onValueChange` | `(value: string[]) => void` | Se llama cuando cambia la selección. |
-| `multiple` | `boolean` | Permite que se presione más de un elemento a la vez. Predeterminado `false` (selección única, desactivable al volver a alternar). |
-| `disabled` | `boolean` | Deshabilita todos los elementos. |
-| `orientation` | `"horizontal" \| "vertical"` | Flujo de diseño, y el eje por el que se desplazan las teclas de flecha. Predeterminado `"horizontal"`. |
-| `id` | `string` | El id del elemento raíz. |
-| `variant` | `"outline" \| "ghost"` | Estilo visual. Predeterminado `"outline"`. |
-| `size` | `"sm" \| "md" \| "lg"` | Tamaño visual. Predeterminado `"md"`. |
-| `interactive` | `boolean` | Anula la decisión de hidratación (ver arriba). |
-| `class` | `string` | Clases CSS personalizadas para el elemento raíz. |
+### Esquema de elementos del grupo de alternancia
 
-## Composición predeterminada
+Cada entrada dentro del array `items` acepta los siguientes parámetros:
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `items` | `ToggleGroupItem[]` | Botones a renderizar cuando se omite `children`. |
+| Propiedad | Tipo de campo CMS | Requerido | Descripción |
+| --- | --- | --- | --- |
+| **Texto visible** (`label`) | `string` | Sí | Texto de etiqueta renderizado dentro del botón de alternancia. |
+| **Clave única** (`value`) | `string` | Sí | Identificador clave que hace referencia al estado activo de esta opción. |
+| **Deshabilitado** (`disabled`) | `boolean` | `false` | Deshabilita la interacción del usuario y atenúa el estilo de este botón. |
 
-## ToggleGroupItem
+***
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `value` | `string` | El valor único del elemento. |
-| `label` | `string \| JSX.Element` | El contenido visible del botón. |
-| `disabled` | `boolean` | Deshabilita este botón. |
+# Notas para desarrolladores y accesibilidad
 
-## Subcomponentes
-
-| Part | Description |
-| --- | --- |
-| `ToggleGroup.Item` | Un botón de alternancia. Requiere una propiedad `value`; renderiza `role="checkbox"` en modo `multiple` o `role="radio"` en caso contrario. |
-
-# Accesibilidad
-
-- El elemento raíz tiene `role="group"`.
-- Los elementos renderizan `role="checkbox"` + `aria-pressed` cuando `multiple`, o `role="radio"` + `aria-checked` en caso contrario.
-- Las teclas de flecha (Derecha/Abajo para avanzar, Izquierda/Arriba para retroceder) desplazan el foco entre los elementos habilitados; Home/End saltan al primer/último elemento habilitado — según coincida con `orientation`.
-- `data-state` (`on`/`off`) y `data-disabled` se reflejan en cada elemento para su estilización.
+- **Patrones de accesibilidad WAI-ARIA:** Renderiza una barra de herramientas robusta navegable por teclado:
+    - El contenedor raíz recibe `role="group"`.
+    - Los elementos individuales se renderizan como `role="checkbox"` con estados `aria-checked` cuando `multiple` es true, o como `role="radio"` con estados `aria-checked` en caso contrario.
+- **Navegación por teclado con foco móvil (Roving Focus):** Admite el movimiento de foco nativo:
+    - Las teclas de flecha (Derecha/Abajo para avanzar, Izquierda/Arriba para retroceder) recorren automáticamente el foco entre los botones activos, coincidiendo con el eje de `orientation` elegido.
+    - Las teclas Inicio y Fin desplazan el foco instantáneamente al primer y último botón habilitado del grupo.
+- **Asociación de formularios:** Las opciones de alternancia actualizan sin problemas el contexto de estado asociado, permitiendo que los contenedores principales o los hooks de formulario capturen los cambios dinámicamente.

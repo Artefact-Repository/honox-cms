@@ -1,7 +1,7 @@
 ---
 title: Grid Grade
-hydration: 3
 category: Layout
+hydration: 3
 ---
 
 import { Grid } from "../../../app/components/ui";
@@ -124,14 +124,12 @@ Este componente está disponível como um bloco `grid` no [Construtor de página
 | --- | --- | --- |
 | `children` | `any` | Conteúdo a ser renderizado dentro da grade. |
 | `class` | `string` | Classes CSS personalizadas. |
-
-| `columns` | \`Responsive\<number \ | string\>\` | Número de colunas (`repeat(columns, minmax(0, 1fr))`). Tem precedência sobre `minChildWidth` se ambos estiverem definidos. |
-| `rows` | \`Responsive\<number \ | string\>\` | Número de linhas (`repeat(rows, minmax(0, 1fr))`). |
-| `minChildWidth` | \`Responsive\<number \ | string\>\` | Autoajusta quantas colunas couberem, cada uma com pelo menos essa largura (`repeat(auto-fit, minmax(width, 1fr))`). Ignorado quando `columns` é definido. |
-
-| `gap` | \`string \ | number \ | Responsive\<...\>\` | Espaçamento entre células. Padrão `"8px"` a menos que `columnGap`/`rowGap` seja definido. |
-| `columnGap` | \`string \ | number \ | Responsive\<...\>\` | Espaçamento apenas entre colunas. |
-| `rowGap` | \`string \ | number \ | Responsive\<...\>\` | Espaçamento apenas entre linhas. |
+| `columns` | `number \| string \| Responsive<...>` | Número de colunas (`repeat(columns, minmax(0, 1fr))`). Tem precedência sobre `minChildWidth` se ambos estiverem definidos. |
+| `rows` | `number \| string \| Responsive<...>` | Número de linhas (`repeat(rows, minmax(0, 1fr))`). |
+| `minChildWidth` | `number \| string \| Responsive<...>` | Autoajusta quantas colunas couberem, cada uma com pelo menos essa largura (`repeat(auto-fit, minmax(width, 1fr))`). Ignorado quando `columns` é definido. |
+| `gap` | `string \| number \| Responsive<...>` | Espaçamento entre células. Padrão `"8px"` a menos que `columnGap`/`rowGap` seja definido. |
+| `columnGap` | `string \| number \| Responsive<...>` | Espaçamento apenas entre colunas. |
+| `rowGap` | `string \| number \| Responsive<...>` | Espaçamento apenas entre filas. |
 
 `Responsive<T>` aceita um valor simples ou um objeto por breakpoint,
 por exemplo `{ base: 1, md: 2, lg: 3 }`, usando os mesmos breakpoints do restante

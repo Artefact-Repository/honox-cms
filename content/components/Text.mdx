@@ -1,7 +1,7 @@
 ---
 title: Text
-hydration: 3
 category: Typography
+hydration: 3
 ---
 
 import { Text } from "../../app/components/ui";
@@ -9,45 +9,65 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-A polymorphic component for displaying body text, paragraphs, or spans with consistent typography.
+The foundational typographic component used to render body copy, paragraphs, descriptions, or short textual span highlights with consistent tracking, line-heights, and responsive font-sizing.
+
+The **Text** component is fully integrated as a standard `text` block inside the **Page Builder**, enabling Sveltia CMS authors to configure text copy, font sizing, and polymorphic HTML elements directly inside the page layouts.
+
+***
 
 # Usage
 
+These configurations represent exactly how page-builder block items are constructed.
+
+## 1. Large Body Lead Paragraph
+
+An optimized larger paragraph text commonly placed directly beneath heading blocks to introduce a page, highlight key metrics, or set article summaries.
+
 <DemoPreview>
-  <Text size="lg">This is a paragraph.</Text>
+  <Text size="lg">This is a main lead paragraph describing the core platform features. It scales larger for optimal legibility.</Text>
 </DemoPreview>
-
-```tsx
-import { Text } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Text size="lg" class="muted">
-      This is a paragraph.
-    </Text>
-  );
-}
-```
-
-## CMS Page Builder
-
-This component is available as a `text` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
 
 ```json
 {
   "type": "text",
-  "content": "This is a paragraph.",
-  "size": "lg"
+  "content": "This is a main lead paragraph describing the core platform features. It scales larger for optimal legibility.",
+  "size": "lg",
+  "as": "p"
 }
 ```
 
+## 2. Standard Descriptive Body Copy
+
+A standard body paragraph block used to describe features, write extensive documentation notes, or document specifications.
+
+<DemoPreview>
+  <Text size="md">Pulse analytics provides sub-second database synchronization loops across all active workspace zones instantly.</Text>
+</DemoPreview>
+
+```json
+{
+  "type": "text",
+  "content": "Pulse analytics provides sub-second database synchronization loops across all active workspace zones instantly.",
+  "size": "md",
+  "as": "p"
+}
+```
+
+***
+
 # Props
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `children` | `any` | The text or content. |
-| `class` | `string` | Custom CSS classes. |
-| `as` | `string` | The HTML element to render (e.g., "p", "span"). Defaults to "p". |
-| `size` | `string` | The font size variant. |
-| `variant` | `string` | Typographic style variant (e.g., "heading", "label"). |
-| `interactive` | `boolean` | Whether to enable client-side hydration. |
+| Property | CMS Field Type | Default | Description / Supported Options |
+| --- | --- | --- | --- |
+| **Text Content** (`content`) | `string` | - | The raw text copy or paragraph content to render on-screen. |
+| **HTML Tag Element** (`as`) | `select` | `"p"` | Semantic HTML element written to the page output. <br/>• Options: `"p"`, `"span"`, `"div"`, `"small"`. |
+| **Size Scaling** (`size`) | `select` | `"md"` | Typographic size preset. <br/>• Options: `"xs"`, `"sm"`, `"md"`, `"lg"`, `"xl"`, `"2xl"`. |
+| **Visual Variant** (`variant`) | `string` | - | Custom visual styling rules or predefined utility classes. |
+
+***
+
+# Technical Implementation Notes
+
+- **Polymorphic Layouts:** The HTML element generated on the server is determined by the `as` property (e.g., `<p>` vs `<span>`), while visual styling remains independent. This allows developers to maintain perfect semantic layout rules for SEO indexing while adjusting visual text sizing freely.
+- **Atomic Styles with Panda CSS:** Sizing styles are precompiled on build into atomic utility classes. This provides optimal letter tracking, vertical line heights, and margins to eliminate lay-out shifts while navigating.
+- **Static Delivery:** Typographic elements contain no interactive JavaScript. Setting `"interactive": true` is accepted but typographic copy remains fully static by default.

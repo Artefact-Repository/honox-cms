@@ -1,7 +1,7 @@
 ---
 title: Drawer Tiroir
-hydration: 1
 category: Overlays
+hydration: 1
 ---
 
 import { Drawer, Button } from "../../../app/components/ui";
@@ -9,72 +9,108 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introduction
 
-Un panneau qui glisse depuis le bord de l'écran pour présenter du contenu ou des actions sans quitter la page actuelle.
+Un panneau superposé qui glisse depuis le bord de l'écran, hébergeant un contenu temporaire, des formulaires, des paramètres ou des flux en plusieurs étapes. Ce composant permet aux utilisateurs d'effectuer des tâches, d'ajuster des préférences ou de consulter des informations détaillées sans perdre le contexte de leurs vues de page principales.
+
+Le composant **Drawer** est entièrement intégré en tant que bloc `drawer` dans le **Page Builder**, permettant aux auteurs de contenu et aux développeurs de configurer facilement des boutons déclencheurs, des en-têtes descriptifs et des pieds de page d'action personnalisés directement dans le CMS.
+
+***
 
 # Utilisation
 
-## Tiroir de base
+Ces exemples illustrent comment les éditeurs de contenu lient et structurent les composants drawer.
+
+## 1. Tiroir de Configuration de Paramètres Standard
+
+Un panneau de configuration standard comprenant un titre, une description et des déclencheurs de boutons primaires/secondaires.
 
 <DemoPreview>
   <Drawer
-    trigger={<Button>Open Drawer</Button>}
-    title="Settings"
-    description="Adjust your preferences."
-    body="Drawer body content goes here."
-    cancel={<Button variant="outline">Close</Button>}
-    confirm={<Button>Save</Button>}
+    trigger={<Button>Open Settings</Button>}
+    title="Workspace Preferences"
+    description="Customize your development workspace configurations."
+    body="Configure default themes, enable telemetry, toggle system status reports, and authorize third-party API hook integrations for your active workspace."
+    cancel={<Button variant="outline">Cancel</Button>}
+    confirm={<Button>Apply Changes</Button>}
   />
 </DemoPreview>
-
-```tsx
-import { Drawer, Button } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Drawer
-      trigger={<Button>Open Drawer</Button>}
-      title="Settings"
-      description="Adjust your preferences."
-      body="Drawer body content goes here."
-      cancel={<Button variant="outline">Close</Button>}
-      confirm={<Button>Save</Button>}
-    />
-  );
-}
-```
-
-## Constructeur de pages CMS
-
-Ce composant est disponible sous forme de bloc « tiroir » dans [Page Builder](/docs/PageBuilder) (`content/pages/*.json`). `trigger` est une liste de blocage imbriquée (le CMS soumet toujours un tableau) :
 
 ```json
 {
   "type": "drawer",
-  "title": "Settings",
-  "description": "Adjust your preferences.",
-  "confirmText": "Save",
-  "cancelText": "Close",
-  "trigger": [{ "type": "button", "text": "Open Drawer" }]
+  "title": "Workspace Preferences",
+  "description": "Customize your development workspace configurations.",
+  "confirmText": "Apply Changes",
+  "cancelText": "Cancel",
+  "trigger": [
+    {
+      "type": "button",
+      "text": "Open Settings",
+      "variant": "outline"
+    }
+  ]
 }
 ```
 
-# Propriétés
+## 2. Tiroir de Révision d'Informations avec Pied de Page Personnalisé
 
-## Tiroir
+Présente une composition de mise en page alternative où une liste de boutons d'action personnalisés est fournie dans le tableau de pied de page aux côtés des contrôles standard.
 
-| Propriété | Type | Description |
-| --- | --- | --- |
-| `trigger` | `JSX.Element` | Élément qui ouvre le tiroir lorsqu'il est activé. |
+<DemoPreview>
+  <Drawer
+    trigger={<Button>Review System Specs</Button>}
+    title="System Diagnostics"
+    description="Real-time node and performance overview."
+    body="All background microservices are reporting healthy statuses. Memory allocation is stable at 42%, and static page routing delivery latency is currently averaging 12ms."
+    cancel={<Button variant="outline">Dismiss</Button>}
+    footer={[
+      <Button variant="subtle" colorPalette="blue" style={{ marginRight: "8px" }}>Refresh Node</Button>
+    ]}
+  />
+</DemoPreview>
 
-| `title` | \`string \ | JSX.Élément\` | The drawer title. |
-| `description` | \`string \ | JSX.Élément\` | The drawer description. |
-| `body` | \`string \ | JSX.Élément\` | The main body content. |
-| `footer` | \`string \ | JSX.Élément\` | Custom footer content. |
+```json
+{
+  "type": "drawer",
+  "title": "System Diagnostics",
+  "description": "Real-time node and performance overview.",
+  "cancelText": "Dismiss",
+  "trigger": [
+    {
+      "type": "button",
+      "text": "Review System Specs"
+    }
+  ],
+  "footer": [
+    {
+      "type": "button",
+      "text": "Refresh Node",
+      "variant": "subtle",
+      "colorPalette": "blue"
+    }
+  ]
+}
+```
 
-| `cancel` | `JSX.Element` | Élément rendu comme un déclencheur de fermeture (annulation). |
-| `confirm` | `JSX.Element` | Élément rendu comme déclencheur d'action. |
-| `closable` | `boolean` | S'il faut afficher le bouton de fermeture. Par défaut : « vrai ». |
-| `interactive` | `boolean` | Activez l’hydratation côté client pour un comportement interactif. |
-| `class` | `string` | Classes CSS personnalisées pour l'élément racine. |
+***
 
-Des accessoires supplémentaires (par exemple `open`, `defaultOpen`, `onOpenChange`, `id`) sont transmis à la primitive de tiroir sous-jacente.
+# Props
+
+| Propriété | Type de Champ CMS | Par défaut | Description / Options Prises en Charge |
+| --- | --- | --- | --- |
+| **Titre du Tiroir** (`title`) | `string` | - | En-tête principal affiché bien en évidence en haut du panneau tiroir coulissant. |
+| **Description** (`description`) | `string` | - | Message de sous-titre de support imbriqué sous le titre. |
+| **Contenu du Corps** (`body`) | `string` | - | Contenu textuel principal affiché à l'intérieur du conteneur de défilement du tiroir. |
+| **Blocs Déclencheurs** (`trigger`) | `list` | - | Tableau de composants (généralement un seul Bouton) rendus sur la page pour ouvrir le tiroir. |
+| **Texte de Confirmation** (`confirmText`) | `string` | - | Libellé personnalisé pour le bouton d'action principal. Omettre pour masquer le contrôle de confirmation. |
+| **Texte d'Annulation** (`cancelText`) | `string` | - | Libellé personnalisé pour le bouton secondaire de rejet. Omettre pour masquer le contrôle d'annulation. |
+| **Blocs de Pied de Page** (`footer`) | `list` | - | Liste de blocs de boutons auxiliaires rendus à côté des actions standard confirmer/annuler. |
+| **Afficher le Bouton de Fermeture** (`closable`) | `boolean` | `true` | Lorsque activé, rend une icône visuelle de fermeture « X » standard dans le coin supérieur. |
+| **Forcer Interactif** (`interactive`) | `boolean` | `true` | Hydrate instantanément la superposition du tiroir, les couches de transition et le piégeage du focus en tant qu'îlot côté client. |
+
+***
+
+# Notes de Développement et Accessibilité
+
+- **Îlot d'Hydratation :** Parce que le panneau coulissant repose sur des transformations d'état côté client, des fermetures d'overlay d'arrière-plan, des pièges de focus clavier et des interactions tactiles, il s'hydrate par défaut en tant qu'îlot client interactif (`"interactive": true`).
+- **Conformité WAI-ARIA :** Sous le capot, ce composant est conforme aux spécifications d'overlay (`role="dialog"`, `aria-modal="true"`, `aria-labelledby`, `aria-describedby`). L'ouverture du tiroir piège automatiquement le focus clavier à l'intérieur du panneau. Appuyer sur la touche `Escape` ou cliquer sur la couche d'arrière-plan assombrie rejette le tiroir en toute sécurité, renvoyant le focus à l'élément déclencheur.
+- **Composition d'Îlot Unifiée :** Pour éviter les divergences d'hydratation et les bugs de collision d'overlay dans des cadres client complexes, les éléments imbriqués (y compris les déclencheurs de confirmation, les cales de fermeture et les spinners de chargement) sont regroupés dans un environnement d'îlot unifié unique.

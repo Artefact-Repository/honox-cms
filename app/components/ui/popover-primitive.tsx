@@ -582,10 +582,7 @@ function InteractivePopoverRoot(props: InteractivePopoverProps) {
 				trigger.setAttribute("data-state", "open");
 				trigger.setAttribute("aria-expanded", "true");
 			}
-			const indicators = ownedBy<HTMLElement>(
-				root,
-				'[data-part="indicator"]',
-			);
+			const indicators = ownedBy<HTMLElement>(root, '[data-part="indicator"]');
 			indicators.forEach((i) => {
 				i.setAttribute("data-state", "open");
 			});
@@ -613,10 +610,7 @@ function InteractivePopoverRoot(props: InteractivePopoverProps) {
 				trigger.setAttribute("data-state", "closed");
 				trigger.setAttribute("aria-expanded", "false");
 			}
-			const indicators = ownedBy<HTMLElement>(
-				root,
-				'[data-part="indicator"]',
-			);
+			const indicators = ownedBy<HTMLElement>(root, '[data-part="indicator"]');
 			indicators.forEach((i) => {
 				i.setAttribute("data-state", "closed");
 			});

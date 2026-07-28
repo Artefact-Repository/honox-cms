@@ -1,7 +1,7 @@
 ---
 title: Field
-hydration: 2
 category: Forms
+hydration: 2
 ---
 
 import { Field } from "../../app/components/ui";
@@ -9,156 +9,129 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-A foundational component for form fields, managing labels, helper text, error messages, and validation state. It follows the "Smart Switcher" pattern, automatically hydrating as an interactive island when needed.
+A foundational input control designed to manage forms cleanly and accessibly. It aggregates input labels, contextual helper texts, dynamic error validation states, and custom JS-based rule checking into a cohesive, developer-friendly interface.
+
+The **Field** component is fully integrated as an interactive `field` block inside the **Page Builder**. This allows content creators and designers to draft fields, place custom HTML form inputs, and supply instant client-side validation logic directly from Sveltia CMS without writing layout boilerplate.
+
+***
 
 # Usage
 
-## Smart Auto-Hydration
+These examples illustrate how content editors bind and configure form field structures.
 
-The `Field` component automatically determines if it should be interactive. It becomes an island if any of the following props are provided: `interactive`, `onValueChange`, `value`, `defaultValue`, `validator`, or `minLength`.
+## 1. Standard Input Field
 
-## Validation
-
-Field supports built-in and custom validation.
-
-### Minimum Length
-
-Using `minLength` will automatically show an error message if the input is too short.
-
-```tsx
-<Field
-  label="Username"
-  minLength={5}
-  placeholder="Enter at least 5 characters"
-/>
-```
-
-### Custom Validator
-
-The `validator` prop accepts a function that returns `true` for valid, `false` for invalid (using default error message), or a `string` as a custom error message.
-
-```tsx
-<Field
-  label="Email"
-  validator={(value) => {
-    if (!value.includes("@")) return "Must be a valid email";
-    return true;
-  }}
-/>
-```
-
-The simplest way to use Field is with the flattened props. It will automatically render an input.
+A standard text field featuring a companion label, placeholder prompt, and a description helper text located directly below the input element.
 
 <DemoPreview>
   <div style={{ width: "100%", maxWidth: "320px" }}>
     <Field
       label="Username"
-      helperText="Choose a unique username."
-      placeholder="Type here..."
-      minLength={3}
+      placeholder="e.g. jules_architect"
+      helperText="Choose a unique public username."
+      interactive
     />
   </div>
 </DemoPreview>
-
-```tsx
-import { Field } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Field
-      label="Username"
-      helperText="Choose a unique username."
-      placeholder="Type here..."
-      minLength={3}
-    />
-  );
-}
-```
-
-## Fieldset inheritance
-
-A `Field` nested inside a `Fieldset` inherits the group's `disabled`/`required`
-state, and its `invalid` state too — but only when the `Field` has no
-validation of its own (no `validator`/`minLength` and no explicit `invalid`
-prop). An explicit prop on `Field` always wins over the inherited value.
-
-```tsx
-<Fieldset legend="Shipping address" disabled>
-  {/* inherits disabled — no need to repeat it */}
-  <Field label="Street" />
-</Fieldset>
-```
-
-Note that native `<fieldset disabled>` also disables every descendant form
-control at the browser level regardless of this inheritance — the inherited
-`disabled` prop only keeps the `Field`'s own styling/ARIA in sync with that,
-it can't be overridden back to enabled from inside a disabled fieldset.
-
-## Composition
-
-For more control, you can wrap other components like `Textarea` or custom inputs. The `Field` provides context to its children.
-
-```tsx
-import { Field, Textarea } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Field
-      label="Bio"
-      helperText="Tell us about yourself."
-      minLength={10}
-    >
-      <Textarea placeholder="A short bio" />
-    </Field>
-  );
-}
-```
-
-## CMS Page Builder
-
-This component is available as a `field` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
 
 ```json
 {
   "type": "field",
   "label": "Username",
-  "helperText": "Choose a unique username.",
-  "required": true
+  "placeholder": "e.g. jules_architect",
+  "helperText": "Choose a unique public username.",
+  "name": "username",
+  "interactive": true
 }
 ```
 
-`validator` also accepts a plain string in CMS content — a JS expression that
-evaluates to a function, since a live function can't survive the CMS's JSON
-serialization. It's reconstructed client-side via `new Function()`, so it
-must not close over any outer variable:
+## 2. Dynamic Input with Client-Side Validation
+
+Utilizes custom validation logic. When the user inputs fewer than 5 characters or skips the `@` sign, an error message is automatically displayed and announced dynamically.
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <Field
+      label="Email Address"
+      placeholder="architect@domain.com"
+      defaultValue="invalid-email"
+      validator={(value) => value.includes("@") || "Must be a valid email containing '@'"}
+      interactive
+    />
+  </div>
+</DemoPreview>
 
 ```json
 {
   "type": "field",
-  "label": "Email",
-  "validator": "(value) => value.includes('@') || 'Must be a valid email'"
+  "label": "Email Address",
+  "placeholder": "architect@domain.com",
+  "defaultValue": "invalid-email",
+  "validator": "(value) => value.includes('@') || 'Must be a valid email containing \'@\''",
+  "name": "email",
+  "interactive": true
 }
 ```
 
+## 3. Required & Disabled Option Fields
+
+Demonstrates form field styles under standard HTML block states. This helps content writers visualize how fields look when they are mandatory (asterisk indicator) or locked due to permissions.
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+    <Field
+      label="Secret Key"
+      defaultValue="SUPER_SECURE_TOKEN"
+      readOnly
+      required
+      interactive
+    />
+    <Field
+      label="Legacy Code"
+      placeholder="Not available"
+      disabled
+      interactive
+    />
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "field",
+  "label": "Secret Key",
+  "defaultValue": "SUPER_SECURE_TOKEN",
+  "readOnly": true,
+  "required": true,
+  "interactive": true
+}
+```
+
+***
+
 # Props
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `children` | `any` | Content to be rendered inside the component. If provided, the internal input is not rendered. |
-| `class` | `string` | Custom CSS classes. |
-| `id` | `string` | Unique identifier. If not provided, one is generated. |
-| `label` | `Child` | The label for the field. |
-| `helperText` | `Child` | The helper text for the field. |
-| `errorText` | `Child` | The error text for the field. If provided as a string, it will be used as the message. |
-| `disabled` | `boolean` | Whether the field is disabled. |
-| `invalid` | `boolean` | Whether the field is in an invalid state. |
-| `required` | `boolean` | Whether the field is required. |
-| `readOnly` | `boolean` | Whether the field is read-only. |
-| `value` | `string` | The current value (forces interactive mode). |
-| `defaultValue` | `string` | The initial value (forces interactive mode). |
-| `onValueChange` | `(val: string) => void` | Callback triggered when value changes (forces interactive mode). |
-| `minLength` | `number` | Minimum length validation (forces interactive mode). |
+| Property | CMS Field Type | Default | Description / Supported Options |
+| --- | --- | --- | --- |
+| **Label Text** (`label`) | `string` | - | The visual title or description positioned directly above the input element. |
+| **Name** (`name`) | `string` | - | Standard HTML name attribute sent with form submissions. |
+| **Placeholder** (`placeholder`) | `string` | - | Light placeholder text shown inside the input when it's completely empty. |
+| **Helper Text** (`helperText`) | `string` | - | Contextual hint or instruction text printed beneath the input field. |
+| **Error Text** (`errorText`) | `string` | - | Manual error message override. Triggers invalid styling and screen-reader announcements. |
+| **Default Value** (`defaultValue`) | `string` | - | Pre-populates the input on page load. Forces client-side interactive island mode. |
+| **Required** (`required`) | `boolean` | `false` | Renders a red asterisk indicator signaling that this input must not be left empty. |
+| **Disabled** (`disabled`) | `boolean` | `false` | Prevents all typing or cursor interaction and dims the entire field. |
+| **Read Only** (`readOnly`) | `boolean` | `false` | Keeps the value selectable and tab-focused but prevents editing of the text. |
+| **Invalid State** (`invalid`) | `boolean` | `false` | Explicitly forces the field into an error state, highlighting borders in red. |
 
-| `validator` | \`(val: string) => boolean \ | string\` | Custom validation function (forces interactive mode). |
+| **Validator Expression** (`validator`) | `string` | - | Advanced JavaScript function expression evaluating the string input. Reconstructed client-side via `new Function()`. <br/>*Example:* \`(value) => value.includes('@') \ | \ | 'Invalid email address'\` |
 
-| `interactive` | `boolean` | Forces hydration as an island. |
+| **Force Interactive** (`interactive`) | `boolean` | `true` | Ensures client-side hydration as an interactive island to support real-time user validation. |
+
+***
+
+# Developer Notes & Accessibility
+
+- **Smart Switcher Hydration:** By default, if the field is standard static presentation with no custom validation triggers or dynamic bindings, it remains lightweight static SSR markup. Providing any of `validator`, `defaultValue`, or `"interactive": true` automatically promotes the element to a fully hydrated client-side island.
+- **WAI-ARIA Descriptive Connections:** The wrapper element dynamically manages aria connections. The input element automatically registers `aria-describedby` pointing to the exact generated IDs of both the helper text and error text slots.
+- **Attribute Leakage Prevention:** The `FieldRoot` primitive includes built-in filters to prevent standard input properties (like `placeholder`, `autocomplete`, or `name`) from leaking onto the outer wrapper `<div>`, ensuring completely valid, clean HTML output.
+- **Compositional Context:** The Field component supports a compositional architecture. When nesting sub-elements (like custom `Textarea` or custom select elements) as children in the Page Builder, they automatically consume the outer Field's shared context to resolve appropriate validation attributes.

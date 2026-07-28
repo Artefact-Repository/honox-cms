@@ -1,67 +1,120 @@
 ---
 title: RadioGroup
-hydration: 2
 category: Forms
+hydration: 2
 ---
 
 import { RadioGroup } from "../../app/components/ui";
 import { DemoPreview } from "../../app/components/demo-preview";
 
-A set of checkable buttons where only one can be checked at a time.
+# Introduction
 
-## Usage
+The `RadioGroup` component is a set of checkable button options where only one option can be selected at a time. Once an option is chosen, selecting another option automatically deselects the previous choice, facilitating mutually exclusive preferences (e.g. system configurations, delivery tiers, or localized page settings).
+
+***
+
+# Usage
+
+These examples illustrate how content editors bind and structure interactive radio button lists.
+
+## 1. Standard Vertical Priority Selection
+
+A standard vertically aligned option selector, excellent for lists with distinct, descriptive text labels.
 
 <DemoPreview>
-  <RadioGroup
-    label="Choose an option"
-    items={[
-      { label: "Option A", value: "a" },
-      { label: "Option B", value: "b" },
-      { label: "Option C", value: "c" },
-    ]}
-  />
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <RadioGroup
+      label="Choose Priority Option"
+      items={[
+        { label: "Option A", value: "a" },
+        { label: "Option B", value: "b" },
+        { label: "Option C", value: "c" },
+      ]}
+      interactive
+    />
+  </div>
 </DemoPreview>
-
-### CMS Page Builder
-
-This component is available as a `radioGroup` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
 
 ```json
 {
   "type": "radioGroup",
-  "label": "Choose an option",
+  "label": "Choose Priority Option",
+  "defaultValue": "a",
   "items": [
     { "label": "Option A", "value": "a" },
-    { "label": "Option B", "value": "b" }
-  ]
+    { "label": "Option B", "value": "b" },
+    { "label": "Option C", "value": "c" }
+  ],
+  "interactive": true
 }
 ```
 
-## Props
+## 2. Horizontal Configuration Preferences (Purple Theme)
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `label` | `string` | - | Group label. |
-| `items` | `RadioGroupItem[]` | - | Array of items with `label` and `value`. |
+Lays the radio options out horizontally side-by-side, styled with customized purple theme accents. Highly recommended for short layout selections or tag filters.
 
-| `orientation` | \`'horizontal' \ | 'vertical'\` | `'vertical'` | Layout orientation. |
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "480px" }}>
+    <RadioGroup
+      label="System Theme"
+      orientation="horizontal"
+      items={[
+        { label: "Light", value: "light" },
+        { label: "Dark", value: "dark" },
+      ]}
+      colorPalette="purple"
+      interactive
+    />
+  </div>
+</DemoPreview>
 
-## CMS Configuration
-
-```yaml
-- label: RadioGroup
-  name: radio-group
-  widget: object
-  fields:
-    - { label: Label, name: label, widget: string, required: false }
-    - label: Items
-      name: items
-      widget: list
-      fields:
-        - { label: Label, name: label, widget: string }
-        - { label: Value, name: value, widget: string }
+```json
+{
+  "type": "radioGroup",
+  "label": "System Theme",
+  "orientation": "horizontal",
+  "defaultValue": "light",
+  "items": [
+    { "label": "Light", "value": "light" },
+    { "label": "Dark", "value": "dark" }
+  ],
+  "colorPalette": "purple",
+  "interactive": true
+}
 ```
 
-## Hydration
+***
 
-Tier-2: Hydrates when `value`, `defaultValue`, or `onValueChange` is provided.
+# Props
+
+| Property | CMS Field Type | Default | Description / Supported Options |
+| --- | --- | --- | --- |
+| **Label Text** (`label`) | `string` | - | The visual text heading or instruction placed directly above the radio group. |
+| **Initial Value** (`defaultValue`) | `string` | - | Value key representing the radio option that begins in the selected state. |
+| **Selected Value** (`value`) | `string` | - | Value key representing the currently selected radio option (controlled). |
+| **Radio Options** (`items`) | `list` | `[]` | Ordered collection of selectable radio items. (See options schema below). |
+| **Layout Flow** (`orientation`) | `select` | `"vertical"` | Direction along which options are aligned. <br/>• Options: `"vertical"`, `"horizontal"`. |
+| **Size Scale** (`size`) | `select` | `"md"` | Controls overall height, thumb scale, and font sizes. <br/>• Options: `"sm"`, `"md"`, `"lg"`. |
+| **Color Theme** (`colorPalette`) | `select` | `"green"` | Visual color accent applied to the selected radio button. <br/>• Options: `blue`, `green`, `red`, `purple`, `orange`, `amber`, `cyan`, `slate`. |
+| **Force Interactive** (`interactive`) | `boolean` | `true` | Hydrates the component as an interactive client-side island to coordinate alignments and handle keyboard routing. |
+
+### Radio Group Items Schema
+
+Every entry inside the `items` array accepts the following parameters:
+
+| Property | CMS Field Type | Required | Description |
+| --- | --- | --- | --- |
+| **Display Text** (`label`) | `string` | Yes | Label text rendered directly adjacent to the radio circle. |
+| **Unique Key** (`value`) | `string` | Yes | Key identifier referencing the active state of this option. |
+| **Disabled** (`disabled`) | `boolean` | `false` | Disables user interaction and dims the styling of this option. |
+
+***
+
+# Developer Notes & Accessibility
+
+- **Keyboard Arrow-Key Navigation:** Supports full keyboard standard interaction:
+    - Users can press arrow keys (`ArrowUp`/`ArrowLeft` to move backward, `ArrowDown`/`ArrowRight` to move forward) to toggle selection instantly between adjacent enabled items.
+- **WAI-ARIA Accessibility Standards:** Renders robust accessibility markup:
+    - The root container receives `role="radiogroup"`.
+    - Individual items are wrapped in a semantic container, utilizing custom click-event delegation on the root to handle selections reliably.
+- **Hidden Input Form Mapping:** Generates a native hidden `<input type="radio">` per selection. This ensures form submissions accurately map the active state value without additional Javascript hooks.

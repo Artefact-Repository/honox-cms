@@ -4,61 +4,114 @@ hydration: 3
 category: Layout
 ---
 
-import { Group, Button } from "../../../app/components/ui";
+import { Group, Button, Input } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Einführung
 
-Eine Layout-Komponente zum visuellen Gruppieren zusammengehöriger Elemente.
+Eine semantische Wrapper-Komponente, die verwendet wird, um mehrere verwandte Steuerelemente (wie Schaltflächen, Schalter oder Eingaben) visuell und strukturell zu gruppieren und einheitliche Abstände, Ausrichtung und Verbindungen zwischen den Kindern zu erzwingen. Sie vereinfacht die Toolbar-Konstruktion und vermeidet manuelles Flexbox-Boilerplate.
 
-# Verwendung
+Die **Group**-Komponente ist vollständig als `group`-Block im **Page Builder** integriert und ermöglicht es Content-Autoren und Entwicklern, interagierende Steuerelemente (wie Aktionsschaltflächen oder Eingabekombinationen) direkt innerhalb des CMS zu clustern.
+
+***
+
+# Verwendung über den CMS Page Builder (JSON)
+
+Diese Beispiele veranschaulichen, wie Content-Editoren gruppierte Steuerungssätze innerhalb von JSON-Seitenschemata (`content/pages/*.json`) binden und strukturieren.
+
+## 1. Horizontale Aktions-Toolbar
+
+Eine standardmäßige horizontale Gruppierung von Aktionsschaltflächen mit gleichmäßig verteilten internen Abständen. Clustert kontextbezogene Speicher- und Bearbeitungsoperationen.
 
 <DemoPreview>
-  <Group attached>
-    <Button>First</Button>
-    <Button>Second</Button>
-    <Button>Third</Button>
+  <Group>
+    <Button>Save</Button>
+    <Button variant="outline">Edit</Button>
+    <Button variant="subtle" colorPalette="red">Delete</Button>
   </Group>
 </DemoPreview>
-
-```tsx
-import { Group } from "../components/ui";
-import { Button } from "../components/ui/button";
-
-export default function MyPage() {
-  return (
-    <Group attached>
-      <Button>First</Button>
-      <Button>Second</Button>
-      <Button>Third</Button>
-    </Group>
-  );
-}
-```
-
-## CMS-Seitenbauer
-
-Diese Komponente ist als `group`-Block im [Seitenbauer](/docs/PageBuilder) (`content/pages/*.json`) verfügbar:
 
 ```json
 {
   "type": "group",
-  "attached": true,
+  "orientation": "horizontal",
+  "gap": "sm",
+  "attached": false,
   "children": [
-    { "type": "button", "text": "First" },
-    { "type": "button", "text": "Second" }
+    { "type": "button", "text": "Save" },
+    { "type": "button", "text": "Edit", "variant": "outline" },
+    { "type": "button", "text": "Delete", "variant": "subtle", "colorPalette": "red" }
   ]
 }
 ```
 
-# Eigenschaften
+## 2. Verbundene Such-Eingabekombination
 
-| Eigenschaft | Typ | Beschreibung |
-| --- | --- | --- |
-| `children` | `any` | Innerhalb der Komponente zu rendernder Inhalt. |
-| `class` | `string` | Benutzerdefinierte CSS-Klassen. |
+Nutzt die `attached`-Eigenschaft, um ein einzelnes nahtloses Widget zu erstellen. Eingabe und Schaltfläche verschmelzen visuell zu einem durchgehenden Steuerelement.
 
-| `orientation` | \`"horizontal" \ | "vertical"\` | Die Ausrichtung der Gruppe. |
+<DemoPreview>
+  <Group attached>
+    <Input placeholder="Search documentation..." />
+    <Button>Search</Button>
+  </Group>
+</DemoPreview>
 
-| `attached` | `boolean` | Ob die Kinder zusammengefügt werden sollen. |
-| `grow` | `boolean` | Ob die Kinder wachsen sollen, um den verfügbaren Platz zu füllen. |
+```json
+{
+  "type": "group",
+  "orientation": "horizontal",
+  "gap": "none",
+  "attached": true,
+  "children": [
+    { "type": "input", "placeholder": "Search documentation..." },
+    { "type": "button", "text": "Search" }
+  ]
+}
+```
+
+## 3. Vertikale Gestapelte Steuerelemente
+
+Zeigt die vertikale Ausrichtung für gestapelte Schaltersteuerungen oder vertikale Menüs, die konsistenten vertikalen Abstand erfordern.
+
+<DemoPreview>
+  <Group orientation="vertical" gap="md">
+    <Button>Profile</Button>
+    <Button variant="outline">Settings</Button>
+    <Button variant="subtle" colorPalette="red">Logout</Button>
+  </Group>
+</DemoPreview>
+
+```json
+{
+  "type": "group",
+  "orientation": "vertical",
+  "gap": "md",
+  "attached": false,
+  "children": [
+    { "type": "button", "text": "Profile" },
+    { "type": "button", "text": "Settings", "variant": "outline" },
+    { "type": "button", "text": "Logout", "variant": "subtle", "colorPalette": "red" }
+  ]
+}
+```
+
+***
+
+# CMS-Konfigurationsreferenz
+
+Diese Felder ordnen sich direkt den Sveltia-CMS-Blockeigenschaften unter `public/admin/config.yml` oder den Page-Builder-Konfigurationen zu:
+
+| Eigenschaft | CMS-Feldtyp | Standard | Beschreibung / Unterstützte Optionen |
+| :--- | :--- | :--- | :--- |
+| **Ausrichtung** (`orientation`) | `select` | `"horizontal"` | Hauptachsen-Anordnung der Kinder.<br/>• Optionen: `"horizontal"`, `"vertical"`. |
+| **Abstand** (`gap`) | `string` | `"sm"` | Interner Polsterabstand zwischen einzelnen Kindelementen.<br/>• Optionen: `"none"`, `"sm"`, `"md"`, `"lg"`. |
+| **Verbundener Modus** (`attached`) | `boolean` | `false` | Wenn true, entfernt innere Polsterabstände und verschmilzt angrenzende Elemente visuell zu einem einheitlichen Steuerelement. |
+| **Untergeordnete Blöcke** (`children`) | `list` | - | Liste interaktiver Elemente (Schaltflächen, Schalter, Eingaben), die im Gruppentrack angeordnet sind. |
+
+***
+
+# Entwicklerhinweise & Barrierefreiheit
+
+- **Hydration-Frei (Nur Statisch):** Group ist eine semantische Layout-Komponente, die als rein statische Komponente (`Tier 3`) gekennzeichnet ist. Sie wird vollständig als standardmäßiges server-seitiges HTML gerendert und ist von clientseitigen Hydration-Skripten ausgenommen.
+- **Struktureller Kontext-Wrapper:** Um Layout-Verschiebungen und inkonsistente Abstände zu verhindern, umschließt die Group-Komponente untergeordnete Komponenten explizit in einer internen `<div>`-Spur und stellt so einheitliche Abstandsberechnungen unabhängig von der Verschachtelungskomplexität sicher.
+- **Flexible Wiederverwendbarkeit:** Da sie bei allen Kindern eine einzige starre Flex-Richtung erzwingt, können Entwickler mehrere Group-Komponenten (gemischte horizontal/vertikale Ausrichtungen) verschachteln, um mit minimalem Aufwand komplexe rasterähnliche Aktionspanels zu konstruieren.

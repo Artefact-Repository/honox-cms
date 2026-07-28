@@ -1,39 +1,35 @@
 ---
 title: Stack Pila
-hydration: 3
 category: Layout
+hydration: 3
 ---
 
-import { Stack } from "../../../app/components/ui";
+import { Stack, Button } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-Un primitivo de diseño que puede usarse para crear una pila vertical u horizontal de elementos.
+# Introducción
 
-## Uso
+El componente `Stack` es un contenedor de diseño de alto rendimiento que se utiliza para agrupar y disponer componentes relacionados en un flujo lineal, ya sea vertical u horizontalmente. Construido sobre CSS Flexbox, ofrece control preciso sobre alineaciones, justificaciones, espacios y ajustes de diseño responsivos.
+
+El **Stack** está totalmente integrado como un bloque `stack` en el **Page Builder**, lo que permite a los autores de contenido y desarrolladores estructurar fácilmente secciones visuales, menús de navegación y estructuras de formulario directamente dentro del CMS.
+
+***
+
+# Uso
+
+Estos ejemplos ilustran cómo los editores de contenido enlazan y estructuran diseños lineales.
+
+## 1. Stack de diseño horizontal
+
+Dispone los elementos secundarios secuencialmente a lo largo del eje horizontal X con espacios personalizados. Excelente para elementos de navegación horizontal, avatares o insignias de etiqueta.
 
 <DemoPreview>
   <Stack direction="row" gap="4">
-    <div style={{ padding: "0.75rem 1rem", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Item 1</div>
-    <div style={{ padding: "0.75rem 1rem", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Item 2</div>
-    <div style={{ padding: "0.75rem 1rem", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Item 3</div>
+    <div style={{ padding: "0.75rem 1rem", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Item A</div>
+    <div style={{ padding: "0.75rem 1rem", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Item B</div>
+    <div style={{ padding: "0.75rem 1rem", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Item C</div>
   </Stack>
 </DemoPreview>
-
-```tsx
-import { Stack } from '../components/ui/stack'
-
-export const Example = () => (
-  <Stack direction="row" gap="4">
-    <div>Item 1</div>
-    <div>Item 2</div>
-    <div>Item 3</div>
-  </Stack>
-)
-```
-
-### Constructor de páginas CMS
-
-Este componente está disponible como un bloque `stack` en el [Constructor de páginas](/docs/PageBuilder) (`content/pages/*.json`):
 
 ```json
 {
@@ -41,27 +37,69 @@ Este componente está disponible como un bloque `stack` en el [Constructor de p�
   "direction": "horizontal",
   "gap": "4",
   "children": [
-    { "type": "text", "content": "Item 1" },
-    { "type": "text", "content": "Item 2" }
+    { "type": "badge", "text": "Item A", "colorPalette": "blue" },
+    { "type": "badge", "text": "Item B", "colorPalette": "blue" },
+    { "type": "badge", "text": "Item C", "colorPalette": "blue" }
   ]
 }
 ```
 
-## Propiedades
+## 2. Stack de flujo vertical
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `direction` | `flex-direction` | `column` | La dirección flex de la pila. |
-| `gap` | `spacing` | `8px` | El espacio entre los elementos de la pila. |
-| `align` | `align-items` | - | La alineación de los elementos de la pila. |
-| `justify` | `justify-content` | - | La justificación de los elementos de la pila. |
+Dispone los elementos secundarios secuencialmente a lo largo del eje vertical Y. Perfecto para preferencias de configuración estándar, destacados de páginas de aterrizaje o directorios de tarjetas.
 
-## Responsividad
+<DemoPreview>
+  <Stack direction="column" gap="3" style={{ width: "100%", maxWidth: "320px" }}>
+    <div style={{ padding: "0.75rem 1rem", background: "var(--colors-purple-3)", borderRadius: "8px" }}>Priority Option 1</div>
+    <div style={{ padding: "0.75rem 1rem", background: "var(--colors-purple-3)", borderRadius: "8px" }}>Priority Option 2</div>
+  </Stack>
+</DemoPreview>
 
-El componente `Stack` admite valores responsivos para todas sus propiedades.
-
-```tsx
-<Stack direction={{ base: 'column', md: 'row' }} gap={{ base: '4', md: '8' }}>
-  {/* Elements will be stacked vertically on mobile and horizontally on desktop */}
-</Stack>
+```json
+{
+  "type": "stack",
+  "direction": "vertical",
+  "gap": "3",
+  "children": [
+    { "type": "text", "content": "Priority Option 1" },
+    { "type": "text", "content": "Priority Option 2" }
+  ]
+}
 ```
+
+## 3. Alternancia responsiva de columna a fila
+
+Configura el diseño para apilar los elementos secundarios verticalmente en dimensiones de pantalla más pequeñas y disponerlos horizontalmente en pantallas de tableta/escritorio automáticamente.
+
+```json
+{
+  "type": "stack",
+  "direction": "{\"base\": \"column\", \"md\": \"row\"}",
+  "gap": "{\"base\": \"4\", \"md\": \"8\"}",
+  "children": [
+    { "type": "button", "text": "Call to Action 1" },
+    { "type": "button", "text": "Call to Action 2", "variant": "outline" }
+  ]
+}
+```
+
+***
+
+# Propiedades
+
+| Propiedad | Tipo de campo CMS | Predeterminado | Descripción / opciones admitidas |
+| --- | --- | --- | --- |
+| **Dirección del stack** (`direction`) | `select` \ | `string` | `"vertical"` | La dirección del diseño flex. Puede aceptar JSON stringificado para configuraciones responsivas (p. ej., `'{"base": "column", "md": "row"}'`).<br/>• Opciones: `"vertical"`, `"horizontal"`. |
+| **Espaciado de separación** (`gap`) | `string` | `"8px"` | Márgenes de espacio entre los elementos secundarios dentro del stack. |
+| **Alinear elementos** (`align`) | `select` | - | Alineación visual de los elementos a lo largo del eje transversal (Flexbox `align-items`).<br/>• Opciones: `"start"`, `"center"`, `"end"`, `"stretch"`. |
+| **Justificar elementos** (`justify`) | `select` | - | Distribución del espacio vacío a lo largo del eje principal (Flexbox `justify-content`).<br/>• Opciones: `"start"`, `"center"`, `"end"`, `"between"`, `"around"`. |
+| **Contenido secundario** (`children`) | `list` | - | La colección de bloques de diseño o visuales anidados que apilar dentro del contenedor. |
+| **Clase personalizada** (`class`) | `string` | - | Anulaciones de clases CSS personalizadas aplicadas directamente al contenedor del stack. |
+
+***
+
+# Notas para desarrolladores y accesibilidad
+
+- **Cadenas JSON responsivas:** En Sveltia CMS, las reglas de estilo complejas por punto de quiebre (como el colapso de filas a columnas) se pueden definir alimentando un diseño JSON stringificado a las propiedades `direction` y `gap`.
+- **Navegación accesible:** Al ordenar interactivos activos dentro de un stack (como flujos de botones), preserve la secuencia HTML estándar. No dependa en gran medida del reordenamiento de diseño CSS (como `flex-direction: row-reverse`), que puede no coincidir con el flujo físico de la tecla Tab.
+- **Soporte de Flex Gap del navegador:** La propiedad gap utiliza reglas nativas de `gap` de CSS Flexbox, asegurando diseños limpios sin necesidad de anulaciones de márgenes negativos en navegadores web de escritorio/móviles modernos.

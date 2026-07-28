@@ -9,71 +9,122 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # 简介
 
-一种允许用户在选择、未选择和半选（不确定）状态之间切换的控件。
+`Checkbox` 组件是一种表单控件，允许用户在二进制选项（选中或未选中）以及不确定状态之间切换。该组件针对页面构建器进行了全面优化，支持标准浏览器行为，并可通过状态条件（例如无效和禁用状态）和强调的设计主题进行自定义。
+
+***
 
 # 用法
 
+您可以通过以下方式自定义并结构化复选框：
+
+## 基础复选框
+
+标准复选框，带有可交互点击的标签，适用于直接的用户选项。
+
 <DemoPreview>
-  <Checkbox defaultChecked interactive>Accept Terms and Conditions</Checkbox>
+  <Checkbox interactive>Accept Terms and Conditions</Checkbox>
 </DemoPreview>
-
-```tsx
-import { Checkbox } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Checkbox
-      defaultChecked={true}
-      onCheckedChange={(details) => console.log(details.checked)}
-      interactive
-    >
-      Accept Terms and Conditions
-    </Checkbox>
-  );
-}
-```
-
-## 不确定状态
-
-```tsx
-import { Checkbox } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Checkbox checked="indeterminate" interactive>
-      Parent Checkbox
-    </Checkbox>
-  );
-}
-```
-
-## CMS 页面构建器
-
-此组件在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中以 `checkbox` 块的形式提供：
 
 ```json
 {
-  "type": "checkbox",
-  "label": "Accept Terms and Conditions",
-  "checked": true,
-  "colorPalette": "blue"
+  "blockType": "checkbox",
+  "label": "Accept Terms and Conditions"
 }
 ```
 
+***
+
+## 预选中复选框
+
+配置复选框在页面首次加载时默认以选中状态渲染。
+
+<DemoPreview>
+  <Checkbox defaultChecked interactive>Subscribe to our newsletter</Checkbox>
+</DemoPreview>
+
+```json
+{
+  "blockType": "checkbox",
+  "label": "Subscribe to our newsletter",
+  "checked": true
+}
+```
+
+***
+
+## 禁用复选框
+
+在保留当前视觉状态的同时，阻止用户与复选框交互。
+
+<DemoPreview>
+  <Checkbox disabled interactive>Premium feature unlocked</Checkbox>
+  <Checkbox checked={true} disabled interactive>Auto-renew subscription (fixed)</Checkbox>
+</DemoPreview>
+
+```json
+{
+  "blockType": "checkbox",
+  "label": "Auto-renew subscription (fixed)",
+  "checked": true,
+  "disabled": true
+}
+```
+
+***
+
+## 无效校验状态
+
+指示复选框字段未通过校验。例如强制勾选以接受强制政策条款。输入会使用设计系统默认的状态令牌以错误边界高亮显示。
+
+<DemoPreview>
+  <Checkbox invalid interactive>I accept the User Policy Agreement</Checkbox>
+</DemoPreview>
+
+```json
+{
+  "blockType": "checkbox",
+  "label": "I accept the User Policy Agreement",
+  "invalid": true
+}
+```
+
+***
+
+## 强调主题复选框
+
+使用设计系统调色板中的自定义美学强调色为选中状态和焦点标记着色，并可放大或缩小尺寸。
+
+<DemoPreview>
+  <Checkbox size="lg" colorPalette="purple" defaultChecked interactive>Purple Large Checkbox</Checkbox>
+</DemoPreview>
+
+```json
+{
+  "blockType": "checkbox",
+  "label": "Purple Large Checkbox",
+  "checked": true,
+  "size": "lg",
+  "colorPalette": "purple"
+}
+```
+
+***
+
 # 属性
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `children` | `any` | 渲染在复选框旁边的标签内容。 |
-| `class` | `string` | 自定义 CSS 类。 |
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | `String` | - | 显示在复选框控件旁边的文本描述。点击标签也会切换复选框状态。 |
+| `checked` | `Boolean` | `false` | 复选框是否初始选中。（在服务器端映射为 `defaultChecked`，以允许自由、非受控的点击，而不会锁定输入状态）。 |
+| `disabled` | `Boolean` | `false` | 禁用用户交互与视觉点击响应。 |
+| `invalid` | `Boolean` | `false` | 使用红色/无效边框高亮组件，以标记校验错误。 |
+| `size` | `Select` | `md` | 调整复选框边界框的高度和宽度。选项：`sm`、`md`、`lg`。 |
+| `colorPalette` | `Select` | - | 应用于复选框激活或选中时背景的强调色主题。选项：`blue`、`green`、`red`、`purple`、`orange`、`amber`、`cyan`、`slate`。 |
 
-| `checked` | \`boolean \ | "indeterminate"\` | 复选框是否选中（受控）。 |
-| `defaultChecked` | \`boolean \ | "indeterminate"\` | 初始选中状态（非受控）。 |
+***
 
-| `disabled` | `boolean` | 复选框是否禁用。 |
+# 架构说明
 
-| `onCheckedChange` | \`(details: \{ checked: boolean \ | "indeterminate" \}) => void\` | 选中状态变化时触发的回调。 |
-
-| `size` | \`"sm" \ | "md" \ | "lg"\` | 复选框的尺寸。 |
-
-| `interactive` | `boolean` | 强制作为岛屿进行水合。 |
+- **非受控默认勾选：** 为防止复选框在缺乏自定义内联处理程序的静态、数据驱动模板中被锁定（阻止用户点击），CMS 字段 `checked` 在我们的页面注册表中解析为 `defaultChecked`。
+- **表单标准重置：** 该组件与标准 HTML 表单重置集成。重置会无缝将复选框恢复为在 JSON 模板中配置的原始 `checked` 状态。
+- **原生键盘焦点：** 焦点指示器和切换交互（空格键触发）依赖于标准 HTML 输入和浏览器行为。这在辅助屏幕阅读器上保持高性能和可访问性。

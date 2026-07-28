@@ -1,52 +1,87 @@
 ---
 title: PaginatedTable
-hydration: 2
 category: Data Display
+hydration: 2
 ---
 
 import { PaginatedTable } from "../../app/components/ui";
 import { DemoPreview } from "../../app/components/demo-preview";
 
-A high-level component that combines a Table with Pagination, managing state internally.
+# Introduction
 
-## Usage
+The `PaginatedTable` component is a high-level table controller that seamlessly blends table content rendering with a matching Pagination island block. Built specifically for high-volume datasets or platform logs, it manages all active page tracking, data slices, and next/prev clicks automatically on client-side machines.
+
+***
+
+# Usage
+
+You can position and style paginated tables as following:
+
+## 1. Standard Paginated User Table
+
+Renders the default paginated data view showcasing users. The list defaults to a set page size, rendering pagination numbers underneath for smooth transition clicks.
 
 <DemoPreview>
   <div style={{ width: "100%" }}>
-    <PaginatedTable title="Users" pageSize={5} />
+    <PaginatedTable title="System Users" pageSize={5} />
   </div>
 </DemoPreview>
-
-### CMS Page Builder
-
-This component is available as a `paginatedTable` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
 
 ```json
 {
   "type": "paginatedTable",
-  "title": "Users",
+  "title": "System Users",
   "pageSize": 5
 }
 ```
 
-## Props
+***
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `title` | `string` | - | Table title. |
-| `pageSize` | `number` | `10` | Items per page. |
+## 2. API-Driven Data Feed Table (Advanced)
 
-## CMS Configuration
+Connects to a custom JSON API endpoint (e.g. your blog posts feed, transaction logs, or server operations list) and dynamically slices and renders entries based on client-side clicks.
 
-```yaml
-- label: PaginatedTable
-  name: paginated-table
-  widget: object
-  fields:
-    - { label: Title, name: title, widget: string, required: false }
-    - { label: Page Size, name: pageSize, widget: number, default: 10 }
+```json
+{
+  "type": "paginatedTable",
+  "title": "Platform Activity Logs",
+  "url": "/api/platform-logs.json",
+  "dataKey": "logs",
+  "pageSize": 10,
+  "columns": [
+    { "header": "Timestamp", "key": "timestamp" },
+    { "header": "IP Address", "key": "ip" },
+    { "header": "Activity Description", "key": "description" }
+  ]
+}
 ```
 
-## Hydration
+***
 
-Tier-2: Always hydrates as an island to manage internal pagination state.
+# Props
+
+| Property | CMS Field Type | Default | Description / Supported Options |
+| --- | --- | --- | --- |
+| **Title** (`title`) | `string` | - | Descriptive header title rendered above the table block. |
+| **API Endpoint URL** (`url`) | `string` | - | Optional path to an external JSON API endpoint returning an object feed (e.g., `{ data: [...] }`). If blank or omitted, built-in demo datasets are loaded automatically. |
+| **Data Key Mapping** (`dataKey`) | `string` | - | Target property key holding the row array inside the JSON response (e.g., `"users"`, `"logs"`). |
+| **Page Size** (`pageSize`) | `number` | `5` | Maximum number of data rows displayed simultaneously per page slice. |
+| **Initial Page** (`initialPage`) | `number` | `1` | The default page index active when the block first loads on the client. |
+| **Columns** (`columns`) | `list` | - | Custom columns mapping list (see Column sub-properties below). |
+
+### Column List Properties (`columns`)
+
+Each entry in the `columns` list parameter accepts the following fields:
+
+| Sub-Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| **Header Title** (`header`) | `string` | Yes | Title label displayed in the column header cell. |
+| **Item Data Key** (`key`) | `string` | Yes | Matching property key in the JSON row object to map into this cell. |
+
+***
+
+# Architecture Notes
+
+- **Conditional Client Hydration (Tier 2):** Because the paginated table requires active state tracking to handle transitions, slice records, and next/prev page calculations, it automatically hydrates as an interactive Preact island on client page loads.
+- **Built-In Demostration Data:** If no custom API endpoint URL is provided in the configuration parameters, the component falls back to load standard operational datasets for testing.
+- **Form-Reset Compatible:** When embedded inside interactive panels, any parent container resets safely return the active page tracking back to its specified `initialPage` value.

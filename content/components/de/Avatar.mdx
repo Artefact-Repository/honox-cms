@@ -9,74 +9,103 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Einführung
 
-Zeigt das Profilbild eines Benutzers an und fällt auf dessen Initialen oder ein generisches Benutzersymbol zurück, wenn kein Bild verfügbar ist oder das Laden des Bildes fehlschlägt.
+Ein bildbasiertes Benutzerprofil-Element, das benutzerdefinierte grafische Kennungen anzeigt. Es fällt ordentlich auf formatierte Namenskürzel oder ein universelles Platzhalter-Symbol zurück, wenn Bildquellen weggelassen werden, beim Laden sind oder nicht geladen werden können. Hauptsächlich verwendet für Profil-Navigationstrigger, Nachrichtenlisten, Bewertungen und Community-Verzeichnisse.
 
-# Hydration
+Die **Avatar**-Komponente ist vollständig als `avatar`-Block im **Page Builder** integriert, sodass Inhaltsautoren und Entwickler Profilpfade, Größenstufen und visuelle Themen direkt im CMS konfigurieren können.
 
-**Stufe 2 — intelligente Auto-Erkennung.** `Avatar` wird als statisches HTML gerendert und liefert kein Client-JS, sofern kein `src` angegeben ist.
-
-| `interactive`-Eigenschaft | Ergebnis |
-| --- | --- |
-| nicht angegeben, kein `src` | Statisch — kein Client-JS |
-| nicht angegeben, `src` vorhanden | Wird als Insel hydriert |
-| `true` | Wird als Insel hydriert |
-| `false` | Statisch — kein Client-JS (Bild wird eager gerendert, ohne Fehler-Fallback beim Laden) |
+***
 
 # Verwendung
 
+Diese Beispiele veranschaulichen, wie Inhaltsredakteure Avatar-Komponenten binden und strukturieren.
+
+## 1. Profil-Avatar mit hoher Treue (mit Bildquelle)
+
+Lädt ein hochauflösendes Benutzerbild. Verarbeitet automatisch das Hintergrund-Netzwerkladen und blendet es bei Auflösung animiert ein.
+
 <DemoPreview>
-  <Stack direction="horizontal" gap="4">
-    <Avatar name="Artefact UI" size="sm" variant="solid" colorPalette="blue" />
-    <Avatar
-      src="https://i.pravatar.cc/80"
-      name="Jane Doe"
-      size="md"
-      shape="rounded"
-    />
-    <Avatar size="lg" />
-  </Stack>
+  <Avatar
+    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop"
+    name="Jane Doe"
+    size="lg"
+    interactive
+  />
 </DemoPreview>
 
-```tsx
-import { Avatar } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Avatar
-      src="https://i.pravatar.cc/80"
-      name="Jane Doe"
-      size="md"
-      shape="rounded"
-    />
-  );
+```json
+{
+  "type": "avatar",
+  "src": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop",
+  "name": "Jane Doe",
+  "size": "lg",
+  "interactive": true
 }
 ```
 
+## 2. Akzentuierter Initialen-Rückfall (ohne Bildquelle)
+
+Wenn das Profilbild fehlt, parst der Avatar automatisch die `name`-Eigenschaft des Benutzers, um korrekte große Initialen zu berechnen und zu rendern (z. B. "Jane Doe" -> "JD") über einem akzentuierten Farbthema.
+
+<DemoPreview>
+  <Avatar
+    name="Jane Doe"
+    variant="solid"
+    colorPalette="blue"
+    size="md"
+    interactive
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "avatar",
+  "name": "Jane Doe",
+  "variant": "solid",
+  "colorPalette": "blue",
+  "size": "md",
+  "interactive": true
+}
+```
+
+## 3. Abgerundeter Platzhalter-Avatar
+
+Rendert ein standardmäßiges abgerundetes Benutzersymbol, wenn weder Bildpfade noch Benutzernamen angegeben werden.
+
+<DemoPreview>
+  <Avatar
+    shape="rounded"
+    size="md"
+    interactive
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "avatar",
+  "shape": "rounded",
+  "size": "md",
+  "interactive": true
+}
+```
+
+***
+
 # Eigenschaften
 
-| Eigenschaft | Typ | Beschreibung |
-| --- | --- | --- |
-| `src` | `string` | Bild-URL. Das Angeben dieser Eigenschaft ist das Hydration-Signal der Stufe 2. |
-| `alt` | `string` | Alternativtext für das Bild. |
-| `name` | `string` | Wird verwendet, um Initialen (Vor- + Nachname) abzuleiten, wenn kein Bild vorhanden ist. |
-| `fallback` | `JSX.Element` | Benutzerdefinierter Fallback-Inhalt, der die abgeleiteten Initialen/ das Symbol überschreibt. |
+| Eigenschaft | CMS-Feldtyp | Standard | Beschreibung / Unterstützte Optionen |
+| --- | --- | --- | --- |
+| **Profilbild** (`src`) | `image` | - | Bild-URL oder relativer Asset-Pfad. Die Angabe löst eine Tier-2-Hydration aus. |
+| **Benutzername** (`name`) | `string` | - | Kontobenutzername. Parst erste und letzte Zeichen in visuelle Initialen. |
+| **Alternativdetails** (`alt`) | `string` | - | Alternative Textbeschreibungen des Fotos für Screenreader. |
+| **Größenstufe** (`size`) | `select` | `"md"` | Steuert Höhe, Breite und Initialen-Textskalierung des Avatars. <br/>• Optionen: `"2xs"`, `"xs"`, `"sm"`, `"md"`, `"lg"`, `"xl"`, `"2xl"`. |
+| **Visuelle Variante** (`variant`) | `select` | `"subtle"` | Auf den Hintergrund der Fallback-Initialen angewandtes Stil-Overlay. <br/>• Optionen: `"solid"`, `"surface"`, `"subtle"`, `"outline"`. |
+| **Eckform** (`shape`) | `select` | `"full"` | Krümmung der Avatar-Grenzen. <br/>• Optionen: `"square"`, `"rounded"`, `"full"`. |
+| **Farbschema** (`colorPalette`) | `select` | `"blue"` | Akzentfarbe für Fallback-Hintergrundthemen. <br/>• Optionen: `blue`, `green`, `red`, `purple`, `orange`, `amber`, `cyan`, `slate`. |
+| **Interaktiv erzwingen** (`interactive`) | `boolean` | `true` | Stellt sofortiges clientseitiges Lade-Monitoring und sanfte Übergangs-Rückfälle sicher. |
 
-| `status` | \`"idle" \ | "loading" \ | "loaded" \ | "error"\` | Der Ladezustand des Bildes. Wird automatisch von der Insel verwaltet; nur manuell bei einem statischen Render setzen. |
+***
 
-| `size` | \`"full" \ | "2xs" \ | "xs" \ | "sm" \ | "md" \ | "lg" \ | "xl" \ | "2xl"\` | Visuelle Größe. Standard `"md"`. |
+# Entwicklerhinweise & Barrierefreiheit
 
-| `variant` | \`"solid" \ | "surface" \ | "subtle" \ | "outline"\` | Visueller Stil. Standard `"subtle"`. |
-
-| `shape` | \`"square" \ | "rounded" \ | "full"\` | Eckform. Standard `"full"`. |
-
-| `interactive` | `boolean` | Überschreibt die Hydrationsentscheidung (siehe oben). |
-| `class` | `string` | Benutzerdefinierte CSS-Klassen für das Wurzelelement. |
-
-## Unterkomponenten
-
-Für eigene Zusammensetzungen werden `Avatar.Root` / `Avatar.Image` / `Avatar.Fallback` zusammen mit der Standardkomponente aus dem Primitiv exportiert — dieselben Teile, die die Standard-`src`/`name`/`fallback`-API intern rendert.
-
-# Barrierefreiheit
-
-- Der Fallback wird als `<span>` gerendert; geben Sie dem Bild einen sinnvollen `alt`-Text (oder lassen Sie ihn für rein dekorative Avatare weg), da der Fallback selbst keinen eigenständigen zugänglichen Namen über seine sichtbaren Initialen/ sein Symbol hinaus trägt.
-- `data-state` (`idle`/`loading`/`loaded`/`error`) wird auf dem Wurzelelement, dem Bild und dem Fallback für zustandsbasierte Gestaltung gesetzt.
+- **Hydration-Insel:** Der Avatar läuft als Tier-2-bedingte Insel. Wenn keine Bild-`src` angegeben ist, kompiliert er direkt zu leichtem statischem Markup mit null Client-JS-Footprint. Wenn eine `src` angegeben wird, hydriert er clientseitig, um asynchrone Ladezyklen automatisch zu verwalten (`loading` -> `loaded`/`error`).
+- **WAI-ARIA-Konformität:** Unter der Haube laufen Fallback-Initialen und -Symbole innerhalb semantischer `<span>`-Tags. Wenn der Avatar eine rein dekorative Rolle spielt, stellen Sie sicher, dass das `alt`-Attribut weggelassen oder leer ist, damit Screenreader ihn überspringen.

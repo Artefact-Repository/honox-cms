@@ -1,7 +1,7 @@
 ---
 title: Breadcrumb Trilha de Navegação
-hydration: 3
 category: Navigation
+hydration: 3
 ---
 
 import { Breadcrumb } from "../../../app/components/ui";
@@ -9,11 +9,19 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introdução
 
-Um auxílio de navegação que mostra a localização da página atual dentro de uma hierarquia usando uma lista de links.
+O componente `Breadcrumb` é uma ajuda de navegação que exibe a localização da página atual dentro de uma estrutura hierárquica do site. Ele ajuda os usuários a rastrear seu caminho desde a página inicial até sua posição atual e a navegar de volta para cima na hierarquia facilmente.
+
+O **Breadcrumb** está totalmente integrado como um bloco `breadcrumb` no **Page Builder**, permitindo que editores de conteúdo e desenvolvedores configurem facilmente estilos visuais, divisores/separadores e dimensionamento responsivo diretamente no CMS.
+
+***
 
 # Uso
 
-## Breadcrumb básico
+Estes exemplos ilustram como os editores de conteúdo vinculam e estruturam componentes de navegação.
+
+## 1. Trilha de navegação padrão
+
+Uma configuração clássica de trilha hierárquica mostrando a página inicial, a categoria secundária e o marcador de texto de página terminal.
 
 <DemoPreview>
   <Breadcrumb
@@ -25,76 +33,99 @@ Um auxílio de navegação que mostra a localização da página atual dentro de
   />
 </DemoPreview>
 
-```tsx
-import { Breadcrumb } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Breadcrumb
-      items={[
-        { label: "Home", href: "/" },
-        { label: "Components", href: "/components" },
-        { label: "Breadcrumb" },
-      ]}
-    />
-  );
-}
-```
-
-## Separador personalizado
-
-```tsx
-import { Breadcrumb } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Breadcrumb
-      separator="/"
-      items={[
-        { label: "Home", href: "/" },
-        { label: "Breadcrumb" },
-      ]}
-    />
-  );
-}
-```
-
-## Construtor de Páginas CMS
-
-Este componente está disponível como um bloco `breadcrumb` no [Construtor de Páginas](/docs/PageBuilder) (`content/pages/*.json`):
-
 ```json
 {
   "type": "breadcrumb",
   "items": [
     { "label": "Home", "href": "/" },
-    { "label": "Docs", "href": "/docs" },
+    { "label": "Components", "href": "/components" },
     { "label": "Breadcrumb" }
-  ],
-  "variant": "underline",
-  "size": "md"
+  ]
 }
 ```
 
+## 2. Separador personalizado (divisor de barra)
+
+Usa um caractere de divisor de texto personalizado (como uma barra `"/"`) para separar os itens de navegação.
+
+<DemoPreview>
+  <Breadcrumb
+    separator="/"
+    items={[
+      { label: "Home", href: "/" },
+      { label: "Library", href: "/library" },
+      { label: "Overview" },
+    ]}
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "breadcrumb",
+  "separator": "/",
+  "items": [
+    { "label": "Home", "href": "/" },
+    { "label": "Library", "href": "/library" },
+    { "label": "Overview" }
+  ]
+}
+```
+
+## 3. Dimensionamento e estilo visual acentuados
+
+Ajusta a escala geral para pequena e aplica um estilo visual de sublinhado personalizado para uma sensação de layout destacado.
+
+<DemoPreview>
+  <Breadcrumb
+    variant="underline"
+    size="sm"
+    items={[
+      { label: "Console", href: "/console" },
+      { label: "Resources", href: "/console/resources" },
+      { label: "Deployments" },
+    ]}
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "breadcrumb",
+  "variant": "underline",
+  "size": "sm",
+  "items": [
+    { "label": "Console", "href": "/console" },
+    { "label": "Resources", "href": "/console/resources" },
+    { "label": "Deployments" }
+  ]
+}
+```
+
+***
+
 # Propriedades
 
-## Breadcrumb
+| Propriedade | Tipo de campo CMS | Padrão | Descrição / Opções suportadas |
+| --- | --- | --- | --- |
+| **Separador** (`separator`) | `string` | `"chevron-right"` | Caractere divisor personalizado colocado entre os itens. |
+| **Estilo visual** (`variant`) | `select` | `"plain"` | O estilo visual dos links. <br/>• Opções: `"plain"`, `"underline"`. |
+| **Escala de tamanho** (`size`) | `select` | `"md"` | Controla a escala geral da fonte e do chevron. <br/>• Opções: `"xs"`, `"sm"`, `"md"`, `"lg"`. |
+| **Itens de navegação** (`items`) | `list` | `[]` | Coleção ordenada de itens de página. (Veja o esquema dos itens de trilha abaixo). |
+| **Classe personalizada** (`class`) | `string` | - | Substituições de classe CSS personalizadas aplicadas diretamente ao contêiner de trilha. |
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `items` | `BreadcrumbItem[]` | Os itens do breadcrumb a serem renderizados. |
-| `separator` | `Child` | Separador personalizado entre os itens. Padrão: um ícone chevron-right. |
+### Esquema dos itens de trilha
 
-| `variant` | \`"underline" \ | "plain"\` | O estilo visual do breadcrumb. |
+Cada entrada dentro do array `items` aceita os seguintes parâmetros:
 
-| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg"\` | O tamanho do breadcrumb. |
+| Propriedade | Tipo de campo CMS | Obrigatório | Descrição |
+| --- | --- | --- | --- |
+| **Texto exibido** (`label`) | `string` | Sim | Texto de rótulo renderizado para o segmento do item. |
+| **Rota de destino** (`href`) | `string` | Não | URL de destino ou rota de página. Se omitido, renderiza como texto simples da página atual. |
+| **Página atual** (`current`) | `boolean` | `false` | Define o item para denotar a página ativa (automaticamente true para o último item). |
 
-| `class` | `string` | Classes CSS personalizadas para o elemento raiz. |
+***
 
-### BreadcrumbItem
+# Notas para desenvolvedores e acessibilidade
 
-| Property | Type | Description |
-| --- | --- | --- |
-| `label` | `Child` | Texto de exibição ou nó JSX. |
-| `href` | `string` | Se presente, renderiza como um link; caso contrário, renderiza como texto simples (página atual). |
-| `current` | `boolean` | Marca a página atual. Por padrão `true` para o último item. |
+- **Hierarquia compatível com ARIA:** O componente é renderizado automaticamente dentro de um elemento de navegação semântico acessível (`<nav aria-label="Breadcrumb">`).
+- **ARIA de página ativa:** O elemento terminal final (onde `href` é omitido ou `current` é definido) recebe automaticamente `aria-current="page"` para cumprir as diretrizes de acessibilidade de leitores de tela.
+- **Estilo de micro-interação:** Os links herdam automaticamente gatilhos e transições de hover do layout, refletindo suavemente os acentos da paleta de cores principal.

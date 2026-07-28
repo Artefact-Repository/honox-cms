@@ -9,74 +9,103 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # 简介
 
-显示用户的头像图片；当没有图片或图片加载失败时，回退到用户姓名首字母或通用的用户图标。
+基于图像的UserProfile元素，用于展示自定义图形标识。当图片源被省略、正在加载或加载失败时，它会优雅地回退到格式化的姓名首字母或通用占位图标。主要用于个人资料导航触发器、消息列表、评论和社区名录。
 
-# 水合
+**Avatar** 组件已作为 `avatar` 区块完整集成到 **Page Builder** 中，内容作者和开发者可以直接在 CMS 内轻松配置个人资料路径、尺寸比例和视觉主题。
 
-**二级 —— 智能自动探测。** `Avatar` 渲染为静态 HTML，除非提供了 `src`，否则不附带任何客户端 JS。
-
-| `interactive` prop | 结果 |
-| --- | --- |
-| omitted, no `src` | 静态 —— 无客户端 JS |
-| omitted, `src` present | 作为岛屿水合 |
-| `true` | 作为岛屿水合 |
-| `false` | 静态 —— 无客户端 JS（图片立即渲染，无加载失败回退） |
+***
 
 # 用法
 
+以下示例展示了内容编辑者如何绑定和构建头像组件。
+
+## 1. 高保真个人资料头像（带图片源）
+
+加载高分辨率用户图片。自动处理后台网络加载，并在解析完成后以动画形式呈现。
+
 <DemoPreview>
-  <Stack direction="horizontal" gap="4">
-    <Avatar name="Artefact UI" size="sm" variant="solid" colorPalette="blue" />
-    <Avatar
-      src="https://i.pravatar.cc/80"
-      name="Jane Doe"
-      size="md"
-      shape="rounded"
-    />
-    <Avatar size="lg" />
-  </Stack>
+  <Avatar
+    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop"
+    name="Jane Doe"
+    size="lg"
+    interactive
+  />
 </DemoPreview>
 
-```tsx
-import { Avatar } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Avatar
-      src="https://i.pravatar.cc/80"
-      name="Jane Doe"
-      size="md"
-      shape="rounded"
-    />
-  );
+```json
+{
+  "type": "avatar",
+  "src": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop",
+  "name": "Jane Doe",
+  "size": "lg",
+  "interactive": true
 }
 ```
 
+## 2. 强调首字母回退（不带图片源）
+
+当个人资料图片缺失时，Avatar 会自动解析用户 `name` 属性，计算并渲染正确的姓名首字母（例如 "Jane Doe" -> "JD"），叠加在强调色主题之上。
+
+<DemoPreview>
+  <Avatar
+    name="Jane Doe"
+    variant="solid"
+    colorPalette="blue"
+    size="md"
+    interactive
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "avatar",
+  "name": "Jane Doe",
+  "variant": "solid",
+  "colorPalette": "blue",
+  "size": "md",
+  "interactive": true
+}
+```
+
+## 3. 圆角占位头像
+
+当既未提供图片路径也未提供用户名时，渲染标准的圆角用户图标。
+
+<DemoPreview>
+  <Avatar
+    shape="rounded"
+    size="md"
+    interactive
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "avatar",
+  "shape": "rounded",
+  "size": "md",
+  "interactive": true
+}
+```
+
+***
+
 # 属性
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `src` | `string` | 图片 URL。提供此属性即为二级水合信号。 |
-| `alt` | `string` | 图片的替代文本。 |
-| `name` | `string` | 没有图片时，用于推导首字母（名 + 姓）。 |
-| `fallback` | `JSX.Element` | 自定义回退内容，覆盖推导出的首字母/图标。 |
+| 属性 | CMS 字段类型 | 默认值 | 说明 / 可选项 |
+| --- | --- | --- | --- |
+| **个人资料图片** (`src`) | `image` | - | 图片 URL 或相对资源路径。提供此项会触发 Tier-2 水合。 |
+| **用户名** (`name`) | `string` | - | 账户用户名。解析首末字符以生成视觉首字母。 |
+| **替换描述** (`alt`) | `string` | - | 供屏幕阅读器使用的图片替代文本描述。 |
+| **尺寸比例** (`size`) | `select` | `"md"` | 控制头像的高度、宽度与首字母文本比例。 <br/>• 选项：`"2xs"`、`"xs"`、`"sm"`、`"md"`、`"lg"`、`"xl"`、`"2xl"`。 |
+| **视觉变体** (`variant`) | `select` | `"subtle"` | 应用于回退首字母背景的样式叠加。 <br/>• 选项：`"solid"`、`"surface"`、`"subtle"`、`"outline"`。 |
+| **圆角形状** (`shape`) | `select` | `"full"` | 头像边界的弯曲程度。 <br/>• 选项：`"square"`、`"rounded"`、`"full"`。 |
+| **配色主题** (`colorPalette`) | `select` | `"blue"` | 用于回退背景主题的强调色。 <br/>• 选项：`blue`、`green`、`red`、`purple`、`orange`、`amber`、`cyan`、`slate`。 |
+| **强制交互** (`interactive`) | `boolean` | `true` | 确保即时的客户端加载监控与平滑的回退过渡。 |
 
-| `status` | \`"idle" \ | "loading" \ | "loaded" \ | "error"\` | 图片加载状态。由岛屿自动管理；仅在静态渲染时手动设置。 |
+***
 
-| `size` | \`"full" \ | "2xs" \ | "xs" \ | "sm" \ | "md" \ | "lg" \ | "xl" \ | "2xl"\` | 视觉尺寸。默认 `"md"`。 |
+# 开发者说明与无障碍
 
-| `variant` | \`"solid" \ | "surface" \ | "subtle" \ | "outline"\` | 视觉样式。默认 `"subtle"`。 |
-
-| `shape` | \`"square" \ | "rounded" \ | "full"\` | 圆角形状。默认 `"full"`。 |
-
-| `interactive` | `boolean` | 覆盖水合决策（见上）。 |
-| `class` | `string` | 根元素的自定义 CSS 类。 |
-
-## 子组件
-
-对于自定义组合，`Avatar.Root` / `Avatar.Image` / `Avatar.Fallback` 与原生组件一同从基础包导出 —— 即默认 `src`/`name`/`fallback` API 内部所渲染的相同部分。
-
-# 无障碍
-
-- 回退内容渲染为 `<span>`；请为图片提供有意义的 `alt`（纯装饰性头像可省略），因为回退内容本身除其可见的首字母/图标外，不携带独立的无障碍名称。
-- `data-state`（`idle`/`loading`/`loaded`/`error`）设置在根元素、图片以及回退内容上，用于基于状态设置样式。
+- **水合岛屿：** Avatar 作为 Tier-2 条件岛屿执行。如果未指定图片 `src`，它会直接编译为轻量静态标记，客户端 JS 占用为零。如果提供了 `src`，它会在客户端进行水合，以自动管理异步加载周期（`loading` -> `loaded`/`error`）。
+- **WAI-ARIA 合规：** 在底层，回退首字母与图标在语义化 `<span>` 标签内运行。如果头像仅用于装饰，请确保 `alt` 属性被省略或留空，以便屏幕阅读器跳过它。

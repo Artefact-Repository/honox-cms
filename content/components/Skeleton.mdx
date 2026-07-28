@@ -1,7 +1,7 @@
 ---
 title: Skeleton
-hydration: 3
 category: Feedback
+hydration: 3
 ---
 
 import { Skeleton } from "../../app/components/ui";
@@ -9,71 +9,126 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-A placeholder used to indicate that content is loading, with a variety of animation and shape options.
+The `Skeleton` component is a high-performance placeholder element used to indicate that content is currently loading. By rendering layout-mocking geometric placeholders, it prevents sudden content shifts when remote data loads.
+
+The component supports distinct geometric formats (including text columns, square blocks, and circle profile avatars) along with responsive animation loops (such as glowing or pulsing transitions) directly through visual configurations.
+
+***
 
 # Usage
 
-## Basic Skeleton
+You can construct mockup states for cards, profiles, and listings like following:
+
+## 1. Multi-line Text Block Placeholder
+
+Mock a paragraph or description field while waiting for article text to load. This renders multiple stacked columns with a subtle pulsing cycle automatically.
 
 <DemoPreview>
-  <div style={{ display: "flex", flexDirection: "column", gap: "1rem", width: "100%", maxWidth: "320px" }}>
-    <Skeleton shape="circle" size="12" />
-    <Skeleton height="6" width="40" />
+  <div style={{ width: "100%", maxWidth: "320px" }}>
     <Skeleton shape="text" noOfLines={3} />
   </div>
 </DemoPreview>
-
-```tsx
-import { Skeleton, SkeletonCircle, SkeletonText } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <div>
-      <SkeletonCircle size="12" />
-      <Skeleton height="6" width="40" />
-      <SkeletonText noOfLines={3} />
-    </div>
-  );
-}
-```
-
-## CMS Page Builder
-
-This component is available as a `skeleton` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`). The CMS `shape` options are `box`/`circle`/`text`, mapped to the real `shape` prop (`box` falls through to the plain default):
 
 ```json
 {
   "type": "skeleton",
   "shape": "text",
-  "noOfLines": 3
+  "noOfLines": 3,
+  "variant": "pulse"
 }
 ```
 
+***
+
+## 2. Avatar Circle Placeholder
+
+Renders a circular shape matching profile pictures or user avatar icons. Combine this with text skeletons to mock user headers.
+
+<DemoPreview>
+  <div style={{ width: "100%" }}>
+    <Skeleton shape="circle" size="12" />
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "skeleton",
+  "shape": "circle",
+  "variant": "pulse"
+}
+```
+
+***
+
+## 3. High-Shine Box Container (Card Mockup)
+
+Features a rectangular box container with a high-shine diagonal shimmer reflection animation, ideal for media cards or banner mockups.
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <Skeleton shape="box" height="32" />
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "skeleton",
+  "shape": "box",
+  "variant": "shine"
+}
+```
+
+***
+
+## 4. Loaded State Content Toggle
+
+Once data finishes loading on client machines, setting `loaded` to `true` instantly reveals nested children blocks (such as a Heading or real Card) and stops rendering the placeholder background.
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <Skeleton loaded={true}>
+      <div style={{ padding: "1rem", border: "1px solid var(--colors-gray-4)", borderRadius: "8px" }}>
+        <h3>Account Connected</h3>
+        <p style={{ fontSize: "0.85rem", color: "var(--colors-gray-11)", marginTop: "4px" }}>API key sync complete.</p>
+      </div>
+    </Skeleton>
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "skeleton",
+  "loaded": true,
+  "children": [
+    {
+      "blockType": "heading",
+      "text": "Account Connected",
+      "size": "sm"
+    },
+    {
+      "blockType": "text",
+      "content": "API key sync complete."
+    }
+  ]
+}
+```
+
+***
+
 # Props
 
-## Skeleton
+| Property | CMS Field Type | Default | Description / Supported Options |
+| --- | --- | --- | --- |
+| **Shape** (`shape`) | `select` | `"box"` | The geometric format representing the loading resource. <br/>• Options: `"box"` (for cards/images), `"circle"` (for avatars), `"text"` (for paragraph columns). |
+| **Animation Variant** (`variant`) | `select` | `"pulse"` | The animation styling. <br/>• Options: `"pulse"` (gradual glow loop), `"shine"` (diagonal shimmer reflection), `"none"` (static neutral fill). |
+| **Line Count** (`noOfLines`) | `number` | `3` | Total number of row columns to display when `shape` is set to `"text"`. |
+| **Loaded State** (`loaded`) | `boolean` | `false` | When true, skips skeleton masking and directly displays child components. |
+| **Children Blocks** (`children`) | `list` | - | Nested page builder components that remain hidden until `loaded` turns true. |
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `loading` | `boolean` | Whether to show the skeleton. Default: `true`. |
-| `circle` | `boolean` | Render the skeleton as a circle. |
+***
 
-| `variant` | \`"pulse" \ | "shine" \ | "none"\` | The animation style. |
+# Architecture Notes
 
-| `class` | `string` | Custom CSS classes for the root element. |
-
-All other native `<div>` attributes (e.g. `style`, `id`, `width`, `height`) are forwarded to the underlying element.
-
-## SkeletonCircle
-
-Same props as `Skeleton`, pre-configured with `circle`.
-
-## SkeletonText
-
-| Prop | Type | Description |
-| --- | --- | --- |
-| `noOfLines` | `number` | Number of lines to display. Default: `3`. |
-
-| `gap` | \`string \ | number\` | Gap between lines. Default: `"2"`. |
-
-Plus all `Skeleton` props.
+- **Zero Layout Shifts:** Geometric sizing parameters (like CSS grid height and width) are parsed on the server before client-side hydration. This preserves proportional layout boundaries and avoids cumulative layout shifts (CLS).
+- **GPU-Accelerated Shimmer:** High-shine reflections and glowing pulse loops utilize high-performance CSS transforms. This guarantees 60fps animations even on lower-end mobile devices.
+- **Dynamic Content Mapping:** Wrapping components with a Skeleton lets developers fetch client-side data feeds asynchronously, safely transitioning elements from placeholders to visible states seamlessly.

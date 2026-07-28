@@ -1,7 +1,7 @@
 ---
 title: DatePicker Sélecteur de Date
-hydration: 2
 category: Forms
+hydration: 2
 ---
 
 import { DatePicker } from "../../../app/components/ui";
@@ -9,176 +9,91 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introduction
 
-Un sélecteur de date qui combine une saisie de texte avec un calendrier contextuel. Il prend en charge la sélection unique, multiple et par plage, les vues de panneau mois/année, les préréglages de sélection rapide, les numéros de semaine et la saisie manuelle de la date – rendus côté serveur avec HonoX et hydratés comme un îlot uniquement lorsque l'interactivité est nécessaire.
+Un contrôle de formulaire interactif qui combine un champ de saisie de texte avec une superposition de calendrier contextuelle. Il prend en charge les sélecteurs de date unique, les sélections de plage de dates, les bascules de multi-sélection, les limites de calendrier personnalisées, les en-têtes de jours de semaine localisés et la navigation au clavier.
 
-Le composant est **sans tête de par sa conception** : `app/components/ui/date-picker-primitive.tsx` produit un balisage et un état sémantiques et accessibles, tandis que `app/islands/date-picker.tsx` ajoute le comportement côté client (navigation au clavier, aperçu au survol, clic extérieur, saisie). Aucune nouvelle dépendance d'exécution n'est introduite - il s'appuie sur Hono JSX et Panda CSS, la même pile que le reste du système de conception.
+Le **DatePicker** est entièrement intégré en tant que bloc `datePicker` dans le **Page Builder**, permettant aux gestionnaires de contenu et aux développeurs de définir des libellés de texte, le format des espaces réservés, les modes de sélection et les thèmes de couleur d'accentuation directement dans les modèles de page Sveltia CMS.
 
-# Quoi de neuf dans cette révision
-
-- **Les valeurs sélectionnées survivent désormais au rendu statique.** L'entrée rendait auparavant sa valeur via `defaultValue`, que hono/jsx sérialise comme un attribut `defaultValue="…"` mort — un sélecteur rendu statiquement avec une `value`/`defaultValue` a montré une entrée vide. Il restitue désormais un véritable attribut « valeur » ; la frappe reste incontrôlée car le runtime DOM n'attribue la propriété value que lorsque la prop change réellement.- **Les listes déroulantes Mois/année sont présélectionnées correctement dans SSR.** `MonthSelect`/`YearSelect` utilisait `value` sur `<select>`, qui n'est pas un attribut HTML, donc le mois/l'année ciblé n'a jamais été présélectionné dans la sortie du serveur. Le `<option>` correspondant porte désormais `selected`.- **Texte du calendrier localisé.** Les en-têtes de jours de la semaine, les grilles mensuelles et la liste déroulante des mois sont générés à partir de « Intl.DateTimeFormat » pour les « paramètres régionaux » configurés (mis en cache par paramètres régionaux, avec une solution de secours en anglais lorsque les paramètres régionaux sont inconnus). Auparavant, seul le titre respectait « locale ».- **Les points de terminaison de la plage se connectent à la bande.** Les jours de début/fin d'une plage portent désormais `data-range-start` / `data-range-end`, et la recette aligne leurs coins intérieurs afin que les points de terminaison rejoignent la surbrillance dans la plage de manière transparente.- **Le focus clavier survit aux commutateurs de vue.** Le zoom entre les vues jour/mois/année (via l'en-tête ou en explorant un mois/année) était utilisé pour déposer le focus DOM sur `<body>` car le contrôle précédemment ciblé est masqué. Le focus se déplace désormais sur la cellule active de la nouvelle vue.- **Sémantique de la grille renforcée.** Le `role="row"` parasite sur `<thead>` (qui a remplacé son rôle implicite `rowgroup`) a disparu, et la grille annonce `aria-multiselectable` dans les modes `multiple`/`range`.- **La fenêtre contextuelle reste à l'écran.** La fenêtre contextuelle du calendrier limite sa largeur à la fenêtre d'affichage sur les écrans étroits au lieu de déborder horizontalement.
-Reprise de la révision précédente : navigation dans la grille avec le clavier en premier, limitée à « [min, max] », vues mois/année délimitées, aperçu du survol de la plage, saisie de texte libre avec validation sur entrée/flou, soumission de formulaire natif via des entrées cachées, numéros de semaine ISO, déclencheur d'effacement conditionnel, sémantique de grille ARIA avec un taquet de tabulation itinérant et animations d'ouverture/fermeture liées à « état des données ».
-
-# Fonctionnalité
-
-- **Calendrier contextuel** : s'ouvre à partir du déclencheur du calendrier ou en focalisant/cliquant sur l'entrée ; se ferme sur un clic extérieur, <kbd>Escape</kbd> (le focus revient sur le déclencheur), ou après une sélection terminée lorsque `closeOnSelect` est défini.- **Vues du panneau** — cliquez sur l'en-tête mois/année pour effectuer un zoom arrière entre jours → mois → années ; la sélection d'une année ou d'un mois redescend. La page des flèches précédente/suivante par mois, année ou décennie selon la vue.- **Sélection limitée** — `min`/`max` sont appliqués dans chaque vue : les jours hors plage sont désactivés, les mois et les années qui se situent entièrement en dehors de la plage sont également désactivés et le focus du clavier est bloqué afin qu'il ne puisse jamais reposer sur une cellule désactivée.- **Saisie manuelle** — saisissez une date dans la saisie et appuyez sur <kbd>Entrée</kbd> (ou flou). Les valeurs valides « AAAA-MM-JJ » sont validées et normalisées ; les valeurs non valides ou hors plage reviennent à la dernière valeur validée. Effacer l’entrée efface la sélection.- **Sélection de plage** — le premier clic définit le début, le second définit la fin (automatiquement ordonné) ; les jours intermédiaires sont mis en surbrillance et le survol donne un aperçu de la période avant de vous engager.- **Sélection multiple** : cliquez pour activer et désactiver des jours individuels.- **Numéros de semaine** — avec `showWeekNumbers`, une colonne ISO de numéro de semaine est affichée à côté de la grille des jours.- **Soumission de formulaire** — transmettez un accessoire `name` et une entrée cachée est rendue pour chaque date sélectionnée, de sorte que le sélecteur fonctionne à l'intérieur d'un simple `<form>` sans code de colle supplémentaire.- **Préréglages** — `DatePicker.PresetTrigger` prend en charge les valeurs `today`, `last3Days`, `last7Days`, `last14Days`, `last30Days` et `last90Days`. En mode plage, un préréglage sélectionne toute la plage ; sinon, il sélectionne la date d'ancrage unique.
-# Prise en charge du clavier
-
-Lorsque la fenêtre contextuelle est ouverte et que le focus est à l'intérieur du calendrier, les touches suivantes sont actives :
-
-| Key | Day view | Month view | Year view |
-| --- | --- | --- | --- |
-| <kbd>←</kbd> / <kbd>→</kbd> | Previous / next day | Previous / next month | Previous / next year |
-| <kbd>↑</kbd> / <kbd>↓</kbd> | ±1 week | ±3 months | ±3 years |
-| <kbd>Home</kbd> / <kbd>End</kbd> | Start / end of week | — | — |
-| <kbd>PageUp</kbd> / <kbd>PageDown</kbd> | Previous / next month | Previous / next year | Previous / next decade |
-| <kbd>Shift</kbd>+<kbd>PageUp</kbd> / <kbd>Shift</kbd>+<kbd>PageDown</kbd> | Previous / next year | — | — |
-| <kbd>Enter</kbd> / <kbd>Space</kbd> | Select focused day | Drill into month | Drill into year |
-| <kbd>Esc</kbd> | Close popup, return focus to trigger |  |  |
-
-Le déclencheur et l'entrée sont accessibles par <kbd>Tab</kbd> ; l'ouverture à partir du clavier déplace le focus directement dans la grille afin que le calendrier puisse être utilisé sans souris.
-
-# Accessibilité
-
-- La grille utilise la sémantique de la grille ARIA (`role="grid"`, `row`, `gridcell`, `columnheader`, `rowheader`) avec `aria-selected`, `aria-current="date"` sur la cellule d'aujourd'hui et `aria-multiselectable` dans les modes `multiple`/`range`.- Un **tabindex itinérant** conserve un seul taquet de tabulation sur la date ciblée ; les touches fléchées déplacent le focus sans parcourir chaque cellule.- Le focus est géré : l'ouverture depuis le clavier focalise la journée active ; la fermeture renvoie le focus sur le déclencheur ; le basculement entre les vues jour/mois/année déplace le focus sur la cellule active de la nouvelle vue au lieu de la supprimer.- Tous les contrôles interactifs portent des `aria-label` (`Ouvrir le sélecteur de date`, `Effacer les dates sélectionnées`, `Précédent`, `Suivant`, `Changer la vue du calendrier`, `Sélectionner le mois`, `Sélectionner l'année`).- La couleur n'est jamais le seul signal : les états sélectionné, aujourd'hui, à portée et désactivé combinent le remplissage, le poids et (pour aujourd'hui) un marqueur de points.- Respecte `disabled` / `readOnly` / `invalid` via `aria-disabled`, `readonly` et `aria-invalid`.
-# Emplacements de style
-
-La recette d'emplacement Panda CSS (`app/theme/recipes/date-picker.ts`) expose les emplacements `data-part` suivants pour la thématisation. Remplacez via les accessoires `class`/`className` ou une carte sémantique `classNames` :
-
-`root`, `label`, `control`, `input`, `trigger`, `clearTrigger`, `positioner`, `content`, `view`, `viewControl`, `prevTrigger`, `nextTrigger`, `viewTrigger`, `rangeText`, `table`, `tableHead`, `tableHeader`, `tableRow`, `tableBody`, `tableCell`, `tableCellTrigger`, `weekNumber`, `monthSelect`, `yearSelect`, `presetTrigger`, `valueText`. La partie `hidden-input` est rendue uniquement lorsque `name` est défini et ne porte aucun style visible.
-
-Les états sélectionnés / aujourd'hui / dans la plage / aperçu de la plage / désactivés sont pilotés par les attributs « données sélectionnées », « données-aujourd'hui », « données dans la plage », « données hors plage », « données- plage-aperçu » et « données désactivées » (appliqués dans les trois vues du panneau), de sorte qu'ils peuvent être relookés indépendamment de la recette. Les points de terminaison de la plage portent en outre « data-range-start » / « data-range-end » (uniquement lorsque la plage s'étend sur plus d'un jour), que la recette utilise pour aligner leurs coins intérieurs par rapport à la bande dans la plage. L'animation d'ouverture/fermeture désactive `data-state="open"` / `data-state="closed"`.
-
-# Hydratation
-
-**Niveau 1 — interactif par défaut.** Un `DatePicker` s'hydrate comme une île à moins qu'il ne soit explicitement désactivé avec `interactive={false}`, auquel cas il s'affiche au format HTML statique sans client JS.
-
-| `interactive` prop | Résultat |
-| --- | --- |
-| omitted | Hydrates as an island |
-| `true` | Hydrates as an island |
-| `false` | Static — no client JS |
-
-Toutes les décisions d'interactivité dans la bibliothèque sont acheminées via l'assistant partagé `shouldHydrate()` dans `app/components/ui/island-utils.ts`.
+***
 
 # Utilisation
 
+Ces configurations représentent exactement comment les éléments de bloc du page-builder sont construits.
+
+## 1. Sélecteur de date unique (non contrôlé / standard)
+
+Notre disposition standard de sélecteur de date permettant aux utilisateurs de sélectionner une date spécifique dans le menu déroulant du calendrier. Utile pour les formulaires, les inscriptions ou les réservations planifiées.
+
 <DemoPreview>
-  <DatePicker label="Choose Date" selectionMode="single" />
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <DatePicker label="Choose Date" selectionMode="single" interactive />
+  </div>
 </DemoPreview>
-
-```tsx
-import { DatePicker } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <>
-      {/* Single date */}
-      <DatePicker label="Choose Date" selectionMode="single" />
-
-      {/* Date range with bounds */}
-      <DatePicker
-        label="Travel Dates"
-        selectionMode="range"
-        min="2026-01-01"
-        max="2026-12-31"
-      />
-
-      {/* Week numbers + accent colour */}
-      <DatePicker
-        label="Pick a day"
-        selectionMode="single"
-        showWeekNumbers
-        colorPalette="purple"
-      />
-
-      {/* Preselected value */}
-      <DatePicker label="Due Date" defaultValue="2026-07-15" />
-
-      {/* Inside a native form — the selected date submits as `due` */}
-      <form method="post" action="/submit">
-        <DatePicker label="Due Date" name="due" selectionMode="single" />
-        <button type="submit">Save</button>
-      </form>
-
-      {/* Range submission — start/end submit as two `range` entries */}
-      <form method="post" action="/report">
-        <DatePicker
-          label="Reporting Window"
-          name="range"
-          selectionMode="range"
-        />
-        <button type="submit">Run</button>
-      </form>
-    </>
-  );
-}
-```
-
-## Constructeur de pages CMS
-
-Ce composant est disponible sous forme de bloc `datePicker` dans [Page Builder](/docs/PageBuilder) (`content/pages/*.json`) :
 
 ```json
 {
   "type": "datePicker",
-  "label": "Check-in Date",
+  "label": "Choose Date",
   "selectionMode": "single",
   "placeholder": "YYYY-MM-DD",
-  "colorPalette": "blue"
+  "colorPalette": "blue",
+  "interactive": true
 }
 ```
 
+## 2. Sélecteur de plage de voyage (calendrier délimité)
+
+Restreint les limites du calendrier sélectionnable entre des dates spécifiques. Excellent pour les sélections de vols, les réservations d'hôtels ou les fenêtres comptables. Définir `selectionMode` sur `"range"` rend les entrées de début et de fin.
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <DatePicker
+      label="Travel Dates"
+      selectionMode="range"
+      min="2026-01-01"
+      max="2026-12-31"
+      interactive
+    />
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "datePicker",
+  "label": "Travel Dates",
+  "selectionMode": "range",
+  "min": "2026-01-01",
+  "max": "2026-12-31",
+  "colorPalette": "purple",
+  "interactive": true
+}
+```
+
+***
+
 # Propriétés
 
-| Propriété | Type | Description |
-| --- | --- | --- |
-| `label` | `string` | Renvoie une étiquette associée à la première entrée (structure par défaut uniquement). |
-| `placeholder` | `string` | Espace réservé pour l’entrée. La valeur par défaut est « AAAA-MM-JJ ». |
+| Propriété | Type de champ CMS | Défaut | Description / Options prises en charge |
+| --- | --- | --- | --- |
+| **Texte du libellé** (`label`) | `string` | - | Texte de libellé descriptif du formulaire rendu adjacent au champ de saisie de texte. |
+| **Espace réservé** (`placeholder`) | `string` | `"YYYY-MM-DD"` | Texte de format guide affiché dans le champ de saisie de texte lorsqu'il est vide. |
+| **Mode de sélection** (`selectionMode`) | `select` | `"single"` | Définit comment les dates sont collectées. <br/>• `"single"` — Résout une seule date. <br/>• `"range"` — Résout un bloc s'étendant (crée des entrées doubles). <br/>• `"multiple"` — Bascule plusieurs jours indépendants. |
+| **Date minimale** (`min`) | `string` | - | La date sélectionnable la plus ancienne au format ISO `YYYY-MM-DD`. Les cellules précédentes sont désactivées. |
+| **Date maximale** (`max`) | `string` | - | La date sélectionnable la plus tardive au format ISO `YYYY-MM-DD`. |
+| **Afficher les numéros de semaine** (`showWeekNumbers`) | `boolean` | `false` | Lorsque true, rend une colonne de numéro de semaine ISO-8601 le long du bord gauche de la grille de jours. |
+| **Thème de couleur** (`colorPalette`) | `select` | `"blue"` | Thème visuel appliqué aux jours sélectionnés, surbrillances du jour et limites actives. <br/>• Options : `blue`, `green`, `red`, `purple`, `orange`, `amber`, `cyan`, `slate`. |
+| **Activer l'hydratation** (`interactive`) | `boolean` | `true` | Lorsque true, hydrate le composant en tant qu'îlot pour gérer les fenêtres contextuelles de calendrier et les clics extérieurs. |
 
-| `selectionMode` | \`"single" \ | "plusieurs" \ | "range"\` | How dates are selected. Defaults to `"single"`. Range mode renders start and end inputs. |
+***
 
-| `value` | \`CalendarDate[] \ | chaîne[] \ | string \ | Date[]\` | Selected date(s) (controlled). Strings use the `YYYY-MM-DD` format. |
-| `defaultValue` | \`CalendarDate[] \ | chaîne[] \ | string \ | Date[]\` | Initial selected date(s) (uncontrolled). |
+# Prise en charge clavier et accessibilité
 
-| `focusedValue` | \`CalendarDate \ | chaîne \ | Date\` | The date the calendar panel is focused on (controlled). |
-| `defaultFocusedValue` | \`CalendarDate \ | chaîne \ | Date\` | Initial panel date (uncontrolled). |
-| `min` | \`CalendarDate \ | chaîne \ | Date\` | Earliest selectable date. Earlier days, months, and years are disabled; typed dates outside the range are rejected; keyboard focus is clamped to the range. |
-| `max` | \`CalendarDate \ | chaîne \ | Date\` | Latest selectable date. |
+Lorsque le panneau de superposition du calendrier est ouvert et que le focus est dirigé à l'intérieur, les utilisateurs peuvent effectuer entièrement les sélections via les touches standard du clavier :
 
-| `isDateUnavailable` | `(date, locale) => boolean` | Marque les dates individuelles comme non sélectionnables (utilisation statique/composée). |
+- <kbd>←</kbd> / <kbd>→</kbd> — Déplacer le focus vers la cellule du jour précédent ou suivant.
+- <kbd>↑</kbd> / <kbd>↓</kbd> — Déplacer le focus de ±1 semaine (7 jours) verticalement.
+- <kbd>PageUp</kbd> / <kbd>PageDown</kbd> — Faire avancer ou reculer la vue du calendrier d'un mois complet.
+- <kbd>Shift</kbd>+<kbd>PageUp</kbd> / <kbd>Shift</kbd>+<kbd>PageDown</kbd> — Faire avancer ou reculer d'une année complète.
+- <kbd>Enter</kbd> / <kbd>Space</kbd> — Sélectionner la cellule de jour active focalisée et valider.
+- <kbd>Esc</kbd> — Fermer immédiatement la superposition contextuelle et renvoyer le focus sur le champ de saisie du déclencheur.
 
-| `view` | \`"day" \ | "mois" \ | "year"\` | The active panel view (controlled). |
-
-| `open` | `boolean` | Si le calendrier contextuel est ouvert (contrôlé). |
-| `closeOnSelect` | `boolean` | Fermez la fenêtre contextuelle après une sélection terminée. La valeur par défaut est « vrai ». |
-| `showWeekNumbers` | `boolean` | Affiche une colonne de numéro de semaine ISO-8601. La valeur par défaut est « false ». |
-| `numOfMonths` | `number` | Réservé au rendu sur plusieurs mois. Actuellement, un panneau d'un seul mois est toujours affiché ; les valeurs supérieures à « 1 » sont acceptées mais pas encore rendues. |
-| `name` | `string` | Lorsqu'il est défini, affiche une entrée masquée par date sélectionnée sous ce nom, permettant la soumission native `<form>`. En mode plage/multiple, chaque date sélectionnée devient une entrée distincte (ordonnée). |
-| `locale` | `string` | Paramètres régionaux BCP 47 utilisés pour l'en-tête, les en-têtes de jours de la semaine, les noms de mois et les étiquettes de cellules (via `Intl.DateTimeFormat`, avec une solution de secours en anglais). La valeur par défaut est « en-US ». |
-| `disabled` | `boolean` | Désactive tout le sélecteur. |
-| `readOnly` | `boolean` | Rend l'entrée en lecture seule. |
-| `invalid` | `boolean` | Marque l'entrée invalide (`aria-invalid` + style d'erreur). |
-
-| `colorPalette` | \`"blue" \ | "vert" \ | "red" \ | "orange" \ | "gray" \ | "cyan" \ | "amber" \ | "purple"\` | Accent color for the selected date, today indicator, and range highlight. Defaults to `"blue"`. |
-
-| `interactive` | `boolean` | Force (ou supprime) l’hydratation comme une île. |
-| `onValueChange` | `(details: { value: CalendarDate[] }) => void` | Appelé lorsque la sélection change. |
-| `onOpenChange` | `(details: { open: boolean }) => void` | Appelé lorsque la fenêtre contextuelle s'ouvre ou se ferme. |
-
-## Date du calendrier
-
-Les dates sont représentées par la classe `CalendarDate` (`{ année, mois, jour }`, le mois est basé sur 1) pour éviter la dérive du fuseau horaire. Les assistants sont exportés avec le composant :
-
-| Helper | Description |
-| --- | --- |
-| `parseDate(str)` | Analyse une chaîne `AAAA-MM-JJ`, en limitant les parties hors plage. |
-| `isValidDateString(str)` | Valide strictement une chaîne « AAAA-MM-JJ » (y compris la durée des mois et les années bissextiles). |
-| `daysInMonth(year, month)` | Nombre de jours dans le mois donné. |
-| `fromJSDate(date)` | Convertit un `Date` JavaScript en `CalendarDate`. |
-| `getWeekNumber(date)` | Numéro de semaine ISO-8601 pour un `CalendarDate` (utilisé par `showWeekNumbers`). |
-| `getWeekDays(locale)` | Noms de jours de la semaine localisés (`{ court, étroit, long }`, dimanche premier), mis en cache par paramètres régionaux. |
-| `getMonthNames(locale, format?)` | Noms de mois localisés ("short" ou "long"), premier janvier, mis en cache par langue. |
-
-# Notes de production
-
-- **Aucune nouvelle dépendance.** Construit entièrement sur Hono JSX + Panda CSS, cohérent avec le reste du système de conception.- **Sûr SSR.** Le balisage est rendu sur le serveur ; seule la succursale de l'île prend en compte le comportement du client, et uniquement lorsqu'elle est signalée.- **Piloté par des jetons.** Les couleurs, l'espacement, les rayons et les ombres proviennent des jetons de thème partagés, de sorte que le sélecteur hérite automatiquement du mode sombre et de la « palette de couleurs » configurée.- **Valeurs de type sécurisé.** `CalendarDate` évite les pièges du fuseau horaire liés à la gestion brute de `Date`/`string`.- **Délimité par la conception.** `min`/`max` sont appliqués de manière cohérente dans les vues jour, mois et année – à la fois pour la sélection de la souris et la mise au point du clavier – de sorte qu'une valeur hors plage ne peut jamais être validée ou ciblée.- **Prêt pour le formulaire.** La prop facultative `name` restitue les entrées masquées, de sorte que le sélecteur passe aux formulaires natifs sans gestionnaires de soumission personnalisés.- **Panneau d'un seul mois.** `numOfMonths` est accepté pour des raisons de compatibilité ascendante mais affiche actuellement un seul mois. Le rendu sur plusieurs mois est sur la feuille de route.
+Sous le capot, la grille de jours utilise des arrêts de focus `tabIndex` vagabonds pour éviter de tabuler à travers chaque jour du calendrier. Toutes les grilles de cellules annoncent des descriptions sémantiques correctes pour lecteurs d'écran (`role="grid"`, `aria-multiselectable`, `aria-current="date"`).

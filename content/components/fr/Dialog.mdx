@@ -1,7 +1,7 @@
 ---
 title: Dialog Dialogue
-hydration: 1
 category: Overlays
+hydration: 1
 ---
 
 import { Dialog, Button } from "../../../app/components/ui";
@@ -9,98 +9,122 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introduction
 
-Une fenêtre modale superposée sur la page qui nécessite une interaction de l'utilisateur avant de continuer.
+Un conteneur modal superposé qui interrompt l'interaction normale de l'utilisateur avec la page pour recueillir des saisies explicites, afficher des outils de tableau de bord essentiels ou demander des confirmations d'action.
 
-# Hydratation
+Le composant **Dialog** est entièrement intégré en tant que bloc `dialog` dans le **Page Builder**, permettant aux gestionnaires de contenu de définir facilement des déclencheurs structurels (tels que le clic sur un bouton d'action), des titres, des menus de pied de page personnalisés et du texte modal directement dans Sveltia CMS.
 
-**Niveau 1 — auto-interactif par défaut.** Un « dialogue » n'a pas de solution de secours statique significative : l'ouverture, le recouvrement du focus et la gestion ESC nécessitent tous du JavaScript côté client - il s'hydrate donc comme une île par défaut. Passez `interactive={false}` pour afficher un shell de dialogue statique et inerte qui ne fournit aucun JS client.
+***
 
-| `interactive` prop | Résultat |
-| --- | --- |
-| omitted | Hydrates as an island (default) |
-| `true` | Hydrates as an island |
-| `false` | Static — no client JS |
+# Hydratation et Comportement Interactif
 
-Toutes les décisions d'interactivité dans la bibliothèque sont acheminées via l'assistant partagé `shouldHydrate()` dans `app/components/ui/island-utils.ts`.
+Un `Dialog` nécessite un moteur JavaScript côté client pour gérer le comportement critique d'accessibilité, le piégeage du focus et les contrôles au clavier. Par conséquent, la boîte de dialogue s'hydrate par défaut sous forme d'îlot client actif. Si un enveloppe de présentation statique et en lecture seule est souhaitée, définissez `"interactive": false` pour empêcher le chargement des ressources de script côté client.
 
-# Accessibilité
+| Propriété JSON | Mode d'Hydratation | Description |
+| --- | --- | --- |
+| `"interactive": true` | Îlot Interactif (Par défaut) | Modale entièrement réactive avec piégeage du focus, fermetures Échap et assombrissement de la superposition. |
+| `"interactive": false` | Modèle HTML Statique | Une coque de mise en page statique rendue côté serveur sans comportement JavaScript interactif. |
 
-Conforme au [modèle de conception Dialog (Modal) WAI-ARIA](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/). Lorsqu'elle est hydratée (`interactive` par défaut est `true`), la boîte de dialogue présente le comportement suivant :
+***
 
-- **Le focus se déplace dans la boîte de dialogue à l'ouverture** — vers `initialFocusEl()`, sinon le premier élément focalisable, sinon le contenu lui-même.- **Le focus est piégé lorsqu'il est ouvert** — Cycle `Tab` / `Shift+Tab` uniquement dans le contenu de la boîte de dialogue. Les boîtes de dialogue imbriquées sont gérées : seule la boîte de dialogue la plus haute piège et possède "Escape".- **`Escape` ferme** la boîte de dialogue (sauf si `closeOnEscape={false}`).- **L'arrière-plan est inerte** — tout ce qui se trouve en dehors de la boîte de dialogue (y compris une boîte de dialogue parent derrière une boîte de dialogue imbriquée) devient « inerte » + est supprimé de l'ordre de tabulation, tandis que la sous-arborescence de la boîte de dialogue reste interactive.- **Le défilement du corps est verrouillé** lorsqu'au moins une boîte de dialogue est ouverte et restauré à la fermeture de la dernière.- **Le focus revient au déclencheur à la fermeture** (ou à `finalFocusEl()` si fourni).- **Nom accessible** — dérivé de `title` (`aria-labelledby`) ou d'un `aria-label` explicite. Un « console.warn » côté client est émis si aucun des deux n'est présent.- **`role="alertdialog"`** — transmettez `role="alertdialog"` pour les confirmations destructives et pointez `initialFocusEl` sur l'action d'annulation/sécurité afin qu'elle reçoive le focus en premier. Avec `closeOnInteractOutside={false}`, la boîte de dialogue ne peut être fermée que via un bouton ou `Escape`.
 # Utilisation
 
-## Boîte de dialogue de base
+Ces configurations représentent exactement comment les éléments de bloc du constructeur de pages sont construits.
+
+## 1. Modale de Confirmation d'Action
+
+Une boîte de dialogue de confirmation standard déclenchée via un bouton d'action, comprenant les options annuler et accepter. Idéale pour des choix simples comme vérifier des paramètres ou confirmer des éléments.
 
 <DemoPreview>
-  <Dialog
-    trigger={<Button>Open Dialog</Button>}
-    title="Confirm action"
-    description="Are you sure you want to continue?"
-    body="This action cannot be undone."
-    cancel={<Button variant="outline">Cancel</Button>}
-    confirm={<Button>Confirm</Button>}
-  />
-</DemoPreview>
-
-```tsx
-import { Dialog, Button } from "../components/ui";
-
-export default function MyPage() {
-  return (
+  <div style={{ width: "100%", maxWidth: "480px" }}>
     <Dialog
-      trigger={<Button>Open Dialog</Button>}
-      title="Confirm action"
-      description="Are you sure you want to continue?"
-      body="This action cannot be undone."
-      cancel={<Button variant="outline">Cancel</Button>}
-      confirm={<Button>Confirm</Button>}
+      trigger={<Button>Trigger Action Modal</Button>}
+      title="Confirm Account Sync"
+      description="Are you sure you want to merge workspace details?"
+      body="This syncs configurations across devices. Unsaved local changes might be overridden."
+      cancel={<Button variant="outline">Dismiss</Button>}
+      confirm={<Button>Synchronize</Button>}
     />
-  );
-}
-```
-
-## Constructeur de pages CMS
-
-Ce composant est disponible sous forme de bloc « dialogue » dans [Page Builder](/docs/PageBuilder) (`content/pages/*.json`). `trigger` est une liste de blocage imbriquée (le CMS soumet toujours un tableau) :
+  </div>
+</DemoPreview>
 
 ```json
 {
   "type": "dialog",
-  "title": "Confirm action",
-  "description": "Are you sure you want to continue?",
-  "confirmText": "Confirm",
-  "cancelText": "Cancel",
-  "trigger": [{ "type": "button", "text": "Open Dialog" }]
+  "title": "Confirm Account Sync",
+  "description": "Are you sure you want to merge workspace details?",
+  "body": "This syncs configurations across devices. Unsaved local changes might be overridden.",
+  "confirmText": "Synchronize",
+  "cancelText": "Dismiss",
+  "trigger": [
+    {
+      "type": "button",
+      "text": "Trigger Action Modal",
+      "colorPalette": "blue"
+    }
+  ]
 }
 ```
 
-# Propriétés
+## 2. Alerte d'Action Destructrice (Rôle Alertdialog)
 
-## Dialogue
+Utilisez ce format pour des confirmations destructrices à fort impact et irréversibles (par exemple, supprimer une base de données ou abandonner un travail non enregistré). Cette configuration modifie le rôle sémantique à l'écran de la boîte de dialogue en `alertdialog`.
 
-| Propriété | Type | Description |
-| --- | --- | --- |
-| `trigger` | `JSX.Element` | Élément qui ouvre la boîte de dialogue lorsqu'il est activé. |
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "480px" }}>
+    <Dialog
+      role="alertdialog"
+      trigger={<Button colorPalette="red">Delete Database</Button>}
+      title="Destroy Database"
+      description="You are about to permanently erase production server nodes."
+      body="This operation is immediate and completely irreversible. All live connections will instantly shut down."
+      cancel={<Button variant="outline">Keep Database</Button>}
+      confirm={<Button colorPalette="red">Erase Forever</Button>}
+    />
+  </div>
+</DemoPreview>
 
-| `title` | \`string \ | JSX.Élément\` | The dialog title. |
-| `description` | \`string \ | JSX.Élément\` | The dialog description. |
-| `body` | \`string \ | JSX.Élément\` | The main body content. |
-| `footer` | \`string \ | JSX.Élément\` | Custom footer content. |
+```json
+{
+  "type": "dialog",
+  "role": "alertdialog",
+  "title": "Destroy Database",
+  "description": "You are about to permanently erase production server nodes.",
+  "body": "This operation is immediate and completely irreversible. All live connections will instantly shut down.",
+  "confirmText": "Erase Forever",
+  "cancelText": "Keep Database",
+  "trigger": [
+    {
+      "type": "button",
+      "text": "Delete Database",
+      "colorPalette": "red"
+    }
+  ]
+}
+```
 
-| `cancel` | `JSX.Element` | Élément rendu comme un déclencheur de fermeture (annulation). |
-| `confirm` | `JSX.Element` | Élément rendu comme déclencheur d'action. |
-| `closable` | `boolean` | S'il faut afficher le bouton de fermeture. Par défaut : « vrai ». |
-| `interactive` | `boolean` | Activez l’hydratation côté client pour un comportement interactif. |
-| `class` | `string` | Classes CSS personnalisées pour l'élément racine. |
+***
 
-| `role` | \`"dialog" \ | "dialogue d'alerte"\` | Dialog variant. Use `"alertdialog"` for destructive confirmations. Default: `"dialog"`. |
+# Props
 
-| `aria-label` | `string` | Nom accessible lorsqu'aucun « titre » n'est fourni. |
-| `closeOnEscape` | `boolean` | Fermez lorsque `Escape` est enfoncé. Par défaut : « vrai ». |
-| `closeOnInteractOutside` | `boolean` | Fermez lorsque vous cliquez sur la toile de fond. Par défaut : « vrai ». |
+| Propriété | Type de Champ CMS | Par défaut | Description / Options Prises en Charge |
+| --- | --- | --- | --- |
+| **Élément Déclencheur** (`trigger`) | `list` | - | Éléments de bloc (tels que des Boutons ou des Liens) rendus sur la page pour ouvrir la boîte de dialogue au clic. |
+| **En-tête** (`title`) | `string` | - | Le texte d'en-tête en gras affiché en haut de la carte de dialogue. |
+| **Sous-titre** (`description`) | `string` | - | Texte de sous-titre supplémentaire fournissant un contexte explicatif secondaire. |
+| **Contenu du Corps** (`body`) | `string` | - | Le texte descriptif principal ou les blocs de contenu de mise en page rendus dans la région centrale de la carte. |
+| **Texte d'Action de Confirmation** (`confirmText`) | `string` | - | Optionnel. Libellé de texte pour le bouton de confirmation d'action principal. |
+| **Texte d'Action d'Annulation** (`cancelText`) | `string` | - | Optionnel. Libellé de texte pour le bouton d'action fermer/ignorer. |
+| **Type de Rôle** (`role`) | `select` | `"dialog"` | Rôle sémantique de la modale.<br/>• `"dialog"` — Fenêtre interactive standard.<br/>• `"alertdialog"` — Avertissements destructifs. |
+| **Pied de Page Personnalisé** (`footer`) | `list` | - | Liste de blocs rendus sur le bord inférieur. Idéal pour des contrôles personnalisés ou des raccourcis de boutons supplémentaires. |
+| **Activer l'Hydratation** (`interactive`) | `boolean` | `true` | Lorsque true, hydrate le composant en tant qu'îlot côté client pour activer les superpositions, le piégeage du focus et les fermetures Échap. |
 
-| `initialFocusEl` | \`() => HTMLElement \ | nul\` | Element to focus on open. Defaults to the first focusable. |
-| `finalFocusEl` | \`() => HTMLElement \ | nul\` | Element to focus on close. Defaults to the trigger. |
+***
 
-Des accessoires supplémentaires (par exemple `open`, `defaultOpen`, `onOpenChange`, `id`) sont transmis à la primitive de dialogue sous-jacente.
+# Accessibilité et Notes de Développement
+
+Conforme au [modèle de conception Dialog (Modal) WAI-ARIA](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/). Lors de l'hydratation, le composant implémente les couches d'accessibilité critiques suivantes :
+
+- **Piégeage du Focus Initial :** Le focus se déplace dans la boîte de dialogue à l'ouverture (en sélectionnant d'abord l'action annuler/sécurisée pour éviter les déclenchements accidentels) et reste piégé en interne lors du défilement avec `Tab` / `Shift + Tab`.
+- **Inertie d'Arrière-plan :** Les éléments interactifs à l'extérieur du conteneur modal ouvert sont automatiquement marqués avec l'attribut HTML `inert` pour empêcher les lecteurs d'écran ou les contrôles clavier de focaliser des éléments derrière l'arrière-plan.
+- **Gestion de la Fermeture Échap :** En appuyant sur la touche clavier `Escape`, le conteneur de dialogue actif se ferme automatiquement (sauf si `closeOnEscape` est configuré autrement).
+- **Verrouillage du Défilement du Corps :** Le défilement du corps du document est figé tant qu'une modale est active et est automatiquement restauré une fois que la boîte de dialogue a terminé sa transition de fermeture.

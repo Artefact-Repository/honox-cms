@@ -1,7 +1,7 @@
 ---
 title: Badge Insignia
-hydration: 3
 category: Feedback
+hydration: 3
 ---
 
 import { Badge } from "../../../app/components/ui";
@@ -9,51 +9,99 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introducción
 
-Un pequeño elemento visual que etiqueta o categoriza contenido.
+El componente `Badge` es un elemento visual pequeño y versátil utilizado para etiquetar, categorizar o resaltar metadatos de contenido. Se utiliza comúnmente para mostrar estados (como "Éxito" o "Pendiente"), etiquetas o contadores numéricos.
+
+A través del CMS Page Builder, los autores de contenido pueden configurar rápidamente variantes de insignias, tamaños y paletas de colores para ajustarse perfectamente a sus pautas de diseño.
+
+***
 
 # Uso
 
+Puede personalizar la apariencia de los distintivos utilizando estilos visuales, colores personalizados y tamaños responsivos.
+
+## Variantes de estilo
+
+El componente admite múltiples estilos de visualización para ayudar a establecer la jerarquía visual.
+
 <DemoPreview>
-  <Badge colorPalette="blue" variant="solid">New</Badge>
-  <Badge colorPalette="green" variant="subtle">Active</Badge>
-  <Badge colorPalette="red" variant="outline">Error</Badge>
+  <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+    <Badge colorPalette="blue" variant="solid">Solid</Badge>
+    <Badge colorPalette="blue" variant="subtle">Subtle</Badge>
+    <Badge colorPalette="blue" variant="surface">Surface</Badge>
+    <Badge colorPalette="blue" variant="outline">Outline</Badge>
+  </div>
 </DemoPreview>
-
-```tsx
-import { Badge } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Badge colorPalette="blue" variant="solid">
-      New
-    </Badge>
-  );
-}
-```
-
-## Constructor de Páginas CMS
-
-Este componente está disponible como un bloque `badge` en el [Constructor de Páginas](/docs/PageBuilder) (`content/pages/*.json`):
 
 ```json
 {
   "type": "badge",
-  "text": "New",
-  "colorPalette": "blue",
-  "variant": "solid"
+  "text": "New Feature",
+  "variant": "solid",
+  "colorPalette": "blue"
 }
 ```
 
+***
+
+## Paletas de color
+
+Elija entre una amplia gama de colores de acento del tema para indicar significados semánticos.
+
+<DemoPreview>
+  <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
+    <Badge colorPalette="green" variant="solid">Success</Badge>
+    <Badge colorPalette="red" variant="solid">Error</Badge>
+    <Badge colorPalette="amber" variant="solid">Warning</Badge>
+    <Badge colorPalette="purple" variant="solid">Special</Badge>
+    <Badge colorPalette="gray" variant="solid">Draft</Badge>
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "badge",
+  "text": "Error Detected",
+  "variant": "solid",
+  "colorPalette": "red"
+}
+```
+
+***
+
+## Opciones de tamaño
+
+Escalone sus distintivos desde píldoras de metadatos compactas hasta etiquetas de llamada más grandes.
+
+<DemoPreview>
+  <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
+    <Badge size="sm" colorPalette="blue">Small</Badge>
+    <Badge size="md" colorPalette="blue">Medium</Badge>
+    <Badge size="lg" colorPalette="blue">Large</Badge>
+    <Badge size="xl" colorPalette="blue">Extra Large</Badge>
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "badge",
+  "text": "Large Label",
+  "size": "lg",
+  "colorPalette": "blue",
+  "variant": "subtle"
+}
+```
+
+***
+
 # Propiedades
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `children` | `any` | Contenido que se renderiza dentro del componente. |
-| `class` | `string` | Clases CSS personalizadas. |
-| `colorPalette` | `string` | El tema de color del badge. |
+Al agregar un bloque `badge` dentro del esquema del [Page Builder](/docs/PageBuilder) (`content/pages/*.json`), están disponibles los siguientes parámetros de configuración:
 
-| `variant` | \`"solid" \ | "subtle" \ | "surface" \ | "outline"\` | El estilo visual. |
-
-| `size` | \`"sm" \ | "md" \ | "lg" \ | "xl" \ | "2xl"\` | El tamaño del badge. |
-
-| `interactive` | `boolean` | Si se habilita la hidratación del lado del cliente. |
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `type` | `String` | - | El identificador del bloque. Debe establecerse en `"badge"`. |
+| `text` | `String` | - | El contenido de la etiqueta de texto renderizado dentro del distintivo. |
+| `variant` | `Select` | `"subtle"` | El tratamiento de estilo visual. Opciones: `"solid"`, `"subtle"`, `"surface"`, `"outline"`. |
+| `colorPalette` | `Select` | `"green"` | Acento de color temático semántico. Opciones: `"blue"`, `"green"`, `"red"`, `"purple"`, `"orange"`, `"amber"`, `"cyan"`, `"slate"`, `"gray"`. |
+| `size` | `Select` | `"md"` | Las dimensiones físicas del distintivo. Opciones: `"sm"`, `"md"`, `"lg"`, `"xl"`, `"2xl"`. |
+| `class` | `String` | - | Anulaciones de clase CSS personalizadas aplicadas directamente al distintivo. |

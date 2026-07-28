@@ -1,103 +1,157 @@
 ---
 title: Fieldset 字段集
-hydration: 3
 category: Layout
+hydration: 3
 ---
 
 import { Fieldset, Field } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-## 简介
+# 简介
 
-在原生 `<fieldset>` 下对相关的表单控件进行分组，带有无障碍的图例（legend）、辅助文本与错误文本。与 `Field` 不同，它没有自身的校验器——它是一个静态、服务端渲染的分组原语，因此永远不会作为客户端岛屿水合。它将其 `disabled`/`invalid`/`required` 状态作为上下文提供给嵌套的 `Field`，与 Ark UI 的 Fieldset 一致——参见 [上下文传播](#context-propagation-to-nested-fields)。
+一个结构化布局容器，将相关表单控件分组到原生 `<fieldset>` 下，并配有可访问的图例、辅助文本以及验证错误消息。它是复杂用户输入表单不可或缺的语义锚点，会自动将禁用、无效和必填状态向下传播到嵌套的字段控件。
 
-## 用法
+**Fieldset** 组件已作为 `fieldset` 区块完全集成到 **Page Builder** 中，使内容作者和开发者能够直接在 CMS 中轻松构建多输入个人资料区块、地址表单或账单模块。
+
+***
+
+# 通过 CMS 页面构建器使用（JSON）
+
+以下示例展示了内容编辑者如何在 JSON 页面模式（`content/pages/*.json`）中绑定和构建字段集分组。
+
+## 1. 标准账户信息分组
+
+一个带有必填嵌套名称字段的标准用户资料分组。包含活动的图例和辅助状态文本。
 
 <DemoPreview>
-  <div style={{ width: "100%", maxWidth: "320px" }}>
-    <Fieldset legend="User Profile" helperText="Manage your info." required>
-      <Field label="Name" placeholder="Jane Doe" />
+  <div style={{ width: "100%", maxWidth: "360px" }}>
+    <Fieldset legend="Account Information" helperText="Configure your primary account details." required>
+      <Field label="Full Name" placeholder="Jane Doe" interactive />
+      <Field label="Email Address" placeholder="jane@example.com" interactive />
     </Fieldset>
   </div>
 </DemoPreview>
 
-```tsx
-import { Fieldset, Field } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Fieldset
-      legend="User Profile"
-      helperText="Manage your info."
-      required
-      errorText="Something went wrong."
-    >
-      <Field>...</Field>
-    </Fieldset>
-  );
-}
-```
-
-传入 `errorText` 就足以让 fieldset 进入无效状态——你无需同时传入 `invalid`。如果你想在保留文本的同时抑制错误样式，可显式传入 `invalid={false}`。
-
-### 向嵌套 Field 的上下文传播
-
-`Fieldset` 将其 `disabled`/`invalid`/`required` 状态作为上下文暴露出来。每个嵌套的 `Field` 都会将其读取为自身状态的回退值——因此组级别的 `disabled` 或 `required` 无需在每个字段上重复：
-
-```tsx
-<Fieldset legend="Shipping address" disabled required>
-  <Field label="Street" />   {/* renders disabled + required */}
-  <Field label="Apt #" required={false} />  {/* opts back out of required */}
-</Fieldset>
-```
-
-`Field` 自身的属性始终优先于继承值。就 `invalid` 而言，继承仅在 `Field` 自身没有校验（没有 `validator`、`minLength` 或显式的 `invalid` 属性）时适用——自行校验其值的 `Field` 永远不会被组静默覆盖。
-
-这种传播只有一层：只有 `Field`（以及构建于其之上的任何组件，如 `Textarea`）会查询 `Fieldset` 的上下文。直接放置在 `Fieldset` 内部、没有包裹 `Field` 的裸 `Switch` 或 `Checkbox`——不会获取组的样式，尽管原生的 `<fieldset disabled>` 仍会阻止与其交互。
-
-### 组合
-
-`children` 始终是实际的表单控件组——`Fieldset` 会为你将其包裹在一个间距容器中。`legend` / `helperText` / `errorText` 接受任意 `Child`，而不仅仅是字符串，因此富内容（图标、徽章）应放在那里，而非放在 `children` 中：
-
-```tsx
-<Fieldset legend={<>Profile <Badge>New</Badge></>}>
-  <Field>...</Field>
-  <Textarea>...</Textarea>
-</Fieldset>
-```
-
-不要将 `FieldsetLegend`（或 `FieldsetHelperText` / `FieldsetErrorText`）放在 `children` 内部——`Fieldset` 会将 `children` 包裹在 `<div>` 中，而浏览器只有在 `<legend>` 作为 `<fieldset>` 的直接子元素（而非嵌套在包裹元素内）时，才会用它来计算 fieldset 的无障碍名称。这些导出的子组件（`FieldsetLegend`、`FieldsetHelperText`、`FieldsetErrorText`、`FieldsetContent`、`FieldsetControl`、`FieldsetRequiredIndicator`）是为在完全手工编写的标记中复用而存在的，并非在 `Fieldset` 内部组合的另一个方式。
-
-### CMS 页面构建器
-
-该组件在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中作为 `fieldset` 区块提供：
-
 ```json
 {
   "type": "fieldset",
-  "legend": "User Profile",
-  "helperText": "Manage your info.",
+  "legend": "Account Information",
+  "helperText": "Configure your primary account details.",
   "required": true,
   "children": [
-    { "type": "field", "label": "Name" }
+    {
+      "type": "field",
+      "label": "Full Name",
+      "placeholder": "Jane Doe",
+      "interactive": true
+    },
+    {
+      "type": "field",
+      "label": "Email Address",
+      "placeholder": "jane@example.com",
+      "interactive": true
+    }
   ]
 }
 ```
 
-## 属性
+## 2. 带错误消息的无效分组
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `children` | `any` | fieldset 内部要渲染的表单控件。 |
-| `class` | `string` | 自定义 CSS 类名。 |
-| `id` | `string` | 唯一标识符。省略时自动生成。 |
-| `disabled` | `boolean` | 禁用 fieldset。原生的 `<fieldset disabled>` 会自动禁用每一个后代控件，而嵌套的 `Field` 也会将其作为上下文读取——参见 [上下文传播](#context-propagation-to-nested-fields)。 |
-| `invalid` | `boolean` | fieldset 是否处于无效状态。只要设置了 `errorText` 就默认 `true`，因此通常无需显式传入。 |
-| `required` | `boolean` | 将组标记为必填，并向图例追加一个必填指示器。 |
-| `legend` | `Child` | fieldset 的图例文本。始终渲染为 `<fieldset>` 的直接子元素——参见 [组合](#composition)。 |
-| `helperText` | `Child` | 显示在图例下方的辅助文本。 |
-| `errorText` | `Child` | fieldset 无效时显示的错误文本。 |
+展示当分组要求被违反时，Fieldset 如何显示验证错误消息。输入 `errorText` 会自动在所有子字段上触发无效状态。
 
-## CMS 绑定
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "360px" }}>
+    <Fieldset
+      legend="Billing Credentials"
+      helperText="Enter your card billing details."
+      errorText="A valid postal code is required."
+    >
+      <Field label="Cardholder Name" placeholder="Jane Doe" interactive />
+      <Field label="Postal Code" placeholder="90210" invalid interactive />
+    </Fieldset>
+  </div>
+</DemoPreview>
 
-`legend`、`helperText`、`errorText`、`disabled`、`invalid` 和 `required` 作为可编辑字段暴露在 `public/admin/config.yml` 中，外加一个用于嵌套其他区块的 `children` 列表——即上述相同的便捷属性。`id`/`class` 以及组合子组件（`FieldsetContent`、`FieldsetControl`、`FieldsetRequiredIndicator` 等）未被暴露：它们是供开发者手工编写页面的 JSX 级 API，而非 JSON 驱动的 CMS 区块所能表达的。
+```json
+{
+  "type": "fieldset",
+  "legend": "Billing Credentials",
+  "helperText": "Enter your card billing details.",
+  "errorText": "A valid postal code is required.",
+  "children": [
+    {
+      "type": "field",
+      "label": "Cardholder Name",
+      "placeholder": "Jane Doe",
+      "interactive": true
+    },
+    {
+      "type": "field",
+      "label": "Postal Code",
+      "placeholder": "90210",
+      "invalid": true,
+      "interactive": true
+    }
+  ]
+}
+```
+
+## 3. 禁用的账单选项区块
+
+展示一个完全禁用的配送参数区块。停用父级 Fieldset 会自动锁定每个嵌套元素。
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "360px" }}>
+    <Fieldset legend="Shipping Address" helperText="Unavailable during local holidays." disabled>
+      <Field label="Street" placeholder="123 Main St" interactive />
+      <Field label="Apt #" placeholder="4B" interactive />
+    </Fieldset>
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "fieldset",
+  "legend": "Shipping Address",
+  "helperText": "Unavailable during local holidays.",
+  "disabled": true,
+  "children": [
+    {
+      "type": "field",
+      "label": "Street",
+      "placeholder": "123 Main St",
+      "interactive": true
+    },
+    {
+      "type": "field",
+      "label": "Apt #",
+      "placeholder": "4B",
+      "interactive": true
+    }
+  ]
+}
+```
+
+***
+
+# CMS 配置参考
+
+这些字段直接映射到 `public/admin/config.yml` 下的 Sveltia CMS 区块属性，或 Page Builder 配置：
+
+| 属性 | CMS 字段类型 | 默认值 | 描述 / 支持选项 |
+| :--- | :--- | :--- | :--- |
+| **图例文本** (`legend`) | `string` | - | 字段组的主要视觉与屏幕阅读器标题。 |
+| **辅助消息** (`helperText`) | `string` | - | 位于图例正下方的解释性文本。 |
+| **错误消息** (`errorText`) | `string` | - | 当分组被标记为无效时显示的视觉验证消息。 |
+| **必填状态** (`required`) | `boolean` | `false` | 将分组标记为必填，并在图例上附加一个指示图标。 |
+| **禁用状态** (`disabled`) | `boolean` | `false` | 禁用整个区块，锁定所有嵌套输入。 |
+| **无效状态** (`invalid`) | `boolean` | `false` | 强制分组显示活动错误边框和警报。 |
+| **子区块** (`children`) | `list` | - | 分组在 fieldset 轨道内的嵌套子输入（例如 Field、Textarea）。 |
+
+***
+
+# 开发者说明与无障碍
+
+- **免水合（仅静态）：** Fieldset 是一个被指定为仅静态组件（`Tier 3`）的语义布局组件。它完全以标准服务端 HTML 渲染，并免除客户端水合脚本。
+- **上下文传播：** 它利用上下文提供者将 `disabled`、`invalid` 和 `required` 状态向下传播。直接的子组件区块（如 `Field` 和 `Textarea`）会自动监听此上下文并继承分组属性，从而省去重复的键声明。
+- **WAI-ARIA 合规：** Fieldset 严格编译为包含直接 `<legend>` 元素的语义 HTML `<fieldset>` 容器，满足可访问的浏览器标题要求。

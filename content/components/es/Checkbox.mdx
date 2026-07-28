@@ -9,71 +9,122 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introducción
 
-Un control que permite al usuario alternar entre los estados seleccionado, no seleccionado e indeterminado.
+El componente `Checkbox` es un control de formulario que permite a los usuarios alternar entre opciones binarias (marcadas o desmarcadas) y estados indeterminados. Totalmente optimizado para el page builder, el componente admite comportamientos estándar del navegador y se puede personalizar con condiciones de estado (como estados inválidos y deshabilitados) y temas de diseño con acentos.
+
+***
 
 # Uso
 
+Puede personalizar y estructurar las casillas de verificación de la siguiente manera:
+
+## Casilla básica
+
+Una casilla de verificación estándar con una etiqueta de clic interactivo para opciones de usuario directas.
+
 <DemoPreview>
-  <Checkbox defaultChecked interactive>Accept Terms and Conditions</Checkbox>
+  <Checkbox interactive>Accept Terms and Conditions</Checkbox>
 </DemoPreview>
-
-```tsx
-import { Checkbox } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Checkbox
-      defaultChecked={true}
-      onCheckedChange={(details) => console.log(details.checked)}
-      interactive
-    >
-      Accept Terms and Conditions
-    </Checkbox>
-  );
-}
-```
-
-## Estado indeterminado
-
-```tsx
-import { Checkbox } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Checkbox checked="indeterminate" interactive>
-      Parent Checkbox
-    </Checkbox>
-  );
-}
-```
-
-## Constructor de Páginas CMS
-
-Este componente está disponible como un bloque `checkbox` en el [Constructor de Páginas](/docs/PageBuilder) (`content/pages/*.json`):
 
 ```json
 {
-  "type": "checkbox",
-  "label": "Accept Terms and Conditions",
-  "checked": true,
-  "colorPalette": "blue"
+  "blockType": "checkbox",
+  "label": "Accept Terms and Conditions"
 }
 ```
 
+***
+
+## Casilla pre-marcada
+
+Configure una casilla para que se renderice en estado marcado de forma predeterminada cuando la página se cargue por primera vez.
+
+<DemoPreview>
+  <Checkbox defaultChecked interactive>Subscribe to our newsletter</Checkbox>
+</DemoPreview>
+
+```json
+{
+  "blockType": "checkbox",
+  "label": "Subscribe to our newsletter",
+  "checked": true
+}
+```
+
+***
+
+## Casilla deshabilitada
+
+Impida que los usuarios interactúen con la casilla manteniendo su estado visual actual.
+
+<DemoPreview>
+  <Checkbox disabled interactive>Premium feature unlocked</Checkbox>
+  <Checkbox checked={true} disabled interactive>Auto-renew subscription (fixed)</Checkbox>
+</DemoPreview>
+
+```json
+{
+  "blockType": "checkbox",
+  "label": "Auto-renew subscription (fixed)",
+  "checked": true,
+  "disabled": true
+}
+```
+
+***
+
+## Estado de validación inválido
+
+Indica que un campo de casilla no ha pasado la validación. Por ejemplo, forzar una marca para aceptar términos de política obligatorios. La entrada se resalta con bordes de error utilizando los tokens de estado predeterminados del sistema de diseño.
+
+<DemoPreview>
+  <Checkbox invalid interactive>I accept the User Policy Agreement</Checkbox>
+</DemoPreview>
+
+```json
+{
+  "blockType": "checkbox",
+  "label": "I accept the User Policy Agreement",
+  "invalid": true
+}
+```
+
+***
+
+## Casilla con tema de acento
+
+Tiña los estados marcados y los marcadores de foco con acentos estéticos personalizados de la paleta de colores del sistema de diseño, y escale los tamaños hacia arriba o hacia abajo.
+
+<DemoPreview>
+  <Checkbox size="lg" colorPalette="purple" defaultChecked interactive>Purple Large Checkbox</Checkbox>
+</DemoPreview>
+
+```json
+{
+  "blockType": "checkbox",
+  "label": "Purple Large Checkbox",
+  "checked": true,
+  "size": "lg",
+  "colorPalette": "purple"
+}
+```
+
+***
+
 # Propiedades
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `children` | `any` | Contenido de la etiqueta que se renderiza junto al checkbox. |
-| `class` | `string` | Clases CSS personalizadas. |
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | `String` | - | La descripción de texto mostrada junto al control de casilla. Hacer clic en la etiqueta también alterna el estado de la casilla. |
+| `checked` | `Boolean` | `false` | Si la casilla está marcada inicialmente. (Mapeado a `defaultChecked` del lado del servidor para permitir clics libres y no controlados sin bloquear el estado de entrada). |
+| `disabled` | `Boolean` | `false` | Deshabilita las interacciones del usuario y la respuesta visual al clic. |
+| `invalid` | `Boolean` | `false` | Resalta el componente con bordes rojos/inválidos para marcar un error de validación. |
+| `size` | `Select` | `md` | Ajusta la altura y el ancho del cuadro delimitador de la casilla. Opciones: `sm`, `md`, `lg`. |
+| `colorPalette` | `Select` | - | Tema de color de acento aplicado al fondo de la casilla cuando está activo o marcado. Opciones: `blue`, `green`, `red`, `purple`, `orange`, `amber`, `cyan`, `slate`. |
 
-| `checked` | \`boolean \ | "indeterminate"\` | Si el checkbox está seleccionado (controlado). |
-| `defaultChecked` | \`boolean \ | "indeterminate"\` | El estado de selección inicial (no controlado). |
+***
 
-| `disabled` | `boolean` | Si el checkbox está deshabilitado. |
+# Notas de arquitectura
 
-| `onCheckedChange` | \`(details: \{ checked: boolean \ | "indeterminate" \}) => void\` | Callback disparado cuando cambia el estado de selección. |
-
-| `size` | \`"sm" \ | "md" \ | "lg"\` | El tamaño del checkbox. |
-
-| `interactive` | `boolean` | Fuerza la hidratación como isla. |
+- **Marcas predeterminadas no controladas:** Para evitar que las casillas se bloqueen (impidiendo clics de usuario) en plantillas estáticas y basadas en datos sin controladores en línea personalizados, el campo CMS `checked` se resuelve como `defaultChecked` en nuestro registro de páginas.
+- **Restablecimiento estándar de formulario:** El componente se integra con los restablecimientos estándar de formularios HTML. Los restablecimientos devuelven sin problemas las casillas a sus estados `checked` originales configurados en la plantilla JSON.
+- **Enfoque de teclado nativo:** Los indicadores de enfoque y las interacciones de alternancia (disparadores con la barra espaciadora) dependen de entradas HTML estándar y del comportamiento del navegador. Esto permanece muy eficiente y accesible en lectores de pantalla asistivos.

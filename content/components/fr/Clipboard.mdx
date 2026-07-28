@@ -1,7 +1,7 @@
 ---
 title: Clipboard Presse-papiers
-hydration: 2
 category: Forms
+hydration: 2
 ---
 
 import { Clipboard } from "../../../app/components/ui";
@@ -9,13 +9,22 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introduction
 
-Un champ en lecture seule associé à un déclencheur de copie dans le presse-papiers, avec
-états des indicateurs copiés/non copiés.
+Le composant `Clipboard` est un conteneur de texte en lecture seule associé à un déclencheur d'action de copie dans le presse-papiers. Il propose des changements d'état d'indicateurs visuels intégrés et réactifs (états copié/non copié) pour fournir un retour immédiat aux utilisateurs copiant des commandes de terminal, des clés API, des jetons ou des liens.
+
+Le **Clipboard** est entièrement intégré en tant que bloc `clipboard` dans le **Page Builder**, permettant aux auteurs de contenu et aux développeurs de configurer facilement des libellés descriptifs, des valeurs de copie, des délais d'action et des thèmes de couleurs directement dans le CMS.
+
+***
 
 # Utilisation
 
+Ces exemples illustrent comment les éditeurs de contenu lient et structurent les éléments de copie dans le presse-papiers.
+
+## 1. Commande de clonage de code standard
+
+Un extrait de commande de terminal standard ou de clonage Git accompagné d'un déclencheur de copie visuel.
+
 <DemoPreview>
-  <div style={{ width: "100%", maxWidth: "360px" }}>
+  <div style={{ width: "100%", maxWidth: "480px" }}>
     <Clipboard
       label="Clone Command"
       value="git clone https://github.com/honojs/honox"
@@ -24,86 +33,85 @@ Un champ en lecture seule associé à un déclencheur de copie dans le presse-pa
   </div>
 </DemoPreview>
 
-```tsx
-import { Clipboard } from "../components/ui";
+```json
+{
+  "type": "clipboard",
+  "label": "Clone Command",
+  "value": "git clone https://github.com/honojs/honox",
+  "interactive": true
+}
+```
 
-export default function MyPage() {
-  return (
+## 2. Presse-papiers de clé API avec délai personnalisé (thème violet)
+
+Démontre une configuration de plateforme de couleur personnalisée avec un délai de réinitialisation d'état personnalisé plus rapide fixé à 1500 millisecondes.
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "480px" }}>
     <Clipboard
-      label="Clone Command"
-      value="git clone https://github.com/honojs/honox"
+      label="Production API Key"
+      value="pk_live_51HxF4pE2"
+      colorPalette="purple"
+      timeout={1500}
+      interactive
     />
-  );
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "clipboard",
+  "label": "Production API Key",
+  "value": "pk_live_51HxF4pE2",
+  "colorPalette": "purple",
+  "timeout": 1500,
+  "interactive": true
 }
 ```
 
-## Composition personnalisée
+## 3. Configuration compacte en lecture seule
 
-Passez « children » à « Clipboard.Trigger » pour remplacer la copie/vérification par défaut
-échangez des icônes ou composez les pièces directement pour un contrôle total :
+Idéal pour intégrer des URL compactes ou des ID système dans des barres latérales de tableau de bord serrées ou des mises en page de métadonnées compactes.
 
-```tsx
-import { Clipboard } from "../components/ui";
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "480px" }}>
+    <Clipboard
+      label="Endpoint URL"
+      value="https://api.acme.com/v1/deploy"
+      size="sm"
+      interactive
+    />
+  </div>
+</DemoPreview>
 
-export default function MyPage() {
-  return (
-    <Clipboard.Root value="npm install honox">
-      <Clipboard.Label>Install Command</Clipboard.Label>
-      <Clipboard.Control>
-        <Clipboard.Input />
-        <Clipboard.Trigger>
-          <Clipboard.CopyText />
-        </Clipboard.Trigger>
-      </Clipboard.Control>
-    </Clipboard.Root>
-  );
+```json
+{
+  "type": "clipboard",
+  "label": "Endpoint URL",
+  "value": "https://api.acme.com/v1/deploy",
+  "size": "sm",
+  "interactive": true
 }
 ```
+
+***
 
 # Propriétés
 
-## Racine
+| Propriété | Type de champ CMS | Défaut | Description / Options prises en charge |
+| --- | --- | --- | --- |
+| **Texte du libellé** (`label`) | `string` | - | Le texte d'en-tête visuel rendu directement au-dessus du champ de saisie en lecture seule. |
+| **Valeur de copie** (`value`) | `string` | - | La valeur texte réelle copiée dans le presse-papiers système de l'utilisateur lors du clic sur le déclencheur. |
+| **Délai d'expiration** (`timeout`) | `number` | `3000` | Durée en millisecondes pendant laquelle l'état de coche "Copié" reste actif avant de revenir en arrière. |
+| **Thème de couleur** (`colorPalette`) | `select` | `"green"` | Accent de couleur visuel appliqué au déclencheur de copie lorsqu'il bascule sur actif. <br/>• Options : `blue`, `green`, `red`, `purple`, `orange`, `amber`, `cyan`, `slate`. |
+| **Échelle de taille** (`size`) | `select` | `"md"` | Contrôle la hauteur globale, le remplissage et l'échelle du texte. <br/>• Options : `"sm"`, `"md"`, `"lg"`. |
+| **Forcer interactif** (`interactive`) | `boolean` | `true` | Assure l'hydratation côté client en tant qu'îlot interactif Preact afin que les actions de clic déclenchent une copie instantanée. |
 
-| Propriété | Type | Description |
-| --- | --- | --- |
-| `value` | `string` | Le texte à copier (contrôlé). |
-| `defaultValue` | `string` | Le texte initial à copier (non contrôlé). |
-| `disabled` | `boolean` | Désactive le déclencheur. |
-| `timeout` | `number` | Millisecondes pendant lesquelles l'état copié reste actif avant de revenir. Par défaut `3000`. |
-| `translations` | `Partial<ClipboardTranslations>` | Remplacements pour « aria-label » du déclencheur. |
-| `onValueChange` | `(details: { value: string }) => void` | Appelé lorsque la valeur change (par exemple via une entrée personnalisée). |
-| `onStatusChange` | `(details: { copied: boolean }) => void` | Appelé lorsque l'état copié est inversé. |
-| `size` | `"sm" \| "md" \| "lg"` | Visual size. Default `"md"`. |
-| `colorPalette` | `string` | Le thème des couleurs. « vert » par défaut. |
-| `interactive` | `boolean` | Force (ou supprime) l’hydratation comme une île. |
-| `class` | `string` | Classes CSS personnalisées pour l'élément racine. |
+***
 
-## Composition par défaut
+# Notes pour les développeurs et accessibilité
 
-Ceux-ci s'appliquent uniquement au `<Clipboard>` de niveau supérieur (pas à `Clipboard.Root`),
-qui restitue `Label` + `Control` (`Input` + `Trigger`) pour vous.
-
-| Propriété | Type | Description |
-| --- | --- | --- |
-| `label` | `JSX.Element \| chaîne` | Label rendered above the control. |
-| `children` | `JSX.Element` | Contenu « Trigger » personnalisé, remplaçant l'échange d'icônes de copie/vérification par défaut. |
-
-## Sous-composants
-
-| Partie | Description |
-| --- | --- |
-| `Clipboard.Label` | `<label>` lié à l'entrée en lecture seule. |
-| `Clipboard.Control` | Enveloppe « Input » et « Trigger ». |
-| `Clipboard.Input` | Lecture seule `<input>` affichant la valeur actuelle ; sélectionne son texte sur le focus. La copie manuelle via Ctrl/Cmd+C déclenche également l'état copié. |
-| `Clipboard.Trigger` | Copie la « valeur » dans le presse-papiers au clic. Accepte `asChild` pour fusionner sur un enfant personnalisé au lieu de restituer un `<button>`. |
-| `Clipboard.Indicator` | Rend à la fois les « enfants » et une variante « copiée » en tant que nœuds frères, basculés via « caché » — à utiliser pour les échanges d'icônes ou de texte copiés/non copiés personnalisés. |
-| `Clipboard.CopyText` | Commodité de l'indicateur qui permute entre le texte "Copier" / "Copié" (remplacement via les accessoires "enfants"/"copiés"). |
-| `Clipboard.Context` | Accès Render-prop au contexte du presse-papiers : `<Clipboard.Context>{(ctx) => ...}</Clipboard.Context>`. |
-
-# Accessibilité
-
-- `Trigger` obtient un `aria-label` de `translations.triggerLabel (copié)`  (par défaut `"Copier dans le presse-papier"` / `"Copié dans le presse-papier"`), annonçant le
-  changement d’état vers la technologie d’assistance.
-- `Input` est `readOnly`, pas `disabled`, donc il reste focalisable et son texte  sélectionnable/copiable via des raccourcis clavier natifs même sans cliquer
-  le déclencheur.
-- « data-copied » est reflété sur chaque partie pour un style basé sur l'état.
+- **Libellé accessible et annonces d'état :** Sous le capot, ce composant gère nativement l'accessibilité du lecteur d'écran :
+    - Le déclencheur du bouton de copie reçoit des mises à jour `aria-label` localisées (bascule entre `"Copy to clipboard"` / `"Copied to clipboard"`), garantissant que les lecteurs d'écran annoncent immédiatement les changements d'état.
+- **Sélection au focus et saisies en lecture seule :** Le champ de saisie reste focalisable (`readOnly` plutôt que `disabled`). Lorsqu'il est focalisé, il sélectionne automatiquement son texte interne complet afin que les utilisateurs clavier puissent copier manuellement le contenu avec `Ctrl+C` ou `Cmd+C`.
+- **Marqueurs d'état actif :** Un attribut `data-copied` est dynamiquement reflété sur le conteneur externe et tous les éléments descendants lorsqu'il est actif, facilitant le style CSS personnalisé pendant la copie.

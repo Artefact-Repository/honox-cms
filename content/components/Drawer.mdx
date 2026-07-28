@@ -1,7 +1,7 @@
 ---
 title: Drawer
-hydration: 1
 category: Overlays
+hydration: 1
 ---
 
 import { Drawer, Button } from "../../app/components/ui";
@@ -9,73 +9,108 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-A panel that slides in from the edge of the screen to present content or actions without leaving the current page.
+An overlay panel that slides in from the edge of the screen, housing temporary content, forms, settings, or multi-step flows. This component allows users to perform tasks, adjust preferences, or review detailed information without losing context of their primary page views.
+
+The **Drawer** component is fully integrated as a `drawer` block in the **Page Builder**, enabling content authors and developers to easily configure trigger buttons, descriptive headers, and custom action footers directly within the CMS.
+
+***
 
 # Usage
 
-## Basic Drawer
+These examples illustrate how content editors bind and structure drawer components.
+
+## 1. Standard Settings Configuration Drawer
+
+A standard configuration panel that includes a title, description, and primary/secondary button triggers.
 
 <DemoPreview>
   <Drawer
-    trigger={<Button>Open Drawer</Button>}
-    title="Settings"
-    description="Adjust your preferences."
-    body="Drawer body content goes here."
-    cancel={<Button variant="outline">Close</Button>}
-    confirm={<Button>Save</Button>}
+    trigger={<Button>Open Settings</Button>}
+    title="Workspace Preferences"
+    description="Customize your development workspace configurations."
+    body="Configure default themes, enable telemetry, toggle system status reports, and authorize third-party API hook integrations for your active workspace."
+    cancel={<Button variant="outline">Cancel</Button>}
+    confirm={<Button>Apply Changes</Button>}
   />
 </DemoPreview>
-
-```tsx
-import { Drawer, Button } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Drawer
-      trigger={<Button>Open Drawer</Button>}
-      title="Settings"
-      description="Adjust your preferences."
-      body="Drawer body content goes here."
-      cancel={<Button variant="outline">Close</Button>}
-      confirm={<Button>Save</Button>}
-    />
-  );
-}
-```
-
-## CMS Page Builder
-
-This component is available as a `drawer` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`). `trigger` is a nested block list (the CMS always submits an array), and so is `footer` — a row of blocks (typically Buttons) rendered alongside the dedicated Confirm/Cancel shortcuts:
 
 ```json
 {
   "type": "drawer",
-  "title": "Settings",
-  "description": "Adjust your preferences.",
-  "confirmText": "Save",
-  "cancelText": "Close",
-  "trigger": [{ "type": "button", "text": "Open Drawer" }],
-  "footer": [{ "type": "button", "variant": "outline", "text": "Reset" }]
+  "title": "Workspace Preferences",
+  "description": "Customize your development workspace configurations.",
+  "confirmText": "Apply Changes",
+  "cancelText": "Cancel",
+  "trigger": [
+    {
+      "type": "button",
+      "text": "Open Settings",
+      "variant": "outline"
+    }
+  ]
 }
 ```
 
+## 2. Information Review Drawer with Custom Footer
+
+Features an alternative layout composition where a custom action button list is supplied within the footer array alongside standard controls.
+
+<DemoPreview>
+  <Drawer
+    trigger={<Button>Review System Specs</Button>}
+    title="System Diagnostics"
+    description="Real-time node and performance overview."
+    body="All background microservices are reporting healthy statuses. Memory allocation is stable at 42%, and static page routing delivery latency is currently averaging 12ms."
+    cancel={<Button variant="outline">Dismiss</Button>}
+    footer={[
+      <Button variant="subtle" colorPalette="blue" style={{ marginRight: "8px" }}>Refresh Node</Button>
+    ]}
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "drawer",
+  "title": "System Diagnostics",
+  "description": "Real-time node and performance overview.",
+  "cancelText": "Dismiss",
+  "trigger": [
+    {
+      "type": "button",
+      "text": "Review System Specs"
+    }
+  ],
+  "footer": [
+    {
+      "type": "button",
+      "text": "Refresh Node",
+      "variant": "subtle",
+      "colorPalette": "blue"
+    }
+  ]
+}
+```
+
+***
+
 # Props
 
-## Drawer
+| Property | CMS Field Type | Default | Description / Supported Options |
+| --- | --- | --- | --- |
+| **Drawer Title** (`title`) | `string` | - | Primary heading displayed prominently at the top of the sliding drawer panel. |
+| **Description** (`description`) | `string` | - | Supporting subtitle message nested beneath the title. |
+| **Body Content** (`body`) | `string` | - | Main text content displayed inside the drawer scroll container. |
+| **Trigger Blocks** (`trigger`) | `list` | - | Array of components (typically a single Button) rendered on the page to open the drawer. |
+| **Confirm Text** (`confirmText`) | `string` | - | Custom label for the primary action button. Omit to hide the confirm control. |
+| **Cancel Text** (`cancelText`) | `string` | - | Custom label for the secondary dismiss button. Omit to hide the cancel control. |
+| **Footer Blocks** (`footer`) | `list` | - | List of auxiliary button blocks rendered adjacent to standard confirm/cancel actions. |
+| **Show Close Button** (`closable`) | `boolean` | `true` | When enabled, renders a standard visual close "X" icon trigger in the upper corner. |
+| **Force Interactive** (`interactive`) | `boolean` | `true` | Instantly hydrates the drawer overlay, transition layers, and focus trap as a client-side island. |
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `trigger` | `JSX.Element` | Element that opens the drawer when activated. |
+***
 
-| `title` | \`string \ | JSX.Element\` | The drawer title. |
-| `description` | \`string \ | JSX.Element\` | The drawer description. |
-| `body` | \`string \ | JSX.Element\` | The main body content. |
-| `footer` | \`string \ | JSX.Element\` | Custom footer content. In CMS content this field is a block list, rendered as a fragment. For `start`/`end` placements the footer is pinned to the bottom of the panel regardless of body length. |
+# Developer Notes & Accessibility
 
-| `cancel` | `JSX.Element` | Element rendered as a close (cancel) trigger. |
-| `confirm` | `JSX.Element` | Element rendered as an action trigger. |
-| `closable` | `boolean` | Whether to show the close button. Default: `true`. |
-| `interactive` | `boolean` | Enable client-side hydration for interactive behavior. |
-| `class` | `string` | Custom CSS classes for the root element. |
-
-Additional props (e.g. `open`, `defaultOpen`, `onOpenChange`, `id`) are forwarded to the underlying drawer primitive.
+- **Hydration Island:** Because the sliding panel relies on client-side state transformations, background overlay dismissals, keyboard focus traps, and touch interactions, it hydrates as an interactive client island by default (`"interactive": true`).
+- **WAI-ARIA Compliance:** Under the hood, this component complies with overlay specifications (`role="dialog"`, `aria-modal="true"`, `aria-labelledby`, `aria-describedby`). Opening the drawer automatically traps keyboard focus inside the panel. Pressing the `Escape` key or clicking the dimmed backdrop layer dismisses the drawer safely, returning focus back to the triggering element.
+- **Unified Island Composition:** To prevent hydration mismatches and overlay collision bugs inside complex client frames, nested elements (including confirm triggers, close shims, and loading spinners) are bundled inside a single unified island environment.

@@ -1,7 +1,7 @@
 ---
 title: Dialog Diálogo
-hydration: 1
 category: Overlays
+hydration: 1
 ---
 
 import { Dialog, Button } from "../../../app/components/ui";
@@ -9,106 +9,122 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introdução
 
-Uma janela modal sobreposta à página que exige interação do usuário antes de continuar.
+Um contêiner modal sobreposto que interrompe a interação normal do usuário com a página para coletar entradas explícitas, exibir ferramentas vitais do painel ou solicitar confirmações de ação.
 
-# Hidratação
+O componente **Dialog** está totalmente integrado como um bloco `dialog` no **Page Builder**, permitindo que os gestores de conteúdo definam facilmente gatilhos estruturais (como clicar em um botão de ação), títulos, menus de rodapé personalizados e texto do modal diretamente no Sveltia CMS.
 
-**Nível 1 — auto-interativo por padrão.** Um `Dialog` não tem um fallback estático significativo — a abertura, a captura de foco e o tratamento de ESC exigem todos JavaScript do lado do cliente — por isso ele hidrata como ilha por padrão. Passe `interactive={false}` para renderizar uma carcaça de diálogo estática e inerte que não envia JS de cliente.
+***
 
-| `interactive` prop | Resultado |
-| --- | --- |
-| omitido | Hidrata como ilha (padrão) |
-| `true` | Hidrata como ilha |
-| `false` | Estático — sem JS de cliente |
+# Hidratação e Comportamento Interativo
 
-Todas as decisões de interatividade na biblioteca passam pelo helper compartilhado `shouldHydrate()` em `app/components/ui/island-utils.ts`.
+Um `Dialog` requer um mecanismo JavaScript do lado do cliente para gerenciar o comportamento crítico de acessibilidade, a captura de foco e os controles de teclado. Como resultado, o diálogo é hidratado como uma ilha de cliente ativa por padrão. Se um invólucro de apresentação estático e somente leitura for desejado, defina `"interactive": false` para evitar o carregamento de recursos de script do lado do cliente.
 
-# Acessibilidade
+| Propriedade JSON | Modo de Hidratação | Descrição |
+| --- | --- | --- |
+| `"interactive": true` | Ilha Interativa (Padrão) | Modal totalmente responsivo com captura de foco, fechamentos por Escape e escurecimento de sobreposição. |
+| `"interactive": false` | Modelo HTML Estático | Uma casca de layout estática renderizada no servidor sem comportamento JavaScript interativo. |
 
-Está em conformidade com o [padrão de design WAI-ARIA Dialog (Modal)](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/). Quando hidratado (`interactive` é `true` por padrão), o diálogo oferece o seguinte comportamento:
-
-- **O foco se move para dentro do diálogo ao abrir** — para `initialFocusEl()`, senão o primeiro elemento focável, senão o próprio conteúdo.
-- **O foco fica preso enquanto está aberto** — `Tab` / `Shift+Tab` ciclam apenas dentro do conteúdo do diálogo. Diálogos aninhados são tratados: apenas o diálogo mais no topo captura e possui `Escape`.
-- **`Escape` fecha** o diálogo (a menos que `closeOnEscape={false}`).
-- **O fundo fica inerte** — tudo fora do diálogo (incluindo um diálogo pai atrás de um aninhado) recebe `inert` e é removido da ordem de tabulação, enquanto a subárvore do diálogo permanece interativa.
-- **O scroll do body é bloqueado** enquanto pelo menos um diálogo está aberto, e restaurado quando o último é fechado.
-- **O foco retorna ao disparador ao fechar** (ou a `finalFocusEl()` se fornecido).
-- **Nome acessível** — derivado de `title` (`aria-labelledby`) ou um `aria-label` explícito. Um `console.warn` do lado do cliente é emitido se nenhum dos dois estiver presente.
-- **`role="alertdialog"`** — passe `role="alertdialog"` para confirmações destrutivas, e aponte `initialFocusEl` para a ação de cancelar/segura para que receba o foco primeiro. Com `closeOnInteractOutside={false}` o diálogo só pode ser dispensado por meio de um botão ou `Escape`.
+***
 
 # Uso
 
-## Diálogo básico
+Essas configurações representam exatamente como os itens de bloco do construtor de páginas são construídos.
+
+## 1. Modal de Confirmação de Ação
+
+Uma caixa de diálogo de confirmação padrão acionada por um botão de ação, com opções de cancelar e aceitar. Ideal para escolhas simples como verificar configurações ou confirmar itens.
 
 <DemoPreview>
-  <Dialog
-    trigger={<Button>Open Dialog</Button>}
-    title="Confirm action"
-    description="Are you sure you want to continue?"
-    body="This action cannot be undone."
-    cancel={<Button variant="outline">Cancel</Button>}
-    confirm={<Button>Confirm</Button>}
-  />
-</DemoPreview>
-
-```tsx
-import { Dialog, Button } from "../components/ui";
-
-export default function MyPage() {
-  return (
+  <div style={{ width: "100%", maxWidth: "480px" }}>
     <Dialog
-      trigger={<Button>Open Dialog</Button>}
-      title="Confirm action"
-      description="Are you sure you want to continue?"
-      body="This action cannot be undone."
-      cancel={<Button variant="outline">Cancel</Button>}
-      confirm={<Button>Confirm</Button>}
+      trigger={<Button>Trigger Action Modal</Button>}
+      title="Confirm Account Sync"
+      description="Are you sure you want to merge workspace details?"
+      body="This syncs configurations across devices. Unsaved local changes might be overridden."
+      cancel={<Button variant="outline">Dismiss</Button>}
+      confirm={<Button>Synchronize</Button>}
     />
-  );
-}
-```
-
-## Construtor de páginas CMS
-
-Este componente está disponível como um bloco `dialog` no [Construtor de páginas](/docs/PageBuilder) (`content/pages/*.json`). `trigger` é uma lista de blocos aninhada (o CMS sempre envia um array):
+  </div>
+</DemoPreview>
 
 ```json
 {
   "type": "dialog",
-  "title": "Confirm action",
-  "description": "Are you sure you want to continue?",
-  "confirmText": "Confirm",
-  "cancelText": "Cancel",
-  "trigger": [{ "type": "button", "text": "Open Dialog" }]
+  "title": "Confirm Account Sync",
+  "description": "Are you sure you want to merge workspace details?",
+  "body": "This syncs configurations across devices. Unsaved local changes might be overridden.",
+  "confirmText": "Synchronize",
+  "cancelText": "Dismiss",
+  "trigger": [
+    {
+      "type": "button",
+      "text": "Trigger Action Modal",
+      "colorPalette": "blue"
+    }
+  ]
 }
 ```
 
-# Propriedades
+## 2. Alerta de Ação Destrutiva (Função Alertdialog)
 
-## Dialog
+Use este formato para confirmações destrutivas de alto impacto e irreversíveis (por exemplo, excluir um banco de dados ou descartar trabalho não salvo). Essa configuração altera o papel semântico de tela do diálogo para `alertdialog`.
 
-| Prop | Tipo | Descrição |
-| --- | --- | --- |
-| `trigger` | `JSX.Element` | Elemento que abre o diálogo ao ser ativado. |
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "480px" }}>
+    <Dialog
+      role="alertdialog"
+      trigger={<Button colorPalette="red">Delete Database</Button>}
+      title="Destroy Database"
+      description="You are about to permanently erase production server nodes."
+      body="This operation is immediate and completely irreversible. All live connections will instantly shut down."
+      cancel={<Button variant="outline">Keep Database</Button>}
+      confirm={<Button colorPalette="red">Erase Forever</Button>}
+    />
+  </div>
+</DemoPreview>
 
-| `title` | \`string \ | JSX.Element\` | O título do diálogo. |
-| `description` | \`string \ | JSX.Element\` | A descrição do diálogo. |
-| `body` | \`string \ | JSX.Element\` | O conteúdo principal. |
-| `footer` | \`string \ | JSX.Element\` | Conteúdo personalizado do rodapé. |
+```json
+{
+  "type": "dialog",
+  "role": "alertdialog",
+  "title": "Destroy Database",
+  "description": "You are about to permanently erase production server nodes.",
+  "body": "This operation is immediate and completely irreversible. All live connections will instantly shut down.",
+  "confirmText": "Erase Forever",
+  "cancelText": "Keep Database",
+  "trigger": [
+    {
+      "type": "button",
+      "text": "Delete Database",
+      "colorPalette": "red"
+    }
+  ]
+}
+```
 
-| `cancel` | `JSX.Element` | Elemento renderizado como disparador de fechamento (cancelar). |
-| `confirm` | `JSX.Element` | Elemento renderizado como disparador de ação. |
-| `closable` | `boolean` | Se deve mostrar o botão de fechar. Padrão: `true`. |
-| `interactive` | `boolean` | Habilita a hidratação do lado do cliente para comportamento interativo. |
-| `class` | `string` | Classes CSS personalizadas para o elemento raiz. |
+***
 
-| `role` | \`"dialog" \ | "alertdialog"\` | Variante do diálogo. Use `"alertdialog"` para confirmações destrutivas. Padrão: `"dialog"`. |
+# Props
 
-| `aria-label` | `string` | Nome acessível quando nenhum `title` é fornecido. |
-| `closeOnEscape` | `boolean` | Fecha quando `Escape` é pressionado. Padrão: `true`. |
-| `closeOnInteractOutside` | `boolean` | Fecha quando o fundo é clicado. Padrão: `true`. |
+| Propriedade | Tipo de Campo CMS | Padrão | Descrição / Opções Suportadas |
+| --- | --- | --- | --- |
+| **Elemento Acionador** (`trigger`) | `list` | - | Itens de bloco (como Botões ou Links) que são renderizados na página para abrir o diálogo ao clicar. |
+| **Cabeçalho** (`title`) | `string` | - | O texto de cabeçalho em negrito exibido no topo do cartão de diálogo. |
+| **Subtítulo** (`description`) | `string` | - | Texto de subtítulo complementar que fornece contexto explicativo secundário. |
+| **Conteúdo do Corpo** (`body`) | `string` | - | O texto descritivo principal ou blocos de conteúdo de layout renderizados na região central do cartão. |
+| **Texto de Ação de Confirmação** (`confirmText`) | `string` | - | Opcional. Rótulo de texto para o botão principal de confirmação de ação. |
+| **Texto de Ação de Cancelamento** (`cancelText`) | `string` | - | Opcional. Rótulo de texto para o botão de ação fechar/descartar. |
+| **Tipo de Função** (`role`) | `select` | `"dialog"` | Função semântica da modal.<br/>• `"dialog"` — Janela interativa padrão.<br/>• `"alertdialog"` — Avisos destrutivos. |
+| **Rodapé Personalizado** (`footer`) | `list` | - | Lista de blocos renderizados na borda inferior. Ideal para controles personalizados ou atalhos de botões adicionais. |
+| **Habilitar Hidratação** (`interactive`) | `boolean` | `true` | Quando true, hidrata o componente como uma ilha do lado do cliente para habilitar sobreposições, captura de foco e fechamentos por Escape. |
 
-| `initialFocusEl` | \`() => HTMLElement \ | null\` | Elemento a focar ao abrir. Padrão o primeiro focável. |
-| `finalFocusEl` | \`() => HTMLElement \ | null\` | Elemento a focar ao fechar. Padrão o disparador. |
+***
 
-Props adicionais (por exemplo, `open`, `defaultOpen`, `onOpenChange`, `id`) são repassados ao primitive de diálogo subjacente.
+# Acessibilidade e Notas do Desenvolvedor
+
+Está em conformidade com o [padrão de design Dialog (Modal) WAI-ARIA](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/). Quando hidratado, o componente implementa as seguintes camadas críticas de acessibilidade:
+
+- **Armadilha de Foco Inicial:** O foco muda para o diálogo ao abrir (selecionando primeiro a ação cancelar/segura para evitar acionadores acidentais) e permanece preso internamente ao rolar com `Tab` / `Shift + Tab`.
+- **Inércia de Fundo:** Elementos interativos fora do contêiner modal aberto são automaticamente marcados com o atributo HTML `inert` para impedir que leitores de tela ou controles de teclado foquem elementos atrás do plano de fundo.
+- **Tratamento de Fechamento por Escape:** Pressionar o botão `Escape` do teclado fecha automaticamente o contenedor de diálogo ativo (a menos que `closeOnEscape` seja configurado de outra forma).
+- **Bloqueio de Rolagem do Corpo:** A rolagem do corpo do documento é congelada enquanto uma modal está ativa e é restaurada automaticamente assim que o diálogo conclui sua transição de fechamento.

@@ -1,39 +1,35 @@
 ---
 title: Stack
-hydration: 3
 category: Layout
+hydration: 3
 ---
 
 import { Stack } from "../../app/components/ui";
 import { DemoPreview } from "../../app/components/demo-preview";
 
-A layout primitive that can be used to create a vertical or horizontal stack of elements.
+# Introduction
 
-## Usage
+A structural layout primitive used to align collections of consecutive child elements either vertically (columns) or horizontally (rows). It provides standardized spacing, alignments, and distribution properties to keep card groups, action menus, button layouts, or content blocks perfectly structured.
+
+The **Stack** component is fully integrated as a `stack` block inside the **Page Builder**, allowing content authors and developers to recursively nest other layout blocks and customize responsive alignment rules directly within the CMS.
+
+***
+
+# Usage
+
+These configurations represent exactly how page-builder block items are constructed.
+
+## 1. Simple Horizontal Button Row
+
+Arranges elements side-by-side with a consistent spacing gap. Ideal for lists of tags, action sheets, navigation links, or horizontal cards.
 
 <DemoPreview>
   <Stack direction="row" gap="4">
-    <div style={{ padding: "0.75rem 1rem", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Item 1</div>
-    <div style={{ padding: "0.75rem 1rem", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Item 2</div>
-    <div style={{ padding: "0.75rem 1rem", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Item 3</div>
+    <div style={{ padding: "0.75rem 1.5rem", background: "var(--colors-blue-3)", borderRadius: "8px", fontWeight: "600", fontSize: "0.85rem" }}>Button Option A</div>
+    <div style={{ padding: "0.75rem 1.5rem", background: "var(--colors-blue-3)", borderRadius: "8px", fontWeight: "600", fontSize: "0.85rem" }}>Button Option B</div>
+    <div style={{ padding: "0.75rem 1.5rem", background: "var(--colors-blue-3)", borderRadius: "8px", fontWeight: "600", fontSize: "0.85rem" }}>Button Option C</div>
   </Stack>
 </DemoPreview>
-
-```tsx
-import { Stack } from '../components/ui/stack'
-
-export const Example = () => (
-  <Stack direction="row" gap="4">
-    <div>Item 1</div>
-    <div>Item 2</div>
-    <div>Item 3</div>
-  </Stack>
-)
-```
-
-### CMS Page Builder
-
-This component is available as a `stack` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
 
 ```json
 {
@@ -41,27 +37,90 @@ This component is available as a `stack` block in the [Page Builder](/docs/PageB
   "direction": "horizontal",
   "gap": "4",
   "children": [
-    { "type": "text", "content": "Item 1" },
-    { "type": "text", "content": "Item 2" }
+    {
+      "type": "text",
+      "content": "Button Option A"
+    },
+    {
+      "type": "text",
+      "content": "Button Option B"
+    },
+    {
+      "type": "text",
+      "content": "Button Option C"
+    }
   ]
 }
 ```
 
-## Props
+## 2. Standard Vertical Column Stack
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `direction` | `flex-direction` | `column` | The flex direction of the stack. |
-| `gap` | `spacing` | `8px` | The gap between the elements in the stack. |
-| `align` | `align-items` | - | The alignment of the elements in the stack. |
-| `justify` | `justify-content` | - | The justification of the elements in the stack. |
+Stacks nested blocks vertically. This is our default layout pattern and is ideal for arranging article headings above body text paragraphs, or stacking card grids.
 
-## Responsiveness
+<DemoPreview>
+  <Stack direction="column" gap="3">
+    <h3 style={{ fontSize: "1.1rem", fontWeight: "bold" }}>Feature Header</h3>
+    <p style={{ color: "var(--colors-fg-muted)", fontSize: "0.9rem" }}>This description text is stacked directly beneath the heading block with a standardized spacing interval.</p>
+  </Stack>
+</DemoPreview>
 
-The `Stack` component supports responsive values for all its props.
-
-```tsx
-<Stack direction={{ base: 'column', md: 'row' }} gap={{ base: '4', md: '8' }}>
-  {/* Elements will be stacked vertically on mobile and horizontally on desktop */}
-</Stack>
+```json
+{
+  "type": "stack",
+  "direction": "vertical",
+  "gap": "3",
+  "children": [
+    {
+      "type": "heading",
+      "text": "Feature Header"
+    },
+    {
+      "type": "text",
+      "content": "This description text is stacked directly beneath the heading block with a standardized spacing interval."
+    }
+  ]
+}
 ```
+
+***
+
+# Props
+
+| Property | CMS Field Type | Default | Description / Supported Options |
+| --- | --- | --- | --- |
+| **Direction** (`direction`) | `select` | `"vertical"` | Direction of the flex flow. Can be `"vertical"` (column) or `"horizontal"` (row). Supports responsive JSON objects (e.g., `{"base": "vertical", "md": "horizontal"}`). |
+| **Spacing Gap** (`gap`) | `string` | `"8px"` | Space separating consecutive child blocks (e.g., `"4"`, `"8"`, `"16px"`, `"1rem"`). Supports responsive JSON mappings. |
+| **Cross Alignment** (`align`) | `select` | - | Align items along the secondary axis (align-items). <br/>• Options: `"stretch"`, `"center"`, `"start"`, `"end"`. |
+| **Main Justification** (`justify`) | `select` | - | Distribute space along the main axis (justify-content). <br/>• Options: `"start"`, `"center"`, `"end"`, `"space-between"`, `"space-around"`. |
+| **Nested Children** (`children`) | `list` | - | Recursive list of child layout blocks rendering inside the stack. |
+
+***
+
+# Responsive Layout Structuring
+
+The `Stack` component natively supports responsive JSON configurations for all its primary structural parameters. This enables content editors to stack blocks vertically on smaller mobile displays and transition them automatically to a horizontal layout on tablets or desktop screens:
+
+```json
+{
+  "type": "stack",
+  "direction": {
+    "base": "vertical",
+    "md": "horizontal"
+  },
+  "gap": {
+    "base": "4",
+    "md": "8"
+  },
+  "children": [
+    { "type": "card", "title": "Left Panel" },
+    { "type": "card", "title": "Right Panel" }
+  ]
+}
+```
+
+***
+
+# Developer Implementation Notes
+
+- **Zero-Layout Shift Performance:** This component compiles directly to native CSS Flexbox styles using Panda CSS atomic compilation utility classes. No high-cost resize observers or runtime javascript bindings are triggered during load.
+- **Recursive Page Builders:** Because Sveltia CMS blocks render recursively inside the Page Registry (`app/components/page-registry.tsx`), Stacks can be nested inside Stacks endlessly to construct highly customizable responsive columns, complex landing pages, or sidebar forms.

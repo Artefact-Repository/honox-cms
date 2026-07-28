@@ -1,7 +1,7 @@
 ---
 title: PinField
-hydration: 2
 category: Forms
+hydration: 2
 ---
 
 import { PinField } from "../../app/components/ui";
@@ -9,139 +9,123 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-A segmented input for short fixed-length codes — one-time passwords, SMS/email
-verification codes, PINs. Each character gets its own box, with keyboard
-navigation, paste/autofill support, and the same label/helper text/error
-text/validator conventions as `Field`.
+An interactive segmented input control designed for entering short, fixed-length alphanumeric strings, such as verification codes, one-time passwords (OTP), SMS login tokens, and PIN values. It features automatic cursor focus cycling, backward backspace deletion, paste-sanitization, and fully unified accessibility descriptors.
+
+The **PinField** component is fully integrated as a `pinField` block in the **Page Builder**, enabling content authors and developers to easily configure code lengths, verification formats, and input states directly within the CMS.
+
+***
 
 # Usage
 
+These examples illustrate how content editors bind and structure custom pin-field components.
+
+## 1. Standard 6-Digit SMS Verification Input
+
+A standard numeric PIN input configured with 6 segment boxes, optimized for email or SMS code verifications.
+
 <DemoPreview>
-  <div style={{ width: "100%", maxWidth: "320px" }}>
+  <div style={{ width: "100%", maxWidth: "360px" }}>
     <PinField
       label="Verification code"
-      helperText="Check your email for the 6-digit code"
+      helperText="Enter the 6-digit confirmation code we sent to your address."
       count={6}
       otp
       blurOnComplete
-      validator={(value) => value !== "000000" || "That code isn't valid"}
+      interactive
     />
   </div>
 </DemoPreview>
 
-```tsx
-import { PinField } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <PinField
-      label="Verification code"
-      helperText="Check your email for the 6-digit code"
-      count={6}
-      otp
-      blurOnComplete
-      onValueComplete={(details) => console.log(details.valueAsString)}
-    />
-  );
+```json
+{
+  "type": "pinField",
+  "label": "Verification code",
+  "helperText": "Enter the 6-digit confirmation code we sent to your address.",
+  "count": 6,
+  "otp": true,
+  "blurOnComplete": true,
+  "interactive": true
 }
 ```
 
-## Character format
+## 2. Secure Hidden Password Input (4-Digits)
 
-`format` (`"numeric"` | `"alphanumeric"` | `"alphabetic"`, default `"numeric"`)
-restricts what a box accepts and picks the right mobile keyboard via
-`inputMode`. Pass `pattern` with a custom per-character regexp source to
-override it entirely — useful for coupon-style codes.
+Demonstrates a secure 4-digit PIN module. Setting the mask property secures typing by replacing characters with generic secure bullet glyphs.
 
-```tsx
-<PinField format="alphanumeric" count={8} placeholder="_" />
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "240px" }}>
+    <PinField
+      label="Security PIN"
+      placeholder="•"
+      count={4}
+      mask
+      interactive
+    />
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "pinField",
+  "label": "Security PIN",
+  "placeholder": "•",
+  "count": 4,
+  "mask": true,
+  "interactive": true
+}
 ```
 
-## Autofill
+## 3. Custom Alphanumeric Promo Code (Flushed Variant)
 
-`otp` marks the field as an SMS/email one-time code. Rather than putting
-`autocomplete="one-time-code"` on every box (which makes browsers and password
-managers show a fill affordance on all of them at once), only the box the user
-would fill next advertises it — and accepts the full code length, so a mobile
-keyboard's OTP suggestion or a full paste can land in one shot and get
-redistributed across the remaining boxes automatically. Every other box opts
-out of autofill and password-manager icon overlays.
+Renders a 5-box code selector using an alphanumeric format and a distinct `flushed` border variant.
 
-## Keyboard and pointer behaviour
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "300px" }}>
+    <PinField
+      label="Promo Coupon Code"
+      placeholder="-"
+      count={5}
+      format="alphanumeric"
+      variant="flushed"
+      interactive
+    />
+  </div>
+</DemoPreview>
 
-- **Typing** a valid character fills the current box and advances focus; an
-  already-focused box's content is selected first (`selectOnFocus`, on by
-  default), so typing always replaces rather than getting silently blocked.
-- **Backspace** on an empty box clears and steps back into the previous one.
-- **Arrow Left/Right** move focus between boxes; **Arrow Up/Down** are
-  suppressed rather than doing nothing useful.
-- **Pasting** or an OS/password-manager autofill distributes characters
-  across boxes starting from the one it landed on.
-- **Tab** and click/pointer focus stop at the first empty box — you can't
-  jump ahead of a gap, only edit an already-filled box or continue where you
-  left off.
-
-## Validation
-
-Like `Field`, `PinField` accepts a `validator` that runs against the joined
-value and can return `false` (generic error) or a `string` (custom message).
-It only re-validates once every box is filled.
-
-```tsx
-<PinField
-  count={6}
-  validator={(value) =>
-    value !== "000000" || "That code isn't valid"
-  }
-  errorText="Enter the code we sent you"
-/>
+```json
+{
+  "type": "pinField",
+  "label": "Promo Coupon Code",
+  "placeholder": "-",
+  "count": 5,
+  "format": "alphanumeric",
+  "variant": "flushed",
+  "interactive": true
+}
 ```
 
-## Forms: auto-submit and reset
-
-`form` associates the field's hidden submit input with a `<form id>` elsewhere
-in the document (or omit it if the field already lives inside the form).
-`autoSubmit` calls `form.requestSubmit()` the moment every box is filled,
-after firing `onAutoSubmit`; pressing **Enter** in any box also attempts a
-submit, since a form with several sibling inputs suppresses the browser's own
-submit-on-Enter. Resetting the form (a native `<button type="reset">`, or
-`form.reset()`) clears the field back to empty.
-
-```tsx
-<form id="verify-form">
-  <PinField form="verify-form" name="code" count={6} otp autoSubmit />
-  <button type="reset">Clear</button>
-</form>
-```
+***
 
 # Props
 
-| Prop | Type | Default | Description |
+| Property | CMS Field Type | Default | Description / Supported Options |
 | --- | --- | --- | --- |
-| `count` | `number` | `4` | Number of boxes. |
-| `value` | `string[]` | - | Controlled value, one entry per box (forces interactive mode). |
-| `defaultValue` | `string[]` | - | Initial value, one entry per box (forces interactive mode). |
-| `format` | `"numeric" \| "alphanumeric" \| "alphabetic"` | `"numeric"` | Character class accepted per box. |
-| `pattern` | `string` | - | Custom per-character regexp source, overrides `format`. |
-| `placeholder` | `string` | `"○"` | Shown in each empty box. |
-| `mask` | `boolean` | - | Renders each box as `type="password"`. |
-| `otp` | `boolean` | - | Targets `autocomplete="one-time-code"` autofill at the active box only. |
-| `blurOnComplete` | `boolean` | - | Blurs the last box once every box is filled. |
-| `autoFocus` | `boolean` | - | Focuses the first box on mount. |
-| `selectOnFocus` | `boolean` | `true` | Selects a box's content on focus so typing replaces it. |
-| `disabled` | `boolean` | - | Disables every box. |
-| `readOnly` | `boolean` | - | Prevents editing. |
-| `required` | `boolean` | - | Marks every box as required. |
-| `invalid` | `boolean` | - | Forces the invalid state, overriding `validator`. |
-| `name` | `string` | - | Form field name for the hidden submit input. |
-| `form` | `string` | - | Associates the hidden input (and `autoSubmit`/reset) with a `<form id>`. |
-| `autoSubmit` | `boolean` | - | Calls `form.requestSubmit()` once complete (forces interactive mode). |
-| `onAutoSubmit` | `(valueAsString: string) => void` | - | Fired right before an `autoSubmit` submission is attempted. |
-| `label` | `Child` | - | The field's label. |
-| `helperText` | `Child` | - | Helper text shown below the boxes. |
-| `errorText` | `Child` | - | Error text shown when invalid; a `validator` string result overrides this. |
-| `validator` | `(value: string) => boolean \| string` | - | Validates the joined value once complete (forces interactive mode). |
-| `onValueChange` | `(details: { value: string[]; valueAsString: string }) => void` | - | Fires on every change (forces interactive mode). |
-| `onValueComplete` | `(details: { value: string[]; valueAsString: string }) => void` | - | Fires once every box is filled. |
-| `onValueInvalid` | `(details: { index: number; value: string }) => void` | - | Fires when a typed/pasted character is rejected by `format`/`pattern`. |
-| `interactive` | `boolean` | - | Forces or forbids hydration as an island. |
+| **Label Text** (`label`) | `string` | - | Primary visual heading placed above the input segments. |
+| **Supporting Text** (`helperText`) | `string` | - | Descriptive instructions displayed beneath the input boxes. |
+| **Error Message** (`errorText`) | `string` | - | Validation message displayed when code entries fail validator checks. |
+| **Box Count** (`count`) | `number` | `4` | Number of input segment boxes to generate. |
+| **Character Class** (`format`) | `select` | `"numeric"` | Restricts accepted characters. <br/>• Options: `"numeric"`, `"alphanumeric"`, `"alphabetic"`. |
+| **Character Mask** (`mask`) | `boolean` | `false` | When checked, obscures typed values for secure passcode entries. |
+| **OTP Autofill** (`otp`) | `boolean` | `false` | Enables one-time code autofill detection across mobile devices. |
+| **Auto Submit** (`autoSubmit`) | `boolean` | `false` | Instantly submits the enclosing form when the final segment is filled. |
+| **Visual Variant** (`variant`) | `select` | `"outline"` | Visual style of each box. <br/>• Options: `"outline"`, `"subtle"`, `"surface"`, `"flushed"`. |
+| **Size Scale** (`size`) | `select` | `"md"` | Controls the width and height of input boxes. <br/>• Options: `"xs"`, `"sm"`, `"md"`, `"lg"`, `"xl"`. |
+| **Force Interactive** (`interactive`) | `boolean` | `true` | Hydrates the code field elements to bind tab triggers and paste sanitation. |
+
+***
+
+# Developer Notes & Accessibility
+
+- **Hydration Island:** As an advanced layout capturing paste events, sanitizing entries, and handling multi-input cursor hopping on mobile focus boundaries, the PinField operates as a Tier-2 conditional island (`"interactive": true`).
+- **WAI-ARIA Compliance:** The component wraps each segment input with appropriate layout and labeling tags (`role="group"`, `aria-label`). Users can cycle between segments seamlessly using left/right arrow keys or backspace triggers.
+- **Form Integration:** It features a native, hidden `<input>` carrying the fully joined passcode string. Auto-submit rules call `form.requestSubmit()` upon entry completion, seamlessly submitting actions to the nearest parent form.

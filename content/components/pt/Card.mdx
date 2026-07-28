@@ -1,7 +1,7 @@
 ---
 title: Card
-hydration: 2
 category: Data Display
+hydration: 2
 ---
 
 import { Card, Button } from "../../../app/components/ui";
@@ -9,94 +9,91 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introdução
 
-Um contêiner flexível para agrupar conteúdo relacionado, com slots opcionais de cabeçalho, corpo, rodapé, imagem e avatar.
+Um contêiner de layout altamente versátil projetado para agrupar informações, ações, mídia e metadados relacionados em um único módulo visualmente estruturado. Ele inclui áreas designadas para cabeçalhos, títulos, descrições, texto do corpo, avatares, imagens de capa, ações e rodapés.
+
+O componente **Card** está totalmente integrado como um bloco `card` no **Page Builder**, permitindo que autores de conteúdo e desenvolvedores configurem estruturas de layout, variações de superfície e formatação responsiva diretamente no CMS.
+
+***
 
 # Uso
 
-## Card básico
+Estes exemplos ilustram como os editores de conteúdo vinculam e estruturam componentes de cartão.
+
+## 1. Cartão de visão geral de projeto elevado
+
+Um cartão de perfil elevado clássico, completo com título, descrição, texto do corpo e um botão de ação primária renderizado dentro do slot do rodapé.
 
 <DemoPreview>
   <Card
     variant="elevated"
-    title="Project title"
-    description="A short description of the project."
-    body="Main content of the card goes here."
-    footer={<Button>View</Button>}
+    title="Project Launchpad"
+    description="Accelerate your workflow development"
+    body="Create, configure, and scale multi-platform applications seamlessly. Our cloud-native environment is optimized for high performance, serverless routing, and automatic localized static site generation."
+    footer={<Button>View Project</Button>}
   />
 </DemoPreview>
-
-```tsx
-import { Card, Button } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Card
-      variant="elevated"
-      title="Project title"
-      description="A short description of the project."
-      body="Main content of the card goes here."
-      footer={<Button>View</Button>}
-    />
-  );
-}
-```
-
-## Card com imagem
-
-```tsx
-import { Card } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Card
-      image="/cover.png"
-      imagePosition="top"
-      title="Card with image"
-      body="Content beneath the image."
-    />
-  );
-}
-```
-
-## Construtor de Páginas CMS
-
-Este componente está disponível como um bloco `card` no [Construtor de Páginas](/docs/PageBuilder) (`content/pages/*.json`):
 
 ```json
 {
   "type": "card",
-  "title": "Project title",
-  "description": "A short description of the project.",
-  "body": "Main content of the card goes here.",
-  "variant": "elevated"
+  "title": "Project Launchpad",
+  "description": "Accelerate your workflow development",
+  "body": "Create, configure, and scale multi-platform applications seamlessly. Our cloud-native environment is optimized for high performance, serverless routing, and automatic localized static site generation.",
+  "variant": "elevated",
+  "boxShadow": "lg",
+  "children": [
+    {
+      "type": "button",
+      "text": "View Project",
+      "variant": "solid"
+    }
+  ]
 }
 ```
 
+## 2. Cartão de capa rica com imagem superior
+
+Renderiza um cartão em contorno apresentando uma grande imagem de capa visual alinhada na parte superior do corpo do conteúdo. Perfeito para postagens de blog, grades de notícias ou destaques de produtos.
+
+<DemoPreview>
+  <Card
+    variant="outline"
+    image="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop"
+    imagePosition="top"
+    title="Design Systems in Production"
+    body="Explore optimal architectural patterns for managing multi-variant design tokens, static compilation, and robust hydration frameworks in large engineering organizations."
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "card",
+  "image": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop",
+  "imagePosition": "top",
+  "title": "Design Systems in Production",
+  "body": "Explore optimal architectural patterns for managing multi-variant design tokens, static compilation, and robust hydration frameworks in large engineering organizations.",
+  "variant": "outline"
+}
+```
+
+***
+
 # Propriedades
 
-## Card
+| Propriedade | Tipo de campo CMS | Padrão | Descrição / Opções suportadas |
+| --- | --- | --- | --- |
+| **Título do cartão** (`title`) | `string` | - | Cabeçalho principal exibido dentro da área de cabeçalho do cartão. |
+| **Descrição do cartão** (`description`) | `string` | - | Subtítulo de suporte secundário posicionado abaixo do título. |
+| **Texto do corpo** (`body`) | `string` | - | Conteúdo principal do bloco de texto renderizado dentro do corpo do cartão. |
+| **Imagem de capa** (`image`) | `image` | - | URL ou caminho de mídia para o gráfico ou foto acompanhante. |
+| **Posição da imagem** (`imagePosition`) | `select` | `"top"` | Alinhamento de layout do gráfico de capa. <br/>• Opções: `"top"`, `"bottom"`, `"left"`, `"right"`. |
+| **Variante visual** (`variant`) | `select` | `"elevated"` | Estilo de borda e sombra. <br/>• Opções: `"elevated"`, `"outline"`, `"subtle"`. |
+| **Profundidade de sombra** (`boxShadow`) | `select` | `"sm"` | Sombra do tema aplicada ao redor do contorno externo da borda. <br/>• Opções: `"none"`, `"2xs"`, `"xs"`, `"sm"`, `"md"`, `"lg"`, `"xl"`, `"2xl"`. |
+| **Limites de estouro** (`overflow`) | `select` | `"hidden"` | Política de estouro. Defina como `"visible"` quando o cartão aninha elementos sobrepostos sem portal (Dropdowns, Popovers, DatePickers) para evitar o recorte de layout. |
 
-| Prop | Type | Description |
-| --- | --- | --- |
+***
 
-| `title` | \`string \ | JSX.Element\` | O título do card. |
-| `description` | \`string \ | JSX.Element\` | A descrição do card. |
-| `body` | \`string \ | JSX.Element\` | O conteúdo principal do corpo. |
-| `footer` | \`string \ | JSX.Element\` | Conteúdo do rodapé. |
+# Notas para desenvolvedores e acessibilidade
 
-| `avatar` | `JSX.Element` | Elemento exibido no cabeçalho (por exemplo, um avatar). |
-| `headerAction` | `JSX.Element` | Elemento exibido no final do cabeçalho (por exemplo, um menu). |
-
-| `image` | \`string \ | JSX.Element\` | Fonte da imagem ou elemento. |
-
-| `imagePosition` | \`"top" \ | "bottom" \ | "left" \ | "right"\` | Onde a imagem é posicionada. Padrão: `"top"`. |
-
-| `headerClass` | `string` | Classes CSS personalizadas para o cabeçalho. |
-| `bodyClass` | `string` | Classes CSS personalizadas para o corpo. |
-| `footerClass` | `string` | Classes CSS personalizadas para o rodapé. |
-| `imageClass` | `string` | Classes CSS personalizadas para a imagem. |
-
-| `variant` | \`"elevated" \ | "outline" \ | "subtle"\` | O estilo visual do card. |
-
-| `interactive` | `boolean` | Habilita a hidratação do lado do cliente. |
-| `class` | `string` | Classes CSS personalizadas para o elemento raiz. |
+- **Ilha de hidratação:** Por padrão, os cartões compilam para elementos estáticos leves e puramente de apresentação. No entanto, se eles contêm blocos filhos interativos ativos ou gatilhos de estado explícitos, eles hidratam no cliente como uma ilha condicional de Nível 2.
+- **Conformidade WAI-ARIA:** Os cartões são estruturados para impor ordens de leitura de conteúdo lógicas. Use cabeçalhos semânticos (`h2`-`h4`) para os slots de título. Certifique-se de que qualquer gráfico de capa decorativo seja fornecido com tags alt em branco apropriadas para que os leitores de tela os ignorem graciosamente.

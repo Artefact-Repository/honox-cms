@@ -4,61 +4,114 @@ hydration: 3
 category: Layout
 ---
 
-import { Group, Button } from "../../../app/components/ui";
+import { Group, Button, Input } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
 # 简介
 
-一个用于以视觉方式对相关元素进行分组的布局组件。
+一个语义化包装组件，用于从视觉和结构上对多个相关控件（如按钮、开关或输入框）进行分组，并在子元素之间强制统一的间距、排列方向和连接样式。它简化了工具栏的构建，并避免了手动编写 flexbox 样板代码。
 
-# 用法
+**Group** 组件已作为 `group` 区块完全集成到 **Page Builder** 中，使内容作者和开发者能够直接在 CMS 中轻松聚簇交互控件（如操作按钮或输入框组合）。
+
+***
+
+# 通过 CMS 页面构建器使用（JSON）
+
+以下示例展示了内容编辑者如何在 JSON 页面模式（`content/pages/*.json`）中绑定和构建分组控件集。
+
+## 1. 水平操作工具栏
+
+操作按钮的标准水平分组，内部间距均匀分布。聚簇上下文相关的保存与编辑操作。
 
 <DemoPreview>
-  <Group attached>
-    <Button>First</Button>
-    <Button>Second</Button>
-    <Button>Third</Button>
+  <Group>
+    <Button>Save</Button>
+    <Button variant="outline">Edit</Button>
+    <Button variant="subtle" colorPalette="red">Delete</Button>
   </Group>
 </DemoPreview>
-
-```tsx
-import { Group } from "../components/ui";
-import { Button } from "../components/ui/button";
-
-export default function MyPage() {
-  return (
-    <Group attached>
-      <Button>First</Button>
-      <Button>Second</Button>
-      <Button>Third</Button>
-    </Group>
-  );
-}
-```
-
-## CMS 页面构建器
-
-该组件在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中作为 `group` 区块提供：
 
 ```json
 {
   "type": "group",
-  "attached": true,
+  "orientation": "horizontal",
+  "gap": "sm",
+  "attached": false,
   "children": [
-    { "type": "button", "text": "First" },
-    { "type": "button", "text": "Second" }
+    { "type": "button", "text": "Save" },
+    { "type": "button", "text": "Edit", "variant": "outline" },
+    { "type": "button", "text": "Delete", "variant": "subtle", "colorPalette": "red" }
   ]
 }
 ```
 
-# 属性
+## 2. 连接的搜索输入组合
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `children` | `any` | 组件内部要渲染的内容。 |
-| `class` | `string` | 自定义 CSS 类名。 |
+使用 `attached` 属性创建一个无缝的单一控件。输入框和按钮在视觉上合并为一个连续的控制元素。
 
-| `orientation` | \`"horizontal" \ | "vertical"\` | 组的排列方向。 |
+<DemoPreview>
+  <Group attached>
+    <Input placeholder="Search documentation..." />
+    <Button>Search</Button>
+  </Group>
+</DemoPreview>
 
-| `attached` | `boolean` | 是否将子元素连接在一起。 |
-| `grow` | `boolean` | 子元素是否应增长以填充可用空间。 |
+```json
+{
+  "type": "group",
+  "orientation": "horizontal",
+  "gap": "none",
+  "attached": true,
+  "children": [
+    { "type": "input", "placeholder": "Search documentation..." },
+    { "type": "button", "text": "Search" }
+  ]
+}
+```
+
+## 3. 垂直堆叠控件
+
+展示用于堆叠开关控件或需要一致垂直间距的垂直菜单的垂直排列方向。
+
+<DemoPreview>
+  <Group orientation="vertical" gap="md">
+    <Button>Profile</Button>
+    <Button variant="outline">Settings</Button>
+    <Button variant="subtle" colorPalette="red">Logout</Button>
+  </Group>
+</DemoPreview>
+
+```json
+{
+  "type": "group",
+  "orientation": "vertical",
+  "gap": "md",
+  "attached": false,
+  "children": [
+    { "type": "button", "text": "Profile" },
+    { "type": "button", "text": "Settings", "variant": "outline" },
+    { "type": "button", "text": "Logout", "variant": "subtle", "colorPalette": "red" }
+  ]
+}
+```
+
+***
+
+# CMS 配置参考
+
+这些字段直接映射到 `public/admin/config.yml` 下的 Sveltia CMS 区块属性，或 Page Builder 配置：
+
+| 属性 | CMS 字段类型 | 默认值 | 描述 / 支持选项 |
+| :--- | :--- | :--- | :--- |
+| **排列方向** (`orientation`) | `select` | `"horizontal"` | 子元素的主轴排列方式。<br/>• 选项：`"horizontal"`、`"vertical"`。 |
+| **间距** (`gap`) | `string` | `"sm"` | 各个子元素之间的内部填充间距。<br/>• 选项：`"none"`、`"sm"`、`"md"`、`"lg"`。 |
+| **连接模式** (`attached`) | `boolean` | `false` | 为 true 时，移除内部填充间距，并在视觉上将相邻元素合并为统一的单一控件。 |
+| **子区块** (`children`) | `list` | - | 在组合轨道内布局的交互项（按钮、开关、输入框）列表。 |
+
+***
+
+# 开发者说明与无障碍
+
+- **免水合（仅静态）：** Group 是一个被指定为仅静态组件（`Tier 3`）的语义布局组件。它完全以标准服务端 HTML 渲染，并免除客户端水合脚本。
+- **结构化上下文包装：** 为防止布局偏移和间距不一致，Group 组件将子组件显式包裹在内部的 `<div>` 轨道中，确保无论嵌套内容复杂度如何都能进行统一的间距计算。
+- **灵活可复用性：** 由于它在所有子元素上强制单一固定的 flex 方向，开发者可以嵌套多个 Group 组件（混合水平/垂直方向），以最小的代价构建复杂的类网格操作面板。

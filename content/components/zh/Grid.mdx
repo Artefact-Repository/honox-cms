@@ -1,7 +1,7 @@
 ---
 title: Grid 网格
-hydration: 3
 category: Layout
+hydration: 3
 ---
 
 import { Grid } from "../../../app/components/ui";
@@ -121,13 +121,11 @@ export default function MyPage() {
 | --- | --- | --- |
 | `children` | `any` | 网格内部要渲染的内容。 |
 | `class` | `string` | 自定义 CSS 类名。 |
-
-| `columns` | \`Responsive\<number \ | string\>\` | 列数（`repeat(columns, minmax(0, 1fr))`）。若同时设置了 `minChildWidth`，则本属性优先。 |
-| `rows` | \`Responsive\<number \ | string\>\` | 行数（`repeat(rows, minmax(0, 1fr))`）。 |
-| `minChildWidth` | \`Responsive\<number \ | string\>\` | 自动适配尽可能多的列，每列至少此宽（`repeat(auto-fit, minmax(width, 1fr))`）。设置了 `columns` 时忽略。 |
-
-| `gap` | \`string \ | number \ | Responsive\<...\>\` | 单元格之间的间距。除非设置了 `columnGap`/`rowGap`，否则默认 `"8px"`。 |
-| `columnGap` | \`string \ | number \ | Responsive\<...\>\` | 仅列之间的间距。 |
-| `rowGap` | \`string \ | number \ | Responsive\<...\>\` | 仅行之间的间距。 |
+| `columns` | `number \| string \| Responsive<...>` | 列数（`repeat(columns, minmax(0, 1fr))`）。若同时设置了 `minChildWidth`，则本属性优先。 |
+| `rows` | `number \| string \| Responsive<...>` | 行数（`repeat(rows, minmax(0, 1fr))`）。 |
+| `minChildWidth` | `number \| string \| Responsive<...>` | 自动适配尽可能多的列，每列至少此宽（`repeat(auto-fit, minmax(width, 1fr))`）。设置了 `columns` 时忽略。 |
+| `gap` | `string \| number \| Responsive<...>` | 单元格之间的间距。除非设置了 `columnGap`/`rowGap`，否则默认 `"8px"`。 |
+| `columnGap` | `string \| number \| Responsive<...>` | 仅列之间的间距。 |
+| `rowGap` | `string \| number \| Responsive<...>` | 仅行之间的间距。 |
 
 `Responsive<T>` 接受纯值或按断点的对象，例如 `{ base: 1, md: 2, lg: 3 }`，使用与设计系统其余部分相同的断点（`base`、`sm`、`md`、`lg`、`xl`、`2xl`）。

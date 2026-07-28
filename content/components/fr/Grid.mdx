@@ -1,7 +1,7 @@
 ---
 title: Grid Grille
-hydration: 3
 category: Layout
+hydration: 3
 ---
 
 import { Grid } from "../../../app/components/ui";
@@ -124,14 +124,12 @@ Ce composant est disponible sous forme de bloc `grid` dans [Page Builder](/docs/
 | --- | --- | --- |
 | `children` | `any` | Contenu à restituer à l’intérieur de la grille. |
 | `class` | `string` | Classes CSS personnalisées. |
-
-| `columns` | \`Responsive\<number \ | chaîne\>\` | Number of columns (`repeat(columns, minmax(0, 1fr))`). Takes precedence over `minChildWidth` if both are set. |
-| `rows` | \`Responsive\<number \ | chaîne\>\` | Number of rows (`repeat(rows, minmax(0, 1fr))`). |
-| `minChildWidth` | \`Responsive\<number \ | chaîne\>\` | Auto-fits as many columns as fit, each at least this wide (`repeat(auto-fit, minmax(width, 1fr))`). Ignored when `columns` is set. |
-
-| `gap` | \`string \ | nombre \ | Responsive\<...\>\` | Gap between cells. Defaults to `"8px"` unless `columnGap`/`rowGap` is set. |
-| `columnGap` | \`string \ | nombre \ | Responsive\<...\>\` | Gap between columns only. |
-| `rowGap` | \`string \ | nombre \ | Responsive\<...\>\` | Gap between rows only. |
+| `columns` | `number \| string \| Responsive<...>` | Nombre de colonnes (`repeat(columns, minmax(0, 1fr))`). A la priorité sur `minChildWidth` si les deux sont définis. |
+| `rows` | `number \| string \| Responsive<...>` | Nombre de lignes (`repeat(rows, minmax(0, 1fr))`). |
+| `minChildWidth` | `number \| string \| Responsive<...>` | Ajuste automatiquement autant de colonnes que possible, chacune ayant au moins cette largeur (`repeat(auto-fit, minmax(width, 1fr))`). Ignoré si `columns` est défini. |
+| `gap` | `string \| number \| Responsive<...>` | Espace entre les cellules. Vaut par défaut `"8px"` sauf si `columnGap`/`rowGap` est défini. |
+| `columnGap` | `string \| number \| Responsive<...>` | Espace entre les colonnes uniquement. |
+| `rowGap` | `string \| number \| Responsive<...>` | Espace entre les lignes uniquement. |
 
 `Responsive<T>` accepte soit une valeur simple, soit un objet par point d'arrêt,
 par ex. `{ base : 1, md : 2, lg : 3 }`, en utilisant les mêmes points d'arrêt que le reste de

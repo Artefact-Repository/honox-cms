@@ -1,7 +1,7 @@
 ---
 title: Splitter 分割面板
-hydration: 1
 category: Layout
+hydration: 1
 ---
 
 import { Splitter } from "../../../app/components/ui";
@@ -9,86 +9,115 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # 简介
 
-一种将内容分割为可由拖拽手柄调整大小的面板的布局组件。
+一种结构化的布局组件，可将空间划分为多个由高对比度视觉分隔线隔开的内容区域。它旨在将复杂的子模块或侧边栏整齐地归组在一个统一的容器区块中。
+
+**Splitter** 组件已在 **Page Builder** 中作为 `splitter` 区块完整集成。这让内容编辑者与开发者能够直接在 CMS 内轻松将布局组织为水平并排或垂直堆叠的面板。
+
+***
 
 # 用法
 
-## 基础分割器
+以下示例展示了内容编辑者如何配置并组织可调整尺寸的分割器容器。
+
+## 1. 水平仪表盘分割器
+
+将布局划分为左侧导航/信息栏与右侧主内容区。非常适合工作区布局、技术文档页面或并排的产品展示。
 
 <DemoPreview>
-  <div style={{ width: "100%", height: "180px" }}>
+  <div style={{ width: "100%", height: "180px", border: "1px solid var(--colors-border)", borderRadius: "8px", overflow: "hidden" }}>
     <Splitter
       orientation="horizontal"
       panels={[
-        { id: "left", content: <div style={{ padding: "1rem" }}>Sidebar</div> },
-        { id: "right", content: <div style={{ padding: "1rem" }}>Content</div> },
+        { id: "left", content: <div style={{ padding: "1rem", background: "var(--colors-bg-subtle)", height: "100%" }}>Left Panel (Sidebar)</div> },
+        { id: "right", content: <div style={{ padding: "1rem", height: "100%" }}>Right Panel (Main Content)</div> }
       ]}
     />
   </div>
 </DemoPreview>
-
-```tsx
-import { Splitter } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Splitter
-      orientation="horizontal"
-      panels={[
-        { id: "left", content: <aside>Sidebar</aside> },
-        { id: "right", content: <main>Content</main> },
-      ]}
-    />
-  );
-}
-```
-
-## CMS 页面构建器
-
-该组件可作为 `splitter` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用。**始终渲染为静态**（`interactive={false}`，不可拖拽调整大小）——面板的 `content` 是任意嵌套的 JSX，它无法像 `children` 那样跨越岛屿的属性序列化边界：
 
 ```json
 {
   "type": "splitter",
   "orientation": "horizontal",
   "panels": [
-    { "id": "left", "content": [{ "type": "text", "content": "Left panel" }] },
-    { "id": "right", "content": [{ "type": "text", "content": "Right panel" }] }
+    {
+      "id": "left",
+      "content": [
+        {
+          "blockType": "text",
+          "content": "Left Panel (Sidebar)"
+        }
+      ]
+    },
+    {
+      "id": "right",
+      "content": [
+        {
+          "blockType": "text",
+          "content": "Right Panel (Main Content)"
+        }
+      ]
+    }
   ]
 }
 ```
 
+## 2. 垂直堆叠分割器
+
+将内容区域垂直堆叠，由一条水平分隔线隔开。适合划分代码游乐场、堆叠内容信息流，或预览与编辑并存的仪表盘区块。
+
+<DemoPreview>
+  <div style={{ width: "100%", height: "220px", border: "1px solid var(--colors-border)", borderRadius: "8px", overflow: "hidden" }}>
+    <Splitter
+      orientation="vertical"
+      panels={[
+        { id: "top", content: <div style={{ padding: "1rem", background: "var(--colors-bg-subtle)", height: "100%" }}>Top Section (Code / Editor)</div> },
+        { id: "bottom", content: <div style={{ padding: "1rem", height: "100%" }}>Bottom Section (Live Preview)</div> }
+      ]}
+    />
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "splitter",
+  "orientation": "vertical",
+  "panels": [
+    {
+      "id": "top",
+      "content": [
+        {
+          "blockType": "text",
+          "content": "Top Section (Code / Editor)"
+        }
+      ]
+    },
+    {
+      "id": "bottom",
+      "content": [
+        {
+          "blockType": "text",
+          "content": "Bottom Section (Live Preview)"
+        }
+      ]
+    }
+  ]
+}
+```
+
+***
+
 # 属性
 
-## Splitter
+| 属性 | CMS 字段类型 | 默认值 | 说明 / 可选项 |
+| --- | --- | --- | --- |
+| **布局方向** (`orientation`) | `select` | `"horizontal"` | 分割器面板的视觉方向。 <br/>• 选项：`"horizontal"`（并排）、`"vertical"`（堆叠）。 |
+| **面板** (`panels`) | `list` | - | 嵌套面板配置区块的列表。每个面板包含：<br/>• **唯一标识** (`id`)：面板的唯一标识字符串。<br/>• **内容** (`content`)：可嵌套页面区块的列表。 |
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `panels` | `PanelConfig[]` | 需要渲染的面板（必填）。 |
+***
 
-| `orientation` | \`"horizontal" \ | "vertical"\` | 面板的布局方向。 |
+# 开发者说明与无障碍
 
-| `interactive` | `boolean` | 启用客户端拖拽调整大小。 |
-
-| `defaultSize` | \`\{ id: string \ | number; size: number \}[]\` | 初始尺寸（交互模式）。 |
-| `size` | \`\{ id: string \ | number; size: number \}[]\` | 受控尺寸（交互模式）。 |
-| `onSizeChange` | \`(sizes: \{ id: string \ | number; size: number \}[]) => void\` | 尺寸变化时的回调。 |
-
-| `resizeTriggerClass` | `string` | 调整大小手柄的自定义 CSS 类。 |
-| `class` | `string` | 根元素的自定义 CSS 类。 |
-
-| `style` | \`Record\<string, string \ | number\>\` | 根元素的内联样式。 |
-
-| `id` | `string` | 根元素的自定义 id。 |
-
-### PanelConfig
-
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-
-| `id` | \`string \ | number\` | 面板的唯一标识符。 |
-| `content` | \`JSX.Element \ | string\` | 面板内渲染的内容。 |
-
-| `class` | `string` | 面板的自定义 CSS 类。 |
-
-| `style` | \`Record\<string, string \ | number\>\` | 面板的内联样式。 |
+- **静态内容编译：** 为保证零水合延迟与极致性能，经由 CMS Page Builder 编译的 Splitter 区块始终以**静态展示模式**渲染（`interactive={false}`）。由于面板的 `content` 持有任意嵌套的 JSX 区块元素，保持静态可避免岛屿水合期间出现的序列化边界问题。
+- **纯 CSS Flexbox 布局：** 静态 Splitter 布局被编译为轻量的纯 CSS Flexbox 行或列。这消除了加载时任何 JavaScript 布局执行的需求，完全避免布局抖动（CLS）。
+- **WAI-ARIA 布局角色：** 生成语义化的布局属性，清晰标识面板分组。水平与垂直分隔线会被编译为标准分隔符（`role="separator"`），帮助屏幕阅读器用户理解布局转变。

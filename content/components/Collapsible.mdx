@@ -9,93 +9,101 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-An expandable component that can be expanded or collapsed to show or hide content.
+A layout utility component that allows users to reveal or hide supplementary page content. It facilitates space-efficient layout arrangements by consolidating details behind a clean, togglable header, making it perfect for FAQs, secondary spec sheets, technical details, or collapsible navigation rails.
 
-# Usage
+The **Collapsible** component is fully integrated as a `collapsible` block in the **Page Builder**, enabling content authors and developers to easily nest trigger buttons and custom content layout blocks directly within the CMS.
 
-## Basic Collapsible
+***
+
+# Usage via CMS Page Builder (JSON)
+
+These examples illustrate how content editors bind and structure custom collapsible blocks inside the JSON page schemas (`content/pages/*.json`).
+
+## 1. Simple Frequently Asked Question (FAQ) Block
+
+A standard collapsible block displaying an informational response when expanded. Uses the default open state and trailing chevron alignment.
 
 <DemoPreview>
   <Collapsible
-    trigger="Show more"
-    content={<p>Additional details go here.</p>}
+    trigger="Is my subscription fee refundable?"
+    content={<p>Yes, we provide full refunds for cancelations processed within the first 14 days of account registration. No tedious processes required.</p>}
     defaultOpen
   />
 </DemoPreview>
 
-```tsx
-import { Collapsible } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Collapsible
-      trigger="Show more"
-      content={<p>Additional details go here.</p>}
-      defaultOpen
-    />
-  );
-}
-```
-
-## With Indicator and Controlled State
-
-```tsx
-import { Collapsible } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Collapsible
-      trigger="Details"
-      content={<p>Content revealed on toggle.</p>}
-      indicatorPlacement="start"
-      onOpenChange={(open) => console.log("open:", open)}
-    />
-  );
-}
-```
-
-## CMS Page Builder
-
-This component is available as a `collapsible` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`). `trigger` is a nested block list (the CMS always submits an array, even for a single trigger element):
-
 ```json
 {
   "type": "collapsible",
-  "trigger": [{ "type": "button", "text": "Show more" }],
+  "trigger": [
+    {
+      "type": "button",
+      "text": "Is my subscription fee refundable?",
+      "variant": "plain"
+    }
+  ],
+  "defaultOpen": true,
   "showIndicator": true,
+  "indicatorPlacement": "end",
   "children": [
-    { "type": "text", "content": "Additional details go here." }
+    {
+      "type": "text",
+      "content": "Yes, we provide full refunds for cancelations processed within the first 14 days of account registration. No tedious processes required."
+    }
   ]
 }
 ```
 
-# Props
+## 2. Technical System Details with Leading Indicator
 
-| Prop | Type | Description |
-| --- | --- | --- |
+Showcases a collapsible layout that positions the expand/collapse indicator chevron before the trigger text, utilizing compact styling scales.
 
-| `trigger` | \`JSX.Element \ | string\` | The trigger element or string. A string is wrapped in a button. |
+<DemoPreview>
+  <Collapsible
+    trigger="Technical Node Specifications"
+    content={<p>Our platform handles requests via serverless worker nodes deployed across 34 edge regions, delivering cache-hit responses under 10ms worldwide.</p>}
+    indicatorPlacement="start"
+  />
+</DemoPreview>
 
-| `content` | `JSX.Element` | The content to be shown or hidden. |
-| `indicator` | `JSX.Element` | Optional indicator element (e.g. a chevron). |
+```json
+{
+  "type": "collapsible",
+  "trigger": [
+    {
+      "type": "button",
+      "text": "Technical Node Specifications",
+      "variant": "subtle"
+    }
+  ],
+  "indicatorPlacement": "start",
+  "showIndicator": true,
+  "children": [
+    {
+      "type": "text",
+      "content": "Our platform handles requests via serverless worker nodes deployed across 34 edge regions, delivering cache-hit responses under 10ms worldwide."
+    }
+  ]
+}
+```
 
-| `indicatorPlacement` | \`"start" \ | "end"\` | Where to place the indicator relative to the trigger. Default: `"end"`. |
+***
 
-| `open` | `boolean` | Whether the collapsible is open (controlled). |
-| `defaultOpen` | `boolean` | Whether the collapsible is open by default (uncontrolled). |
-| `onOpenChange` | `(open: boolean) => void` | Callback for when the open state changes. |
-| `disabled` | `boolean` | Whether the collapsible is disabled. |
-| `interactive` | `boolean` | Enable client-side interactivity. Collapsible is **Tier-1 (auto-interactive)**: it always hydrates as an island unless you pass `interactive={false}`. |
-| `class` | `string` | Root element class name. |
-| `triggerClass` | `string` | Trigger element class name. |
-| `contentClass` | `string` | Content element class name. |
-| `indicatorClass` | `string` | Indicator element class name. |
-| `id` | `string` | ID for the collapsible. |
+# CMS Configuration Reference
 
-# Hydration
+These fields map directly to Sveltia CMS block properties under `public/admin/config.yml` or the Page Builder configurations:
 
-Collapsible is classified as **Tier-1 (auto-interactive)**.
+| Property | CMS Field Type | Default | Description / Supported Options |
+| :--- | :--- | :--- | :--- |
+| **Trigger Blocks** (`trigger`) | `list` | - | Array of blocks (typically a Button or Text block) that opens the content when clicked. |
+| **Initially Open** (`defaultOpen`) | `boolean` | `false` | Whether the collapsible panel begins in its expanded (open) state on load. |
+| **Show Indicator** (`showIndicator`) | `boolean` | `true` | Renders a rotating chevron indicator next to the trigger text. |
+| **Indicator Position** (`indicatorPlacement`) | `select` | `"end"` | Alignment of the indicator chevron. <br/>• Options: `"start"`, `"end"`. |
+| **Child Blocks** (`children`) | `list` | - | The target content blocks revealed or hidden when the trigger is toggled. |
+| **Force Interactive** (`interactive`) | `boolean` | `true` | Hydrates the collapsible component to enable dynamic client-side animations. |
 
-- It always renders as a hydrated client island (it needs JS to expand/collapse and to run `onOpenChange`).
-- The only way to opt out of hydration is to pass `interactive={false}`, in which case it renders the static `*-primitive` markup without the toggle behavior.
-- This is implemented via the shared `shouldHydrate(interactive, true)` predicate in `app/components/ui/island-utils.ts`, the single source of truth for all hydration decisions.
+***
+
+# Developer Notes & Accessibility
+
+- **Hydration Island:** As a dynamic layout relying on instant client-side expansion animations and height calculations, the Collapsible component is designated as an Interactive-First (`Tier 1`) component and hydrates as a client island by default (`"interactive": true`).
+- **WAI-ARIA Compliance:** Under the hood, the trigger compiles with standard disclosure attributes (`aria-expanded`, `aria-controls`), and focus states match standard disclosure outlines. Keyboards cycle state effortlessly via the `Space` and `Enter` keys.

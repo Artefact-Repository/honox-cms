@@ -1,7 +1,7 @@
 ---
 title: Spinner
-hydration: 3
 category: Feedback
+hydration: 3
 ---
 
 import { Spinner } from "../../app/components/ui";
@@ -9,40 +9,79 @@ import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-A component used to indicate a loading state.
+The `Spinner` component is an animated circular indicator used to represent active waiting states. Excellent for quick transitions, form submissions, and loading dialog overlays, it can be customized with explicit scaling ranges and accessible descriptions.
+
+***
 
 # Usage
+
+You can position and configure spinners as following:
+
+## 1. Standard Inline Loader
+
+A default loader, ideal for indicating system progress inside sections, page-center containers, or sidebar panels.
 
 <DemoPreview>
   <Spinner size="md" label="Loading..." />
 </DemoPreview>
 
-```tsx
-import { Spinner } from "../components/ui";
-
-export default function MyPage() {
-  return <Spinner size="md" label="Loading..." />;
+```json
+{
+  "type": "spinner",
+  "size": "md",
+  "label": "Loading..."
 }
 ```
 
-## CMS Page Builder
+***
 
-This component is available as a `spinner` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
+## 2. Accented Large Loader
+
+Features large-scale visual tracking, commonly used as a centerpiece during full-page reloads or initial workspace synchronizations.
+
+<DemoPreview>
+  <Spinner size="lg" label="Synchronizing data..." />
+</DemoPreview>
 
 ```json
 {
   "type": "spinner",
   "size": "lg",
-  "label": "Loading"
+  "label": "Synchronizing data..."
 }
 ```
 
+***
+
+## 3. Tiny Sub-indicator (Button/Contextual Loader)
+
+A small loader size used in dense dashboards or compact context cards to imply individual asset reloading.
+
+<DemoPreview>
+  <Spinner size="sm" label="Connecting..." />
+</DemoPreview>
+
+```json
+{
+  "type": "spinner",
+  "size": "sm",
+  "label": "Connecting..."
+}
+```
+
+***
+
 # Props
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `class` | `string` | Custom CSS classes. |
+| Property | CMS Field Type | Default | Description / Supported Options |
+| --- | --- | --- | --- |
+| **Size Scale** (`size`) | `select` | `"md"` | Controls the diameter and line weight of the circular loader. <br/>• Options: `"xs"`, `"sm"`, `"md"`, `"lg"`, `"xl"`, `"2xl"`. |
+| **Accessible Label** (`label`) | `string` | - | An alternative description announced by assistive screen-reader software. Strongly recommended to keep the page compliant. |
 
-| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg" \ | "xl" \ | "2xl" \ | "inherit"\` | The size of the spinner. |
+***
 
-| `label` | `string` | An accessible label for screen readers. |
+# Architecture Notes
+
+- **Accessible Out-Of-The-Box:** Every spinner compiles with a native `role="status"` wrapper containing screen-reader-only labels (`class="sr-only"`). This ensures screen readers announce active progress correctly.
+- **Pure SVG Rendering:** Spinner animations utilize lightweight vector paths (`<svg>`) rotated via CSS keyframes. This bypasses the need for heavy asset dependencies or static image loads.
+- **Optimal Layout Sizing:** Size scales correspond precisely to the design system's spacing tokens, guaranteeing alignment within buttons, alerts, or custom cards.
