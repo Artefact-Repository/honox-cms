@@ -6,6 +6,7 @@ import { renderBlocks } from "../../components/page-registry";
 import {
 	Anchor,
 	Badge,
+	Collapsible,
 	Heading,
 	Layout,
 	type LayoutProps,
@@ -14,6 +15,7 @@ import {
 } from "../../components/ui";
 import { ArrowLeftIcon as ArrowLeftIconImport } from "../../icons/arrow-left";
 import { ArrowRightIcon as ArrowRightIconImport } from "../../icons/arrow-right";
+import { ChevronDownIcon } from "../../icons/chevron-down";
 import { ExternalLinkIcon as ExternalLinkIconImport } from "../../icons/external-link";
 import { GitHubIcon as GitHubIconImport } from "../../icons/github";
 import {
@@ -153,57 +155,84 @@ function DocsSidenav({
 			})}
 		>
 			{groups.map((group) => (
-				<div key={group.label}>
-					<Text
-						size="xs"
-						class={css({
-							fontWeight: "semibold",
-							textTransform: "uppercase",
-							letterSpacing: "wide",
-							color: "fg.muted",
-							mb: "2",
-							display: "block",
-						})}
-					>
-						{group.label}
-					</Text>
-					<div
-						class={css({
-							display: "flex",
-							flexDirection: "column",
-							gap: "0.5",
-						})}
-					>
-						{group.items.map((doc) => {
-							const isActive = doc.slug === activeSlug;
-							return (
-								<a
-									key={doc.slug}
-									href={localiseLink(`/docs/${doc.slug}`)}
-									aria-current={isActive ? "page" : undefined}
-									class={css({
-										display: "block",
-										px: "3",
-										// ~44px touch target on mobile; compact on desktop
-										py: { base: "2.5", md: "1.5" },
-										borderRadius: "md",
-										fontSize: "sm",
-										textDecoration: "none",
-										color: isActive ? "fg" : "fg.muted",
-										bg: isActive ? "colorPalette.4" : "transparent",
-										fontWeight: isActive ? "semibold" : "normal",
-										_hover: {
-											bg: isActive ? "colorPalette.4" : "bg.subtle",
-											color: "fg",
-										},
-									})}
-								>
-									{doc.title}
-								</a>
-							);
-						})}
-					</div>
-				</div>
+				<Collapsible
+					key={group.label}
+					interactive
+					defaultOpen
+					trigger={
+						<button
+							type="button"
+							class={css({
+								display: "flex",
+								alignItems: "center",
+								justifyContent: "space-between",
+								width: "full",
+								mb: "2",
+							})}
+						>
+							<Text
+								size="xs"
+								class={css({
+									fontWeight: "semibold",
+									textTransform: "uppercase",
+									letterSpacing: "wide",
+									color: "fg.muted",
+								})}
+							>
+								{group.label}
+							</Text>
+						</button>
+					}
+					indicator={
+						<ChevronDownIcon
+							width="14"
+							height="14"
+							class={css({
+								color: "fg.muted",
+								transition: "transform 0.2s",
+								"[data-state=open] &": { transform: "rotate(180deg)" },
+							})}
+						/>
+					}
+					content={
+						<div
+							class={css({
+								display: "flex",
+								flexDirection: "column",
+								gap: "0.5",
+							})}
+						>
+							{group.items.map((doc) => {
+								const isActive = doc.slug === activeSlug;
+								return (
+									<a
+										key={doc.slug}
+										href={localiseLink(`/docs/${doc.slug}`)}
+										aria-current={isActive ? "page" : undefined}
+										class={css({
+											display: "block",
+											px: "3",
+											// ~44px touch target on mobile; compact on desktop
+											py: { base: "2.5", md: "1.5" },
+											borderRadius: "md",
+											fontSize: "sm",
+											textDecoration: "none",
+											color: isActive ? "fg" : "fg.muted",
+											bg: isActive ? "colorPalette.4" : "transparent",
+											fontWeight: isActive ? "semibold" : "normal",
+											_hover: {
+												bg: isActive ? "colorPalette.4" : "bg.subtle",
+												color: "fg",
+											},
+										})}
+									>
+										{doc.title}
+									</a>
+								);
+							})}
+						</div>
+					}
+				/>
 			))}
 			{links && links.length > 0 && (
 				<div
