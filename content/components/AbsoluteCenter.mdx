@@ -1,62 +1,119 @@
 ---
 title: AbsoluteCenter
-hydration: 3
 category: Layout
+hydration: 3
 ---
 
-import { AbsoluteCenter } from "../../app/components/ui";
+import { AbsoluteCenter, Badge } from "../../app/components/ui";
 import { DemoPreview } from "../../app/components/demo-preview";
 
 # Introduction
 
-A utility component for centering content within its parent container.
+A utility container component that centers its child elements absolutely inside its nearest relative-positioned parent container. Excellent for overlay content, loading skeletons, center-pinned badges, callout cards, and landing banner highlights.
+
+The **AbsoluteCenter** component is fully integrated as an `absoluteCenter` block in the **Page Builder**, allowing content authors and developers to easily configure visual layouts, alignment axes, and spacing behaviors directly within the CMS.
+
+***
 
 # Usage
 
+These examples illustrate how content editors bind and structure center-aligned absolute containers.
+
+## 1. Centering on Both Axes
+
+Centers nested elements perfectly horizontally and vertically within the parent context. Ideal for centralized call-to-action badges or progress loader overlays.
+
 <DemoPreview>
-  <div style={{ position: "relative", height: "140px", width: "260px", border: "1px solid var(--colors-border)" }}>
-    <AbsoluteCenter axis="both">Centered Content</AbsoluteCenter>
+  <div style={{ position: "relative", height: "140px", width: "100%", maxWidth: "320px", border: "1px dashed var(--colors-border)", borderRadius: "8px" }}>
+    <AbsoluteCenter axis="both">
+      <Badge colorPalette="purple" variant="solid">Centered Content</Badge>
+    </AbsoluteCenter>
   </div>
 </DemoPreview>
 
-```tsx
-import { AbsoluteCenter } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <div
-      style={{
-        position: "relative",
-        height: "200px",
-        width: "200px",
-        border: "1px solid black",
-      }}
-    >
-      <AbsoluteCenter axis="both">Centered Content</AbsoluteCenter>
-    </div>
-  );
-}
-```
-
-## CMS Page Builder
-
-This component is available as an `absoluteCenter` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
-
-```markdown
+```json
 {
   "type": "absoluteCenter",
   "axis": "both",
   "children": [
-    { "type": "badge", "text": "Centered Badge", "colorPalette": "purple", "variant": "solid" }
+    {
+      "type": "badge",
+      "text": "Centered Content",
+      "colorPalette": "purple",
+      "variant": "solid"
+    }
   ]
 }
 ```
 
+## 2. Horizontal-Only Alignment
+
+Pins the elements to center-align horizontally (along the X-axis) while leaving the vertical position unmodified.
+
+<DemoPreview>
+  <div style={{ position: "relative", height: "120px", width: "100%", maxWidth: "320px", border: "1px dashed var(--colors-border)", borderRadius: "8px" }}>
+    <AbsoluteCenter axis="horizontal">
+      <Badge colorPalette="blue" variant="outline">Horizontal Only</Badge>
+    </AbsoluteCenter>
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "absoluteCenter",
+  "axis": "horizontal",
+  "children": [
+    {
+      "type": "badge",
+      "text": "Horizontal Only",
+      "colorPalette": "blue",
+      "variant": "outline"
+    }
+  ]
+}
+```
+
+## 3. Vertical-Only Alignment
+
+Pins the elements to center-align vertically (along the Y-axis) while leaving the horizontal position unmodified.
+
+<DemoPreview>
+  <div style={{ position: "relative", height: "120px", width: "100%", maxWidth: "320px", border: "1px dashed var(--colors-border)", borderRadius: "8px" }}>
+    <AbsoluteCenter axis="vertical">
+      <Badge colorPalette="green" variant="subtle">Vertical Only</Badge>
+    </AbsoluteCenter>
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "absoluteCenter",
+  "axis": "vertical",
+  "children": [
+    {
+      "type": "badge",
+      "text": "Vertical Only",
+      "colorPalette": "green",
+      "variant": "subtle"
+    }
+  ]
+}
+```
+
+***
+
 # Props
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `children` | `any` | Content to be rendered inside the component. |
-| `class` | `string` | Custom CSS classes. |
+| Property | CMS Field Type | Default | Description / Supported Options |
+| --- | --- | --- | --- |
+| **Alignment Axis** (`axis`) | `select` | `"both"` | The layout coordinate axes to apply center calculations. <br/>• Options: `"both"`, `"horizontal"`, `"vertical"`. |
+| **Children Content** (`children`) | `list` | - | The collection of nested component blocks to align inside the absolute context. |
+| **Custom Class** (`class`) | `string` | - | Custom CSS class overrides applied directly to the absolute wrapper. |
 
-| `axis` | \`"horizontal" \ | "vertical" \ | "both"\` | The axis to center the content on. |
+***
+
+# Developer Notes & Accessibility
+
+- **Relative Parent Target:** For AbsoluteCenter to function correctly, its immediate parent container or layout wrapper must have `position: relative` (or other non-static positioning) applied.
+- **Hardware-Accelerated Positioning:** Under the hood, this component uses high-efficiency CSS translation rules (`transform: translate(-50%, -50%)`) to prevent any sub-pixel rendering blur or font-scaling issues across varying screen pixel densities.
+- **Accessible Tree Ordering:** The component maintains the native DOM sequential reading order for screen readers. It does not alter keyboard navigation tabs or accessibility outline highlights of its inner child content.
