@@ -9,94 +9,252 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introdução
 
-Uma apresentação de slides que pagina por um conjunto de slides usando CSS
-scroll-snap real e nativo — não cálculos de transform. Suporta paginação por
-grupo (`slidesPerPage`), loop, reprodução automática, rolagem com arraste do
-mouse, navegação por teclado e orientação vertical.
+O componente `Carousel` é uma apresentação de slides de alto desempenho com rolagem nativa que pagina através de um conjunto de slides. Criado especificamente para a construção de páginas no CMS e com renderização estática sem JS por padrão, ele se apoia em primitivas modernas de CSS scroll-snap em vez de uma pesada lógica de transformação em JS.
+
+Como resultado, o deslizamento por toque, a rolagem por trackpad e a navegação por setas do teclado funcionam instantaneamente mesmo antes da hidratação do cliente. O JavaScript é sobreposto com elegância somente quando indicadores, botões anterior/próximo e gatilhos de reprodução automática são clicados.
+
+***
 
 # Uso
 
-## Carrossel básico
+Você pode configurar e ordenar os slides, definir layouts de exibição e controlar as propriedades de reprodução automática.
+
+## Apresentação básica
+
+Um banner de imagens padrão com slides em largura total, legendas sobrepostas e links de navegação. Ideal para cabeçalhos hero ou vitrines na página principal.
 
 <DemoPreview>
-  <div style={{ width: "100%", maxWidth: "360px" }}>
+  <div style={{ width: "100%", maxWidth: "600px" }}>
     <Carousel
       slides={[
-        <div style={{ padding: "3rem 1rem", textAlign: "center", background: "var(--colors-blue-3)" }}>Slide 1</div>,
-        <div style={{ padding: "3rem 1rem", textAlign: "center", background: "var(--colors-purple-3)" }}>Slide 2</div>,
-        <div style={{ padding: "3rem 1rem", textAlign: "center", background: "var(--colors-green-3)" }}>Slide 3</div>,
+        <div style={{ position: "relative", width: "100%", height: "280px" }}>
+          <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80" alt="Analytics" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <div style={{ position: "absolute", inset: "auto 0 0 0", padding: "1.5rem 1rem", background: "linear-gradient(to top, rgba(0,0,0,0.85), transparent)" }}>
+            <span style={{ color: "white", fontSize: "0.95rem", fontWeight: "500" }}>Real-Time Analytics — Pulse delivers live data and dashboards with sub-second streaming latency.</span>
+          </div>
+        </div>,
+        <div style={{ position: "relative", width: "100%", height: "280px" }}>
+          <img src="https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=800&q=80" alt="AI Detection" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <div style={{ position: "absolute", inset: "auto 0 0 0", padding: "1.5rem 1rem", background: "linear-gradient(to top, rgba(0,0,0,0.85), transparent)" }}>
+            <span style={{ color: "white", fontSize: "0.95rem", fontWeight: "500" }}>AI-Powered Detection — Smart anomaly detection notifies your team before production breaks.</span>
+          </div>
+        </div>,
+        <div style={{ position: "relative", width: "100%", height: "280px" }}>
+          <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80" alt="Workspaces" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <div style={{ position: "absolute", inset: "auto 0 0 0", padding: "1.5rem 1rem", background: "linear-gradient(to top, rgba(0,0,0,0.85), transparent)" }}>
+            <span style={{ color: "white", fontSize: "0.95rem", fontWeight: "500" }}>Unified Team Workspaces — Share annotated charts and build custom workspaces with ease.</span>
+          </div>
+        </div>
       ]}
+      itemClass="h-72"
     />
   </div>
 </DemoPreview>
 
-```tsx
-import { Carousel } from "../components/ui";
-
-export default function Page() {
-  return (
-    <Carousel
-      slides={[
-        <div>Slide 1</div>,
-        <div>Slide 2</div>,
-        <div>Slide 3</div>,
-      ]}
-    />
-  );
+```json
+{
+  "blockType": "carousel",
+  "slides": [
+    {
+      "image": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
+      "caption": "Real-Time Analytics — Pulse delivers live data and dashboards with sub-second streaming latency.",
+      "href": "/features/analytics"
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=800&q=80",
+      "caption": "AI-Powered Detection — Smart anomaly detection notifies your team before production breaks.",
+      "href": "/features/ai-detection"
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80",
+      "caption": "Unified Team Workspaces — Share annotated charts and build custom workspaces with ease.",
+      "href": "/features/workspaces"
+    }
+  ]
 }
 ```
 
-## Múltiplos slides por página, com loop
+***
 
-```tsx
-<Carousel
-  slides={slides}
-  slidesPerPage={3}
-  spacing="16px"
-  loop
-  colorPalette="purple"
-/>
-```
+## Banner com autoplay e controles ao passar o cursor
 
-## Reprodução automática com pausa ao passar o cursor
+Configure o carrossel para avançar automaticamente em uma velocidade definida. Para manter a interface acessível e discreta, ative `pauseOnHover` para que os usuários possam pausar a reprodução simplesmente passando o cursor sobre um slide.
 
-```tsx
-<Carousel
-  slides={slides}
-  autoplay={{ delay: 2500 }}
-  pauseOnHover
-  loop
-  showAutoplayTrigger
-/>
-```
-
-## Orientação vertical
-
-```tsx
-<div class={css({ height: "72" })}>
-  <Carousel slides={slides} orientation="vertical" class={css({ height: "full" })} />
-</div>
-```
-
-## Controles sobrepostos (inline)
-
-```tsx
-<Carousel slides={slides} inline loop />
-```
-
-## Construtor de Páginas CMS
-
-Este componente está disponível como um bloco `carousel` no [Construtor de Páginas](/docs/PageBuilder) (`content/pages/*.json`). Os slides são registros simples `{ image, caption, href }`, não blocos de componentes aninhados:
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "600px" }}>
+    <Carousel
+      slides={[
+        <div style={{ position: "relative", width: "100%", height: "280px" }}>
+          <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&q=80" alt="Tech" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <div style={{ position: "absolute", inset: "auto 0 0 0", padding: "1.5rem 1rem", background: "linear-gradient(to top, rgba(0,0,0,0.85), transparent)" }}>
+            <span style={{ color: "white", fontSize: "0.95rem", fontWeight: "500" }}>Developer Tools — Integrate your APIs in minutes with our native SDK wrappers.</span>
+          </div>
+        </div>,
+        <div style={{ position: "relative", width: "100%", height: "280px" }}>
+          <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&q=80" alt="Security" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <div style={{ position: "absolute", inset: "auto 0 0 0", padding: "1.5rem 1rem", background: "linear-gradient(to top, rgba(0,0,0,0.85), transparent)" }}>
+            <span style={{ color: "white", fontSize: "0.95rem", fontWeight: "500" }}>Ironclad Security — SOC2-compliant data storage and end-to-end encryption by default.</span>
+          </div>
+        </div>
+      ]}
+      autoplay={{ delay: 3500 }}
+      pauseOnHover={true}
+      loop={true}
+      itemClass="h-72"
+    />
+  </div>
+</DemoPreview>
 
 ```json
 {
-  "type": "carousel",
-  "slides": [
-    { "image": "/hero-1.jpg", "caption": "Slide 1" },
-    { "image": "/hero-2.jpg", "caption": "Slide 2" }
-  ],
+  "blockType": "carousel",
   "loop": true,
-  "autoplayDelay": 3000
+  "pauseOnHover": true,
+  "autoplayDelay": 3500,
+  "slides": [
+    {
+      "image": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&q=80",
+      "caption": "Developer Tools — Integrate your APIs in minutes with our native SDK wrappers.",
+      "href": "/developers"
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&q=80",
+      "caption": "Ironclad Security — SOC2-compliant data storage and end-to-end encryption by default.",
+      "href": "/security"
+    }
+  ]
+}
+```
+
+***
+
+## Layout de múltiplos slides
+
+Exiba vários slides lado a lado simultaneamente. Excelente para listas de produtos, diretórios de equipe e galerias de portfólio. Defina o atributo `slidesPerPage` junto com um `spacing` personalizado entre os itens.
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "600px" }}>
+    <Carousel
+      slides={[
+        <div style={{ padding: "3rem 1rem", textAlign: "center", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Card A</div>,
+        <div style={{ padding: "3rem 1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>Card B</div>,
+        <div style={{ padding: "3rem 1rem", textAlign: "center", background: "var(--colors-green-3)", borderRadius: "8px" }}>Card C</div>,
+        <div style={{ padding: "3rem 1rem", textAlign: "center", background: "var(--colors-orange-3)", borderRadius: "8px" }}>Card D</div>
+      ]}
+      slidesPerPage={2}
+      spacing="16px"
+      itemClass="h-32"
+    />
+  </div>
+</DemoPreview>
+
+```json
+{
+  "blockType": "carousel",
+  "slidesPerPage": 2,
+  "spacing": "16px",
+  "slides": [
+    {
+      "image": "https://images.unsplash.com/photo-1542744094-3a31f103e35f?w=400&q=80",
+      "caption": "Marketing Solutions",
+      "href": "/solutions/marketing"
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&q=80",
+      "caption": "Financial Growth",
+      "href": "/solutions/financial"
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=400&q=80",
+      "caption": "HR Management",
+      "href": "/solutions/hr"
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400&q=80",
+      "caption": "Executive Advisory",
+      "href": "/solutions/consulting"
+    }
+  ]
+}
+```
+
+***
+
+## Feed de galeria vertical
+
+Role pelo conteúdo dos seus slides verticalmente em vez de horizontalmente. Excelente para cartões de conteúdo mobile-first, bobinas de mídia ou painéis de navegação lateral.
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "600px", height: "250px" }}>
+    <Carousel
+      slides={[
+        <div style={{ width: "100%", height: "100%", background: "var(--colors-blue-1)", display: "flex", alignItems: "center", justifyContent: "center" }}>Vertical Item 1</div>,
+        <div style={{ width: "100%", height: "100%", background: "var(--colors-purple-1)", display: "flex", alignItems: "center", justifyContent: "center" }}>Vertical Item 2</div>,
+        <div style={{ width: "100%", height: "100%", background: "var(--colors-green-1)", display: "flex", alignItems: "center", justifyContent: "center" }}>Vertical Item 3</div>
+      ]}
+      orientation="vertical"
+      itemClass="h-full"
+    />
+  </div>
+</DemoPreview>
+
+```json
+{
+  "blockType": "carousel",
+  "orientation": "vertical",
+  "slides": [
+    {
+      "image": "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&q=80",
+      "caption": "Curated Feed — Category Spotlight"
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80",
+      "caption": "Trending Creator Profile"
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=800&q=80",
+      "caption": "Featured Technical Portfolio"
+    }
+  ]
+}
+```
+
+***
+
+## Tema de destaque com controles sobrepostos
+
+Faça com que os gatilhos anterior/próximo e os pontos flutuem diretamente sobre as imagens (em vez de colocá-los abaixo) usando a propriedade `inline`, e tinga os sinais visuais ativos com um token `colorPalette` de destaque.
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "600px" }}>
+    <Carousel
+      slides={[
+        <div style={{ width: "100%", height: "240px", background: "var(--colors-purple-2)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold" }}>Themed Slide 1</div>,
+        <div style={{ width: "100%", height: "240px", background: "var(--colors-purple-3)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold" }}>Themed Slide 2</div>,
+        <div style={{ width: "100%", height: "240px", background: "var(--colors-purple-4)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold" }}>Themed Slide 3</div>
+      ]}
+      inline={true}
+      colorPalette="purple"
+      itemClass="h-60"
+    />
+  </div>
+</DemoPreview>
+
+```json
+{
+  "blockType": "carousel",
+  "inline": true,
+  "colorPalette": "purple",
+  "slides": [
+    {
+      "image": "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=800&q=80",
+      "caption": "Overlay Design Layout"
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=800&q=80",
+      "caption": "High Fidelity Previews"
+    }
+  ]
 }
 ```
 
@@ -104,113 +262,32 @@ Este componente está disponível como um bloco `carousel` no [Construtor de Pá
 
 # Propriedades
 
-## Carousel
-
-O componente de conveniência orientado a dados: passe `slides` e ele compõe
-`ItemGroup`/`Item` mais um `Control` padrão (gatilhos de anterior/próximo e
-pontos indicadores) para você. Para composição manual completa, use
-`Carousel.Root` e as partes exportadas diretamente (ver
-[Composição manual](#manual-composition)).
-
-| Prop | Type | Description | Default |
+| Parâmetro | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
-| `slides` | `JSX.Element[]` | O conteúdo dos slides. `slideCount` é derivado de seu comprimento. | - |
-| `interactive` | `boolean` | Força a hidratação como uma ilha. | `true` |
-| `page` | `number` | Se o carrossel está em uma determinada página (controlado). | - |
-| `defaultPage` | `number` | Página inicial (não controlado). | `0` |
-| `slidesPerPage` | `number` | Número de slides visíveis de uma vez. | `1` |
+| `slides` | `List` | - | Uma coleção ordenada de slides individuais (ver esquema abaixo). |
+| `slidesPerPage` | `Number` | `1` | Quantidade de slides visíveis no viewport simultaneamente. |
+| `spacing` | `String` | - | Espaçamento compatível com CSS entre os slides visíveis (ex. `"16px"`, `"1rem"`). |
+| `loop` | `Boolean` | `false` | Se o carrossel volta ao primeiro slide ao chegar ao final. |
+| `autoplayDelay` | `Number` | - | Temporizador de avanço automático em milissegundos. Deixe em branco ou omita para desativar o autoplay completamente. |
+| `pauseOnHover` | `Boolean` | `true` | Pausa a reprodução automática quando o ponteiro do usuário passa sobre os slides. |
+| `orientation` | `Select` | `horizontal` | Direção do layout de rolagem. Opções: `horizontal`, `vertical`. |
+| `inline` | `Boolean` | `false` | Sobrepõe os controles de navegação e os pontos sobre a mídia do slide em vez de colocá-los em um contêiner abaixo. |
+| `colorPalette` | `Select` | - | Cor de destaque visual para botões e indicadores. Opções: `blue`, `green`, `red`, `purple`, `orange`, `amber`, `cyan`, `slate`. |
 
-| `slidesPerMove` | \`number \ | "auto"\` | Slides avançados por passo de página. `"auto"` usa `slidesPerPage`. | `"auto"` |
-| `orientation` | \`"horizontal" \ | "vertical"\` | Eixo de rolagem. | `"horizontal"` |
+### Esquema do item de slide
 
-| `loop` | `boolean` | Volta ao início na primeira/última página. | `false` |
-| `spacing` | `string` | Espaço entre slides (qualquer comprimento CSS). | `"0px"` |
-| `padding` | `string` | Padding de rolagem extra em cada extremidade (qualquer comprimento CSS). | - |
-| `autoSize` | `boolean` | Permite que os slides se dimensionem sozinhos em vez de se dividirem igualmente por `slidesPerPage`. | `false` |
-| `allowMouseDrag` | `boolean` | Habilita rolagem por clicar-e-arrastar com o mouse (a rolagem por toque/trackpad sempre funciona nativamente). | `false` |
+Cada entrada no parâmetro `slides` aceita as seguintes propriedades:
 
-| `autoplay` | \`boolean \ | \{ delay: number \}\` | Avança as páginas automaticamente. Sempre volta ao início ao final, independentemente de `loop`. | `false` |
-
-| `pauseOnHover` | `boolean` | Pausa a reprodução automática enquanto o ponteiro está sobre o carrossel. | `false` |
-
-| `snapType` | \`"proximity" \ | "mandatory"\` | Rigor do scroll-snap CSS. | `"mandatory"` |
-
-| `disabled` | `boolean` | Desabilita todos os gatilhos/indicadores e o arraste. | `false` |
-| `showControls` | `boolean` | Renderiza `PrevTrigger`/`NextTrigger` no `Control` padrão. | `true` |
-| `showIndicators` | `boolean` | Renderiza um `IndicatorGroup` no `Control` padrão. | `true` |
-| `showAutoplayTrigger` | `boolean` | Renderiza um `AutoplayTrigger` no `Control` padrão. | `false` |
-| `itemClass` | `string` | Classe personalizada aplicada a cada `Item` gerado. | - |
-
-| `size` | \`"sm" \ | "md" \ | "lg"\` | Tamanho dos gatilhos/indicadores. | `"md"` |
-
-| `colorPalette` | \`"gray" \ | "blue" \ | "cyan" \ | "green" \ | "orange" \ | "purple" \ | "red" \ | "teal" \ | "indigo" \ | "pink" \ | "yellow" \ | "success" \ | "error" \ | "warning"\` | Cor de destaque para o indicador ativo/gatilho de autoplay pressionado. | `"green"` |
-
-| `inline` | `boolean` | Sobrepõe o `Control` sobre o grupo de itens em vez de empilhá-lo abaixo. | `false` |
-| `translations` | `CarouselTranslations` | Strings localizadas (aria-labels, texto de progresso). | - |
-| `onPageChange` | `(details: { page: number; pageSnapPoint: number }) => void` | Chamado quando a página ativa se estabiliza. | - |
-| `onAutoplayStatusChange` | `(details: { type: string; isPlaying: boolean; page: number }) => void` | Chamado quando a reprodução automática inicia/avança/para. | - |
-| `onDragStatusChange` | `(details: { type: string; isDragging: boolean; page: number }) => void` | Chamado ao iniciar/mover/finalizar o arraste. | - |
-| `class` | `string` | Classes CSS personalizadas para o elemento raiz. | - |
-| `classNames` | `Record<string, string>` | Classes CSS personalizadas por parte (`root`, `itemGroup`, `item`, `control`, `prevTrigger`, `nextTrigger`, `indicatorGroup`, `indicator`, `autoplayTrigger`). | - |
-
-### Carousel.Item
-
-| Prop | Type | Description | Default |
+| Propriedade | Tipo | Obrigatório | Descrição |
 | --- | --- | --- | --- |
-| `index` | `number` | A posição do slide. Obrigatório. | - |
-
-| `snapAlign` | \`"start" \ | "center" \ | "end"\` | Qual borda do slide se ajusta à visão. | `"start"` |
-
-### Carousel.Indicator
-
-| Prop | Type | Description | Default |
-| --- | --- | --- | --- |
-| `index` | `number` | A página para a qual salta. Obrigatório. | - |
-| `readOnly` | `boolean` | Renderiza o ponto sem um manipulador de clique. | `false` |
+| `image` | `Image` | Sim | Caminho ou URL da imagem de fundo do slide. |
+| `caption` | `String` | Não | Texto de descrição sobreposto renderizado dinamicamente na região inferior do slide. |
+| `href` | `String` | Não | URL de navegação ou rota de página localizada que o slide inteiro dispara ao clicar. |
 
 ***
 
 # Notas de arquitetura
 
-- **Rolagem nativa, não transforms.** `ItemGroup` é um contêiner real
-  `overflow: auto` de grid/flex com `scroll-snap-type`; a paginação chama
-  `scrollTo(...)` sobre ele. Isso significa que o deslize por toque, a
-  rolagem por trackpad e a rolagem por teclas de seta no elemento focado
-  funcionam mesmo antes de a hidratação terminar — apenas os _cliques_ de
-  gatilho/indicador e a reprodução automática requerem JavaScript.
-- **`pageSnapPoints`** é o índice do item em que cada página começa,
-  calculado com a mesma fórmula estrutural que a máquina `@zag-js/carousel`
-  do Ark UI usa (`getPageSnapPoints`) — determinístico apenas a partir de
-  `slideCount`/`slidesPerPage`/`slidesPerMove`, portanto é idêntico no
-  servidor e antes da hidratação (nenhuma medição de layout é necessária
-  para SSR).
-- **Os filhos não são re-renderizados na hidratação.** Assim como nas
-  demais ilhas deste projeto, a raiz interativa do `Carousel` corrige
-  `data-current`, `disabled`, `data-inview` e `aria-hidden` diretamente no
-  DOM já renderizado (ver `applyPageState` em `carousel-primitive.tsx`) em
-  vez de regenerar os filhos `Item`/`Indicator` — o HonoX rehidrata os
-  filhos de uma ilha a partir de um snapshot HTML serializado, sem invocar
-  novamente o componente que os produziu.
-- **Nunca dependa de um `onClick` de JSX para um botão gatilho/
-  indicador.** Pelo mesmo motivo: `PrevTrigger`/`NextTrigger`/`Indicator`/
-  `AutoplayTrigger` são compostos como filhos, então o hono/jsx/dom nunca
-  reconcilia suas próprias props de evento sintéticas sobre esses nós já
-  montados — um `onClick` neles silenciosamente nunca dispara. Todo o
-  tratamento de clique é delegado a partir da raiz em um único
-  `useEffect` (`target.closest('[data-part="..."]')`), espelhando
-  `dropdown-primitive.tsx`/`combobox-primitive.tsx`. Esse efeito (e o de
-  `pauseOnHover`) monta exatamente uma vez e lê `scrollNext`/`scrollPrev`/
-  `isPlaying`/etc. por meio de refs em vez de capturá-los diretamente por
-  closure — colocar estado reativo em seu array de dependências
-  reanexaria o listener a cada mudança, e o próprio `setIsPlaying` de
-  `pauseOnHover` (disparado por `pointerenter`, que chega _logo antes_ do
-  clique emparelhado em um gesto de clique real) de outra forma
-  desmontaria o listener de clique no intervalo entre a chegada do mouse
-  e o pressionar do botão.
-- **Simplificações em relação ao Ark UI upstream:** o rastreamento de
-  "em vista" usa a mesma matemática de intervalo de índices que a
-  renderização SSR (não um `IntersectionObserver` real), e o `tabindex` de
-  `ItemGroup` é sempre `0` (não alternado com base em se um slide contém
-  um elemento focável). Ambos são compromissos pragmáticos que cobrem o
-  caso comum de `slidesPerPage` fixo; RTL (`dir`) não é suportado, em
-  consonância com o restante desta biblioteca de componentes.
+- **Zero mudanças de layout durante SSR:** Para eliminar saltos de layout durante a renderização no servidor, os marcadores de ponto de ancoragem e as larguras do viewport são pré-calculados usando uma fórmula estrutural previsível que corresponde às configurações de `slideCount` e `slidesPerPage`.
+- **Delegação robusta de eventos:** Todos os manipuladores de clique para indicadores, paginação por pontos e gatilhos de pausa são gerenciados por meio de um único listener de eventos unificado delegado a partir do contêiner raiz. Isso evita atribuir repetidamente listeners de eventos a componentes estáticos dentro do modelo de página hidratado.
+- **CSS Scroll Snap:** O CSS scroll-snap puro trata do alinhamento de layout nativamente. Em telas touch móveis e trackpads modernos, as transições de deslizamento ao rolar permanecem suaves e funcionam corretamente mesmo quando o JavaScript está desativado ou atrasado.

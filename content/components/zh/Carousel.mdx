@@ -9,91 +9,252 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # 简介
 
-一种通过真实、原生的 CSS scroll-snap（而非 transform 计算）来翻页浏览一组幻灯片的幻灯片组件。支持按组分页（`slidesPerPage`）、循环、自动播放、鼠标拖拽滚动、键盘导航以及垂直方向。
+`Carousel` 组件是一个高性能、基于原生滚动的幻灯片组件，用于在多张幻灯片之间翻页。它专为 CMS 页面构建而生，默认即零 JS 静态渲染，依赖现代 CSS scroll-snap 原语，而非厚重的 JS transform 逻辑。
+
+因此，触摸滑动、触控板滚动以及键盘方向键导航，即便在客户端水合之前也能即时生效。JavaScript 仅在用户点击指示器、上/下一张按钮以及自动播放触发器时，才被优雅地按需叠加。
+
+***
 
 # 用法
 
-## 基础轮播
+你可以配置并排序幻灯片、设置展示布局，并控制自动播放属性。
+
+## 基础幻灯片
+
+标准的图片横幅，采用全宽幻灯片并叠加标题文字与导航链接。非常适合作为首屏头部或主页展示区。
 
 <DemoPreview>
-  <div style={{ width: "100%", maxWidth: "360px" }}>
+  <div style={{ width: "100%", maxWidth: "600px" }}>
     <Carousel
       slides={[
-        <div style={{ padding: "3rem 1rem", textAlign: "center", background: "var(--colors-blue-3)" }}>Slide 1</div>,
-        <div style={{ padding: "3rem 1rem", textAlign: "center", background: "var(--colors-purple-3)" }}>Slide 2</div>,
-        <div style={{ padding: "3rem 1rem", textAlign: "center", background: "var(--colors-green-3)" }}>Slide 3</div>,
+        <div style={{ position: "relative", width: "100%", height: "280px" }}>
+          <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80" alt="Analytics" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <div style={{ position: "absolute", inset: "auto 0 0 0", padding: "1.5rem 1rem", background: "linear-gradient(to top, rgba(0,0,0,0.85), transparent)" }}>
+            <span style={{ color: "white", fontSize: "0.95rem", fontWeight: "500" }}>Real-Time Analytics — Pulse delivers live data and dashboards with sub-second streaming latency.</span>
+          </div>
+        </div>,
+        <div style={{ position: "relative", width: "100%", height: "280px" }}>
+          <img src="https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=800&q=80" alt="AI Detection" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <div style={{ position: "absolute", inset: "auto 0 0 0", padding: "1.5rem 1rem", background: "linear-gradient(to top, rgba(0,0,0,0.85), transparent)" }}>
+            <span style={{ color: "white", fontSize: "0.95rem", fontWeight: "500" }}>AI-Powered Detection — Smart anomaly detection notifies your team before production breaks.</span>
+          </div>
+        </div>,
+        <div style={{ position: "relative", width: "100%", height: "280px" }}>
+          <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80" alt="Workspaces" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <div style={{ position: "absolute", inset: "auto 0 0 0", padding: "1.5rem 1rem", background: "linear-gradient(to top, rgba(0,0,0,0.85), transparent)" }}>
+            <span style={{ color: "white", fontSize: "0.95rem", fontWeight: "500" }}>Unified Team Workspaces — Share annotated charts and build custom workspaces with ease.</span>
+          </div>
+        </div>
       ]}
+      itemClass="h-72"
     />
   </div>
 </DemoPreview>
 
-```tsx
-import { Carousel } from "../components/ui";
-
-export default function Page() {
-  return (
-    <Carousel
-      slides={[
-        <div>Slide 1</div>,
-        <div>Slide 2</div>,
-        <div>Slide 3</div>,
-      ]}
-    />
-  );
+```json
+{
+  "blockType": "carousel",
+  "slides": [
+    {
+      "image": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
+      "caption": "Real-Time Analytics — Pulse delivers live data and dashboards with sub-second streaming latency.",
+      "href": "/features/analytics"
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=800&q=80",
+      "caption": "AI-Powered Detection — Smart anomaly detection notifies your team before production breaks.",
+      "href": "/features/ai-detection"
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80",
+      "caption": "Unified Team Workspaces — Share annotated charts and build custom workspaces with ease.",
+      "href": "/features/workspaces"
+    }
+  ]
 }
 ```
 
-## 每页多张幻灯片，循环
+***
 
-```tsx
-<Carousel
-  slides={slides}
-  slidesPerPage={3}
-  spacing="16px"
-  loop
-  colorPalette="purple"
-/>
-```
+## 带悬停控制的自动播放横幅
 
-## 自动播放并暂停于悬停
+将轮播配置为以设定速度自动前进。为了兼顾界面的无障碍性与低侵入性，可启用 `pauseOnHover`，让用户只需将指针悬停在幻灯片上即可暂停播放。
 
-```tsx
-<Carousel
-  slides={slides}
-  autoplay={{ delay: 2500 }}
-  pauseOnHover
-  loop
-  showAutoplayTrigger
-/>
-```
-
-## 垂直方向
-
-```tsx
-<div class={css({ height: "72" })}>
-  <Carousel slides={slides} orientation="vertical" class={css({ height: "full" })} />
-</div>
-```
-
-## 叠加（内联）控件
-
-```tsx
-<Carousel slides={slides} inline loop />
-```
-
-## CMS 页面构建器
-
-该组件在 [页面构建器](/docs/PageBuilder) (`content/pages/*.json`) 中作为 `carousel` 区块提供。幻灯片是扁平的 `{ image, caption, href }` 记录，而非嵌套的组件区块：
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "600px" }}>
+    <Carousel
+      slides={[
+        <div style={{ position: "relative", width: "100%", height: "280px" }}>
+          <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&q=80" alt="Tech" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <div style={{ position: "absolute", inset: "auto 0 0 0", padding: "1.5rem 1rem", background: "linear-gradient(to top, rgba(0,0,0,0.85), transparent)" }}>
+            <span style={{ color: "white", fontSize: "0.95rem", fontWeight: "500" }}>Developer Tools — Integrate your APIs in minutes with our native SDK wrappers.</span>
+          </div>
+        </div>,
+        <div style={{ position: "relative", width: "100%", height: "280px" }}>
+          <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&q=80" alt="Security" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <div style={{ position: "absolute", inset: "auto 0 0 0", padding: "1.5rem 1rem", background: "linear-gradient(to top, rgba(0,0,0,0.85), transparent)" }}>
+            <span style={{ color: "white", fontSize: "0.95rem", fontWeight: "500" }}>Ironclad Security — SOC2-compliant data storage and end-to-end encryption by default.</span>
+          </div>
+        </div>
+      ]}
+      autoplay={{ delay: 3500 }}
+      pauseOnHover={true}
+      loop={true}
+      itemClass="h-72"
+    />
+  </div>
+</DemoPreview>
 
 ```json
 {
-  "type": "carousel",
-  "slides": [
-    { "image": "/hero-1.jpg", "caption": "Slide 1" },
-    { "image": "/hero-2.jpg", "caption": "Slide 2" }
-  ],
+  "blockType": "carousel",
   "loop": true,
-  "autoplayDelay": 3000
+  "pauseOnHover": true,
+  "autoplayDelay": 3500,
+  "slides": [
+    {
+      "image": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&q=80",
+      "caption": "Developer Tools — Integrate your APIs in minutes with our native SDK wrappers.",
+      "href": "/developers"
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&q=80",
+      "caption": "Ironclad Security — SOC2-compliant data storage and end-to-end encryption by default.",
+      "href": "/security"
+    }
+  ]
+}
+```
+
+***
+
+## 多张幻灯片布局
+
+同时并排展示多张幻灯片。非常适合产品列表、团队成员目录以及作品集画廊。设置 `slidesPerPage` 属性，并为各条目指定自定义 `spacing` 间距。
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "600px" }}>
+    <Carousel
+      slides={[
+        <div style={{ padding: "3rem 1rem", textAlign: "center", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Card A</div>,
+        <div style={{ padding: "3rem 1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>Card B</div>,
+        <div style={{ padding: "3rem 1rem", textAlign: "center", background: "var(--colors-green-3)", borderRadius: "8px" }}>Card C</div>,
+        <div style={{ padding: "3rem 1rem", textAlign: "center", background: "var(--colors-orange-3)", borderRadius: "8px" }}>Card D</div>
+      ]}
+      slidesPerPage={2}
+      spacing="16px"
+      itemClass="h-32"
+    />
+  </div>
+</DemoPreview>
+
+```json
+{
+  "blockType": "carousel",
+  "slidesPerPage": 2,
+  "spacing": "16px",
+  "slides": [
+    {
+      "image": "https://images.unsplash.com/photo-1542744094-3a31f103e35f?w=400&q=80",
+      "caption": "Marketing Solutions",
+      "href": "/solutions/marketing"
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&q=80",
+      "caption": "Financial Growth",
+      "href": "/solutions/financial"
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=400&q=80",
+      "caption": "HR Management",
+      "href": "/solutions/hr"
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400&q=80",
+      "caption": "Executive Advisory",
+      "href": "/solutions/consulting"
+    }
+  ]
+}
+```
+
+***
+
+## 垂直画廊信息流
+
+以垂直方向而非水平方向滚动浏览幻灯片内容。非常适合移动优先的内容卡片、媒体短片流或侧边导航面板。
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "600px", height: "250px" }}>
+    <Carousel
+      slides={[
+        <div style={{ width: "100%", height: "100%", background: "var(--colors-blue-1)", display: "flex", alignItems: "center", justifyContent: "center" }}>Vertical Item 1</div>,
+        <div style={{ width: "100%", height: "100%", background: "var(--colors-purple-1)", display: "flex", alignItems: "center", justifyContent: "center" }}>Vertical Item 2</div>,
+        <div style={{ width: "100%", height: "100%", background: "var(--colors-green-1)", display: "flex", alignItems: "center", justifyContent: "center" }}>Vertical Item 3</div>
+      ]}
+      orientation="vertical"
+      itemClass="h-full"
+    />
+  </div>
+</DemoPreview>
+
+```json
+{
+  "blockType": "carousel",
+  "orientation": "vertical",
+  "slides": [
+    {
+      "image": "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&q=80",
+      "caption": "Curated Feed — Category Spotlight"
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80",
+      "caption": "Trending Creator Profile"
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=800&q=80",
+      "caption": "Featured Technical Portfolio"
+    }
+  ]
+}
+```
+
+***
+
+## 叠加（内联）控件的强调主题
+
+通过 `inline` 属性让上/下一张触发器与指示点直接浮于图片之上（而非置于其下方），并使用强调色的 `colorPalette` token 为激活状态的视觉提示着色。
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "600px" }}>
+    <Carousel
+      slides={[
+        <div style={{ width: "100%", height: "240px", background: "var(--colors-purple-2)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold" }}>Themed Slide 1</div>,
+        <div style={{ width: "100%", height: "240px", background: "var(--colors-purple-3)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold" }}>Themed Slide 2</div>,
+        <div style={{ width: "100%", height: "240px", background: "var(--colors-purple-4)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold" }}>Themed Slide 3</div>
+      ]}
+      inline={true}
+      colorPalette="purple"
+      itemClass="h-60"
+    />
+  </div>
+</DemoPreview>
+
+```json
+{
+  "blockType": "carousel",
+  "inline": true,
+  "colorPalette": "purple",
+  "slides": [
+    {
+      "image": "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=800&q=80",
+      "caption": "Overlay Design Layout"
+    },
+    {
+      "image": "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=800&q=80",
+      "caption": "High Fidelity Previews"
+    }
+  ]
 }
 ```
 
@@ -101,72 +262,32 @@ export default function Page() {
 
 # 属性
 
-## Carousel
-
-数据驱动的便捷组件：传入 `slides`，它会为你组合 `ItemGroup`/`Item` 以及默认的 `Control`（上/下一张触发器与指示点）。如需完全手动组合，请直接使用 `Carousel.Root` 及导出的各部分（参见 [手动组合](#manual-composition)）。
-
-| 属性 | 类型 | 说明 | 默认值 |
+| 参数 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| `slides` | `JSX.Element[]` | 幻灯片内容。`slideCount` 由其长度推导。 | - |
-| `interactive` | `boolean` | 强制作为岛屿水合。 | `true` |
-| `page` | `number` | 轮播是否位于给定页面（受控）。 | - |
-| `defaultPage` | `number` | 初始页面（非受控）。 | `0` |
-| `slidesPerPage` | `number` | 一次可见的幻灯片数量。 | `1` |
+| `slides` | `List` | - | 一组有序的单个幻灯片集合（见下方 schema）。 |
+| `slidesPerPage` | `Number` | `1` | 视口中同时可见的幻灯片数量。 |
+| `spacing` | `String` | - | 可见幻灯片之间兼容 CSS 的间隙/间距（例如 `"16px"`、`"1rem"`）。 |
+| `loop` | `Boolean` | `false` | 轮播到达末尾时是否回绕到第一张幻灯片。 |
+| `autoplayDelay` | `Number` | - | 自动前进的计时器（毫秒）。留空或省略则完全禁用自动播放。 |
+| `pauseOnHover` | `Boolean` | `true` | 当指针悬停在幻灯片上方时暂停自动播放。 |
+| `orientation` | `Select` | `horizontal` | 滚动布局方向。可选：`horizontal`、`vertical`。 |
+| `inline` | `Boolean` | `false` | 将导航控制器与指示点叠加在幻灯片媒体之上，而非放置在下方容器中。 |
+| `colorPalette` | `Select` | - | 按钮与指示器的视觉强调色。可选：`blue`、`green`、`red`、`purple`、`orange`、`amber`、`cyan`、`slate`。 |
 
-| `slidesPerMove` | \`number \ | "auto"\` | 每次翻页前进的幻灯片数。`"auto"` 使用 `slidesPerPage`。 | `"auto"` |
-| `orientation` | \`"horizontal" \ | "vertical"\` | 滚动轴。 | `"horizontal"` |
+### 幻灯片条目 Schema
 
-| `loop` | `boolean` | 在首页/末页之间循环。 | `false` |
-| `spacing` | `string` | 幻灯片之间的间距（任意 CSS 长度）。 | `"0px"` |
-| `padding` | `string` | 两端额外的滚动内边距（任意 CSS 长度）。 | - |
-| `autoSize` | `boolean` | 让幻灯片自行决定尺寸，而非按 `slidesPerPage` 均匀切分。 | `false` |
-| `allowMouseDrag` | `boolean` | 启用鼠标的点击拖拽滚动（触摸/触控板滚动始终原生可用）。 | `false` |
+`slides` 参数中的每一项均接受以下属性：
 
-| `autoplay` | \`boolean \ | \{ delay: number \}\` | 自动前进页面。无论 `loop` 如何，始终在末尾循环。 | `false` |
-
-| `pauseOnHover` | `boolean` | 当指针悬停在轮播上方时暂停自动播放。 | `false` |
-
-| `snapType` | \`"proximity" \ | "mandatory"\` | CSS scroll-snap 的严格程度。 | `"mandatory"` |
-
-| `disabled` | `boolean` | 禁用所有触发器/指示器及拖拽。 | `false` |
-| `showControls` | `boolean` | 在默认的 `Control` 中渲染 `PrevTrigger`/`NextTrigger`。 | `true` |
-| `showIndicators` | `boolean` | 在默认的 `Control` 中渲染 `IndicatorGroup`。 | `true` |
-| `showAutoplayTrigger` | `boolean` | 在默认的 `Control` 中渲染 `AutoplayTrigger`。 | `false` |
-| `itemClass` | `string` | 应用于每个生成的 `Item` 的自定义类。 | - |
-
-| `size` | \`"sm" \ | "md" \ | "lg"\` | 触发器/指示器的尺寸。 | `"md"` |
-
-| `colorPalette` | \`"gray" \ | "blue" \ | "cyan" \ | "green" \ | "orange" \ | "purple" \ | "red" \ | "teal" \ | "indigo" \ | "pink" \ | "yellow" \ | "success" \ | "error" \ | "warning"\` | 当前指示器/按下的自动播放触发器的强调色。 | `"green"` |
-
-| `inline` | `boolean` | 将 `Control` 叠加在项组之上，而非堆叠在其下方。 | `false` |
-| `translations` | `CarouselTranslations` | 本地化字符串（aria 标签、进度文本）。 | - |
-| `onPageChange` | `(details: { page: number; pageSnapPoint: number }) => void` | 当活动页面稳定时调用。 | - |
-| `onAutoplayStatusChange` | `(details: { type: string; isPlaying: boolean; page: number }) => void` | 当自动播放开始/计时/停止时调用。 | - |
-| `onDragStatusChange` | `(details: { type: string; isDragging: boolean; page: number }) => void` | 在拖拽开始/移动/结束时调用。 | - |
-| `class` | `string` | 根元素的自定义 CSS 类。 | - |
-| `classNames` | `Record<string, string>` | 每个部分的自定义 CSS 类（`root`、`itemGroup`、`item`、`control`、`prevTrigger`、`nextTrigger`、`indicatorGroup`、`indicator`、`autoplayTrigger`）。 | - |
-
-### Carousel.Item
-
-| 属性 | 类型 | 说明 | 默认值 |
+| 属性 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| `index` | `number` | 幻灯片的位置。必填。 | - |
-
-| `snapAlign` | \`"start" \ | "center" \ | "end"\` | 幻灯片哪一侧边缘吸附进入视图。 | `"start"` |
-
-### Carousel.Indicator
-
-| 属性 | 类型 | 说明 | 默认值 |
-| --- | --- | --- | --- |
-| `index` | `number` | 它跳转到的页面。必填。 | - |
-| `readOnly` | `boolean` | 渲染该圆点但不带点击处理器。 | `false` |
+| `image` | `Image` | 是 | 背景幻灯片图片的路径或 URL。 |
+| `caption` | `String` | 否 | 动态渲染在幻灯片下部的叠加描述文字。 |
+| `href` | `String` | 否 | 整张幻灯片在点击时触发的导航 URL 或本地化页面路由。 |
 
 ***
 
 # 架构说明
 
-- **原生滚动，而非 transform。** `ItemGroup` 是一个真正的 `overflow: auto` 网格/弹性容器，带有 `scroll-snap-type`；翻页时对其调用 `scrollTo(...)`。这意味着触摸滑动、触控板滚动以及聚焦元素的方向键滚动在水合完成之前即可工作 —— 只有触发器/指示器的_点击_和自动播放需要 JavaScript。
-- **`pageSnapPoints`** 是每个页面起始处的项索引，使用与 Ark UI 的 `@zag-js/carousel` 机器相同的结构公式（`getPageSnapPoints`）计算 —— 仅由 `slideCount`/`slidesPerPage`/`slidesPerMove` 决定，因此在服务端与水合之前完全一致（SSR 无需布局测量）。
-- **子元素在水合时不会重新渲染。** 与本项目的其他岛屿一样，交互式 `Carousel` 根节点直接修补已渲染 DOM 上的 `data-current`、`disabled`、`data-inview` 和 `aria-hidden`（见 `carousel-primitive.tsx` 中的 `applyPageState`），而不是重新生成 `Item`/`Indicator` 子元素 —— HonoX 从序列化的 HTML 快照而非通过重新调用生成它们的组件来水合岛屿的子元素。
-- **绝不要依赖触发器/指示器按钮上的 JSX `onClick`。** 出于同样的原因：`PrevTrigger`/`NextTrigger`/`Indicator`/`AutoplayTrigger` 是作为子元素组合的，因此 hono/jsx/dom 永远不会将自身的合成事件属性协调到这些已挂载的节点上 —— 它们上的 `onClick` 会静默地永不触发。所有点击处理都由根节点在单个 `useEffect` 中委托（`target.closest('[data-part="..."]')`），与 `dropdown-primitive.tsx`/`combobox-primitive.tsx` 类似。该 effect（以及 `pauseOnHover` 的那个）恰好挂载一次，并通过 ref 而非直接闭包读取 `scrollNext`/`scrollPrev`/`isPlaying` 等 —— 将响应式状态放入其依赖数组会在每次变化时重新挂载监听器，而 `pauseOnHover` 自身的 `setIsPlaying`（由 `pointerenter` 触发，在真实点击手势中恰好位于配对的点击之前）否则会在鼠标到达与按钮按下之间的间隙中拆除点击监听器。
-- **相比上游 Ark UI 的简化：** 在视图内追踪使用与 SSR 渲染相同的索引区间数学（而非真实的 `IntersectionObserver`），并且 `ItemGroup` 的 `tabindex` 始终为 `0`（不根据某张幻灯片是否包含可聚焦元素来切换）。两者都是覆盖常见固定 `slidesPerPage` 场景的务实权衡；RTL（`dir`）不受支持，与本项目其余组件库一致。
+- **SSR 期间零布局偏移：** 为消除服务端渲染时的布局跳动，吸附点标记与视口宽度使用与 `slideCount` 和 `slidesPerPage` 设置相匹配的可预测结构公式预先计算。
+- **稳健的事件委托：** 所有针对指示器、圆点分页与暂停触发器的点击处理器，都通过从根容器委托出来的单一统一事件监听器进行管理。这避免了在水合后的页面模板中，为静态组件重复绑定事件监听器。
+- **CSS Scroll Snap：** 纯 CSS scroll-snap 原生处理布局对齐。在移动端触摸屏与现代触控板上，滑动滚动的过渡依然顺滑，即便在 JavaScript 被禁用或延迟时也能正常工作。
