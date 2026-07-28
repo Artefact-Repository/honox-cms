@@ -6,7 +6,7 @@ This is a full-stack starter built on [**HonoX**](https://github.com/honojs/hono
 
 | Piece | What it does |
 | --- | --- |
-| [HonoX](https://honox.dev) | Meta-framework on [Hono](https://hono.dev) — file-based routing, server/client islands |
+| [HonoX](https://github.com/honojs/honox) | Meta-framework on [Hono](https://hono.dev) — file-based routing, server/client islands |
 | [PandaCSS](https://panda-css.com) | Type-safe, zero-runtime CSS-in-JS, compiled ahead of time |
 | [Sveltia CMS](https://sveltiacms.app) | Git-backed content editing at `/admin/` — no database, no backend service |
 | [`@hono/vite-ssg`](https://github.com/honojs/vite-plugins/tree/main/packages/ssg) | Pre-renders every route to static HTML at build time |
@@ -15,7 +15,7 @@ This is a full-stack starter built on [**HonoX**](https://github.com/honojs/hono
 
 ## Why This Stack
 
-Most UI component libraries are built for one specific JavaScript framework — a liability the moment you need to mix frameworks or switch later. [HonoX](https://honox.dev) sidesteps that as a **meta-framework**: it lets you _Bring Your Own Framework_ (BYOF), so our components stay _framework-agnostic_, resolved entirely at build time rather than tied to a client runtime. Paired with [`@hono/vite-ssg`](https://github.com/honojs/vite-plugins/tree/main/packages/ssg), this also gives us:
+Most UI component libraries are built for one specific JavaScript framework — a liability the moment you need to mix frameworks or switch later. [HonoX](https://github.com/honojs/honox) sidesteps that as a **meta-framework**: it lets you _Bring Your Own Framework_ (BYOF), so our components stay _framework-agnostic_, resolved entirely at build time rather than tied to a client runtime. Paired with [`@hono/vite-ssg`](https://github.com/honojs/vite-plugins/tree/main/packages/ssg), this also gives us:
 
 * **Static and framework-less by default.** The build output is plain HTML/CSS/JS — no server process is required at request time, so it deploys anywhere static files are served (Cloudflare Pages and Vercel are configured out of the box).
 * **Interactive where it counts.** Not every component needs to ship JavaScript. A three-tier [hydration](/docs/Hydration) model lets each component decide whether it hydrates eagerly, conditionally, or never — keeping the client bundle small without giving up rich UI.
