@@ -56,6 +56,8 @@ export interface Task {
 	slug: string;
 	title: string;
 	project: string;
+	/** Slug of another task in this same collection, if this is a subtask. */
+	parentTask?: string;
 	status: TaskStatus;
 	priority: TaskPriority;
 	assignee?: string;
@@ -87,6 +89,7 @@ function buildTask(
 		slug,
 		title: (data.title as string) || slug,
 		project: (data.project as string) ?? "",
+		parentTask: (data.parentTask as string) || undefined,
 		status: (data.status as TaskStatus) ?? "To Do",
 		priority: (data.priority as TaskPriority) ?? "Medium",
 		assignee: data.assignee as string | undefined,
@@ -120,6 +123,13 @@ export async function listTasks(): Promise<Task[]> {
 export async function listTasksByProject(projectSlug: string): Promise<Task[]> {
 	const tasks = await listTasks();
 	return tasks.filter((task) => task.project === projectSlug);
+}
+
+/** Direct children of `parentSlug` — takes an already-loaded task list
+ * (rather than re-reading the collection) since every caller already has
+ * one in hand via `listTasks`/`listTasksByProject`. */
+export function subtasksOf(tasks: Task[], parentSlug: string): Task[] {
+	return tasks.filter((task) => task.parentTask === parentSlug);
 }
 
 export async function loadTaskBySlug(

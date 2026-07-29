@@ -25,13 +25,21 @@ export interface TaskCreateDrawerProps {
 	projects: { label: string; value: string }[];
 	/** Pre-selects a project — e.g. when opened from that project's page. */
 	defaultProjectSlug?: string;
+	/** Candidate parent tasks, for the optional "make this a subtask" field. */
+	tasks?: { label: string; value: string }[];
+	/** Pre-selects a parent task — e.g. "+ Add subtask" from a task's page. */
+	defaultParentTaskSlug?: string;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 }
 
-const emptyForm = (defaultProjectSlug?: string) => ({
+const emptyForm = (
+	defaultProjectSlug?: string,
+	defaultParentTaskSlug?: string,
+) => ({
 	title: "",
 	project: defaultProjectSlug ?? "",
+	parentTask: defaultParentTaskSlug ?? "",
 	status: TASK_STATUSES[0],
 	priority: "Medium",
 	assignee: "",
@@ -46,12 +54,14 @@ const emptyForm = (defaultProjectSlug?: string) => ({
 // one) when one is available, and otherwise falls back to a link into the
 // CMS's own "new entry" screen rather than pretending to have saved anything.
 export default function TaskCreateDrawer(props: TaskCreateDrawerProps) {
-	const [form, setForm] = useState(emptyForm(props.defaultProjectSlug));
+	const [form, setForm] = useState(
+		emptyForm(props.defaultProjectSlug, props.defaultParentTaskSlug),
+	);
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
 	const resetAndClose = () => {
-		setForm(emptyForm(props.defaultProjectSlug));
+		setForm(emptyForm(props.defaultProjectSlug, props.defaultParentTaskSlug));
 		setError(null);
 		props.onOpenChange(false);
 	};
@@ -64,6 +74,7 @@ export default function TaskCreateDrawer(props: TaskCreateDrawerProps) {
 			const slug = await createTask({
 				title: form.title.trim(),
 				project: form.project,
+				parentTask: form.parentTask || undefined,
 				status: form.status,
 				priority: form.priority,
 				assignee: form.assignee.trim() || undefined,
@@ -161,6 +172,24 @@ export default function TaskCreateDrawer(props: TaskCreateDrawerProps) {
 							size="sm"
 						/>
 					</div>
+
+					{props.tasks && props.tasks.length > 0 && (
+						<div>
+							<Text size="sm" class={css({ fontWeight: "medium", mb: "1.5" })}>
+								Parent task
+							</Text>
+							<InteractiveCombobox
+								items={props.tasks}
+								value={form.parentTask}
+								onValueChange={(value: string) =>
+									setForm((f) => ({ ...f, parentTask: value }))
+								}
+								placeholder="None — top-level task"
+								allowClear
+								size="sm"
+							/>
+						</div>
+					)}
 
 					<Stack gap="4" wrap="wrap" class={css({ alignItems: "stretch" })}>
 						<div class={css({ flex: "1", minWidth: "36" })}>

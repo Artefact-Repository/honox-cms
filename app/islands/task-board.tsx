@@ -283,11 +283,27 @@ export default function TaskBoard({ tasks: initialTasks }: TaskBoardProps) {
 											>
 												<Text
 													size="sm"
-													class={css({ fontWeight: "medium", mb: "2" })}
+													class={css({
+														fontWeight: "medium",
+														mb: task.parentTask ? "0.5" : "2",
+													})}
 												>
 													{task.title}
 												</Text>
 											</Anchor>
+											{task.parentTask &&
+												tasks.find((t) => t.slug === task.parentTask) && (
+													<Text
+														size="xs"
+														class={css({ color: "fg.muted", mb: "2" })}
+													>
+														↳{" "}
+														{
+															tasks.find((t) => t.slug === task.parentTask)
+																?.title
+														}
+													</Text>
+												)}
 											<Stack align="center" justify="space-between">
 												<Badge
 													variant="subtle"

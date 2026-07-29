@@ -14,10 +14,13 @@ import { Toaster } from "../../components/ui/toast";
 import TaskActionsMenu from "../../islands/task-actions-menu";
 import TaskEditableText from "../../islands/task-editable-text";
 import TaskProjectEditor from "../../islands/task-project-editor";
+import TaskSubtasks from "../../islands/task-subtasks";
 import { listProjects, loadProjectBySlug } from "../../lib/projects";
 import {
 	listTaskSlugs,
+	listTasks,
 	loadTaskBySlug,
+	subtasksOf,
 	TASK_PRIORITY_COLOR,
 	TASK_STATUS_COLOR,
 } from "../../lib/tasks";
@@ -41,14 +44,22 @@ export default createRoute(
 		const task = await loadTaskBySlug(slug);
 		if (!task) return c.notFound();
 
-		const [project, projects] = await Promise.all([
+		const [project, projects, allTasks] = await Promise.all([
 			loadProjectBySlug(task.project),
 			listProjects(),
+			listTasks(),
 		]);
 		const projectItems = projects.map((p) => ({
 			label: p.title,
 			value: p.slug,
 		}));
+		const taskItems = allTasks
+			.filter((t) => t.slug !== task.slug)
+			.map((t) => ({ label: t.title, value: t.slug }));
+		const parentTask = task.parentTask
+			? allTasks.find((t) => t.slug === task.parentTask)
+			: undefined;
+		const subtasks = subtasksOf(allTasks, task.slug);
 
 		return c.render(
 			<>
@@ -160,6 +171,15 @@ export default createRoute(
 						← Tasks
 					</Anchor>
 
+					{parentTask && (
+						<Text size="sm" class={css({ color: "fg.muted", mb: "1" })}>
+							Subtask of{" "}
+							<Anchor href={`/tasks/${parentTask.slug}`} variant="plain">
+								{parentTask.title}
+							</Anchor>
+						</Text>
+					)}
+
 					<Stack align="start" gap="3" wrap="wrap" class={css({ mb: "4" })}>
 						<TaskEditableText
 							as="h1"
@@ -225,7 +245,7 @@ export default createRoute(
 					)}
 
 					{task.tags.length > 0 && (
-						<Stack gap="2" wrap="wrap">
+						<Stack gap="2" wrap="wrap" class={css({ mb: "6" })}>
 							{task.tags.map((tag) => (
 								<Badge key={tag} variant="subtle" colorPalette="gray" size="sm">
 									{tag}
@@ -233,6 +253,13 @@ export default createRoute(
 							))}
 						</Stack>
 					)}
+
+					<TaskSubtasks
+						task={task}
+						subtasks={subtasks}
+						projects={projectItems}
+						tasks={taskItems}
+					/>
 				</div>
 			</>,
 		);

@@ -50,6 +50,11 @@ export default createRoute(async (c) => {
 		label: project.title,
 		value: project.slug,
 	}));
+	const taskItems = tasks.map((task) => ({
+		label: task.title,
+		value: task.slug,
+	}));
+	const taskTitleBySlug = new Map(tasks.map((task) => [task.slug, task.title]));
 	const assignees = Array.from(
 		new Set(tasks.map((task) => task.assignee).filter(Boolean) as string[]),
 	).sort();
@@ -153,7 +158,7 @@ export default createRoute(async (c) => {
 						>
 							Tasks
 						</Anchor>
-						<PmsCreateMenu projects={projectItems} />
+						<PmsCreateMenu projects={projectItems} tasks={taskItems} />
 						<Anchor
 							href="/admin"
 							class={cx(
@@ -354,20 +359,36 @@ export default createRoute(async (c) => {
 									key: "title",
 									class: css({ maxWidth: "xs" }),
 									render: (task: Task) => (
-										<Anchor
-											href={`/tasks/${task.slug}`}
-											variant="plain"
-											data-task-details-trigger
-											data-task-slug={task.slug}
-											class={css({
-												display: "block",
-												overflow: "hidden",
-												textOverflow: "ellipsis",
-												whiteSpace: "nowrap",
-											})}
-										>
-											{task.title}
-										</Anchor>
+										<div class={css({ overflow: "hidden" })}>
+											<Anchor
+												href={`/tasks/${task.slug}`}
+												variant="plain"
+												data-task-details-trigger
+												data-task-slug={task.slug}
+												class={css({
+													display: "block",
+													overflow: "hidden",
+													textOverflow: "ellipsis",
+													whiteSpace: "nowrap",
+												})}
+											>
+												{task.title}
+											</Anchor>
+											{task.parentTask &&
+												taskTitleBySlug.get(task.parentTask) && (
+													<Text
+														size="xs"
+														class={css({
+															color: "fg.muted",
+															overflow: "hidden",
+															textOverflow: "ellipsis",
+															whiteSpace: "nowrap",
+														})}
+													>
+														↳ {taskTitleBySlug.get(task.parentTask)}
+													</Text>
+												)}
+										</div>
 									),
 								},
 								{

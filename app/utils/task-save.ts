@@ -65,6 +65,8 @@ export function slugifyTaskTitle(title: string): string {
 export interface NewTaskInput {
 	title: string;
 	project: string;
+	/** Slug of another task, if this one is being created as a subtask. */
+	parentTask?: string;
 	status: string;
 	priority: string;
 	assignee?: string;
@@ -95,6 +97,7 @@ export async function createTask(input: NewTaskInput): Promise<string> {
 		status: input.status,
 		priority: input.priority,
 	};
+	if (input.parentTask) data.parentTask = input.parentTask;
 	if (input.assignee) data.assignee = input.assignee;
 	if (input.dueDate) data.dueDate = input.dueDate;
 	if (input.tags.length > 0) data.tags = input.tags;

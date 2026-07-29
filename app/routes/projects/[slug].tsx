@@ -171,6 +171,7 @@ export default createRoute(
 							<PmsCreateMenu
 								projects={projectItems}
 								defaultProjectSlug={slug}
+								tasks={tasks.map((t) => ({ label: t.title, value: t.slug }))}
 							/>
 							<Anchor
 								href="/admin"
