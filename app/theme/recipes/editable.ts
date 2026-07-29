@@ -126,7 +126,7 @@ export const editable = defineSlotRecipe({
 					resize: "vertical",
 				},
 				control: {
-					alignSelf: "flex-end",
+					alignSelf: "flex-start",
 				},
 			},
 			false: {},
@@ -149,7 +149,7 @@ export const editable = defineSlotRecipe({
 					flexWrap: "wrap",
 				},
 				control: {
-					alignSelf: "flex-end",
+					alignSelf: "flex-start",
 				},
 			},
 			false: {},
