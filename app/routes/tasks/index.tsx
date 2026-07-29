@@ -349,7 +349,7 @@ export default createRoute(async (c) => {
 								{
 									header: "Task",
 									key: "title",
-									class: css({ maxWidth: "sm" }),
+									class: css({ maxWidth: "xs" }),
 									render: (task: Task) => (
 										<Anchor
 											href={`/tasks/${task.slug}`}
