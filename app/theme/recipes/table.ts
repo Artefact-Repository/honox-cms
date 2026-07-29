@@ -90,7 +90,7 @@ export const table = defineSlotRecipe({
 			bg: { _light: "white.a7", _dark: "black.a7" },
 			backdropFilter: "blur(32px) saturate(180%)",
 			borderInlineStartWidth: "1px",
-			borderColor: "border",
+			borderColor: { _light: "white.a4", _dark: "black.a4" },
 			boxShadow: "md",
 			opacity: 0,
 			pointerEvents: "none",
