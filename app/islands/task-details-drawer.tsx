@@ -65,75 +65,89 @@ export default function TaskDetailsDrawer({
 			}}
 			title={task?.title ?? ""}
 			description="Task details"
-		>
-			{task && (
-				<Stack
-					direction="column"
-					gap="4"
-					class={css({ alignItems: "stretch" })}
-				>
-					<Stack gap="2" wrap="wrap">
-						<Badge
-							variant="subtle"
-							colorPalette={TASK_STATUS_COLOR[task.status]}
-						>
-							{task.status}
-						</Badge>
-						<Badge
-							variant="subtle"
-							colorPalette={TASK_PRIORITY_COLOR[task.priority]}
-						>
-							{task.priority}
-						</Badge>
-					</Stack>
-
-					<Stack gap="4" wrap="wrap" align="center">
-						{projectTitleBySlug[task.project] && (
-							<Anchor
-								href={`/projects/${task.project}`}
-								variant="plain"
-								class={css({ textStyle: "sm" })}
-							>
-								{projectTitleBySlug[task.project]}
-							</Anchor>
-						)}
-						{task.assignee && (
-							<Stack gap="2" align="center">
-								<Avatar size="xs" name={task.assignee} />
-								<Text size="sm">{task.assignee}</Text>
-							</Stack>
-						)}
-						{task.dueDate && (
-							<Text size="sm" class={css({ color: "fg.muted" })}>
-								Due {formatDate(task.dueDate)}
-							</Text>
-						)}
-					</Stack>
-
-					{task.excerpt && (
-						<Text size="sm" class={css({ color: "fg.muted" })}>
-							{task.excerpt}
-						</Text>
-					)}
-
-					{task.tags.length > 0 && (
-						<Stack gap="2" wrap="wrap">
-							{task.tags.map((tag) => (
-								<Badge key={tag} variant="subtle" colorPalette="gray" size="sm">
-									{tag}
-								</Badge>
-							))}
-						</Stack>
-					)}
-
+			footer={
+				task ? (
 					<Anchor
 						href={`/tasks/${task.slug}`}
 						class={cx(button({ variant: "outline", size: "sm" }))}
 					>
 						Open full page →
 					</Anchor>
-				</Stack>
-			)}
-		</Drawer>
+				) : undefined
+			}
+			// Passed as `body` (not `children`) — see task-create-drawer.tsx for
+			// why: only the `<Body>` part gets the drawer recipe's `flex: 1` /
+			// `overflow: auto` / bottom padding, so a long excerpt or tag list
+			// scrolls instead of overflowing past the (absolutely-positioned)
+			// footer.
+			body={
+				task ? (
+					<Stack
+						direction="column"
+						gap="4"
+						class={css({ alignItems: "stretch", width: "full" })}
+					>
+						<Stack gap="2" wrap="wrap">
+							<Badge
+								variant="subtle"
+								colorPalette={TASK_STATUS_COLOR[task.status]}
+							>
+								{task.status}
+							</Badge>
+							<Badge
+								variant="subtle"
+								colorPalette={TASK_PRIORITY_COLOR[task.priority]}
+							>
+								{task.priority}
+							</Badge>
+						</Stack>
+
+						<Stack gap="4" wrap="wrap" align="center">
+							{projectTitleBySlug[task.project] && (
+								<Anchor
+									href={`/projects/${task.project}`}
+									variant="plain"
+									class={css({ textStyle: "sm" })}
+								>
+									{projectTitleBySlug[task.project]}
+								</Anchor>
+							)}
+							{task.assignee && (
+								<Stack gap="2" align="center">
+									<Avatar size="xs" name={task.assignee} />
+									<Text size="sm">{task.assignee}</Text>
+								</Stack>
+							)}
+							{task.dueDate && (
+								<Text size="sm" class={css({ color: "fg.muted" })}>
+									Due {formatDate(task.dueDate)}
+								</Text>
+							)}
+						</Stack>
+
+						{task.excerpt && (
+							<Text size="sm" class={css({ color: "fg.muted" })}>
+								{task.excerpt}
+							</Text>
+						)}
+
+						{task.tags.length > 0 && (
+							<Stack gap="2" wrap="wrap">
+								{task.tags.map((tag) => (
+									<Badge
+										key={tag}
+										variant="subtle"
+										colorPalette="gray"
+										size="sm"
+									>
+										{tag}
+									</Badge>
+								))}
+							</Stack>
+						)}
+					</Stack>
+				) : undefined
+			}
+		/>
 	);
 }
