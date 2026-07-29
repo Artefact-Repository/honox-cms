@@ -97,6 +97,41 @@ Com linhas alternadas sombreadas em zebrado, realce interativo ao passar o curso
 
 ---
 
+## 3. Ações de foco da linha (Row Hover Actions)
+
+Passe `hoverActions` para renderizar controles adicionais (por exemplo, um botão "Ver detalhes") em uma célula de extremidade de largura zero que permanece oculta até que sua linha correspondente seja focada/passada pelo cursor ou um de seus controles receba o foco do teclado. Está posicionada de maneira absolutamente sobre o final da linha, de modo que nunca alarga a tabela — ela pode ocultar visualmente a última ou as últimas colunas quando revelada.
+
+<DemoPreview>
+  <div style={{ width: "100%" }}>
+    <Table
+      variant="surface"
+      columns={[
+        { header: "Name", key: "name" },
+        { header: "Category", key: "category" },
+      ]}
+      rows={[
+        { name: "Laptop", category: "Electronics" },
+        { name: "Coffee Mug", category: "Home & Kitchen" },
+      ]}
+      hoverActions={(row) => <a href={`/products/${row.name}`}>Ver detalhes</a>}
+    />
+  </div>
+</DemoPreview>
+
+`hoverActions` é uma função de renderização (como `column.render`), não um campo serializável do CMS — ela não é exposta no esquema do bloco `table` do Sveltia CMS.
+
+### Hidratação e limitações interativas de `hoverActions`
+
+Ao usar `hoverActions` em uma tabela que é totalmente ou parcialmente interativa (por exemplo, quando os cabeçalhos são ordenáveis via `sortable` ou a tabela se hidrata por meio de um contêiner island pai), existem considerações arquitetônicas importantes em relação ao estado do lado do cliente:
+
+1. **Renderização de marcação estática**: A função `hoverActions` é executada durante a renderização do lado do servidor (SSR). Se a tabela tiver ordenação ativada ou passar por hidratação no cliente, quaisquer ouvintes de eventos interativos (como `onClick` ou componentes island com estado) aninhados diretamente em `hoverActions` podem ser descartados durante a clonagem e hidratação do DOM.
+2. **Padrão de delegação de clique recomendado**: Em vez de incorporar islands de cliente complexas ou hooks de eventos ativos diretamente no callback `hoverActions`:
+   - Renderize acionadores estáticos ou elementos HTML padrão com atributos de dados descritivos (por exemplo, `<button type="button" data-action="delete" data-id={row.id}>Excluir</button>`).
+   - Monte uma única island de controlador com estado fora do componente `Table`.
+   - Ouça eventos globalmente (ou delegue-os no elemento pai) para capturar cliques nesses atributos de dados e acionar caixas de diálogo modais, gavetas (drawers) ou chamadas de API apropriadas.
+
+---
+
 # Props
 
 | Propriedade | Tipo de campo CMS | Padrão | Descrição / opções suportadas |
@@ -108,6 +143,7 @@ Com linhas alternadas sombreadas em zebrado, realce interativo ao passar o curso
 | **Realce de linhas** (`interactive`) | `boolean` | `false` | Ativa animação de fundo ao passar o cursor em células ativas. |
 | **Bordas de coluna** (`columnBorder`) | `boolean` | `false` | Renderiza separadores verticais entre colunas. |
 | **Cabeçalho fixo** (`stickyHeader`) | `boolean` | `false` | Fixa a linha de cabeçalho no topo do viewport durante a rolagem. |
+| **Ações de foco** (`hoverActions`) | Apenas código | - | `(row, rowIndex) => JSX.Element`. Renderiza uma célula de largura zero no final da linha (pode cobrir a última ou as últimas colunas), oculta até que a linha seja passada pelo cursor (ou que um controle receba o foco). Não exposta no CMS. |
 
 ### Propriedades da lista Column (`columns`)
 

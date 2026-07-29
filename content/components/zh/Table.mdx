@@ -97,6 +97,41 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 ---
 
+## 3. 行悬停操作 (Row Hover Actions)
+
+通过传递 `hoverActions`，可以在行尾渲染一个宽度为零的尾随单元格以放置额外的操作控件（如“查看详情”按钮）。该单元格默认隐藏，直到行被悬停或其中的某个控件获得键盘焦点时才会显示。由于它采用绝对定位挂载在行尾，因此绝不会影响列宽布局；在显示时，它可能会视觉上遮挡最右侧的列。
+
+<DemoPreview>
+  <div style={{ width: "100%" }}>
+    <Table
+      variant="surface"
+      columns={[
+        { header: "Name", key: "name" },
+        { header: "Category", key: "category" },
+      ]}
+      rows={[
+        { name: "Laptop", category: "Electronics" },
+        { name: "Coffee Mug", category: "Home & Kitchen" },
+      ]}
+      hoverActions={(row) => <a href={`/products/${row.name}`}>查看详情</a>}
+    />
+  </div>
+</DemoPreview>
+
+`hoverActions` 是一个渲染函数（类似于 `column.render`），而不是一个在 CMS 中可序列化的字段 — 它在 Sveltia CMS 的 `table` 区块配置架构中不予暴露。
+
+### `hoverActions` 的水合及交互限制
+
+当在完全或部分交互式的表格（例如启用了 Spalten `sortable` 表头排序，或表格通过父级 island 包裹器进行客户端水合）上使用 `hoverActions` 时，存在以下关于客户端状态的重要架构设计考虑：
+
+1. **静态标记渲染**：`hoverActions` 函数在服务器端渲染 (SSR) 期间执行。如果表格启用了排序或进行了客户端水合，任何直接嵌套在 `hoverActions` 内部的交互式事件监听器（如 `onClick` 或有状态的 island 组件）在 DOM 克隆和水合过程中都可能会丢失。
+2. **推荐的事件/点击委托模式**：与其在 `hoverActions` 回调中直接嵌入复杂的客户端 island 或动态事件挂钩，推荐采取以下策略：
+   - 渲染带有描述性数据属性（data-attributes）的静态触发器或标准 HTML 元素（例如 `<button type="button" data-action="delete" data-id={row.id}>删除</button>`）。
+   - 在 `Table` 组件外部挂载一个统一的有状态控制器 island。
+   - 在全局（或在父元素上进行事件委托）监听事件，捕获带有相应数据属性的点击，并触发相关的弹窗（modal）、抽屉（drawer）或 API 调用。
+
+---
+
 # Props
 
 | 属性 | CMS 字段类型 | 默认值 | 描述 / 支持的选项 |
@@ -108,6 +143,7 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 | **行高亮** (`interactive`) | `boolean` | `false` | 在桌面端启用跨活动单元格的鼠标悬停背景动画。 |
 | **列边框** (`columnBorder`) | `boolean` | `false` | 在表格列之间渲染垂直分隔边框线。 |
 | **粘性表头** (`stickyHeader`) | `boolean` | `false` | 滚动时将主表头行固定在表格视口顶部。 |
+| **悬停操作** (`hoverActions`) | 仅代码 | - | `(row, rowIndex) => JSX.Element`。在行尾渲染一个零宽度的尾随单元格（可能遮挡最右侧的列），在悬停或控件获焦时显示。CMS 字段不暴露。 |
 
 ### Column 列表属性（`columns`）
 

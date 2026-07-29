@@ -96,6 +96,41 @@ Mit schattierten, alternierenden Zeilen (Zebra), interaktiven Hover-Hervorhebung
 
 ---
 
+## 3. Zeilen-Hover-Aktionen (Row Hover Actions)
+
+Übergebe `hoverActions`, um zusätzliche Steuerelemente (z. B. eine Schaltfläche "Details anzeigen") in einer Zelle mit der Breite Null am Ende der Zeile zu rendern. Diese Zelle bleibt ausgeblendet, bis sich der Mauszeiger über der Zeile befindet oder eines der Steuerelemente den Tastaturfokus erhält. Sie ist absolut über dem Ende der Zeile positioniert, sodass sie die Tabellenbreite nie verändert — im eingeblendeten Zustand kann sie jedoch visuell die letzte(n) Spalte(n) verdecken.
+
+<DemoPreview>
+  <div style={{ width: "100%" }}>
+    <Table
+      variant="surface"
+      columns={[
+        { header: "Name", key: "name" },
+        { header: "Category", key: "category" },
+      ]}
+      rows={[
+        { name: "Laptop", category: "Electronics" },
+        { name: "Coffee Mug", category: "Home & Kitchen" },
+      ]}
+      hoverActions={(row) => <a href={`/products/${row.name}`}>Details anzeigen</a>}
+    />
+  </div>
+</DemoPreview>
+
+`hoverActions` ist eine Render-Funktion (wie `column.render`), kein über das CMS serialisierbares Feld — sie wird im Sveltia CMS-Schema für den `table`-Block nicht bereitgestellt.
+
+### Hydrierung und interaktive Einschränkungen von `hoverActions`
+
+Bei Verwendung von `hoverActions` in einer Tabelle, die vollständig oder teilweise interaktiv ist (z. B. wenn Spaltenköpfe `sortable` sind oder die Tabelle über eine übergeordnete Island-Komponente hydriert wird), gibt es wichtige architektonische Überlegungen bezüglich des clientseitigen Status:
+
+1. **Statisches Markup-Rendering**: Die Funktion `hoverActions` wird während des serverseitigen Renderings (SSR) ausgeführt. Wenn die Sortierung der Tabelle aktiviert ist oder eine clientseitige Hydrierung stattfindet, können interaktive Ereignis-Listener (wie `onClick` oder zustandsbehaftete Island-Komponenten), die direkt in `hoverActions` verschachtelt sind, während des DOM-Klonens und der Hydrierung verloren gehen.
+2. **Empfohlenes Klick-Delegationsmuster**: Anstatt komplexe Client-Islands oder aktive Event-Hooks direkt im `hoverActions`-Callback einzubetten:
+   - Rendere statische Trigger oder Standard-HTML-Elemente mit beschreibenden Datenattributen (z. B. `<button type="button" data-action="delete" data-id={row.id}>Löschen</button>`).
+   - Mounte eine einzelne zustandsbehaftete Controller-Island außerhalb der `Table`-Komponente.
+   - Lausche global (oder delegiere Events am übergeordneten Element), um Klicks auf diese Datenattribute abzufangen und entsprechende Modals, Drawers oder API-Aufrufe auszulösen.
+
+---
+
 # Props
 
 | Eigenschaft | CMS-Feldtyp | Standard | Beschreibung / unterstützte Optionen |
@@ -107,6 +142,7 @@ Mit schattierten, alternierenden Zeilen (Zebra), interaktiven Hover-Hervorhebung
 | **Zeilenhervorhebung** (`interactive`) | `boolean` | `false` | Aktiviert Hover-Hintergrundanimationen auf aktiven Zellen. |
 | **Spaltenränder** (`columnBorder`) | `boolean` | `false` | Rendert vertikale Trennlinien zwischen Spalten. |
 | **Sticky-Header** (`stickyHeader`) | `boolean` | `false` | Heftet die Kopfzeile beim Scrollen oben im Viewport fest. |
+| **Hover-Aktionen** (`hoverActions`) | Nur Code | - | `(row, rowIndex) => JSX.Element`. Rendert in eine Zelle mit der Breite Null am Zeilenende (kann die letzte(n) Spalte(n) verdecken), ausgeblendet, bis die Zeile gehovert wird (oder ein Steuerelement den Fokus erhält). Nicht im CMS verfügbar. |
 
 ### Spalten-Listeneigenschaften (`columns`)
 

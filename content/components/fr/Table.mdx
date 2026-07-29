@@ -97,6 +97,41 @@ Avec des lignes alternées ombrées (zèbre), surbrillance au survol et bordures
 
 ---
 
+## 3. Actions au survol de ligne (Row Hover Actions)
+
+Passez `hoverActions` pour restituer des commandes supplémentaires (par exemple, un bouton "Détails") dans une cellule de fin de largeur nulle qui reste masquée jusqu'à ce que sa ligne soit survolée ou que l'une de ses commandes reçoive le focus du clavier. Elle est positionnée de manière absolue sur la fin de la ligne, de sorte qu'elle n'élargit jamais le tableau — elle peut masquer visuellement la ou les dernières colonnes lorsqu'elle est révélée.
+
+<DemoPreview>
+  <div style={{ width: "100%" }}>
+    <Table
+      variant="surface"
+      columns={[
+        { header: "Name", key: "name" },
+        { header: "Category", key: "category" },
+      ]}
+      rows={[
+        { name: "Laptop", category: "Electronics" },
+        { name: "Coffee Mug", category: "Home & Kitchen" },
+      ]}
+      hoverActions={(row) => <a href={`/products/${row.name}`}>Détails</a>}
+    />
+  </div>
+</DemoPreview>
+
+`hoverActions` est une fonction de rendu (comme `column.render`), pas un champ sérialisable du CMS — elle n'est pas exposée dans le schéma du bloc `table` de Sveltia CMS.
+
+### Hydratation et limitations interactives de `hoverActions`
+
+Lors de l'utilisation de `hoverActions` sur un tableau entièrement ou partiellement interactif (par exemple, lorsque les en-têtes sont triables via `sortable` ou que le tableau s'hydrate via un conteneur island parent), il existe des considérations architecturales importantes concernant l'état côté client :
+
+1. **Rendu du balisage statique** : La fonction `hoverActions` est exécutée lors du rendu côté serveur (SSR). Si le tri du tableau est activé ou fait l'objet d'une hydratation côté client, tous les écouteurs d'événements interactifs (comme `onClick` ou les composants island avec état) imbriqués directement dans `hoverActions` peuvent être ignorés lors du clonage et de l'hydratation du DOM.
+2. **Modèle de délégation de clic recommandé** : Au lieu d'intégrer des islands clientes complexes ou des hooks d'événements actifs directement dans le callback `hoverActions` :
+   - Restituez des déclencheurs statiques ou des éléments HTML standard avec des attributs de données descriptifs (par exemple, `<button type="button" data-action="delete" data-id={row.id}>Supprimer</button>`).
+   - Montez une seule island de contrôleur avec état en dehors du composant `Table`.
+   - Écoutez les événements globalement (ou déléguez-les sur l'élément parent) pour capturer les clics sur ces attributs de données et déclencher les fenêtres modales, les tiroirs (drawers) ou les appels d'API appropriés.
+
+---
+
 # Props
 
 | Propriété | Type de champ CMS | Défaut | Description / options prises en charge |
@@ -108,6 +143,7 @@ Avec des lignes alternées ombrées (zèbre), surbrillance au survol et bordures
 | **Surbrillance de lignes** (`interactive`) | `boolean` | `false` | Active l'animation de fond au survol des cellules actives. |
 | **Bordures de colonne** (`columnBorder`) | `boolean` | `false` | Rend des séparateurs verticaux entre colonnes. |
 | **En-tête fixe** (`stickyHeader`) | `boolean` | `false` | Épingle la ligne d'en-tête en haut du viewport au défilement. |
+| **Actions au survol** (`hoverActions`) | Code uniquement | - | `(row, rowIndex) => JSX.Element`. Restitue une cellule de largeur nulle à la fin de la ligne (peut masquer la ou les dernières colonnes), masquée jusqu'à ce que la ligne soit survolée (ou qu'une commande reçoive le focus). Non exposée dans le CMS. |
 
 ### Propriétés de la liste Column (`columns`)
 

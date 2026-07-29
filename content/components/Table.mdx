@@ -120,6 +120,16 @@ Pass `hoverActions` to render extra controls (e.g. a "View Details" button) into
 
 `hoverActions` is a render function (like `column.render`), not a CMS-serializable field — it isn't exposed in the Sveltia CMS `table` block schema.
 
+### Hydration and Interactive Limitations of `hoverActions`
+
+When using `hoverActions` on a table that is fully or partially interactive (for example, when headers are `sortable` or the table hydrates via a parent island wrapper), there are some important architectural considerations regarding client-side state:
+
+1. **Static Markup Rendering**: The `hoverActions` function is executed during server-side rendering (SSR). If the table has sorting enabled or undergoes client-side hydration, any interactive event listeners (like `onClick` or stateful island components) nested directly inside `hoverActions` may be dropped during DOM cloning and hydration.
+2. **Recommended Click-Delegation Pattern**: Instead of embedding complex client islands or active event hooks directly inside the `hoverActions` callback:
+   - Render static triggers or standard HTML elements with descriptive data attributes (e.g., `<button type="button" data-action="delete" data-id={row.id}>Delete</button>`).
+   - Mount a single stateful controller island outside of the `Table` component.
+   - Listen to events globally (or delegate them on the parent element) to capture clicks on those data attributes and trigger appropriate modals, drawers, or API calls.
+
 ---
 
 # Props
