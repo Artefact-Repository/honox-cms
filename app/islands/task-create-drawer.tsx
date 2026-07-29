@@ -102,6 +102,8 @@ export default function TaskCreateDrawer(props: TaskCreateDrawerProps) {
 				}
 				props.onOpenChange(true);
 			}}
+			closeOnEscape={false}
+			closeOnInteractOutside={false}
 			title="New Task"
 			description="Creates a task file and commits it to main — same as the CMS."
 			footer={

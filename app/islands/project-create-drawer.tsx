@@ -124,6 +124,8 @@ export default function ProjectCreateDrawer(props: ProjectCreateDrawerProps) {
 				}
 				props.onOpenChange(true);
 			}}
+			closeOnEscape={false}
+			closeOnInteractOutside={false}
 			title="New Project"
 			description="Creates a project file and commits it to main — same as the CMS."
 			footer={
