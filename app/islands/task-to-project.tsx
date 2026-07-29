@@ -43,17 +43,22 @@ function firstGeneratedText(output: unknown): string {
 }
 
 /**
- * Cleans up a local-model rewrite answer: the prompts quote the original
- * text back at the model, and on a "rewrite this" instruction it sometimes
- * copies the surrounding quote marks into its answer, or echoes a fragment of
- * the question itself instead of actually rewriting. Falls back to the
- * pre-rewrite text when the output looks broken rather than shipping garbage.
+ * Cleans up a local-model answer: the prompts quote text back at the model,
+ * and it sometimes copies the surrounding quote marks into its answer, echoes
+ * a fragment of the instruction/field label instead of doing the task, or
+ * (being instruction-tuned on GPT-generated data) produces a canned refusal
+ * or meta-commentary about the task rather than performing it. Falls back to
+ * the given fallback text when the output looks broken rather than shipping
+ * garbage.
  */
-function cleanRewrite(text: string, fallback: string): string {
+function cleanGenerated(text: string, fallback: string): string {
 	const cleaned = text.replace(/^["'\s]+|["'\s]+$/g, "");
 	const looksBroken =
 		cleaned.length < 2 ||
-		/^(rewrite|question|answer)\b/i.test(cleaned) ||
+		/^(rewrite|title|summary|description|question|answer)\b\s*:?/i.test(
+			cleaned,
+		) ||
+		/\bas an ai\b|\bai language model\b|^i'?m sorry\b/i.test(cleaned) ||
 		cleaned.includes("Question:") ||
 		cleaned.includes("Answer:");
 	return looksBroken ? fallback : cleaned;
@@ -90,29 +95,38 @@ async function draftWithLocalModel(props: TaskToProjectProps): Promise<Draft> {
 	// safe to invoke concurrently on the same instance (huggingface/transformers.js#1026);
 	// parallel calls intermittently throw or corrupt output, especially on a
 	// pipeline instance that's already been used once (see enhanceWithLocalModel).
+	//
+	// Plain instructions, not a "Question:/Answer:" scaffold — LaMini-Flan-T5 was
+	// instruction-tuned on direct directives (see its model card), and the Q&A
+	// framing is out-of-distribution for it: it was producing canned refusals
+	// ("as an AI language model...") and meta-commentary about the field instead
+	// of actually generating one.
 	const titleOut = await generate(
-		`Task: "${props.title}"\nQuestion: What short project name (3-6 words) could this task belong to?\nAnswer:`,
+		`Suggest a short, professional project name (3-6 words) for a project that includes this task.\nTask: "${props.title}"`,
 		{ ...generationOptions, max_new_tokens: 12 },
 	);
 	const summaryOut = await generate(
-		`Task: "${props.title}". Notes: "${props.excerpt}"\nQuestion: In one sentence, what is the broader project goal this task supports?\nAnswer:`,
+		`Write one clear sentence describing the broader project that this task is part of.\nTask: "${props.title}"\nNotes: "${props.excerpt}"`,
 		{ ...generationOptions, max_new_tokens: 30 },
 	);
 	const descriptionOut = await generate(
-		`Task: "${props.title}". Notes: "${props.excerpt}"\nQuestion: Write two sentences describing the broader project this task is part of.\nAnswer:`,
+		`Write two or three sentences describing the broader project that this task is part of.\nTask: "${props.title}"\nNotes: "${props.excerpt}"`,
 		{ ...generationOptions, max_new_tokens: 80 },
 	);
 
-	const generatedTitle = firstGeneratedText(titleOut);
+	const generatedTitle = cleanGenerated(firstGeneratedText(titleOut), "");
 
 	return {
-		// The local model occasionally collapses to a near-empty answer (e.g. "a
-		// project") on this prompt — falling back to the task's own title keeps
-		// the field usable instead of shipping filler.
+		// The local model occasionally collapses to a near-empty or broken answer
+		// on this prompt — falling back to the task's own title keeps the field
+		// usable instead of shipping filler or a refusal.
 		title:
 			generatedTitle.split(/\s+/).length >= 3 ? generatedTitle : props.title,
-		summary: firstGeneratedText(summaryOut) || props.title,
-		description: firstGeneratedText(descriptionOut) || props.excerpt,
+		summary: cleanGenerated(firstGeneratedText(summaryOut), props.title),
+		description: cleanGenerated(
+			firstGeneratedText(descriptionOut),
+			props.excerpt,
+		),
 	};
 }
 
@@ -126,34 +140,31 @@ async function draftWithLocalModel(props: TaskToProjectProps): Promise<Draft> {
 async function enhanceWithLocalModel(draft: Draft): Promise<Draft> {
 	const generate = await getGenerator();
 
-	// Sequential for the same reason as draftWithLocalModel above. Framed as
-	// data-then-"Question:"/"Answer:", matching draftWithLocalModel's prompts
-	// above rather than a "Rewrite: ... Rewritten:" instruction — LaMini-Flan-T5
-	// was instruction-tuned heavily on rewrite/paraphrase examples in that Q&A
-	// shape and is much less prone to echoing the prompt or producing
-	// off-topic text with it.
+	// Sequential for the same reason as draftWithLocalModel above. Plain
+	// instructions rather than a "Question:/Answer:" scaffold, matching
+	// draftWithLocalModel's prompts above — see the comment there for why.
 	const titleOut = await generate(
-		`Project title: "${draft.title}"\nQuestion: Rewrite this title so it is clear and professional, in 3-6 words. Do not add new information.\nAnswer:`,
+		`Rewrite this project title so it is clear and professional, in 3-6 words. Do not add new information.\nTitle: "${draft.title}"`,
 		{ ...generationOptions, max_new_tokens: 12 },
 	);
 	const summaryOut = await generate(
-		`Project summary: "${draft.summary}"\nQuestion: Rewrite this summary as one clear, well-structured sentence, keeping the same meaning.\nAnswer:`,
+		`Rewrite this project summary as one clear, well-structured sentence, keeping the same meaning.\nSummary: "${draft.summary}"`,
 		{ ...generationOptions, max_new_tokens: 30 },
 	);
 	const descriptionOut = await generate(
-		`Project description: "${draft.description}"\nQuestion: Rewrite this description so it is clearer and better organized, in two or three sentences. Keep the same meaning.\nAnswer:`,
+		`Rewrite this project description so it is clearer and better organized, in two or three sentences. Keep the same meaning.\nDescription: "${draft.description}"`,
 		{ ...generationOptions, max_new_tokens: 80 },
 	);
 
-	const rewrittenTitle = cleanRewrite(
+	const rewrittenTitle = cleanGenerated(
 		firstGeneratedText(titleOut),
 		draft.title,
 	);
-	const rewrittenSummary = cleanRewrite(
+	const rewrittenSummary = cleanGenerated(
 		firstGeneratedText(summaryOut),
 		draft.summary,
 	);
-	const rewrittenDescription = cleanRewrite(
+	const rewrittenDescription = cleanGenerated(
 		firstGeneratedText(descriptionOut),
 		draft.description,
 	);
