@@ -13,13 +13,16 @@ import {
 } from "../../components/ui";
 import { colorPaletteClass } from "../../components/ui/color-palette";
 import { Toaster } from "../../components/ui/toast";
+import { ChevronUpIcon } from "../../icons/chevron-up";
 import PmsCreateMenu from "../../islands/pms-create-menu";
 import TaskCloneAction from "../../islands/task-clone-action";
 import TaskDeleteConfirm from "../../islands/task-delete-confirm";
 import TaskDetailsDrawer from "../../islands/task-details-drawer";
+import TaskTreeToggle from "../../islands/task-tree-toggle";
 import { listProjects, type Project } from "../../lib/projects";
 import {
 	buildTaskSearchEntries,
+	buildTaskTree,
 	listTasks,
 	TASK_PRIORITIES,
 	TASK_PRIORITY_COLOR,
@@ -28,6 +31,29 @@ import {
 	type Task,
 } from "../../lib/tasks";
 import { filterEntries } from "../../utils/search";
+
+const treeRowClass = css({
+	'&[data-tree-hidden="true"]': { display: "none" },
+});
+
+const treeToggleClass = css({
+	all: "unset",
+	display: "inline-flex",
+	alignItems: "center",
+	justifyContent: "center",
+	width: "5",
+	height: "5",
+	flexShrink: "0",
+	cursor: "pointer",
+	color: "fg.muted",
+	"& [data-part=chevron]": {
+		transition: "transform 0.15s",
+		transform: "rotate(180deg)",
+	},
+	'&[data-expanded="false"] [data-part=chevron]': {
+		transform: "rotate(90deg)",
+	},
+});
 
 function formatDate(value?: string) {
 	if (!value) return undefined;
@@ -54,7 +80,11 @@ export default createRoute(async (c) => {
 		label: task.title,
 		value: task.slug,
 	}));
-	const taskTitleBySlug = new Map(tasks.map((task) => [task.slug, task.title]));
+	// Groups subtasks directly under their parent (indented, collapsible via
+	// TaskTreeToggle) instead of the flat due-date order `tasks` is already
+	// sorted in — `taskTree[rowIndex]` below lines up with `rows={...}`
+	// since both are derived from this same array.
+	const taskTree = buildTaskTree(tasks);
 	const assignees = Array.from(
 		new Set(tasks.map((task) => task.assignee).filter(Boolean) as string[]),
 	).sort();
@@ -346,11 +376,18 @@ export default createRoute(async (c) => {
 							</Text>
 						</div>
 						<Table
-							getRowProps={(task: Task) => ({
-								id: `task-${task.slug}`,
-								"data-task-slug": task.slug,
-								hidden: !matchedSlugs.has(task.slug),
-							})}
+							getRowProps={(task: Task, rowIndex: number) => {
+								const entry = taskTree[rowIndex];
+								return {
+									id: `task-${task.slug}`,
+									"data-task-slug": task.slug,
+									...(entry && entry.depth > 0
+										? { "data-parent-slug": task.parentTask }
+										: {}),
+									hidden: !matchedSlugs.has(task.slug),
+									class: treeRowClass,
+								};
+							}}
 							variant="surface"
 							striped
 							columns={[
@@ -358,38 +395,68 @@ export default createRoute(async (c) => {
 									header: "Task",
 									key: "title",
 									class: css({ maxWidth: "xs" }),
-									render: (task: Task) => (
-										<div class={css({ overflow: "hidden" })}>
-											<Anchor
-												href={`/tasks/${task.slug}`}
-												variant="plain"
-												data-task-details-trigger
-												data-task-slug={task.slug}
+									render: (task: Task, rowIndex: number) => {
+										const entry = taskTree[rowIndex];
+										const depth = entry?.depth ?? 0;
+										const hasChildren = entry?.hasChildren ?? false;
+										return (
+											<div
+												style={{ paddingLeft: `${depth * 20}px` }}
 												class={css({
-													display: "block",
+													display: "flex",
+													alignItems: "center",
+													gap: "1",
 													overflow: "hidden",
-													textOverflow: "ellipsis",
-													whiteSpace: "nowrap",
 												})}
 											>
-												{task.title}
-											</Anchor>
-											{task.parentTask &&
-												taskTitleBySlug.get(task.parentTask) && (
-													<Text
-														size="xs"
-														class={css({
-															color: "fg.muted",
-															overflow: "hidden",
-															textOverflow: "ellipsis",
-															whiteSpace: "nowrap",
-														})}
+												{hasChildren ? (
+													<button
+														type="button"
+														data-subtask-toggle
+														data-task-slug={task.slug}
+														data-expanded="true"
+														aria-expanded="true"
+														aria-label={`Toggle subtasks of "${task.title}"`}
+														class={treeToggleClass}
 													>
-														↳ {taskTitleBySlug.get(task.parentTask)}
-													</Text>
+														<ChevronUpIcon
+															width="12"
+															height="12"
+															data-part="chevron"
+														/>
+													</button>
+												) : (
+													depth > 0 && (
+														<span
+															aria-hidden="true"
+															class={css({
+																width: "5",
+																flexShrink: "0",
+																color: "fg.muted",
+																fontSize: "sm",
+															})}
+														>
+															↳
+														</span>
+													)
 												)}
-										</div>
-									),
+												<Anchor
+													href={`/tasks/${task.slug}`}
+													variant="plain"
+													data-task-details-trigger
+													data-task-slug={task.slug}
+													class={css({
+														display: "block",
+														overflow: "hidden",
+														textOverflow: "ellipsis",
+														whiteSpace: "nowrap",
+													})}
+												>
+													{task.title}
+												</Anchor>
+											</div>
+										);
+									},
 								},
 								{
 									header: "Project",
@@ -485,7 +552,7 @@ export default createRoute(async (c) => {
 									),
 								},
 							]}
-							rows={tasks}
+							rows={taskTree.map((entry) => entry.task)}
 							hoverActions={(task: Task) => (
 								<>
 									<button
@@ -522,6 +589,7 @@ export default createRoute(async (c) => {
 						/>
 						<TaskDeleteConfirm tasks={tasks} />
 						<TaskCloneAction tasks={tasks} />
+						<TaskTreeToggle />
 					</>
 				)}
 			</div>

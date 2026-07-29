@@ -132,6 +132,61 @@ export function subtasksOf(tasks: Task[], parentSlug: string): Task[] {
 	return tasks.filter((task) => task.parentTask === parentSlug);
 }
 
+export interface TaskTreeEntry {
+	task: Task;
+	depth: number;
+	hasChildren: boolean;
+}
+
+/** Reorders `tasks` so each task is immediately followed by its subtasks
+ * (recursively), for table/board views that want to render subtasks nested
+ * under their parent instead of flat — sibling order (e.g. `listTasks`'
+ * due-date sort) is preserved within each group. A task whose `parentTask`
+ * doesn't resolve to another task in this same list — filtered out of a
+ * scoped view, or simply not passed in — is treated as top-level, so
+ * filtered views degrade to showing it flat rather than dropping it. Also
+ * tolerates a `parentTask` cycle (only possible via hand-edited frontmatter,
+ * since the UI never offers a task's own descendant as its parent): every
+ * task in the loop renders top-level instead of vanishing from the tree. */
+export function buildTaskTree(tasks: Task[]): TaskTreeEntry[] {
+	const bySlug = new Map(tasks.map((task) => [task.slug, task]));
+
+	const isTopLevel = (task: Task): boolean => {
+		if (!task.parentTask) return true;
+		const seen = new Set<string>([task.slug]);
+		let current = task;
+		while (current.parentTask) {
+			const parent = bySlug.get(current.parentTask);
+			if (!parent || seen.has(parent.slug)) return true;
+			seen.add(parent.slug);
+			current = parent;
+		}
+		return false;
+	};
+
+	const childrenBySlug = new Map<string, Task[]>();
+	const topLevel: Task[] = [];
+	for (const task of tasks) {
+		if (isTopLevel(task)) {
+			topLevel.push(task);
+			continue;
+		}
+		const parentSlug = task.parentTask as string;
+		const siblings = childrenBySlug.get(parentSlug) ?? [];
+		siblings.push(task);
+		childrenBySlug.set(parentSlug, siblings);
+	}
+
+	const entries: TaskTreeEntry[] = [];
+	const visit = (task: Task, depth: number) => {
+		const children = childrenBySlug.get(task.slug) ?? [];
+		entries.push({ task, depth, hasChildren: children.length > 0 });
+		for (const child of children) visit(child, depth + 1);
+	};
+	for (const task of topLevel) visit(task, 0);
+	return entries;
+}
+
 export async function loadTaskBySlug(
 	slug: string,
 ): Promise<TaskDetail | undefined> {

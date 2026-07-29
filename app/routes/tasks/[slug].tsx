@@ -53,9 +53,10 @@ export default createRoute(
 			label: p.title,
 			value: p.slug,
 		}));
-		const taskItems = allTasks
-			.filter((t) => t.slug !== task.slug)
-			.map((t) => ({ label: t.title, value: t.slug }));
+		// Includes the current task itself — it's the default/selected value for
+		// the "+ Add subtask" flow's parent-task field (a brand-new task can't
+		// actually create a cycle by picking any existing task as its parent).
+		const taskItems = allTasks.map((t) => ({ label: t.title, value: t.slug }));
 		const parentTask = task.parentTask
 			? allTasks.find((t) => t.slug === task.parentTask)
 			: undefined;
