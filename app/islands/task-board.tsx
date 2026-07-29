@@ -1,6 +1,5 @@
-import { css, cx } from "design-system/css";
-import { button } from "design-system/recipes";
-import { useEffect, useState } from "hono/jsx";
+import { css } from "design-system/css";
+import { useState } from "hono/jsx";
 import { Anchor } from "../components/ui/anchor";
 import { Avatar } from "../components/ui/avatar";
 import { Badge } from "../components/ui/badge";
@@ -15,14 +14,9 @@ import {
 	type Task,
 	type TaskStatus,
 } from "../lib/tasks";
-import {
-	clearStoredToken,
-	fetchFile,
-	resolveToken,
-	setStoredToken,
-	updateFile,
-} from "../utils/git-backend";
+import { fetchFile, updateFile } from "../utils/git-backend";
 import { parseFrontmatter, stringifyFrontmatter } from "../utils/markdown";
+import GitTokenBanner, { useGitToken } from "./git-token-banner";
 
 function formatDate(value?: string) {
 	if (!value) return undefined;
@@ -39,38 +33,10 @@ export interface TaskBoardProps {
 
 export default function TaskBoard({ tasks: initialTasks }: TaskBoardProps) {
 	const [tasks, setTasks] = useState<Task[]>(initialTasks);
-	const [token, setToken] = useState<string | null>(null);
-	const [tokenSource, setTokenSource] = useState<"sveltia" | "manual" | null>(
-		null,
-	);
-	const [tokenInput, setTokenInput] = useState("");
+	const { token, tokenSource, connect, disconnect } = useGitToken();
 	const [draggingSlug, setDraggingSlug] = useState<string | null>(null);
 	const [savingSlug, setSavingSlug] = useState<string | null>(null);
 	const [dragOverStatus, setDragOverStatus] = useState<TaskStatus | null>(null);
-
-	// localStorage only exists client-side, so the connect state can't be
-	// known during SSR — read it once after hydration.
-	useEffect(() => {
-		const resolved = resolveToken();
-		setToken(resolved.token);
-		setTokenSource(resolved.source);
-	}, []);
-
-	const handleConnect = (event: Event) => {
-		event.preventDefault();
-		if (!tokenInput.trim()) return;
-		setStoredToken(tokenInput.trim());
-		setToken(tokenInput.trim());
-		setTokenSource("manual");
-		setTokenInput("");
-		toaster.success("Connected — drag a card to move it.");
-	};
-
-	const handleDisconnect = () => {
-		clearStoredToken();
-		setToken(null);
-		setTokenSource(null);
-	};
 
 	const handleDrop = async (newStatus: TaskStatus) => {
 		const slug = draggingSlug;
@@ -120,77 +86,18 @@ export default function TaskBoard({ tasks: initialTasks }: TaskBoardProps) {
 
 	return (
 		<div>
-			{token ? (
-				<Stack
-					align="center"
-					gap="2"
-					class={css({ mb: "4", color: "fg.muted" })}
-				>
-					<Text size="xs">
-						{tokenSource === "sveltia"
-							? "Using your CMS login — drag a card to move it."
-							: "Connected — drag a card to move it."}
-					</Text>
-					{tokenSource === "manual" && (
-						<button
-							type="button"
-							onClick={handleDisconnect}
-							class={css({
-								all: "unset",
-								cursor: "pointer",
-								fontSize: "xs",
-								textDecoration: "underline",
-							})}
-						>
-							Disconnect
-						</button>
-					)}
-				</Stack>
-			) : (
-				<form
-					onSubmit={handleConnect}
-					class={css({
-						display: "flex",
-						flexWrap: "wrap",
-						alignItems: "center",
-						gap: "2",
-						mb: "4",
-						p: "3",
-						borderWidth: "1px",
-						borderColor: "border",
-						borderRadius: "md",
-						bg: "gray.subtle.bg",
-					})}
-				>
-					<Text size="sm" class={css({ color: "fg.muted" })}>
-						Connect a personal access token (repo contents read/write access) to
-						drag tasks between columns:
-					</Text>
-					<input
-						type="password"
-						value={tokenInput}
-						placeholder="Personal access token"
-						onInput={(e: Event) =>
-							setTokenInput((e.target as HTMLInputElement).value)
-						}
-						class={css({
-							borderWidth: "1px",
-							borderColor: "border",
-							borderRadius: "sm",
-							px: "2",
-							py: "1",
-							fontSize: "sm",
-							minWidth: "200px",
-						})}
-					/>
-					<button
-						type="submit"
-						class={cx(button({ variant: "outline", size: "sm" }))}
-					>
-						Connect
-					</button>
-				</form>
-			)}
+			<GitTokenBanner
+				token={token}
+				tokenSource={tokenSource}
+				onConnect={(value) => {
+					if (connect(value)) {
+						toaster.success("Connected — drag a card to move it.");
+					}
+				}}
+				onDisconnect={disconnect}
+				connectedHint="drag a card to move it."
+				promptSuffix=" to drag tasks between columns:"
+			/>
 
 			<div
 				class={css({

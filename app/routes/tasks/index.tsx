@@ -18,6 +18,7 @@ import PmsCreateMenu from "../../islands/pms-create-menu";
 import TaskCloneAction from "../../islands/task-clone-action";
 import TaskDeleteConfirm from "../../islands/task-delete-confirm";
 import TaskDetailsDrawer from "../../islands/task-details-drawer";
+import TaskTreeDnd from "../../islands/task-tree-dnd";
 import TaskTreeToggle from "../../islands/task-tree-toggle";
 import { listProjects, type Project } from "../../lib/projects";
 import {
@@ -53,6 +54,14 @@ const treeToggleClass = css({
 	'&[data-expanded="false"] [data-part=chevron]': {
 		transform: "rotate(90deg)",
 	},
+});
+
+const dragHandleClass = css({
+	flexShrink: "0",
+	color: "fg.subtle",
+	fontSize: "sm",
+	lineHeight: "1",
+	cursor: "grab",
 });
 
 function formatDate(value?: string) {
@@ -375,214 +384,224 @@ export default createRoute(async (c) => {
 								No tasks match your search.
 							</Text>
 						</div>
-						<Table
-							getRowProps={(task: Task, rowIndex: number) => {
-								const entry = taskTree[rowIndex];
-								return {
-									id: `task-${task.slug}`,
-									"data-task-slug": task.slug,
-									...(entry && entry.depth > 0
-										? { "data-parent-slug": task.parentTask }
-										: {}),
-									hidden: !matchedSlugs.has(task.slug),
-									class: treeRowClass,
-								};
-							}}
-							variant="surface"
-							striped
-							columns={[
-								{
-									header: "Task",
-									key: "title",
-									class: css({ maxWidth: "xs" }),
-									render: (task: Task, rowIndex: number) => {
-										const entry = taskTree[rowIndex];
-										const depth = entry?.depth ?? 0;
-										const hasChildren = entry?.hasChildren ?? false;
-										return (
-											<div
-												style={{ paddingLeft: `${depth * 20}px` }}
-												class={css({
-													display: "flex",
-													alignItems: "center",
-													gap: "1",
-													overflow: "hidden",
-												})}
-											>
-												{hasChildren ? (
-													<button
-														type="button"
-														data-subtask-toggle
-														data-task-slug={task.slug}
-														data-expanded="true"
-														aria-expanded="true"
-														aria-label={`Toggle subtasks of "${task.title}"`}
-														class={treeToggleClass}
-													>
-														<ChevronUpIcon
-															width="12"
-															height="12"
-															data-part="chevron"
-														/>
-													</button>
-												) : (
-													depth > 0 && (
-														<span
-															aria-hidden="true"
-															class={css({
-																width: "5",
-																flexShrink: "0",
-																color: "fg.muted",
-																fontSize: "sm",
-															})}
-														>
-															↳
-														</span>
-													)
-												)}
-												<Anchor
-													href={`/tasks/${task.slug}`}
-													variant="plain"
-													data-task-details-trigger
-													data-task-slug={task.slug}
+						<TaskTreeDnd>
+							<Table
+								getRowProps={(task: Task, rowIndex: number) => {
+									const entry = taskTree[rowIndex];
+									return {
+										id: `task-${task.slug}`,
+										"data-task-slug": task.slug,
+										"data-task-title": task.title,
+										"data-order-key": entry?.orderKey ?? 0,
+										"data-depth": entry?.depth ?? 0,
+										...(entry && entry.depth > 0
+											? { "data-parent-slug": task.parentTask }
+											: {}),
+										draggable: true,
+										hidden: !matchedSlugs.has(task.slug),
+										class: treeRowClass,
+									};
+								}}
+								variant="surface"
+								striped
+								columns={[
+									{
+										header: "Task",
+										key: "title",
+										class: css({ maxWidth: "xs" }),
+										render: (task: Task, rowIndex: number) => {
+											const entry = taskTree[rowIndex];
+											const depth = entry?.depth ?? 0;
+											const hasChildren = entry?.hasChildren ?? false;
+											return (
+												<div
+													style={{ paddingLeft: `${depth * 20}px` }}
 													class={css({
-														display: "block",
+														display: "flex",
+														alignItems: "center",
+														gap: "1",
 														overflow: "hidden",
-														textOverflow: "ellipsis",
-														whiteSpace: "nowrap",
 													})}
 												>
-													{task.title}
+													<span aria-hidden="true" class={dragHandleClass}>
+														⠿
+													</span>
+													{hasChildren ? (
+														<button
+															type="button"
+															data-subtask-toggle
+															data-task-slug={task.slug}
+															data-expanded="true"
+															aria-expanded="true"
+															aria-label={`Toggle subtasks of "${task.title}"`}
+															class={treeToggleClass}
+														>
+															<ChevronUpIcon
+																width="12"
+																height="12"
+																data-part="chevron"
+															/>
+														</button>
+													) : (
+														depth > 0 && (
+															<span
+																aria-hidden="true"
+																class={css({
+																	width: "5",
+																	flexShrink: "0",
+																	color: "fg.muted",
+																	fontSize: "sm",
+																})}
+															>
+																↳
+															</span>
+														)
+													)}
+													<Anchor
+														href={`/tasks/${task.slug}`}
+														variant="plain"
+														data-task-details-trigger
+														data-task-slug={task.slug}
+														class={css({
+															display: "block",
+															overflow: "hidden",
+															textOverflow: "ellipsis",
+															whiteSpace: "nowrap",
+														})}
+													>
+														{task.title}
+													</Anchor>
+												</div>
+											);
+										},
+									},
+									{
+										header: "Project",
+										key: "project",
+										render: (task: Task) => {
+											const project = projectBySlug.get(task.project);
+											return project ? (
+												<Anchor
+													href={`/projects/${project.slug}`}
+													variant="plain"
+												>
+													{project.title}
 												</Anchor>
-											</div>
-										);
+											) : (
+												<Text size="sm" class={css({ color: "fg.muted" })}>
+													—
+												</Text>
+											);
+										},
 									},
-								},
-								{
-									header: "Project",
-									key: "project",
-									render: (task: Task) => {
-										const project = projectBySlug.get(task.project);
-										return project ? (
+									{
+										header: "Status",
+										key: "status",
+										sortable: true,
+										sortValue: (task: Task) =>
+											TASK_STATUSES.indexOf(task.status),
+										render: (task: Task) => (
 											<Anchor
-												href={`/projects/${project.slug}`}
-												variant="plain"
-											>
-												{project.title}
-											</Anchor>
-										) : (
-											<Text size="sm" class={css({ color: "fg.muted" })}>
-												—
-											</Text>
-										);
-									},
-								},
-								{
-									header: "Status",
-									key: "status",
-									sortable: true,
-									sortValue: (task: Task) => TASK_STATUSES.indexOf(task.status),
-									render: (task: Task) => (
-										<Anchor
-											href={`/tasks/by-status/${encodeURIComponent(task.status)}`}
-											variant="plain"
-											class={css({ textDecoration: "none" })}
-										>
-											<Badge
-												variant="subtle"
-												size="sm"
-												colorPalette={TASK_STATUS_COLOR[task.status]}
-											>
-												{task.status}
-											</Badge>
-										</Anchor>
-									),
-								},
-								{
-									header: "Priority",
-									key: "priority",
-									sortable: true,
-									sortValue: (task: Task) =>
-										TASK_PRIORITIES.indexOf(task.priority),
-									render: (task: Task) => (
-										<Anchor
-											href={`/tasks/by-priority/${task.priority}`}
-											variant="plain"
-											class={css({ textDecoration: "none" })}
-										>
-											<Badge
-												variant="subtle"
-												size="sm"
-												colorPalette={TASK_PRIORITY_COLOR[task.priority]}
-											>
-												{task.priority}
-											</Badge>
-										</Anchor>
-									),
-								},
-								{
-									header: "Assignee",
-									key: "assignee",
-									render: (task: Task) =>
-										task.assignee ? (
-											<Anchor
-												href={`/tasks/by-assignee/${encodeURIComponent(task.assignee)}`}
+												href={`/tasks/by-status/${encodeURIComponent(task.status)}`}
 												variant="plain"
 												class={css({ textDecoration: "none" })}
 											>
-												<Stack gap="2" align="center">
-													<Avatar size="xs" name={task.assignee} />
-													<Text size="sm">{task.assignee}</Text>
-												</Stack>
+												<Badge
+													variant="subtle"
+													size="sm"
+													colorPalette={TASK_STATUS_COLOR[task.status]}
+												>
+													{task.status}
+												</Badge>
 											</Anchor>
-										) : (
+										),
+									},
+									{
+										header: "Priority",
+										key: "priority",
+										sortable: true,
+										sortValue: (task: Task) =>
+											TASK_PRIORITIES.indexOf(task.priority),
+										render: (task: Task) => (
+											<Anchor
+												href={`/tasks/by-priority/${task.priority}`}
+												variant="plain"
+												class={css({ textDecoration: "none" })}
+											>
+												<Badge
+													variant="subtle"
+													size="sm"
+													colorPalette={TASK_PRIORITY_COLOR[task.priority]}
+												>
+													{task.priority}
+												</Badge>
+											</Anchor>
+										),
+									},
+									{
+										header: "Assignee",
+										key: "assignee",
+										render: (task: Task) =>
+											task.assignee ? (
+												<Anchor
+													href={`/tasks/by-assignee/${encodeURIComponent(task.assignee)}`}
+													variant="plain"
+													class={css({ textDecoration: "none" })}
+												>
+													<Stack gap="2" align="center">
+														<Avatar size="xs" name={task.assignee} />
+														<Text size="sm">{task.assignee}</Text>
+													</Stack>
+												</Anchor>
+											) : (
+												<Text size="sm" class={css({ color: "fg.muted" })}>
+													—
+												</Text>
+											),
+									},
+									{
+										header: "Due",
+										key: "dueDate",
+										sortable: true,
+										render: (task: Task) => (
 											<Text size="sm" class={css({ color: "fg.muted" })}>
-												—
+												{formatDate(task.dueDate) ?? "—"}
 											</Text>
 										),
-								},
-								{
-									header: "Due",
-									key: "dueDate",
-									sortable: true,
-									render: (task: Task) => (
-										<Text size="sm" class={css({ color: "fg.muted" })}>
-											{formatDate(task.dueDate) ?? "—"}
-										</Text>
-									),
-								},
-							]}
-							rows={taskTree.map((entry) => entry.task)}
-							hoverActions={(task: Task) => (
-								<>
-									<button
-										type="button"
-										data-task-clone-trigger
-										data-task-slug={task.slug}
-										aria-label={`Clone "${task.title}"`}
-										class={cx(
-											button({ variant: "outline", size: "sm" }),
-											css({ textStyle: "sm", fontWeight: "medium" }),
-										)}
-									>
-										Clone
-									</button>
-									<button
-										type="button"
-										data-task-delete-trigger
-										data-task-slug={task.slug}
-										aria-label={`Delete "${task.title}"`}
-										class={cx(
-											button({ variant: "outline", size: "sm" }),
-											colorPaletteClass("red"),
-											css({ textStyle: "sm", fontWeight: "medium" }),
-										)}
-									>
-										Delete
-									</button>
-								</>
-							)}
-						/>
+									},
+								]}
+								rows={taskTree.map((entry) => entry.task)}
+								hoverActions={(task: Task) => (
+									<>
+										<button
+											type="button"
+											data-task-clone-trigger
+											data-task-slug={task.slug}
+											aria-label={`Clone "${task.title}"`}
+											class={cx(
+												button({ variant: "outline", size: "sm" }),
+												css({ textStyle: "sm", fontWeight: "medium" }),
+											)}
+										>
+											Clone
+										</button>
+										<button
+											type="button"
+											data-task-delete-trigger
+											data-task-slug={task.slug}
+											aria-label={`Delete "${task.title}"`}
+											class={cx(
+												button({ variant: "outline", size: "sm" }),
+												colorPaletteClass("red"),
+												css({ textStyle: "sm", fontWeight: "medium" }),
+											)}
+										>
+											Delete
+										</button>
+									</>
+								)}
+							/>
+						</TaskTreeDnd>
 						<TaskDetailsDrawer
 							tasks={tasks}
 							projectTitleBySlug={Object.fromEntries(projectTitleBySlug)}

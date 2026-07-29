@@ -58,6 +58,11 @@ export interface Task {
 	project: string;
 	/** Slug of another task in this same collection, if this is a subtask. */
 	parentTask?: string;
+	/** Manual position among sibling tasks (same `parentTask`, or same
+	 * top-level bucket) — set by dragging a row in the tasks table
+	 * (see `task-tree-dnd.tsx`). Unset by default; siblings without one fall
+	 * back to their natural due-date order (see `buildTaskTree`). */
+	order?: number;
 	status: TaskStatus;
 	priority: TaskPriority;
 	assignee?: string;
@@ -90,6 +95,7 @@ function buildTask(
 		title: (data.title as string) || slug,
 		project: (data.project as string) ?? "",
 		parentTask: (data.parentTask as string) || undefined,
+		order: typeof data.order === "number" ? data.order : undefined,
 		status: (data.status as TaskStatus) ?? "To Do",
 		priority: (data.priority as TaskPriority) ?? "Medium",
 		assignee: data.assignee as string | undefined,
@@ -136,18 +142,41 @@ export interface TaskTreeEntry {
 	task: Task;
 	depth: number;
 	hasChildren: boolean;
+	/** This task's resolved position among its siblings — `task.order` if
+	 * set, otherwise an implied value spaced by `TASK_ORDER_GAP` off its
+	 * due-date-sorted position. Exposed (as `data-order-key` in the table) so
+	 * `task-tree-dnd.tsx` can compute a midpoint between two siblings' keys
+	 * for a dropped task without needing every sibling to have an explicit
+	 * `order` already. */
+	orderKey: number;
+}
+
+/** Spacing between implied sibling order keys — wide enough that a dragged
+ * task can be dropped between any two siblings (real or implied) by taking
+ * their midpoint, indefinitely, without ever needing to renumber the rest of
+ * the group (each drop is one task's own file, one git commit). */
+export const TASK_ORDER_GAP = 1000;
+
+function sortSiblings(tasks: Task[]): Array<{ task: Task; orderKey: number }> {
+	return tasks
+		.map((task, index) => ({
+			task,
+			orderKey: task.order ?? index * TASK_ORDER_GAP,
+		}))
+		.sort((a, b) => a.orderKey - b.orderKey);
 }
 
 /** Reorders `tasks` so each task is immediately followed by its subtasks
  * (recursively), for table/board views that want to render subtasks nested
- * under their parent instead of flat — sibling order (e.g. `listTasks`'
- * due-date sort) is preserved within each group. A task whose `parentTask`
- * doesn't resolve to another task in this same list — filtered out of a
- * scoped view, or simply not passed in — is treated as top-level, so
- * filtered views degrade to showing it flat rather than dropping it. Also
- * tolerates a `parentTask` cycle (only possible via hand-edited frontmatter,
- * since the UI never offers a task's own descendant as its parent): every
- * task in the loop renders top-level instead of vanishing from the tree. */
+ * under their parent instead of flat — within each sibling group, tasks with
+ * an explicit `order` are positioned by it; the rest keep their relative
+ * due-date order (see `sortSiblings`). A task whose `parentTask` doesn't
+ * resolve to another task in this same list — filtered out of a scoped
+ * view, or simply not passed in — is treated as top-level, so filtered views
+ * degrade to showing it flat rather than dropping it. Also tolerates a
+ * `parentTask` cycle (only possible via hand-edited frontmatter, since the
+ * UI never offers a task's own descendant as its parent): every task in the
+ * loop renders top-level instead of vanishing from the tree. */
 export function buildTaskTree(tasks: Task[]): TaskTreeEntry[] {
 	const bySlug = new Map(tasks.map((task) => [task.slug, task]));
 
@@ -177,13 +206,21 @@ export function buildTaskTree(tasks: Task[]): TaskTreeEntry[] {
 		childrenBySlug.set(parentSlug, siblings);
 	}
 
+	const sortedChildrenBySlug = new Map<
+		string,
+		Array<{ task: Task; orderKey: number }>
+	>();
+	for (const [slug, children] of childrenBySlug) {
+		sortedChildrenBySlug.set(slug, sortSiblings(children));
+	}
+
 	const entries: TaskTreeEntry[] = [];
-	const visit = (task: Task, depth: number) => {
-		const children = childrenBySlug.get(task.slug) ?? [];
-		entries.push({ task, depth, hasChildren: children.length > 0 });
-		for (const child of children) visit(child, depth + 1);
+	const visit = (task: Task, depth: number, orderKey: number) => {
+		const children = sortedChildrenBySlug.get(task.slug) ?? [];
+		entries.push({ task, depth, hasChildren: children.length > 0, orderKey });
+		for (const child of children) visit(child.task, depth + 1, child.orderKey);
 	};
-	for (const task of topLevel) visit(task, 0);
+	for (const top of sortSiblings(topLevel)) visit(top.task, 0, top.orderKey);
 	return entries;
 }
 

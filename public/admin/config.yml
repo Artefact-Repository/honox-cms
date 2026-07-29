@@ -201,6 +201,12 @@ collections:
         display_fields: [title]
         required: false
         hint: "Leave blank for a top-level task; set this to make it a subtask of another task"
+      - label: Sort Order
+        name: order
+        widget: number
+        value_type: float
+        required: false
+        hint: "Manual position among sibling tasks — set automatically by dragging rows in the tasks table; usually leave blank"
       - label: Status
         name: status
         widget: select
