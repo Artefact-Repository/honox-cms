@@ -40,6 +40,9 @@ export interface EditableContextValue {
 	invalid?: boolean;
 	required?: boolean;
 	autoResize?: boolean;
+	multiline?: boolean;
+	/** Textarea row count when `multiline` is set. @default 3 */
+	rows?: number;
 	activationMode: EditableActivationMode;
 	submitMode: EditableSubmitMode;
 	selectOnFocus: boolean;
@@ -87,6 +90,10 @@ export interface RootProps extends EditableVariantProps, PropsWithChildren {
 	/** @default true */
 	selectOnFocus?: boolean;
 	autoResize?: boolean;
+	/** Renders the input as a resizable `<textarea>` instead of a single-line `<input>`. */
+	multiline?: boolean;
+	/** Textarea row count when `multiline` is set. @default 3 */
+	rows?: number;
 	disabled?: boolean;
 	readOnly?: boolean;
 	required?: boolean;
@@ -126,6 +133,7 @@ export function Root(props: RootProps) {
 		submitMode = "both",
 		selectOnFocus = true,
 		autoResize,
+		rows,
 		disabled,
 		readOnly,
 		required,
@@ -171,6 +179,8 @@ export function Root(props: RootProps) {
 		invalid,
 		required,
 		autoResize,
+		multiline: variantProps.multiline as boolean | undefined,
+		rows,
 		activationMode,
 		submitMode,
 		selectOnFocus,

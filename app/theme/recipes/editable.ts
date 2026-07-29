@@ -54,8 +54,31 @@ export const editable = defineSlotRecipe({
 	},
 	defaultVariants: {
 		size: "md",
+		multiline: false,
 	},
 	variants: {
+		multiline: {
+			true: {
+				root: {
+					display: "flex",
+					flexDirection: "column",
+					alignItems: "stretch",
+				},
+				preview: {
+					display: "block",
+					whiteSpace: "pre-wrap",
+					wordBreak: "break-word",
+				},
+				input: {
+					whiteSpace: "pre-wrap",
+					resize: "vertical",
+				},
+				control: {
+					alignSelf: "flex-end",
+				},
+			},
+			false: {},
+		},
 		size: {
 			"2xs": {
 				preview: { textStyle: "xs", px: "2", py: "0.5" },
