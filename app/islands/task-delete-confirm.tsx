@@ -2,7 +2,7 @@ import { css, cx } from "design-system/css";
 import { button } from "design-system/recipes";
 import { useEffect, useState } from "hono/jsx";
 import { colorPaletteClass } from "../components/ui/color-palette";
-import { Drawer } from "../components/ui/drawer";
+import { Dialog } from "../components/ui/dialog";
 import { Stack } from "../components/ui/stack";
 import { Text } from "../components/ui/text";
 import { toaster } from "../components/ui/toast";
@@ -73,7 +73,7 @@ export default function TaskDeleteConfirm({ tasks }: TaskDeleteConfirmProps) {
 	};
 
 	return (
-		<Drawer
+		<Dialog
 			open={task != null}
 			onOpenChange={(next: boolean) => {
 				if (!next) close();
@@ -111,6 +111,6 @@ export default function TaskDeleteConfirm({ tasks }: TaskDeleteConfirmProps) {
 					</button>
 				</Stack>
 			</Stack>
-		</Drawer>
+		</Dialog>
 	);
 }
