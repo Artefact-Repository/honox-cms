@@ -20,6 +20,9 @@ export const combobox = defineSlotRecipe({
 		"trigger",
 		"clearTrigger",
 		"empty",
+		"helperText",
+		"errorText",
+		"requiredIndicator",
 	],
 	base: {
 		root: {
@@ -30,6 +33,23 @@ export const combobox = defineSlotRecipe({
 		},
 		label: {
 			textStyle: "label",
+			display: "flex",
+			alignItems: "center",
+			gap: "0.5",
+		},
+		requiredIndicator: {
+			color: "colorPalette.solid",
+		},
+		helperText: {
+			color: "fg.muted",
+			textStyle: "sm",
+			_disabled: {
+				layerStyle: "disabled",
+			},
+		},
+		errorText: {
+			color: "error",
+			textStyle: "sm",
 		},
 		input: {
 			...input.base,

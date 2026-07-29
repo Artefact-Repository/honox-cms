@@ -390,4 +390,64 @@ describe("Select Unit Tests", () => {
 		expect(html).toContain("multiple");
 		expect(html).toContain("selected");
 	});
+
+	test("should render label, helper text, and error text via flat API", () => {
+		const html = (
+			<Select
+				interactive={false}
+				label="Framework"
+				required={true}
+				invalid={true}
+				helperText="Please select one"
+				errorText="An option is required"
+				items={[{ label: "Hono", value: "hono" }]}
+			/>
+		).toString();
+
+		expect(html).toContain("Framework");
+		expect(html).toContain('class="select__requiredIndicator');
+		expect(html).toContain("Please select one");
+		expect(html).toContain('id="select-helper-text"');
+		expect(html).toContain("An option is required");
+		expect(html).toContain('id="select-error-text"');
+	});
+
+	test("should render helper text and error text via compound API", () => {
+		const html = (
+			<Select.Root
+				invalid={true}
+				required={true}
+				errorText="An option is required"
+				items={[{ label: "Hono", value: "hono" }]}
+			>
+				<Select.Label>Framework</Select.Label>
+				<Select.HelperText>Please select one</Select.HelperText>
+				<Select.ErrorText />
+			</Select.Root>
+		).toString();
+
+		expect(html).toContain("Framework");
+		expect(html).toContain('class="select__requiredIndicator');
+		expect(html).toContain("Please select one");
+		expect(html).toContain("An option is required");
+	});
+
+	test("should not leak helperText or errorText to the DOM root element", () => {
+		const html = (
+			<Select
+				interactive={false}
+				label="Framework"
+				helperText="Helpful tip"
+				errorText="Some error"
+				items={[{ label: "Hono", value: "hono" }]}
+			/>
+		).toString();
+
+		const rootStart = html.indexOf('data-part="root"');
+		const rootEnd = html.indexOf(">", rootStart);
+		const rootTag = html.slice(rootStart, rootEnd);
+
+		expect(rootTag).not.toContain("helperText=");
+		expect(rootTag).not.toContain("errorText=");
+	});
 });

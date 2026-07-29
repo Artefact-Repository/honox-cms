@@ -36,6 +36,7 @@ interface SelectContextValue {
 	readOnly?: boolean;
 	required?: boolean;
 	name?: string;
+	errorText?: Child;
 	onToggle?: () => void;
 	onClose?: () => void;
 	onItemSelect?: (value: string) => void;
@@ -54,6 +55,7 @@ interface RootProps extends SelectVariantProps, PropsWithChildren {
 	readOnly?: boolean;
 	required?: boolean;
 	name?: string;
+	errorText?: Child;
 	onToggle?: () => void;
 	onClose?: () => void;
 	onItemSelect?: (value: string) => void;
@@ -74,6 +76,7 @@ interface SelectFlattenedProps extends RootProps {
 	allowClear?: boolean;
 	defaultValue?: string[];
 	deselectable?: boolean;
+	helperText?: Child;
 }
 
 interface InteractiveSelectProps extends SelectFlattenedProps {
@@ -106,6 +109,7 @@ function Root(props: RootProps) {
 		readOnly,
 		required,
 		name,
+		errorText,
 		onToggle,
 		onClose,
 		onItemSelect,
@@ -126,6 +130,7 @@ function Root(props: RootProps) {
 		allowClear: _allowClear,
 		defaultValue: _defaultValue,
 		deselectable: _deselectable,
+		helperText: _helperText,
 		...domProps
 	} = rest;
 
@@ -147,6 +152,7 @@ function Root(props: RootProps) {
 				readOnly,
 				required,
 				name,
+				errorText,
 				onToggle,
 				onClose,
 				onItemSelect,
@@ -171,6 +177,59 @@ function Root(props: RootProps) {
 	);
 }
 
+function RequiredIndicator(props: { children?: Child; class?: string }) {
+	const context = useSelectContext();
+	return (
+		<span
+			aria-hidden="true"
+			class={cx(context?.styles.requiredIndicator, props.class)}
+			data-disabled={context?.disabled ? "" : undefined}
+			data-invalid={context?.invalid ? "" : undefined}
+			data-readonly={context?.readOnly ? "" : undefined}
+			data-required={context?.required ? "" : undefined}
+		>
+			{props.children || "*"}
+		</span>
+	);
+}
+
+function HelperText(props: { children?: Child; class?: string }) {
+	const context = useSelectContext();
+	return (
+		<div
+			id={context?.rootId ? `${context.rootId}-helper-text` : undefined}
+			class={cx(context?.styles.helperText, props.class)}
+			data-disabled={context?.disabled ? "" : undefined}
+			data-invalid={context?.invalid ? "" : undefined}
+			data-readonly={context?.readOnly ? "" : undefined}
+			data-required={context?.required ? "" : undefined}
+		>
+			{props.children}
+		</div>
+	);
+}
+
+function ErrorText(props: { children?: Child; class?: string }) {
+	const context = useSelectContext();
+	const content = props.children || context?.errorText;
+	if (context?.invalid && content) {
+		return (
+			<div
+				id={context?.rootId ? `${context.rootId}-error-text` : undefined}
+				aria-live="polite"
+				class={cx(context?.styles.errorText, props.class)}
+				data-disabled={context?.disabled ? "" : undefined}
+				data-invalid={context?.invalid ? "" : undefined}
+				data-readonly={context?.readOnly ? "" : undefined}
+				data-required={context?.required ? "" : undefined}
+			>
+				{content}
+			</div>
+		);
+	}
+	return null;
+}
+
 function Label(props: PropsWithChildren<{ class?: string; htmlFor?: string }>) {
 	const { children, class: classProp, htmlFor, ...rest } = props;
 	const context = useSelectContext();
@@ -189,6 +248,7 @@ function Label(props: PropsWithChildren<{ class?: string; htmlFor?: string }>) {
 			{...rest}
 		>
 			{children}
+			{context?.required && <RequiredIndicator />}
 		</label>
 	);
 }
@@ -552,7 +612,15 @@ function HiddenSelect(props: { items?: SelectItem[] }) {
 }
 
 function SelectStructure(props: SelectFlattenedProps) {
-	const { items = [], label, placeholder, allowClear, children } = props;
+	const {
+		items = [],
+		label,
+		placeholder,
+		allowClear,
+		helperText,
+		errorText,
+		children,
+	} = props;
 
 	return (
 		<>
@@ -584,6 +652,8 @@ function SelectStructure(props: SelectFlattenedProps) {
 				</Content>
 			</Positioner>
 			<HiddenSelect items={items} />
+			{helperText && <HelperText>{helperText}</HelperText>}
+			<ErrorText>{errorText}</ErrorText>
 			{children}
 		</>
 	);
@@ -1017,6 +1087,8 @@ export {
 	ClearTrigger,
 	Content,
 	Control,
+	ErrorText,
+	HelperText,
 	HiddenSelect,
 	Indicator,
 	IndicatorGroup,
@@ -1029,6 +1101,7 @@ export {
 	Label,
 	List,
 	Positioner,
+	RequiredIndicator,
 	Root,
 	SelectStructure,
 	Trigger,

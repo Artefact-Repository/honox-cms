@@ -30,6 +30,7 @@ export interface ComboboxContextValue {
 	invalid?: boolean;
 	readOnly?: boolean;
 	required?: boolean;
+	errorText?: Child;
 	onToggle?: () => void;
 	onClose?: () => void;
 	onInputChange?: (value: string) => void;
@@ -68,6 +69,7 @@ export interface RootProps extends ComboboxVariantProps, PropsWithChildren {
 	invalid?: boolean;
 	readOnly?: boolean;
 	required?: boolean;
+	errorText?: Child;
 	onToggle?: () => void;
 	onClose?: () => void;
 	onInputChange?: (value: string) => void;
@@ -93,6 +95,7 @@ export function Root(props: RootProps) {
 		invalid,
 		readOnly,
 		required,
+		errorText,
 		onToggle,
 		onClose,
 		onInputChange,
@@ -103,6 +106,17 @@ export function Root(props: RootProps) {
 		id,
 		...rest
 	} = localProps;
+
+	// Flattened-API-only props must not leak onto the DOM as attributes.
+	const {
+		label: _label,
+		placeholder: _placeholder,
+		allowClear: _allowClear,
+		closeOnSelect: _closeOnSelect,
+		helperText: _helperText,
+		onValueChange: _onValueChange,
+		...domProps
+	} = rest;
 
 	const styles = combobox(variantProps);
 	const rootId = id || "combobox";
@@ -122,6 +136,7 @@ export function Root(props: RootProps) {
 				invalid,
 				readOnly,
 				required,
+				errorText,
 				onToggle,
 				onClose,
 				onInputChange,
@@ -135,7 +150,7 @@ export function Root(props: RootProps) {
 				data-part="root"
 				class={cx(styles.root, classProp)}
 				style={{ position: "relative", ...style }}
-				{...rest}
+				{...domProps}
 			>
 				{children}
 			</div>
@@ -145,6 +160,59 @@ export function Root(props: RootProps) {
 
 export function RootProvider(props: RootProps) {
 	return <Root {...props} />;
+}
+
+export function RequiredIndicator(props: { children?: Child; class?: string }) {
+	const context = useComboboxContext();
+	return (
+		<span
+			aria-hidden="true"
+			class={cx(context?.styles.requiredIndicator, props.class)}
+			data-disabled={context?.disabled ? "" : undefined}
+			data-invalid={context?.invalid ? "" : undefined}
+			data-readonly={context?.readOnly ? "" : undefined}
+			data-required={context?.required ? "" : undefined}
+		>
+			{props.children || "*"}
+		</span>
+	);
+}
+
+export function HelperText(props: { children?: Child; class?: string }) {
+	const context = useComboboxContext();
+	return (
+		<div
+			id={context?.rootId ? `${context.rootId}-helper-text` : undefined}
+			class={cx(context?.styles.helperText, props.class)}
+			data-disabled={context?.disabled ? "" : undefined}
+			data-invalid={context?.invalid ? "" : undefined}
+			data-readonly={context?.readOnly ? "" : undefined}
+			data-required={context?.required ? "" : undefined}
+		>
+			{props.children}
+		</div>
+	);
+}
+
+export function ErrorText(props: { children?: Child; class?: string }) {
+	const context = useComboboxContext();
+	const content = props.children || context?.errorText;
+	if (context?.invalid && content) {
+		return (
+			<div
+				id={context?.rootId ? `${context.rootId}-error-text` : undefined}
+				aria-live="polite"
+				class={cx(context?.styles.errorText, props.class)}
+				data-disabled={context?.disabled ? "" : undefined}
+				data-invalid={context?.invalid ? "" : undefined}
+				data-readonly={context?.readOnly ? "" : undefined}
+				data-required={context?.required ? "" : undefined}
+			>
+				{content}
+			</div>
+		);
+	}
+	return null;
 }
 
 export function Label(
@@ -167,6 +235,7 @@ export function Label(
 			{...rest}
 		>
 			{children}
+			{context?.required && <RequiredIndicator />}
 		</label>
 	);
 }
@@ -524,11 +593,20 @@ export interface ComboboxFlattenedProps extends RootProps {
 	name?: string;
 	value?: string;
 	defaultValue?: string;
+	helperText?: Child;
 	onValueChange?: (value: string) => void;
 }
 
 export function ComboboxStructure(props: ComboboxFlattenedProps) {
-	const { items = [], label, placeholder, allowClear, children } = props;
+	const {
+		items = [],
+		label,
+		placeholder,
+		allowClear,
+		helperText,
+		errorText,
+		children,
+	} = props;
 	const context = useComboboxContext();
 
 	const filterText =
@@ -591,6 +669,8 @@ export function ComboboxStructure(props: ComboboxFlattenedProps) {
 					</List>
 				</Content>
 			</Positioner>
+			{helperText && <HelperText>{helperText}</HelperText>}
+			<ErrorText>{errorText}</ErrorText>
 			{children}
 		</>
 	);

@@ -477,7 +477,9 @@ export function Input(props: InputProps) {
 			e.key === "Enter" &&
 			// A plain Enter inserts a newline in a `<textarea>` instead of
 			// submitting — only the Cmd/Ctrl+Enter combo commits multiline text.
-			(multiline ? isSubmitCombo : submitOnEnter && !e.shiftKey && !isSubmitCombo)
+			(multiline
+				? isSubmitCombo
+				: submitOnEnter && !e.shiftKey && !isSubmitCombo)
 		) {
 			context?.submit({ restoreFocus: true });
 			e.preventDefault();

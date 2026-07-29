@@ -101,4 +101,65 @@ describe("Combobox Unit Tests", () => {
 		expect(html).toContain('data-disabled=""');
 		expect(html).toContain('data-index="2"');
 	});
+
+	test("should render label, helper text, and error text via flat API", () => {
+		const html = (
+			<Combobox
+				interactive={false}
+				label="Framework"
+				required={true}
+				invalid={true}
+				helperText="Please select one"
+				errorText="An option is required"
+				items={[{ label: "Hono", value: "hono" }]}
+			/>
+		).toString();
+
+		expect(html).toContain("Framework");
+		expect(html).toContain('class="combobox__requiredIndicator');
+		expect(html).toContain("Please select one");
+		expect(html).toContain('id="combobox-helper-text"');
+		expect(html).toContain("An option is required");
+		expect(html).toContain('id="combobox-error-text"');
+	});
+
+	test("should render helper text and error text via compound API", () => {
+		const html = (
+			<Combobox.Root
+				id="my-combo"
+				invalid={true}
+				required={true}
+				errorText="An option is required"
+				items={[{ label: "Hono", value: "hono" }]}
+			>
+				<Combobox.Label>Framework</Combobox.Label>
+				<Combobox.HelperText>Please select one</Combobox.HelperText>
+				<Combobox.ErrorText />
+			</Combobox.Root>
+		).toString();
+
+		expect(html).toContain("Framework");
+		expect(html).toContain('class="combobox__requiredIndicator');
+		expect(html).toContain("Please select one");
+		expect(html).toContain("An option is required");
+	});
+
+	test("should not leak helperText or errorText to the DOM root element", () => {
+		const html = (
+			<Combobox
+				interactive={false}
+				label="Framework"
+				helperText="Helpful tip"
+				errorText="Some error"
+				items={[{ label: "Hono", value: "hono" }]}
+			/>
+		).toString();
+
+		const rootStart = html.indexOf('data-part="root"');
+		const rootEnd = html.indexOf(">", rootStart);
+		const rootTag = html.slice(rootStart, rootEnd);
+
+		expect(rootTag).not.toContain("helperText=");
+		expect(rootTag).not.toContain("errorText=");
+	});
 });

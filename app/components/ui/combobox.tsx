@@ -8,6 +8,8 @@ import {
 	Context,
 	Control,
 	Empty,
+	ErrorText,
+	HelperText,
 	IndicatorGroup,
 	Input,
 	Item,
@@ -18,6 +20,7 @@ import {
 	Label,
 	List,
 	Positioner,
+	RequiredIndicator,
 	Root,
 	RootProvider,
 	Trigger,
@@ -69,6 +72,9 @@ export const Combobox = Object.assign(ComboboxRoot, {
 	Empty,
 	IndicatorGroup,
 	Context,
+	RequiredIndicator,
+	HelperText,
+	ErrorText,
 });
 
 export {
@@ -77,6 +83,8 @@ export {
 	Context,
 	Control,
 	Empty,
+	ErrorText,
+	HelperText,
 	IndicatorGroup,
 	Input,
 	Item,
@@ -87,6 +95,7 @@ export {
 	Label,
 	List,
 	Positioner,
+	RequiredIndicator,
 	Root,
 	RootProvider,
 	Trigger,

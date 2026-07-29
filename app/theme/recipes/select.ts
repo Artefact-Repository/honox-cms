@@ -19,6 +19,9 @@ export const select = defineSlotRecipe({
 		"itemGroup",
 		"itemGroupLabel",
 		"clearTrigger",
+		"helperText",
+		"errorText",
+		"requiredIndicator",
 	],
 	base: {
 		root: {
@@ -128,9 +131,26 @@ export const select = defineSlotRecipe({
 			fontWeight: "medium",
 			userSelect: "none",
 			textStyle: "sm",
+			display: "flex",
+			alignItems: "center",
+			gap: "0.5",
 			_disabled: {
 				color: "fg.muted",
 			},
+		},
+		requiredIndicator: {
+			color: "colorPalette.solid",
+		},
+		helperText: {
+			color: "fg.muted",
+			textStyle: "sm",
+			_disabled: {
+				layerStyle: "disabled",
+			},
+		},
+		errorText: {
+			color: "error",
+			textStyle: "sm",
 		},
 		trigger: {
 			alignItems: "center",
