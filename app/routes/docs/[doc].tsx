@@ -619,6 +619,22 @@ export default createRoute(
 					<>
 						<title>{doc.title} - Docs - Artefact</title>
 
+						{/* Sider (see docsShellProps.siderClass) scrolls its own overflow
+						    independently of the page, so a deep doc list can leave the
+						    active link scrolled out of view on load. Placed in `content`
+						    (rendered inside `<main>`) so by the time it runs, the sider's
+						    HTML already precedes it in the DOM (Layout puts header's
+						    mobile-nav copy, then aside, before main). `block: "nearest"`
+						    no-ops when already visible, and no-ops on the closed
+						    mobile-nav <details> copy since it has no layout box there. */}
+						<script
+							// biome-ignore lint/security/noDangerouslySetInnerHtml: static, non-user-controlled script
+							dangerouslySetInnerHTML={{
+								__html:
+									'(function(){try{document.querySelectorAll(\'[aria-current="page"]\').forEach(function(el){el.scrollIntoView({block:"nearest"});});}catch(e){}})();',
+							}}
+						/>
+
 						{/* Bigger than the content's own h1s (markdownContentClass fixes
 						    those at "2xl") so the page title reads as a distinct, higher
 						    level of hierarchy rather than just another section heading.
