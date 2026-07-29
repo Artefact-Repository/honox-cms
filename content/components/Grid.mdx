@@ -7,11 +7,7 @@ hydration: 3
 import { Grid } from "../../app/components/ui";
 import { DemoPreview } from "../../app/components/demo-preview";
 
-# Introduction
-
 A highly responsive and flexible CSS Grid layout container for constructing grid-based page structures and interface layouts. Lay child elements out with an explicit column or row count, or let them auto-fit dynamically based on a minimum child width without needing explicit media queries. It fully supports responsive, per-breakpoint layout configurations.
-
-The **Grid** component is also fully integrated as a `grid` block in the **Page Builder**, allowing content authors and developers to easily construct responsive structures, card lists, and side-by-side controls directly within the CMS.
 
 ***
 
@@ -42,6 +38,7 @@ Specifies an explicit column count that displays three elements side-by-side. Ex
 </DemoPreview>
 
 ### JSX / TSX
+
 ```tsx
 import { Grid } from "../components/ui";
 
@@ -57,6 +54,7 @@ export default function Example() {
 ```
 
 ### Page Builder JSON
+
 ```json
 {
   "type": "grid",
@@ -85,6 +83,7 @@ Columns are added or dropped automatically as the screen resizes. This avoids th
 </DemoPreview>
 
 ### JSX / TSX
+
 ```tsx
 import { Grid } from "../components/ui";
 
@@ -100,6 +99,7 @@ export default function Example() {
 ```
 
 ### Page Builder JSON
+
 ```json
 {
   "type": "grid",
@@ -138,6 +138,7 @@ export default function ResponsiveGrid() {
 ### Page Builder Configuration (CMS JSON)
 
 ### JSX / TSX
+
 ```tsx
 import { Grid } from "../components/ui";
 
@@ -153,6 +154,7 @@ export default function Example() {
 ```
 
 ### Page Builder JSON
+
 ```json
 {
   "type": "grid",
@@ -182,6 +184,7 @@ Gaps between rows and columns can be configured independently to create asymmetr
 </DemoPreview>
 
 ### JSX / TSX
+
 ```tsx
 import { Grid } from "../components/ui";
 
@@ -198,6 +201,7 @@ export default function Example() {
 ```
 
 ### Page Builder JSON
+
 ```json
 {
   "type": "grid",
@@ -219,14 +223,17 @@ export default function Example() {
 
 | Property | Type / CMS Field Type | Default | Description |
 | --- | --- | --- | --- |
-| `columns` | `number \| string \| Responsive<...>` | - | Explicit column count (e.g. `3` or `"3"`). Can accept a breakpoint object or a JSON string in CMS (e.g., `'{"base": 1, "md": 3}'`). Has priority over `minChildWidth`. |
-| `rows` | `number \| string \| Responsive<...>` | - | Explicit row count. Useful for structured template layouts. |
-| `minChildWidth` | `number \| string \| Responsive<...>` | - | Width threshold for auto-fit columns (e.g., `"120px"`, `"16rem"`). Ignored if `columns` is specified. |
-| `gap` | `string \| number \| Responsive<...>` | `"8px"` | Space separating consecutive cells. |
-| `columnGap` | `string \| number \| Responsive<...>` | - | Horizontal-only gap between grid columns. |
-| `rowGap` | `string \| number \| Responsive<...>` | - | Vertical-only gap between grid rows. |
+
+| `columns` | \`number \ | string \ | Responsive<...>\` | - | Explicit column count (e.g. `3` or `"3"`). Can accept a breakpoint object or a JSON string in CMS (e.g., `'{"base": 1, "md": 3}'`). Has priority over `minChildWidth`. |
+| `rows` | \`number \ | string \ | Responsive<...>\` | - | Explicit row count. Useful for structured template layouts. |
+| `minChildWidth` | \`number \ | string \ | Responsive<...>\` | - | Width threshold for auto-fit columns (e.g., `"120px"`, `"16rem"`). Ignored if `columns` is specified. |
+| `gap` | \`string \ | number \ | Responsive<...>\` | `"8px"` | Space separating consecutive cells. |
+| `columnGap` | \`string \ | number \ | Responsive<...>\` | - | Horizontal-only gap between grid columns. |
+| `rowGap` | \`string \ | number \ | Responsive<...>\` | - | Vertical-only gap between grid rows. |
+
 | `class` | `string` | - | Custom CSS class overrides. |
-| `children` | `any \| list` | - | Collection of nested layout or visual blocks aligned inside the grid container. |
+
+| `children` | \`any \ | list\` | - | Collection of nested layout or visual blocks aligned inside the grid container. |
 
 > **Responsive Values:** `Responsive<T>` accepts a flat value or an object mapped by responsive breakpoints (e.g., `{ base: 1, md: 2, lg: 3 }`). The design system supports the standard scale of breakpoints: `base`, `sm`, `md`, `lg`, `xl`, and `2xl`.
 
@@ -235,14 +242,18 @@ export default function Example() {
 # Hydration & Architecture
 
 ### Tier-3 Presentational Layout Primitive
+
 The `Grid` component is classified as a **Tier-3 Presentational Component** under the project's Island Hydration architecture. It holds zero client-side reactive state and handles no event triggers. Consequently:
+
 - It **never mounts an interactive client-side island**.
 - It compiles directly to zero-JS static HTML, incurring absolutely zero bundle-size overhead.
 - An explicit `interactive` prop is neither required nor supported.
 
 ### Developer Implementation Notes
+
 - **Panda CSS Pattern Integration:** Under the hood, this component translates columns, rows, and gap definitions into Panda CSS `grid` utility structures, generating high-performance atomic CSS classes.
 - **Responsive JSON Strings:** When authoring pages within Sveltia CMS, responsive values (like breakpoint column configurations) should be written as JSON-serialized strings (e.g. `'{"base": 1, "md": 2}'`). These are automatically parsed and translated to breakpoint styles at runtime.
 
 ### Accessibility Compliance
+
 - **Natural DOM Flow:** The container preserves sequential keyboard navigation (`Tab` index) and DOM-tree reading orders. Ensure child element layouts align with logical visual sequences to keep document accessibility consistent for screen readers.
