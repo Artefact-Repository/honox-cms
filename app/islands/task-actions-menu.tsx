@@ -3,6 +3,7 @@ import { useState } from "hono/jsx";
 import { IconButton } from "../components/ui/button";
 import { Dropdown } from "../components/ui/dropdown";
 import { EllipsisIcon } from "../icons/ellipsis";
+import TaskCloneDialog from "./task-clone-dialog";
 import TaskToProject, { type TaskToProjectProps } from "./task-to-project";
 
 export interface TaskActionsMenuProps
@@ -13,6 +14,7 @@ export interface TaskActionsMenuProps
 export default function TaskActionsMenu(props: TaskActionsMenuProps) {
 	const { editHref, ...taskProps } = props;
 	const [convertOpen, setConvertOpen] = useState(false);
+	const [cloneOpen, setCloneOpen] = useState(false);
 
 	return (
 		<>
@@ -26,6 +28,7 @@ export default function TaskActionsMenu(props: TaskActionsMenuProps) {
 				contentClass={css({ minWidth: "48", whiteSpace: "nowrap" })}
 				items={[
 					{ type: "item", label: "Edit", value: "edit", href: editHref },
+					{ type: "item", label: "Clone", value: "clone" },
 					{
 						type: "item",
 						label: "Convert to Project",
@@ -34,12 +37,18 @@ export default function TaskActionsMenu(props: TaskActionsMenuProps) {
 				]}
 				onSelect={(value) => {
 					if (value === "convert-to-project") setConvertOpen(true);
+					if (value === "clone") setCloneOpen(true);
 				}}
 			/>
 			<TaskToProject
 				{...taskProps}
 				open={convertOpen}
 				onOpenChange={setConvertOpen}
+			/>
+			<TaskCloneDialog
+				task={{ slug: taskProps.slug, title: taskProps.title }}
+				open={cloneOpen}
+				onOpenChange={setCloneOpen}
 			/>
 		</>
 	);
