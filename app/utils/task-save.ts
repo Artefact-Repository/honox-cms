@@ -8,11 +8,12 @@ import {
 	createFile,
 	deleteFile,
 	fetchFile,
-	GitBackendError,
-	resolveToken,
+	fileExists,
+	requireToken,
 	updateFile,
 } from "./git-backend";
 import { parseFrontmatter, stringifyFrontmatter } from "./markdown";
+import { slugify } from "./slug";
 
 export interface TaskFieldUpdate {
 	/** Mutate frontmatter fields, return the (possibly unchanged) body. */
@@ -22,29 +23,6 @@ export interface TaskFieldUpdate {
 }
 
 export class TaskSaveError extends Error {}
-
-/** Resolves a token (Sveltia's session, or our own manual one) the same way
- * the project board does — throws a user-facing message if neither is
- * available, so callers can just try/catch and show it. */
-export function requireToken(): string {
-	const { token } = resolveToken();
-	if (!token) {
-		throw new TaskSaveError(
-			"No git host connection found — connect one to save edits.",
-		);
-	}
-	return token;
-}
-
-async function fileExists(path: string, token: string): Promise<boolean> {
-	try {
-		await fetchFile(path, token);
-		return true;
-	} catch (error) {
-		if (error instanceof GitBackendError && error.status === 404) return false;
-		throw error;
-	}
-}
 
 export async function saveTaskField(
 	slug: string,
@@ -81,12 +59,7 @@ export async function deleteTask(slug: string): Promise<void> {
  * pattern would produce, so hand-created and CMS-created task files stay
  * consistent (see public/admin/config.yml's tasks collection). */
 export function slugifyTaskTitle(title: string): string {
-	const slug = title
-		.toLowerCase()
-		.trim()
-		.replace(/[^a-z0-9]+/g, "-")
-		.replace(/^-+|-+$/g, "");
-	return slug || "task";
+	return slugify(title) || "task";
 }
 
 export interface NewTaskInput {

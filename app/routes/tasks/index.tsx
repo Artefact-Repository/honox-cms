@@ -13,8 +13,8 @@ import {
 } from "../../components/ui";
 import { colorPaletteClass } from "../../components/ui/color-palette";
 import { Toaster } from "../../components/ui/toast";
+import PmsCreateMenu from "../../islands/pms-create-menu";
 import TaskCloneAction from "../../islands/task-clone-action";
-import TaskCreateDrawer from "../../islands/task-create-drawer";
 import TaskDeleteConfirm from "../../islands/task-delete-confirm";
 import TaskDetailsDrawer from "../../islands/task-details-drawer";
 import { listProjects, type Project } from "../../lib/projects";
@@ -153,7 +153,7 @@ export default createRoute(async (c) => {
 						>
 							Tasks
 						</Anchor>
-						<TaskCreateDrawer projects={projectItems} />
+						<PmsCreateMenu projects={projectItems} />
 						<Anchor
 							href="/admin"
 							class={cx(

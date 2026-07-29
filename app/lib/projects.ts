@@ -30,6 +30,19 @@ export const PROJECT_STATUS_COLOR: Record<ProjectStatus, ColorPalette> = {
 	Archived: "gray",
 };
 
+// Same options list as public/admin/config.yml's `colorPalette` select, for
+// the "New Project" form's picker.
+export const PROJECT_COLOR_PALETTES: ColorPalette[] = [
+	"gray",
+	"blue",
+	"green",
+	"red",
+	"orange",
+	"purple",
+	"cyan",
+	"amber",
+];
+
 export interface Project {
 	slug: string;
 	title: string;

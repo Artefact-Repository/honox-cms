@@ -16,8 +16,8 @@ import {
 } from "../../components/ui";
 import { colorPaletteClass } from "../../components/ui/color-palette";
 import { Toaster } from "../../components/ui/toast";
+import PmsCreateMenu from "../../islands/pms-create-menu";
 import TaskBoard from "../../islands/task-board";
-import TaskCreateDrawer from "../../islands/task-create-drawer";
 import {
 	listProjects,
 	listProjectSlugs,
@@ -168,7 +168,7 @@ export default createRoute(
 							>
 								Tasks
 							</Anchor>
-							<TaskCreateDrawer
+							<PmsCreateMenu
 								projects={projectItems}
 								defaultProjectSlug={slug}
 							/>

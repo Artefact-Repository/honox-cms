@@ -12,6 +12,8 @@ import {
 	Text,
 } from "../../components/ui";
 import { colorPaletteClass } from "../../components/ui/color-palette";
+import { Toaster } from "../../components/ui/toast";
+import PmsCreateMenu from "../../islands/pms-create-menu";
 import {
 	listProjects,
 	PROJECT_STATUS_COLOR,
@@ -27,10 +29,15 @@ function projectProgress(project: Project, tasks: Task[]) {
 
 export default createRoute(async (c) => {
 	const [projects, tasks] = await Promise.all([listProjects(), listTasks()]);
+	const projectItems = projects.map((project) => ({
+		label: project.title,
+		value: project.slug,
+	}));
 
 	return c.render(
 		<>
 			<title>Projects - Artefact</title>
+			<Toaster />
 
 			<header
 				class={css({
@@ -100,6 +107,7 @@ export default createRoute(async (c) => {
 						>
 							Tasks
 						</Anchor>
+						<PmsCreateMenu projects={projectItems} />
 						<Anchor
 							href="/admin"
 							class={cx(

@@ -163,6 +163,19 @@ export function resolveToken(): {
 	return { token: null, source: null };
 }
 
+/** Resolves a token the same way every direct-commit editor does — throws a
+ * user-facing message if neither a Sveltia session nor a manual token is
+ * available, so callers can just try/catch and show it. */
+export function requireToken(): string {
+	const { token } = resolveToken();
+	if (!token) {
+		throw new Error(
+			"No git host connection found — connect one to save edits.",
+		);
+	}
+	return token;
+}
+
 // btoa/atob only handle Latin1; TextEncoder/decoder round-trip gets a
 // correct UTF-8-safe base64 for arbitrary file content (accented names,
 // em dashes in task titles, etc).
@@ -243,6 +256,21 @@ export async function fetchFile(path: string, token: string): Promise<GitFile> {
 	}
 	const json = (await response.json()) as { content: string; sha: string };
 	return { content: decodeBase64Utf8(json.content), sha: json.sha };
+}
+
+/** Whether `path` already exists on the configured branch — a plain 404 from
+ * `fetchFile` means no, anything else (including a real network/auth error)
+ * still propagates. Used by every direct-commit "create" path to check the
+ * target filename is free before writing (create/update use different API
+ * calls, so there's no single conflict-status check across every backend). */
+export async function fileExists(path: string, token: string): Promise<boolean> {
+	try {
+		await fetchFile(path, token);
+		return true;
+	} catch (error) {
+		if (error instanceof GitBackendError && error.status === 404) return false;
+		throw error;
+	}
 }
 
 /** Creates a new file at `path` — same Contents API as `updateFile`, but
