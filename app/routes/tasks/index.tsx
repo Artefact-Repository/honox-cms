@@ -12,6 +12,7 @@ import {
 	Text,
 } from "../../components/ui";
 import { colorPaletteClass } from "../../components/ui/color-palette";
+import { Toaster } from "../../components/ui/toast";
 import TaskCloneAction from "../../islands/task-clone-action";
 import TaskCreateDrawer from "../../islands/task-create-drawer";
 import TaskDeleteConfirm from "../../islands/task-delete-confirm";
@@ -65,6 +66,7 @@ export default createRoute(async (c) => {
 	return c.render(
 		<>
 			<title>Tasks - Artefact</title>
+			<Toaster />
 
 			<header
 				class={css({

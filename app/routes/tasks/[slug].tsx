@@ -10,6 +10,7 @@ import {
 	Stack,
 	Text,
 } from "../../components/ui";
+import { Toaster } from "../../components/ui/toast";
 import TaskActionsMenu from "../../islands/task-actions-menu";
 import TaskEditableText from "../../islands/task-editable-text";
 import TaskProjectEditor from "../../islands/task-project-editor";
@@ -52,6 +53,7 @@ export default createRoute(
 		return c.render(
 			<>
 				<title>{task.title} - Tasks - Artefact</title>
+				<Toaster />
 
 				<header
 					class={css({
