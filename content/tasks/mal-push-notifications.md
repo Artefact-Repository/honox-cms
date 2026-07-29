@@ -1,6 +1,7 @@
 ---
 title: Implement push notification service
 project: mobile-app-launch
+parentTask: mal-onboarding-flow
 status: To Do
 priority: Urgent
 assignee: Sam Okafor

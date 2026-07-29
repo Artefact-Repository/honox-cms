@@ -1,6 +1,7 @@
 ---
 title: Fix Drawer/Dialog variant props resetting after hydration
 project: ui-components
+parentTask: uic-responsive-variant-bug
 status: To Do
 priority: Medium
 assignee: Sam Okafor
