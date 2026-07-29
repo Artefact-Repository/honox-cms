@@ -9,9 +9,16 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Einführung
 
-Eine flexible Komponente zur Anzeige von Tabellendaten.
+Die `Table`-Komponente ist ein robustes Layout-Element, das komplexe tabellarische Datensätze klar auf Client-Seiten rendert. Mit voller Unterstützung für Zero-JS-responsive Templates und datengetriebene CMS-Konfigurationsschemata bietet sie sauberes vertikales Scroll-Wrapping, dynamische Spaltenausrichtung und Hover-Hervorhebungen.
 
 # Verwendung
+***
+
+Du kannst Daten einfach aus dem Dashboard zuordnen und Tabellen direkt gestalten.
+
+## 1. Einfache Plain-Tabelle mit Custom-Ausrichtung
+
+Eine Standard-Textliste mit der `plain`-Variante und rechtsbündigen Preisen für bessere Lesbarkeit.
 
 <DemoPreview>
   <div style={{ width: "100%" }}>
@@ -31,82 +38,90 @@ Eine flexible Komponente zur Anzeige von Tabellendaten.
   </div>
 </DemoPreview>
 
-```tsx
-import { Table } from "../components/ui";
-
-export default function MyPage() {
-  const columns = [
-    { header: "Name", key: "name" },
-    { header: "Category", key: "category" },
-    { header: "Price", key: "price", align: "end" },
-  ];
-
-  const rows = [
-    { name: "Laptop", category: "Electronics", price: "$999.00" },
-    { name: "Coffee Mug", category: "Home & Kitchen", price: "$15.00" },
-  ];
-
-  return (
-    <Table
-      variant="plain"
-      caption="Product Inventory"
-      columns={columns}
-      rows={rows}
-      footer={
-        <tr>
-          <td colSpan={2}>Total</td>
-          <td style={{ textAlign: "end" }}>$1,014.00</td>
-        </tr>
-      }
-    />
-  );
+```json
+{
+  "type": "table",
+  "variant": "plain",
+  "columns": [
+    { "header": "Name", "key": "name" },
+    { "header": "Category", "key": "category" },
+    { "header": "Price", "key": "price", "align": "end" }
+  ],
+  "rows": "[{\"name\": \"Laptop\", \"category\": \"Electronics\", \"price\": \"$999.00\"}, {\"name\": \"Coffee Mug\", \"category\": \"Home & Kitchen\", \"price\": \"$15.00\"}]"
 }
 ```
 
-## CMS-Seitenbauer
+***
 
-Diese Komponente ist als `table`-Block im [Seitenbauer](/docs/PageBuilder) (`content/pages/*.json`) verfügbar. Da Zeilendaten keine feste CMS-Struktur haben können, ist `rows` ein als JSON kodiertes Zeichenfolgenfeld, das zur Render-Zeit geparst wird:
+## 2. Zebra-Interaktionstabelle (Surface-Variante)
+
+Mit schattierten, alternierenden Zeilen (Zebra), interaktiven Hover-Hervorhebungen und strukturellen Rahmen.
+
+<DemoPreview>
+  <div style={{ width: "100%" }}>
+    <Table
+      variant="surface"
+      striped={true}
+      interactive={true}
+      columnBorder={true}
+      columns={[
+        { header: "System Service", key: "service" },
+        { header: "Server Node", key: "node", align: "center" },
+        { header: "Status", key: "status", align: "end" },
+      ]}
+      rows={[
+        { service: "Auth Endpoint", node: "EU-West", status: "Online" },
+        { service: "Payment API", node: "US-East", status: "Degraded" },
+        { service: "File Storage", node: "APAC-South", status: "Online" }
+      ]}
+    />
+  </div>
+</DemoPreview>
 
 ```json
 {
   "type": "table",
+  "variant": "surface",
+  "striped": true,
+  "interactive": true,
+  "columnBorder": true,
   "columns": [
-    { "header": "Room", "key": "room" },
-    { "header": "Price", "key": "price", "align": "end" }
+    { "header": "System Service", "key": "service" },
+    { "header": "Server Node", "key": "node", "align": "center" },
+    { "header": "Status", "key": "status", "align": "end" }
   ],
-  "rows": "[{\"room\": \"Cabin Loft\", \"price\": \"$180/night\"}, {\"room\": \"Cabin Suite\", \"price\": \"$240/night\"}]",
-  "variant": "plain",
-  "striped": true
+  "rows": "[{\"service\": \"Auth Endpoint\", \"node\": \"EU-West\", \"status\": \"Online\"}, {\"service\": \"Payment API\", \"node\": \"US-East\", \"status\": \"Degraded\"}, {\"service\": \"File Storage\", \"node\": \"APAC-South\", \"status\": \"Online\"}]"
 }
 ```
 
-# Eigenschaften
+***
 
-| Eigenschaft | Typ | Beschreibung |
-| --- | --- | --- |
-| `columns` | `TableColumn[]` | Konfiguration für Tabellenspalten. |
-| `rows` | `any[]` | In der Tabelle anzuzeigende Daten. |
+# Props
 
-| `caption` | `string \| JSX.Element` | Optionale Beschriftung, die oben oder unten angezeigt wird. |
+| Eigenschaft | CMS-Feldtyp | Standard | Beschreibung / unterstützte Optionen |
+| --- | --- | --- | --- |
+| **Spalten** (`columns`) | `list` | - | Geordnete Liste von Spaltenkonfigurationen (Details unten). |
+| **Zeilendaten** (`rows`) | `text` | - | Roh serialisierter JSON-Array-String der Tabellenzeilen (z. B. `"[{\"item\": \"Laptop\"}]"`), zur Render-Zeit automatisch geparst. |
+| **Variante** (`variant`) | `select` | `"plain"` | Allgemeiner Layoutstil des Tabellencontainers. <br/>• Optionen: `"plain"`, `"surface"`. |
+| **Zebra-Streifen** (`striped`) | `boolean` | `false` | Bei `true` werden abwechselnde Zeilen dezent schattiert. |
+| **Zeilenhervorhebung** (`interactive`) | `boolean` | `false` | Aktiviert Hover-Hintergrundanimationen auf aktiven Zellen. |
+| **Spaltenränder** (`columnBorder`) | `boolean` | `false` | Rendert vertikale Trennlinien zwischen Spalten. |
+| **Sticky-Header** (`stickyHeader`) | `boolean` | `false` | Heftet die Kopfzeile beim Scrollen oben im Viewport fest. |
 
-| `footer` | `JSX.Element` | Optionaler Inhalt für die Fußzeile. |
+### Spalten-Listeneigenschaften (`columns`)
 
-| `variant` | `"plain" \| "surface"` | Der visuelle Stil der Tabelle. |
+Jeder Eintrag in der `columns`-Liste akzeptiert folgende Felder:
 
-| `striped` | `boolean` | Legt fest, ob Zeilen abwechselnd farbig hinterlegt werden (Zebra-Muster). |
-| `interactive` | `boolean` | Legt fest, ob Zeilen Hover-Zustände anzeigen. |
-| `columnBorder` | `boolean` | Legt fest, ob Rahmen zwischen Spalten angezeigt werden. |
-| `stickyHeader` | `boolean` | Legt fest, ob die Kopfzeile beim Scrollen sichtbar bleibt. |
-| `class` | `string` | Benutzerdefinierte CSS-Klassen für das Wurzelelement. |
+| Unter-Eigenschaft | Typ | Erforderlich | Beschreibung / unterstützte Optionen |
+| --- | --- | --- | --- |
+| **Kopftext** (`header`) | `string` | Ja | Spaltenüberschrift in der Kopfzeile. |
+| **Schlüssel** (`key`) | `string` | Ja | Eigenschaftsschlüssel im Zeilenobjekt für diese Zelle. |
+| **Textausrichtung** (`align`) | `select` | `"start"` | Ausrichtung der Zellenwerte. <br/>• Optionen: `"start"`, `"center"`, `"end"`. |
 
-### TableColumn
+***
 
-| Eigenschaft | Typ | Beschreibung |
-| --- | --- | --- |
+# Architecture Notes
 
-| `header` | `string \| JSX.Element` | Kopfzeilentext oder -element. |
-
-| `key` | `string` | Schlüssel im Zeilendaten-Objekt. |
-| `render` | `(row, index) => JSX.Element` | Benutzerdefinierte Render-Funktion für die Zelle. |
-
-| `align` | `"start" \| "center" \| "end"` | Textausrichtung für die Spalte. |
+- **Optimierte JSON-String-Konvertierung:** Da sich Roh-Zeilenstrukturen pro Block dynamisch ändern, liefert Sveltia CMS die Zeilen als escapten JSON-Array-String im `rows`-Feld. Dieser wird zur Render-Zeit sicher geparst und hält die Bundle-Größe minimal.
+- **Reine CSS-Layout-Hygiene:** Kopfzeilen, Spaltenumrisse und Zebra-Streifen nutzen leichte Panda-CSS-Utility-Variablen, vermeiden Layout-Verschiebungen und rendern auf Touchscreens sofort.
+- **Scroll-Pinning:** `stickyHeader` nutzt standardmäßiges `position: sticky` auf Headern in einem Overflow-Wrapper und umgeht teure Scroll-Listener.

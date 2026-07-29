@@ -1,62 +1,122 @@
 ---
 title: Switch 开关
-hydration: 2
 category: Forms
+hydration: 2
 ---
 
 import { Switch } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-# 简介
+# Introduction
 
-一种允许用户在选中和未选中状态之间切换的控件。
+一个受 iOS 启发的二元开关控件，用于在启用/禁用单个独立设置之间切换。常用于设置面板、个人资料偏好或订阅开关。它在视觉上比标准复选框更强调「开/关」的语义。
 
-# 用法
+**Switch** 组件已作为 `switch` 区块完全集成到 **Page Builder** 中，使作者能够轻松配置标签、辅助文本、品牌强调色、尺寸比例和默认选中状态。
+
+***
+
+# Usage
+
+以下示例展示了内容编辑人员如何绑定和构建开关控件。
+
+## 1. 带辅助文本的默认开启开关（Line 变体）
+
+默认开启的开关，附带解释性辅助文本。演示了流畅的 `line` 变体，以及为开启状态分配的强调绿色品牌调色板。
 
 <DemoPreview>
-  <Switch defaultChecked interactive>Enable Notifications</Switch>
+  <Switch
+    label="Airplane Mode"
+    helperText="Disable wireless connections"
+    colorPalette="green"
+    defaultChecked
+    interactive
+  />
 </DemoPreview>
-
-```tsx
-import { Switch } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Switch
-      defaultChecked={true}
-      onCheckedChange={(details) => console.log(details.checked)}
-      interactive
-    >
-      Enable Notifications
-    </Switch>
-  );
-}
-```
-
-## CMS 页面构建器
-
-该组件可作为 `switch` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用：
 
 ```json
 {
   "type": "switch",
-  "label": "Dark Mode",
-  "checked": true,
-  "colorPalette": "blue"
+  "label": "Airplane Mode",
+  "helperText": "Disable wireless connections",
+  "colorPalette": "green",
+  "type": "line",
+  "size": "md",
+  "defaultChecked": true,
+  "interactive": true
 }
 ```
 
-# 属性
+## 2. 默认关闭的紧凑开关（强调红色）
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `children` | `any` | 渲染在开关旁边的标签内容。 |
-| `class` | `string` | 自定义 CSS 类。 |
-| `checked` | `boolean` | 开关是否被选中（受控）。 |
-| `defaultChecked` | `boolean` | 初始选中状态（非受控）。 |
-| `disabled` | `boolean` | 开关是否被禁用。 |
-| `onCheckedChange` | `(details: { checked: boolean }) => void` | 选中状态变化时触发的回调。 |
+表示破坏性操作的开启状态应使用红色等危险强调色。此演示使用紧凑的 `sm` 尺寸级别。
 
-| `size` | \`"sm" \ | "md" \ | "lg"\` | 开关的尺寸。 |
+<DemoPreview>
+  <Switch
+    label="Delete History"
+    helperText="Permanently erase activity logs"
+    colorPalette="red"
+    size="sm"
+    interactive
+  />
+</DemoPreview>
 
-| `interactive` | `boolean` | 强制作为岛屿进行水合。 |
+```json
+{
+  "type": "switch",
+  "label": "Delete History",
+  "helperText": "Permanently erase activity logs",
+  "colorPalette": "red",
+  "type": "line",
+  "size": "sm",
+  "defaultChecked": false,
+  "interactive": true
+}
+```
+
+## 3. 带内联图标的禁用开关
+
+演示组合交互状态：禁用但仍显示所选值的开关。
+
+<DemoPreview>
+  <Switch
+    label="Beta Features"
+    helperText="Currently locked by admin"
+    disabled
+    defaultChecked
+    interactive
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "switch",
+  "label": "Beta Features",
+  "helperText": "Currently locked by admin",
+  "disabled": true,
+  "defaultChecked": true,
+  "interactive": true
+}
+```
+
+***
+
+# Props
+
+| 属性 | CMS 字段类型 | 默认值 | 描述 / 支持的选项 |
+| --- | --- | --- | --- |
+| **标签文本** (`label`) | `string` | - | 渲染在开关轨道旁的描述性标题。 |
+| **辅助描述** (`helperText`) | `string` | - | 显示在开关下方的轻量上下文说明。 |
+| **品牌强调色** (`colorPalette`) | `select` | `"blue"` | 开启状态下轨道填充的视觉调色板。 <br/>• 选项：blue、green、red、purple、orange、amber、cyan、slate。 |
+| **视觉变体** (`variant`) | `select` | `"line"` | 轨道的视觉风格。 <br/>• 选项：`"line"`、`"surface"`、`"subtle"`、`"flushed"`。 |
+| **尺寸比例** (`size`) | `select` | `"md"` | 控制开关轨道的整体尺寸。 <br/>• 选项：`"xs"`、`"sm"`、`"md"`、`"lg"`、`"xl"`。 |
+| **默认选中** (`defaultChecked`) | `boolean` | `false` | 若 true，组件在挂载时即呈现开启状态。 |
+| **禁用** (`disabled`) | `boolean` | `false` | 禁用用户交互，并对控件应用变暗的覆盖层。 |
+| **强制交互** (`interactive`) | `boolean` | `true` | 对开关进行注水，以绑定键盘和切换事件。 |
+
+***
+
+# Developer Notes & Accessibility
+
+- **键盘导航：** 该控件原生支持键盘交互——聚焦时按 Space 或 Enter 切换状态。视觉焦点环遵循我们的设计令牌标准。
+- **WAI-ARIA 合规性：** 编译为语义开关（`role="switch"`、`aria-checked`），使屏幕阅读器播报精确的二进制状态。
+- **注水孤岛：** 作为一个捕获切换事件、焦点围栏和无障碍状态管理的高级布局，Switch 作为 Tier-2 条件性孤岛运行（`"interactive": true`）。

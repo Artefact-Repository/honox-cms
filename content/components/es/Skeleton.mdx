@@ -7,73 +7,128 @@ hydration: 3
 import { Skeleton } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-# Introducción
+# Introduction
 
-Un marcador de posición utilizado para indicar que el contenido se está cargando, con una variedad de opciones de animación y forma.
+El componente `Skeleton` es un elemento de marcador de posición de alto rendimiento que indica que el contenido se está cargando. Al renderizar marcadores geométricos que simulan el diseño, evita saltos bruscos de contenido (CLS) mientras se cargan datos remotos.
 
-# Uso
+El componente admite distintas formas geométricas (columnas de texto, bloques cuadrados y avatares circulares), así como bucles de animación responsivos (como brillo o pulsación) directamente mediante configuración visual.
 
-## Skeleton básico
+***
+
+# Usage
+
+Puedes construir estados de maqueta para tarjetas, perfiles y listas así:
+
+## 1. Marcador de bloque de texto multilínea
+
+Simula un párrafo o campo de descripción mientras se espera el texto del artículo. Renderiza columnas apiladas con un ciclo de pulsación sutil automático.
 
 <DemoPreview>
-  <div style={{ display: "flex", flexDirection: "column", gap: "1rem", width: "100%", maxWidth: "320px" }}>
-    <Skeleton shape="circle" size="12" />
-    <Skeleton height="6" width="40" />
+  <div style={{ width: "100%", maxWidth: "320px" }}>
     <Skeleton shape="text" noOfLines={3} />
   </div>
 </DemoPreview>
-
-```tsx
-import { Skeleton, SkeletonCircle, SkeletonText } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <div>
-      <SkeletonCircle size="12" />
-      <Skeleton height="6" width="40" />
-      <SkeletonText noOfLines={3} />
-    </div>
-  );
-}
-```
-
-## Constructor de páginas CMS
-
-Este componente está disponible como un bloque `skeleton` en el [Constructor de páginas](/docs/PageBuilder) (`content/pages/*.json`). Las opciones `shape` del CMS son `box`/`circle`/`text`, que se asignan a la propiedad real `shape` (`box` recae en la forma predeterminada):
 
 ```json
 {
   "type": "skeleton",
   "shape": "text",
-  "noOfLines": 3
+  "noOfLines": 3,
+  "variant": "pulse"
 }
 ```
 
-# Propiedades
+***
 
-## Skeleton
+## 2. Marcador circular de avatar
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `loading` | `boolean` | Si se debe mostrar el skeleton. Valor predeterminado: `true`. |
-| `circle` | `boolean` | Renderiza el skeleton como un círculo. |
+Renderiza una forma circular que coincide con fotos de perfil o iconos de avatar. Combínalo con esqueletos de texto para simular cabeceras de usuario.
 
-| `variant` | \`"pulse" \ | "shine" \ | "none"\` | El estilo de animación. |
+<DemoPreview>
+  <div style={{ width: "100%" }}>
+    <Skeleton shape="circle" size="12" />
+  </div>
+</DemoPreview>
 
-| `class` | `string` | Clases CSS personalizadas para el elemento raíz. |
+```json
+{
+  "type": "skeleton",
+  "shape": "circle",
+  "variant": "pulse"
+}
+```
 
-Todos los demás atributos nativos de `<div>` (por ejemplo, `style`, `id`, `width`, `height`) se reenvían al elemento subyacente.
+***
 
-## SkeletonCircle
+## 3. Contenedor de caja con brillo (maqueta de tarjeta)
 
-Las mismas propiedades que `Skeleton`, preconfigurado con `circle`.
+Un contenedor rectangular con animación de reflejo diagonal de brillo, ideal para tarjetas multimedia o maquetas de banner.
 
-## SkeletonText
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <Skeleton shape="box" height="32" />
+  </div>
+</DemoPreview>
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `noOfLines` | `number` | Número de líneas a mostrar. Valor predeterminado: `3`. |
+```json
+{
+  "type": "skeleton",
+  "shape": "box",
+  "variant": "shine"
+}
+```
 
-| `gap` | \`string \ | number\` | Espacio entre líneas. Valor predeterminado: `"2"`. |
+***
 
-Más todas las propiedades de `Skeleton`.
+## 4. Conmutación de contenido en estado cargado
+
+Cuando los datos del cliente terminan de cargar, `loaded: true` revela al instante los bloques hijos (como un encabezado o tarjeta real) y detiene el fondo de marcador.
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <Skeleton loaded={true}>
+      <div style={{ padding: "1rem", border: "1px solid var(--colors-gray-4)", borderRadius: "8px" }}>
+        <h3>Account Connected</h3>
+        <p style={{ fontSize: "0.85rem", color: "var(--colors-gray-11)", marginTop: "4px" }}>API key sync complete.</p>
+      </div>
+    </Skeleton>
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "skeleton",
+  "loaded": true,
+  "children": [
+    {
+      "blockType": "heading",
+      "text": "Account Connected",
+      "size": "sm"
+    },
+    {
+      "blockType": "text",
+      "content": "API key sync complete."
+    }
+  ]
+}
+```
+
+***
+
+# Props
+
+| Propiedad | Tipo de campo CMS | Predeterminado | Descripción / opciones admitidas |
+| --- | --- | --- | --- |
+| **Forma** (`shape`) | `select` | `"box"` | Formato geométrico del recurso. <br/>• Opciones: `"box"` (tarjetas/imágenes), `"circle"` (avatares), `"text"` (columnas de párrafo). |
+| **Variante de animación** (`variant`) | `select` | `"pulse"` | Estilo de animación. <br/>• Opciones: `"pulse"` (brillo gradual), `"shine"` (reflejo diagonal), `"none"` (relleno estático). |
+| **Número de líneas** (`noOfLines`) | `number` | `3` | Total de columnas al usar `shape: "text"`. |
+| **Estado cargado** (`loaded`) | `boolean` | `false` | Si es true, omite la máscara y muestra los hijos. |
+| **Bloques hijos** (`children`) | `list` | - | Componentes del page builder ocultos hasta que `loaded` sea true. |
+
+***
+
+# Architecture Notes
+
+- **Cero saltos de diseño:** Los parámetros geométricos (altura/ancho CSS grid) se parsean en el servidor antes de la hidratación. Esto preserva los límites proporcionales y evita el cambio acumulativo de diseño (CLS).
+- **Brillo acelerado por GPU:** Los reflejos y pulsos usan transforms CSS de alto rendimiento, garantizando 60fps incluso en móviles básicos.
+- **Mapeo dinámico de contenido:** Envolver componentes con Skeleton permite obtener datos del cliente de forma asíncrona, transitando sin problemas de marcadores a estados visibles.

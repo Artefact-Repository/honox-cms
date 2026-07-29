@@ -9,131 +9,122 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Einführung
 
-Eine mehrzeilige Texteingabekomponente, die mit dem `Field`-Kontext integriert. Sie kann eigenständig oder als Teil einer `Field`-Komponente verwendet werden.
+Ein mehrzeiliges Freitext-Eingabesteuerelement zum Erfassen längerer Benutzereingaben wie Kommentare, Beschreibungen, Feedback oder lange Formularübermittlungen. Es läuft in der Zero-JS-Client-Architektur als vollständig barrierefreies Layout.
 
 # Verwendung
+Die **Textarea**-Komponente ist als `textarea`-Block vollständig in den **Page Builder** integriert, sodass Autoren Platzhalter, Hilfetexte, Validierungsregeln, Größen und Autosize-Verhalten leicht konfigurieren können.
 
-## Eigenständig mit Field-Integration
+***
 
-`Textarea` umschließt sich automatisch mit einem `Field`, wenn Sie `label`, `helperText` usw. angeben.
+
+Diese Beispiele zeigen, wie Redakteure Textbereiche binden und strukturieren.
+
+## 1. Standard-Textbereich mit Hilfetext
+
+Eine Standard-Mehrzeileneingabe mit Label und erklärendem Hilfetext. Ideal für einfache Feedback-Felder.
 
 <DemoPreview>
-  <div style={{ width: "100%", maxWidth: "320px" }}>
+  <div style={{ width: "100%", maxWidth: "420px" }}>
     <Textarea
-      label="Bio"
-      placeholder="Write here..."
-      rows={4}
-      minLength={10}
+      label="Public Comment"
+      placeholder="Share your thoughts..."
+      helperText="Comments are visible to all workspace members."
       interactive
     />
   </div>
 </DemoPreview>
 
-```tsx
-import { Textarea } from "../components/ui";
+```json
+{
+  "type": "textarea",
+  "label": "Public Comment",
+  "placeholder": "Share your thoughts...",
+  "helperText": "Comments are visible to all workspace members.",
+  "interactive": true
+}
+```
 
-export default function MyPage() {
-  return (
+## 2. Kompakter Bereich mit Zeichenzähler und Max-Länge
+
+Ein mittelgroßer Bereich mit Zeichenlimit und aktiviertem Autosize, der live den Zähler anzeigt.
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "420px" }}>
     <Textarea
-      label="Bio"
-      placeholder="Write here..."
-      rows={4}
-      minLength={10}
+      label="Status Update"
+      placeholder="What's happening?"
+      maxLength={200}
+      showCount
+      autoresize
+      size="sm"
       interactive
     />
-  );
-}
-```
-
-## Varianten
-
-```tsx
-import { Stack } from "../design-system/jsx";
-import { Textarea } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Stack gap="4">
-      <Textarea variant="outline" placeholder="Outline" />
-      <Textarea variant="surface" placeholder="Surface" />
-      <Textarea variant="subtle" placeholder="Subtle" />
-      <Textarea variant="flushed" placeholder="Flushed" />
-    </Stack>
-  );
-}
-```
-
-## Größen
-
-```tsx
-import { Stack } from "../design-system/jsx";
-import { Textarea } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Stack gap="4">
-      <Textarea size="xs" placeholder="Extra Small" />
-      <Textarea size="sm" placeholder="Small" />
-      <Textarea size="md" placeholder="Medium" />
-      <Textarea size="lg" placeholder="Large" />
-      <Textarea size="xl" placeholder="Extra Large" />
-    </Stack>
-  );
-}
-```
-
-## Innerhalb einer Field-Komponente
-
-Sie können sie auch innerhalb einer `Field`-Komponente für komplexere Layouts verwenden.
-
-```tsx
-import { Field, Textarea } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Field label="Comments">
-      <Textarea placeholder="Leave a comment..." interactive />
-    </Field>
-  );
-}
-```
-
-## CMS-Seitenbauer
-
-Diese Komponente ist als `textarea`-Block im [Seitenbauer](/docs/PageBuilder) (`content/pages/*.json`) verfügbar:
+  </div>
+</DemoPreview>
 
 ```json
 {
   "type": "textarea",
-  "label": "Bio",
-  "helperText": "Tell us about yourself.",
-  "rows": 4
+  "label": "Status Update",
+  "placeholder": "What's happening?",
+  "maxLength": 200,
+  "showCount": true,
+  "autoresize": true,
+  "size": "sm",
+  "interactive": true
 }
 ```
 
-# Eigenschaften
+## 3. Ungültiger Fehlerstatus-Textbereich
 
-| Eigenschaft | Typ | Beschreibung |
-| --- | --- | --- |
-| `class` | `string` | Benutzerdefinierte CSS-Klassen. |
+Zeigt den Fehler-Status, aktiviert Invalid-Ränder und füllt einen Fehlertext zur Client-Anzeige vorab.
 
-| `variant` | `"outline" | "surface" | "subtle" | "flushed"` | Der visuelle Stil des Textbereichs. |
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "420px" }}>
+    <Textarea
+      label="Account Bio"
+      placeholder="Tell us about yourself"
+      invalid
+      errorText="Bio cannot contain profanity."
+      interactive
+    />
+  </div>
+</DemoPreview>
 
-| `size` | `"xs" | "sm" | "md" | "lg" | "xl"` | Die Größe des Textbereichs. |
+```json
+{
+  "type": "textarea",
+  "label": "Account Bio",
+  "placeholder": "Tell us about yourself",
+  "invalid": true,
+  "errorText": "Bio cannot contain profanity.",
+  "interactive": true
+}
+```
 
-| `resize` | `"none" | "both" | "horizontal" | "vertical"` | Legt fest, ob der Textbereich in der Größe veränderbar ist. |
+***
 
-| `label` | `string` | Die Beschriftung für das Feld (bei Verwendung als eigenständiges Field). |
-| `helperText` | `string` | Der Hilfetext für das Feld. |
-| `errorText` | `string` | Der Fehlertext für das Feld. |
-| `value` | `string` | Der aktuelle Wert. |
-| `defaultValue` | `string` | Der Anfangswert. |
-| `onValueChange` | `(val: string) => void` | Rückruf, der bei Wertänderung ausgelöst wird. |
-| `onInput` | `(e: any) => void` | Ereignisbehandlung für Eingabeänderungen. |
-| `rows` | `number` | Anzahl der sichtbaren Textzeilen. |
-| `placeholder` | `string` | Platzhaltertext. |
-| `minLength` | `number` | Mindestlängen-Validierung. |
+# Props
 
-| `validator` | `(val: string) => boolean | string` | Benutzerdefinierte Validierungslogik. |
+| Eigenschaft | CMS-Feldtyp | Standard | Beschreibung / unterstützte Optionen |
+| --- | --- | --- | --- |
+| **Label-Text** (`label`) | `string` | - | Beschreibender Titel über dem Textbereich. |
+| **Platzhalter** (`placeholder`) | `string` | - | Ghost-Text innerhalb des leeren Feldes. |
+| **Hilfetext** (`helperText`) | `string` | - | Leichte Kontextnotiz unterhalb des Feldes. |
+| **Autogröße** (`autoresize`) | `boolean` | `false` | Passt sich der Inhaltshöhe an, eliminiert statische Scrollbalken. |
+| **Maximallänge** (`maxLength`) | `number` | - | Oberes Limit für eingebare Zeichen. |
+| **Zeichenzähler** (`showCount`) | `boolean` | `false` | Rendert einen Live-Zähler (z. B. `12/200`). |
+| **Visuelle Variante** (`variant`) | `select` | `"outline"` | Rahmen- und Fülltheme. <br/>• Optionen: `"outline"`, `"surface"`, `"subtle"`, `"flushed"`. |
+| **Größenstufe** (`size`) | `select` | `"md"` | Steuert Padding und Schriftgröße. <br/>• Optionen: `"xs"`, `"sm"`, `"md"`, `"lg"`, `"xl"`. |
+| **Breite** (`width`) | `select` | `"full"` | Blockbreiten-Verhalten. <br/>• Optionen: `"full"`, `"fit"`. |
+| **Ungültig** (`invalid`) | `boolean` | `false` | Aktiviert Fehlerrahmen und ungültigen Status. |
+| **Deaktiviert** (`disabled`) | `boolean` | `false` | Deaktiviert Interaktion und dimmt das Feld. |
+| **Interaktiv erzwingen** (`interactive`) | `boolean` | `true` | Hydriert den Textbereich zum Binden von Events. |
 
-| `interactive` | `boolean` | Erzwingt die Hydration als Insel. |
+***
+
+# Developer Notes & Accessibility
+
+- **Native Formular-Integration:** Kompiliert zu nativem `<textarea>` mit `name` und `form`, garantiert native Verfügbarkeit ohne JS.
+- **WAI-ARIA-Konformität:** Label/Fehler-Beziehungen via `label`-Verknüpfung, `aria-invalid` und `aria-describedby` korrekt gebunden, damit Screenreader Validierungsfehler ansagen.
+- **Intelligentes Autosize:** `autoresize` passt die Scrollhöhe bei Tastendruck dynamisch an, ohne teure Layout-Reflows.

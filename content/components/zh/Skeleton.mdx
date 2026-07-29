@@ -7,73 +7,128 @@ hydration: 3
 import { Skeleton } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-# 简介
+# Introduction
 
-用于在内容加载时进行占位提示的元素，提供多种动画和形状选项。
+`Skeleton` 组件是一个高性能占位元素，用于指示内容当前正在加载。通过渲染模拟布局的几何占位符，它能在远程数据加载时防止内容突然跳动（CLS）。
 
-# 用法
+该组件支持通过视觉配置直接呈现不同的几何形态（包括文本列、方形块和圆形头像），以及响应式动画循环（如发光或脉冲过渡）。
 
-## 基础骨架
+***
+
+# Usage
+
+你可以像下面这样为卡片、个人资料和列表构建模拟状态：
+
+## 1. 多行文本块占位符
+
+在等待文章文本加载时模拟段落或描述字段。这会渲染多个堆叠列，并自动呈现微妙的脉冲循环。
 
 <DemoPreview>
-  <div style={{ display: "flex", flexDirection: "column", gap: "1rem", width: "100%", maxWidth: "320px" }}>
-    <Skeleton shape="circle" size="12" />
-    <Skeleton height="6" width="40" />
+  <div style={{ width: "100%", maxWidth: "320px" }}>
     <Skeleton shape="text" noOfLines={3} />
   </div>
 </DemoPreview>
-
-```tsx
-import { Skeleton, SkeletonCircle, SkeletonText } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <div>
-      <SkeletonCircle size="12" />
-      <Skeleton height="6" width="40" />
-      <SkeletonText noOfLines={3} />
-    </div>
-  );
-}
-```
-
-## CMS 页面构建器
-
-该组件可作为 `skeleton` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用。CMS 的 `shape` 选项为 `box`/`circle`/`text`，它们映射到真实的 `shape` 属性（`box` 会回退到普通默认形状）：
 
 ```json
 {
   "type": "skeleton",
   "shape": "text",
-  "noOfLines": 3
+  "noOfLines": 3,
+  "variant": "pulse"
 }
 ```
 
-# 属性
+***
 
-## Skeleton
+## 2. 头像圆形占位符
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `loading` | `boolean` | 是否显示骨架。默认值：`true`。 |
-| `circle` | `boolean` | 将骨架渲染为圆形。 |
+渲染与资料图片或用户头像图标匹配的圆形。可与文本骨架组合以模拟用户头部。
 
-| `variant` | \`"pulse" \ | "shine" \ | "none"\` | 动画样式。 |
+<DemoPreview>
+  <div style={{ width: "100%" }}>
+    <Skeleton shape="circle" size="12" />
+  </div>
+</DemoPreview>
 
-| `class` | `string` | 根元素的自定义 CSS 类。 |
+```json
+{
+  "type": "skeleton",
+  "shape": "circle",
+  "variant": "pulse"
+}
+```
 
-所有其他原生 `<div>` 属性（例如 `style`、`id`、`width`、`height`）都会被透传到底层元素。
+***
 
-## SkeletonCircle
+## 3. 高光矩形容器（卡片模拟）
 
-与 `Skeleton` 相同的属性，但预配置了 `circle`。
+具有矩形盒容器与高光对角线微光反射动画，非常适合媒体卡片或横幅模拟。
 
-## SkeletonText
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <Skeleton shape="box" height="32" />
+  </div>
+</DemoPreview>
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `noOfLines` | `number` | 显示的行数。默认值：`3`。 |
+```json
+{
+  "type": "skeleton",
+  "shape": "box",
+  "variant": "shine"
+}
+```
 
-| `gap` | \`string \ | number\` | 行间距。默认值：`"2"`。 |
+***
 
-以及 `Skeleton` 的全部属性。
+## 4. 已加载状态内容切换
+
+一旦客户端数据加载完成，将 `loaded` 设为 `true` 会立即显示嵌套的子区块（如标题或真实卡片），并停止渲染占位背景。
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <Skeleton loaded={true}>
+      <div style={{ padding: "1rem", border: "1px solid var(--colors-gray-4)", borderRadius: "8px" }}>
+        <h3>Account Connected</h3>
+        <p style={{ fontSize: "0.85rem", color: "var(--colors-gray-11)", marginTop: "4px" }}>API key sync complete.</p>
+      </div>
+    </Skeleton>
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "skeleton",
+  "loaded": true,
+  "children": [
+    {
+      "blockType": "heading",
+      "text": "Account Connected",
+      "size": "sm"
+    },
+    {
+      "blockType": "text",
+      "content": "API key sync complete."
+    }
+  ]
+}
+```
+
+***
+
+# Props
+
+| 属性 | CMS 字段类型 | 默认值 | 描述 / 支持的选项 |
+| --- | --- | --- | --- |
+| **形状** (`shape`) | `select` | `"box"` | 代表正在加载资源的几何形态。 <br/>• 选项：`"box"`（卡片/图片）、`"circle"`（头像）、`"text"`（段落列）。 |
+| **动画变体** (`variant`) | `select` | `"pulse"` | 动画样式。 <br/>• 选项：`"pulse"`（渐变发光循环）、`"shine"`（对角线微光反射）、`"none"`（静态中性填充）。 |
+| **行数** (`noOfLines`) | `number` | `3` | 当 `shape` 设为 `"text"` 时显示的列行总数。 |
+| **已加载状态** (`loaded`) | `boolean` | `false` | 为 true 时跳过骨架遮罩，直接显示子组件。 |
+| **子区块** (`children`) | `list` | - | 嵌套的页面构建器组件，在 `loaded` 变为 true 前保持隐藏。 |
+
+***
+
+# Architecture Notes
+
+- **零布局跳动：** 几何尺寸参数（如 CSS grid 高度和宽度）在客户端注水前于服务器解析。这保留了比例布局边界，避免累积布局偏移（CLS）。
+- **GPU 加速微光：** 高光反射与发光脉冲循环利用高性能 CSS 变换。即使在低端移动设备上也保证 60fps 动画。
+- **动态内容映射：** 用 Skeleton 包裹组件，开发者可以异步获取客户端数据流，安全地将元素从占位符无缝过渡到可见状态。

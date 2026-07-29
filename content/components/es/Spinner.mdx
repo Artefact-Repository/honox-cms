@@ -7,42 +7,81 @@ hydration: 3
 import { Spinner } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-# Introducción
+# Introduction
 
-Un componente utilizado para indicar un estado de carga.
+El componente `Spinner` es un indicador circular animado que representa estados de espera activos. Excelente para transiciones rápidas, envíos de formularios y superposiciones de carga, se puede personalizar con rangos de escala explícitos y descripciones accesibles.
 
-# Uso
+***
+
+# Usage
+
+Puedes posicionar y configurar los spinners así:
+
+## 1. Cargador en línea estándar
+
+Un cargador predeterminado, ideal para indicar progreso del sistema en secciones, contenedores centrados o paneles laterales.
 
 <DemoPreview>
   <Spinner size="md" label="Loading..." />
 </DemoPreview>
 
-```tsx
-import { Spinner } from "../components/ui";
-
-export default function MyPage() {
-  return <Spinner size="md" label="Loading..." />;
+```json
+{
+  "type": "spinner",
+  "size": "md",
+  "label": "Loading..."
 }
 ```
 
-## Constructor de páginas CMS
+***
 
-Este componente está disponible como un bloque `spinner` en el [Constructor de páginas](/docs/PageBuilder) (`content/pages/*.json`):
+## 2. Cargador grande con acento
+
+Presenta un seguimiento visual de gran escala, comúnmente usado como pieza central durante recargas de página completa o sincronizaciones iniciales del espacio de trabajo.
+
+<DemoPreview>
+  <Spinner size="lg" label="Synchronizing data..." />
+</DemoPreview>
 
 ```json
 {
   "type": "spinner",
   "size": "lg",
-  "label": "Loading"
+  "label": "Synchronizing data..."
 }
 ```
 
-# Propiedades
+***
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `class` | `string` | Clases CSS personalizadas. |
+## 3. Subindicador diminuto (cargador de botón/contextual)
 
-| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg" \ | "xl" \ | "2xl" \ | "inherit"\` | El tamaño del spinner. |
+Un cargador de tamaño pequeño usado en paneles de control densos o tarjetas de contexto compactas para implicar recarga individual de recursos.
 
-| `label` | `string` | Una etiqueta accesible para lectores de pantalla. |
+<DemoPreview>
+  <Spinner size="sm" label="Connecting..." />
+</DemoPreview>
+
+```json
+{
+  "type": "spinner",
+  "size": "sm",
+  "label": "Connecting..."
+}
+```
+
+***
+
+# Props
+
+| Propiedad | Tipo de campo CMS | Predeterminado | Descripción / opciones admitidas |
+| --- | --- | --- | --- |
+| **Escala de tamaño** (`size`) | `select` | `"md"` | Controla el diámetro y grosor de línea del cargador circular. <br/>• Opciones: `"xs"`, `"sm"`, `"md"`, `"lg"`, `"xl"`, `"2xl"`. |
+| **Etiqueta accesible** (`label`) | `string` | - | Descripción alternativa anunciada por lectores de pantalla. Recomendado para cumplir normativas. |
+
+***
+
+# Architecture Notes
+
+- **Accesible desde el inicio:** Cada spinner compila con un envoltorio nativo `role="status"` que contiene etiquetas solo para lectores de pantalla (`class="sr-only"`), asegurando que el progreso se anuncie correctamente.
+- **Renderizado SVG puro:** Las animaciones del spinner usan rutas vectoriales ligeras (`<svg>`) rotadas vía keyframes CSS, sin dependencias pesadas ni imágenes estáticas.
+- **Tamaño de diseño óptimo:** Las escalas de tamaño corresponden exactamente a los tokens de espaciado del sistema de diseño, garantizando alineación en botones, alertas o tarjetas.

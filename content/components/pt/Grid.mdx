@@ -9,26 +9,43 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introdução
 
-Um primitive de layout responsivo com CSS Grid. Organize os filhos com um número
-explícito de colunas/linhas, ou deixe-os se autoajustarem com base em uma largura mínima de filho
-— ambos suportam valores responsivos (por breakpoint).
+Um contêiner de layout CSS Grid altamente responsivo e flexível para construir estruturas de página e interfaces baseadas em grade. Disponha elementos filhos com uma contagem explícita de colunas ou linhas, ou deixe-os se ajustar dinamicamente conforme uma largura mínima de filho sem necessidade de media queries explícitas. Suporta plenamente configurações responsivas por breakpoint.
 
-# Uso
+O componente **Grid** também está totalmente integrado como bloco `grid` no **Page Builder**, permitindo que autores e desenvolvedores construam facilmente estruturas responsivas, listas de cartões e controles lado a lado diretamente no CMS.
 
-## Colunas fixas
+***
+
+# Features
+
+- **Colunas e linhas dinâmicas:** Especifique trilhas facilmente com valores numéricos ou definições de template CSS.
+- **Escalonamento Auto-Fit:** Defina um limite de largura mínima (`minChildWidth`) para que o contêiner faça os filhos fluírem em colunas conforme o espaço.
+- **Breakpoints responsivos:** Suporte nativo para configurações entre breakpoints (`base`, `sm`, `md`, `lg`, `xl`, `2xl`).
+- **Renderização polimórfica:** Renderize como qualquer tag HTML semântica via `as`, ou delegue estilos a um filho via `asChild`.
+- **Desempenho sem deslocamento:** Os estilos compilam para utilitários Panda CSS estáticos otimizados, sem sobrecarga de JS no cliente.
+
+***
+
+# Usage
+
+Estes exemplos ilustram como estruturar componentes grid em código (JSX/TSX) e via JSON do Page Builder.
+
+## 1. Estrutura de colunas fixas
+
+Especifica uma contagem explícita de colunas que exibe três elementos lado a lado. Excelente para grades de recursos, métricas ou navegação.
 
 <DemoPreview>
   <Grid columns={3} gap="4" style={{ width: "100%" }}>
-    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-blue-3)", borderRadius: "8px" }}>1</div>
-    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-blue-3)", borderRadius: "8px" }}>2</div>
-    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-blue-3)", borderRadius: "8px" }}>3</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Column 1</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Column 2</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Column 3</div>
   </Grid>
 </DemoPreview>
 
+### JSX / TSX
 ```tsx
 import { Grid } from "../components/ui";
 
-export default function MyPage() {
+export default function Example() {
   return (
     <Grid columns={3} gap="4">
       <div>1</div>
@@ -39,72 +56,7 @@ export default function MyPage() {
 }
 ```
 
-## Autoajuste pela largura mínima de filho
-
-Nenhum breakpoint necessário — colunas são adicionadas ou removidas automaticamente conforme o
-contêiner é redimensionado.
-
-<DemoPreview>
-  <Grid minChildWidth="120px" gap="4" style={{ width: "100%" }}>
-    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>A</div>
-    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>B</div>
-    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>C</div>
-    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>D</div>
-  </Grid>
-</DemoPreview>
-
-```tsx
-import { Grid } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Grid minChildWidth="120px" gap="4">
-      <div>A</div>
-      <div>B</div>
-      <div>C</div>
-      <div>D</div>
-    </Grid>
-  );
-}
-```
-
-## Número de colunas responsivo
-
-```tsx
-import { Grid } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Grid columns={{ base: 1, md: 2, lg: 3 }} gap="4">
-      <div>1</div>
-      <div>2</div>
-      <div>3</div>
-    </Grid>
-  );
-}
-```
-
-## Espaçamentos de coluna e linha separados
-
-```tsx
-import { Grid } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Grid columns={2} columnGap="6" rowGap="2">
-      <div>1</div>
-      <div>2</div>
-      <div>3</div>
-      <div>4</div>
-    </Grid>
-  );
-}
-```
-
-## Construtor de páginas CMS
-
-Este componente está disponível como um bloco `grid` no [Construtor de páginas](/docs/PageBuilder) (`content/pages/*.json`):
-
+### Page Builder JSON
 ```json
 {
   "type": "grid",
@@ -118,19 +70,179 @@ Este componente está disponível como um bloco `grid` no [Construtor de página
 }
 ```
 
-# Propriedades
+***
 
-| Prop | Tipo | Descrição |
-| --- | --- | --- |
-| `children` | `any` | Conteúdo a ser renderizado dentro da grade. |
-| `class` | `string` | Classes CSS personalizadas. |
-| `columns` | `number \| string \| Responsive<...>` | Número de colunas (`repeat(columns, minmax(0, 1fr))`). Tem precedência sobre `minChildWidth` se ambos estiverem definidos. |
-| `rows` | `number \| string \| Responsive<...>` | Número de linhas (`repeat(rows, minmax(0, 1fr))`). |
-| `minChildWidth` | `number \| string \| Responsive<...>` | Autoajusta quantas colunas couberem, cada uma com pelo menos essa largura (`repeat(auto-fit, minmax(width, 1fr))`). Ignorado quando `columns` é definido. |
-| `gap` | `string \| number \| Responsive<...>` | Espaçamento entre células. Padrão `"8px"` a menos que `columnGap`/`rowGap` seja definido. |
-| `columnGap` | `string \| number \| Responsive<...>` | Espaçamento apenas entre colunas. |
-| `rowGap` | `string \| number \| Responsive<...>` | Espaçamento apenas entre filas. |
+## 2. Colunas Auto-Fit por largura mínima
 
-`Responsive<T>` aceita um valor simples ou um objeto por breakpoint,
-por exemplo `{ base: 1, md: 2, lg: 3 }`, usando os mesmos breakpoints do restante
-do design system (`base`, `sm`, `md`, `lg`, `xl`, `2xl`).
+As colunas são adicionadas ou removidas automaticamente ao redimensionar. Evita definir breakpoints, garantindo contêineres de cartões totalmente responsivos.
+
+<DemoPreview>
+  <Grid minChildWidth="120px" gap="4" style={{ width: "100%" }}>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>Card A</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>Card B</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>Card C</div>
+  </Grid>
+</DemoPreview>
+
+### JSX / TSX
+```tsx
+import { Grid } from "../components/ui";
+
+export default function Example() {
+  return (
+    <Grid minChildWidth="120px" gap="4">
+      <div>Card A</div>
+      <div>Card B</div>
+      <div>Card C</div>
+    </Grid>
+  );
+}
+```
+
+### Page Builder JSON
+```json
+{
+  "type": "grid",
+  "minChildWidth": "120px",
+  "gap": "4",
+  "children": [
+    { "type": "text", "content": "Card A" },
+    { "type": "text", "content": "Card B" },
+    { "type": "text", "content": "Card C" }
+  ]
+}
+```
+
+***
+
+## 3. Alocação de colunas responsiva
+
+Exibe uma única coluna em telas móveis, escala para duas em tablets e três em desktop.
+
+### Programmatic Usage (TSX)
+
+```tsx
+import { Grid } from "@/components/ui";
+
+export default function ResponsiveGrid() {
+  return (
+    <Grid columns={{ base: 1, md: 2, lg: 3 }} gap="6">
+      <div>Responsive Grid Item 1</div>
+      <div>Responsive Grid Item 2</div>
+      <div>Responsive Grid Item 3</div>
+    </Grid>
+  );
+}
+```
+
+### Page Builder Configuration (CMS JSON)
+
+### JSX / TSX
+```tsx
+import { Grid } from "../components/ui";
+
+export default function Example() {
+  return (
+    <Grid columns={{ base: 1, md: 2, lg: 3 }} gap="6">
+      <div>Responsive Grid Item 1</div>
+      <div>Responsive Grid Item 2</div>
+      <div>Responsive Grid Item 3</div>
+    </Grid>
+  );
+}
+```
+
+### Page Builder JSON
+```json
+{
+  "type": "grid",
+  "columns": "{\"base\": 1, \"md\": 2, \"lg\": 3}",
+  "gap": "6",
+  "children": [
+    { "type": "text", "content": "Responsive Grid Item 1" },
+    { "type": "text", "content": "Responsive Grid Item 2" },
+    { "type": "text", "content": "Responsive Grid Item 3" }
+  ]
+}
+```
+
+***
+
+## 4. Espaçamentos de coluna e linha separados
+
+Os espaços entre linhas e colunas podem ser configurados independentemente para criar grades assimétricas ou embalagem de linhas mais compacta.
+
+<DemoPreview>
+  <Grid columns={2} columnGap="6" rowGap="2" style={{ width: "100%" }}>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-green-3)", borderRadius: "8px" }}>1</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-green-3)", borderRadius: "8px" }}>2</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-green-3)", borderRadius: "8px" }}>3</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-green-3)", borderRadius: "8px" }}>4</div>
+  </Grid>
+</DemoPreview>
+
+### JSX / TSX
+```tsx
+import { Grid } from "../components/ui";
+
+export default function Example() {
+  return (
+    <Grid columns={2} columnGap="6" rowGap="2">
+      <div>1</div>
+      <div>2</div>
+      <div>3</div>
+      <div>4</div>
+    </Grid>
+  );
+}
+```
+
+### Page Builder JSON
+```json
+{
+  "type": "grid",
+  "columns": 2,
+  "columnGap": "6",
+  "rowGap": "2",
+  "children": [
+    { "type": "text", "content": "1" },
+    { "type": "text", "content": "2" },
+    { "type": "text", "content": "3" },
+    { "type": "text", "content": "4" }
+  ]
+}
+```
+
+***
+
+# Props
+
+| Propriedade | Tipo / Tipo de campo CMS | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `columns` | `number \| string \| Responsive<...>` | - | Contagem explícita de colunas (ex. `3` ou `"3"`). Aceita objeto de breakpoint ou string JSON no CMS (ex. `'{"base": 1, "md": 3}'`). Tem prioridade sobre `minChildWidth`. |
+| `rows` | `number \| string \| Responsive<...>` | - | Contagem explícita de linhas. Útil para layouts de template estruturados. |
+| `minChildWidth` | `number \| string \| Responsive<...>` | - | Limite de largura para colunas auto-fit (ex. `"120px"`, `"16rem"`). Ignorado se `columns` for especificado. |
+| `gap` | `string \| number \| Responsive<...>` | `"8px"` | Espaço entre células consecutivas. |
+| `columnGap` | `string \| number \| Responsive<...>` | - | Espaço horizontal apenas entre colunas. |
+| `rowGap` | `string \| number \| Responsive<...>` | - | Espaço vertical apenas entre linhas. |
+| `class` | `string` | - | Substituições de classe CSS personalizadas. |
+| `children` | `any \| list` | - | Coleção de blocos de layout ou visuais aninhados na grade. |
+
+> **Valores responsivos:** `Responsive<T>` aceita um valor plano ou um objeto mapeado por breakpoints (ex. `{ base: 1, md: 2, lg: 3 }`). O design system suporta `base`, `sm`, `md`, `lg`, `xl` e `2xl`.
+
+***
+
+# Hydration & Architecture
+
+### Tier-3 Presentational Layout Primitive
+O componente `Grid` é classificado como **Componente Presentacional Tier-3** na arquitetura Island Hydration. Não mantém estado reativo no cliente e não trata eventos. Portanto:
+- **Nunca monta uma ilha interativa no cliente**.
+- Compila diretamente para HTML estático sem JS, com overhead de bundle nulo.
+- Um prop `interactive` explícito não é necessário nem suportado.
+
+### Developer Implementation Notes
+- **Integração Panda CSS:** Traduz columns, rows e gaps em utilitários `grid` do Panda CSS com classes atômicas de alto desempenho.
+- **Strings JSON responsivas:** No Sveltia CMS, valores responsivos devem ser escritos como strings JSON (ex. `'{"base": 1, "md": 2}'`). São parseados automaticamente em runtime.
+
+### Accessibility Compliance
+- **Fluxo DOM natural:** O contêiner preserva a navegação sequencial por teclado (`Tab`) e a ordem de leitura do DOM. Alinhe os filhos com a sequência visual lógica para manter a acessibilidade.

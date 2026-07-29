@@ -9,134 +9,123 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introduction
 
-Une entrée segmentée pour les codes courts de longueur fixe — mots de passe à usage unique, SMS/e-mail
-codes de vérification, codes PIN. Chaque personnage a sa propre boîte, avec clavier
-navigation, prise en charge du collage/remplissage automatique et même étiquette/texte d'assistance/erreur
-conventions de texte/validateur comme « Champ ».
+Un contrôle de saisie segmenté et interactif conçu pour la saisie de chaînes alphanumériques courtes à longueur fixe, telles que les codes de vérification, les mots de passe à usage unique (OTP), les jetons de connexion SMS et les valeurs PIN. Il propose un cycle de focus automatique du curseur, la suppression par retour arrière, l'assainissement du collage et des descripteurs d'accessibilité entièrement unifiés.
 
-# Utilisation
+Le composant **PinField** est entièrement intégré en tant que bloc `pinField` dans le **Page Builder**, permettant aux auteurs et développeurs de configurer facilement les longueurs de code, les formats de vérification et les états de saisie directement dans le CMS.
+
+***
+
+# Usage
+
+Ces exemples illustrent comment les éditeurs de contenu lient et structurent des composants de champ PIN personnalisés.
+
+## 1. Saisie standard de vérification SMS à 6 chiffres
+
+Une saisie PIN numérique standard configurée avec 6 cases segmentées, optimisée pour les vérifications par e-mail ou SMS.
 
 <DemoPreview>
-  <div style={{ width: "100%", maxWidth: "320px" }}>
+  <div style={{ width: "100%", maxWidth: "360px" }}>
     <PinField
       label="Verification code"
-      helperText="Check your email for the 6-digit code"
+      helperText="Enter the 6-digit confirmation code we sent to your address."
       count={6}
       otp
       blurOnComplete
-      validator={(value) => value !== "000000" || "That code isn't valid"}
+      interactive
     />
   </div>
 </DemoPreview>
 
-```tsx
-import { PinField } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <PinField
-      label="Verification code"
-      helperText="Check your email for the 6-digit code"
-      count={6}
-      otp
-      blurOnComplete
-      onValueComplete={(details) => console.log(details.valueAsString)}
-    />
-  );
+```json
+{
+  "type": "pinField",
+  "label": "Verification code",
+  "helperText": "Enter the 6-digit confirmation code we sent to your address.",
+  "count": 6,
+  "otp": true,
+  "blurOnComplete": true,
+  "interactive": true
 }
 ```
 
-## Format des caractères
+## 2. Saisie de mot de passe masquée et sécurisée (4 chiffres)
 
-`format` (""numérique"` | `"alphanumérique"` | `"alphabétique"`, par défaut `"numérique"`)
-restreint ce qu'une boîte accepte et sélectionne le bon clavier mobile via
-`mode d'entrée`. Transmettez `pattern` avec une source d'expression rationnelle personnalisée par caractère à
-remplacez-le entièrement – ​​utile pour les codes de style coupon.
+Présente un module PIN sécurisé à 4 chiffres. La propriété `mask` sécurise la frappe en remplaçant les caractères par des puces de sécurité génériques.
 
-```tsx
-<PinField format="alphanumeric" count={8} placeholder="_" />
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "240px" }}>
+    <PinField
+      label="Security PIN"
+      placeholder="•"
+      count={4}
+      mask
+      interactive
+    />
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "pinField",
+  "label": "Security PIN",
+  "placeholder": "•",
+  "count": 4,
+  "mask": true,
+  "interactive": true
+}
 ```
 
-## Remplissage automatique
+## 3. Code promo alphanumérique personnalisé (variante flushed)
 
-`otp` marque le champ comme un code à usage unique SMS/e-mail. Plutôt que de mettre
-`autocomplete="one-time-code"` sur chaque case (ce qui rend les navigateurs et les mots de passe
-les gestionnaires affichent une possibilité de remplissage sur chacun d'eux à la fois), seule la case à laquelle l'utilisateur
-remplirait ensuite l'annonce - et accepte la longueur complète du code, donc un mobile
-La suggestion OTP du clavier ou un collage complet peut atterrir d'un seul coup et obtenir
-redistribué automatiquement dans les cases restantes. Une boîte sur deux opte
-des superpositions d'icônes de saisie automatique et de gestionnaire de mots de passe.
+Rend un sélecteur de code à 5 cases utilisant un format alphanumérique et une variante de bordure `flushed` distincte.
 
-## Comportement du clavier et du pointeur
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "300px" }}>
+    <PinField
+      label="Promo Coupon Code"
+      placeholder="-"
+      count={5}
+      format="alphanumeric"
+      variant="flushed"
+      interactive
+    />
+  </div>
+</DemoPreview>
 
-- **Taper** un caractère valide remplit la case actuelle et fait avancer le focus ; un  le contenu de la boîte déjà focalisée est sélectionné en premier (`selectOnFocus`, activé par
-  par défaut), donc la saisie remplace toujours plutôt que d'être bloquée silencieusement.
-- **Retour arrière** sur une case vide s'efface et revient à la précédente.- **Flèche gauche/droite** déplace le focus entre les cases ; **Les flèches haut/bas** sont  supprimé plutôt que de ne rien faire d’utile.
-- **Coller** ou une saisie automatique du système d'exploitation/gestionnaire de mots de passe distribue les caractères  à travers les cases en commençant par celle sur laquelle il a atterri.
-- **Tab** et le focus du clic/pointeur s'arrête sur la première case vide – vous ne pouvez pas  sautez devant un espace, modifiez uniquement une case déjà remplie ou continuez là où vous
-  laissé tomber.
-
-## Validation
-
-Comme `Field`, `PinField` accepte un `validateur` qui s'exécute sur le joint
-valeur et peut renvoyer « false » (erreur générique) ou une « chaîne » (message personnalisé).
-Il n'est revalidé qu'une fois que chaque case est remplie.
-
-```tsx
-<PinField
-  count={6}
-  validator={(value) =>
-    value !== "000000" || "That code isn't valid"
-  }
-  errorText="Enter the code we sent you"
-/>
+```json
+{
+  "type": "pinField",
+  "label": "Promo Coupon Code",
+  "placeholder": "-",
+  "count": 5,
+  "format": "alphanumeric",
+  "variant": "flushed",
+  "interactive": true
+}
 ```
 
-## Formulaires : soumission et réinitialisation automatiques
+***
 
-`form` associe l'entrée de soumission cachée du champ à un `<form id>` ailleurs
-dans le document (ou omettez-le si le champ réside déjà dans le formulaire).
-`autoSubmit` appelle `form.requestSubmit()` au moment où chaque case est remplie,
-après avoir tiré `onAutoSubmit` ; appuyer sur **Entrée** dans n'importe quelle case tente également
-soumettre, car un formulaire avec plusieurs entrées frères supprime le propre du navigateur
-soumettre sur Entrée. Réinitialisation du formulaire (un `<button type="reset">` natif, ou
-`form.reset()`) remet le champ à vide.
+# Props
 
-```tsx
-<form id="verify-form">
-  <PinField form="verify-form" name="code" count={6} otp autoSubmit />
-  <button type="reset">Clear</button>
-</form>
-```
-
-# Propriétés
-
-| Propriété | Type | Défaut | Description |
+| Propriété | Type de champ CMS | Défaut | Description / options prises en charge |
 | --- | --- | --- | --- |
-| `count` | `number` | `4` | Nombre de cartons. |
-| `value` | `string[]` | - | Valeur contrôlée, une entrée par case (force le mode interactif). |
-| `defaultValue` | `string[]` | - | Valeur initiale, une entrée par case (force le mode interactif). |
-| `format` | `"numeric" \| "alphanumeric" \| "alphabétique"` | `"numeric"` | Character class accepted per box. |
-| `pattern` | `string` | - | Source d'expression rationnelle personnalisée par caractère, remplace le « format ». |
-| `placeholder` | `string` | `"○"` | Affiché dans chaque case vide. |
-| `mask` | `boolean` | - | Renvoie chaque boîte sous la forme `type="password"`. |
-| `otp` | `boolean` | - | Cible le remplissage automatique `autocomplete="one-time-code"` au niveau de la case active uniquement. |
-| `blurOnComplete` | `boolean` | - | Brouille la dernière case une fois que chaque case est remplie. |
-| `autoFocus` | `boolean` | - | Concentre la première case sur la monture. |
-| `selectOnFocus` | `boolean` | `true` | Sélectionne le contenu d'une boîte sur le focus afin que la saisie le remplace. |
-| `disabled` | `boolean` | - | Désactive chaque case. |
-| `readOnly` | `boolean` | - | Empêche l'édition. |
-| `required` | `boolean` | - | Marque chaque case comme requis. |
-| `invalid` | `boolean` | - | Force l'état invalide, en remplaçant `validator`. |
-| `name` | `string` | - | Nom du champ de formulaire pour l’entrée de soumission masquée. |
-| `form` | `string` | - | Associe l'entrée masquée (et `autoSubmit`/reset) à un `<form id>`. |
-| `autoSubmit` | `boolean` | - | Appelle `form.requestSubmit()` une fois terminé (force le mode interactif). |
-| `onAutoSubmit` | `(valueAsString: string) => void` | - | Lancé juste avant la tentative de soumission « autoSubmit ». |
-| `label` | `Child` | - | L'étiquette du champ. |
-| `helperText` | `Child` | - | Texte d'aide affiché sous les cases. |
-| `errorText` | `Child` | - | Texte d'erreur affiché lorsqu'il n'est pas valide ; un résultat de chaîne `validator` remplace cela. |
-| `validator` | `(value: string) => boolean \| string` | - | Validates the joined value once complete (forces interactive mode). |
-| `onValueChange` | `(details: { value: string[]; valueAsString: string }) => void` | - | Se déclenche à chaque changement (force le mode interactif). |
-| `onValueComplete` | `(details: { value: string[]; valueAsString: string }) => void` | - | Se déclenche une fois que chaque boîte est remplie. |
-| `onValueInvalid` | `(details: { index: number; value: string }) => void` | - | Se déclenche lorsqu'un caractère tapé/collé est rejeté par `format`/`pattern`. |
-| `interactive` | `boolean` | - | Force ou interdit l’hydratation comme une île. |
+| **Texte du libellé** (`label`) | `string` | - | En-tête visuel principal placé au-dessus des segments. |
+| **Texte d'aide** (`helperText`) | `string` | - | Instructions descriptives affichées sous les cases. |
+| **Message d'erreur** (`errorText`) | `string` | - | Message de validation affiché en cas d'échec de la validation. |
+| **Nombre de cases** (`count`) | `number` | `4` | Nombre de cases de segment à générer. |
+| **Classe de caractère** (`format`) | `select` | `"numeric"` | Restreint les caractères acceptés. <br/>• Options : `"numeric"`, `"alphanumeric"`, `"alphabetic"`. |
+| **Masque de caractère** (`mask`) | `boolean` | `false` | Masque les valeurs saisies pour les saisies sécurisées. |
+| **Autoremplissage OTP** (`otp`) | `boolean` | `false` | Active la détection de code à usage unique sur mobile. |
+| **Auto-envoi** (`autoSubmit`) | `boolean` | `false` | Soumet le formulaire englobant dès le dernier segment rempli. |
+| **Variante visuelle** (`variant`) | `select` | `"outline"` | Style visuel de chaque case. <br/>• Options : `"outline"`, `"subtle"`, `"surface"`, `"flushed"`. |
+| **Échelle de taille** (`size`) | `select` | `"md"` | Contrôle la largeur et la hauteur des cases. <br/>• Options : `"xs"`, `"sm"`, `"md"`, `"lg"`, `"xl"`. |
+| **Forcer interactif** (`interactive`) | `boolean` | `true` | Hydrate les champs pour lier les déclencheurs et l'assainissement du collage. |
+
+***
+
+# Developer Notes & Accessibility
+
+- **Îlot d'hydratation :** En tant que mise en page avancée capturant les événements de collage, assainissant les entrées et gérant les sauts de curseur entre champs sur les limites de focus mobile, PinField fonctionne comme un îlot conditionnel de Niveau 2 (`"interactive": true`).
+- **Conformité WAI-ARIA :** La composante enveloppe chaque segment avec des balises de mise en page et de libellé appropriées (`role="group"`, `aria-label`). Les utilisateurs peuvent naviguer entre les segments avec les flèches ou la touche de retour.
+- **Intégration de formulaire :** Elle intègre un `<input>` natif masqué portant la chaîne de code complète. Les règles d'auto-envoi appellent `form.requestSubmit()` à la fin de la saisie, transmettant l'action au formulaire parent le plus proche.

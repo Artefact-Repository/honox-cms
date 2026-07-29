@@ -1,5 +1,5 @@
 ---
-title: Tooltip
+title: Tooltip Tooltip
 category: Overlays
 hydration: 1
 ---
@@ -9,74 +9,90 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Einführung
 
-Eine Komponente zum Anzeigen von kontextbezogenen Informationen bei Hover oder Fokus.
+Die `Tooltip`-Komponente ist ein kontextuelles Overlay-Element, das ergänzenden, nicht-interaktiven beschreibenden Text anzeigt, wenn der Zeiger den Trigger berührt oder fokussiert.
 
 # Verwendung
+Speziell für unsere Zero-JS-Static-Rendering-Architektur und das bedingte Hydration-Modell konzipiert, nutzt der Tooltip effiziente, Page-Builder-freundliche Bindings, damit Redakteure kontextuelle Hinweise nahtlos an beliebige UI-Elemente heften können.
 
-## High-Level-Wrapper
+***
+
+
+Diese Beispiele zeigen, wie Redakteure Tooltip-Blöcke konfigurieren und binden.
+
+## 1. Basis-Tooltip mit Button-Trigger
+
+Ein klassischer Hover-Hinweis, der eine Button-Aktion erklärt, mit Standard-Platzierung (oben zentriert).
 
 <DemoPreview>
-  <Tooltip content="This is the tooltip content" placement="bottom" showArrow asChild>
-    <Button>Hover me</Button>
-  </Tooltip>
+  <Tooltip
+    interactive
+    trigger={<Button variant="outline">Submit Report</Button>}
+    content="Sends your compiled analytics to the billing department."
+  />
 </DemoPreview>
-
-```tsx
-import { Tooltip } from "../components/ui/tooltip";
-import { Button } from "../components/ui/button";
-
-export default function MyPage() {
-  return (
-    <Tooltip content="This is the tooltip content" placement="bottom" showArrow asChild>
-      <Button>Hover me</Button>
-    </Tooltip>
-  );
-}
-```
-
-Bevorzugen Sie `asChild`, wenn der Auslöser bereits ein fokussierbares Element ist (eine `Button`, ein Link, …): Es führt die `aria-describedby`, Hover/Fokus-Listener und `data-*`-Attribute des Tooltips direkt mit diesem Element zusammen. Ohne `asChild` wird der Auslöser in ein zusätzliches `<div tabindex="0">` eingehüllt – nützlich zum Umhüllen inaktiven Inhalts (einfacher Text, ein Symbol), der selbst nicht fokussierbar ist, fügt aber eine zweite, redundante Tab-Stopp hinzu, wenn das Kind bereits interaktiv ist.
-
-## CMS-Seitenbauer
-
-Diese Komponente ist als `tooltip`-Block im [Seitenbauer](/docs/PageBuilder) (`content/pages/*.json`) verfügbar. Der CMS-Auslöser ist eine einfache `triggerText`-Zeichenfolge, die automatisch in eine `Button` mit Umriss und `asChild` eingehüllt wird (dasselbe Muster wie `Popover`/`HoverCard`):
 
 ```json
 {
   "type": "tooltip",
-  "content": "Free cancellation up to 24 hours before check-in.",
-  "triggerText": "Cancellation Policy",
-  "placement": "top",
-  "showArrow": true
+  "triggerText": "Submit Report",
+  "content": "Sends your compiled analytics to the billing department."
 }
 ```
 
-# Eigenschaften
+## 2. Multi-Seiten-Platzierung und deaktivierter Tooltip
 
-## Tooltip (High-Level-Wrapper)
+Dieselbe Komponente wird über die `placement`-Eigenschaft in mehrere Richtungen (unten, rechts, links) verschoben, um schmale Panels zu bedienen. Der dritte zeigt die `disabled`-Variante, die beim Deaktivieren keinen Hinweis zeigt.
 
-| Eigenschaft | Typ | Beschreibung |
-| --- | --- | --- |
-| `children` | `any` | Das Element, das den Tooltip auslöst. |
-| `content` | `any` | Der im Tooltip anzuzeigende Inhalt. |
-| `showArrow` | `boolean` | Legt fest, ob ein Pfeil zum Auslöser angezeigt wird. |
+<DemoPreview>
+  <div style={{ display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap" }}>
+    <Tooltip
+      interactive
+      placement="bottom"
+      trigger={<Button variant="outline">Bottom Hint</Button>}
+      content="Appears below the trigger."
+    />
+    <Tooltip
+      interactive
+      placement="right"
+      trigger={<Button variant="outline">Right Hint</Button>}
+      content="Appears to the right side."
+    />
+    <Tooltip
+      interactive
+      disabled
+      trigger={<Button variant="outline">Disabled Hint</Button>}
+      content="Won't show while disabled."
+    />
+  </div>
+</DemoPreview>
 
-| `placement` | `"top" | "bottom" | "left" | "right"` | An welcher Seite des Auslösers der Inhalt geöffnet wird. Standard `"top"`. Wechselt bei unzureichendem Viewport-Platz automatisch auf die gegenüberliegende Seite. |
+```json
+{
+  "type": "tooltip",
+  "triggerText": "Bottom Hint",
+  "content": "Appears below the trigger.",
+  "placement": "bottom",
+  "interactive": true
+}
+```
 
-| `open` | `boolean` | Legt fest, ob der Tooltip geöffnet ist (gesteuert). |
-| `defaultOpen` | `boolean` | Anfänglicher Öffnungszustand (ungesteuert). Standard `false`. |
-| `onOpenChange` | `(details: { open: boolean }) => void` | Wird aufgerufen, wenn der Tooltip geöffnet oder geschlossen wird. |
-| `openDelay` | `number` | Verzögerung (ms) vor dem Anzeigen bei Hover. Standard `100`. |
-| `closeDelay` | `number` | Verzögerung (ms) vor dem Ausblenden bei Maus-verlassen. Standard `100`. |
-| `closeOnEscape` | `boolean` | Schließen, wenn Escape gedrückt wird. Standard `true`. |
-| `disabled` | `boolean` | Legt fest, ob der Tooltip deaktiviert ist. |
-| `interactive` | `boolean` | Erzwingt die Hydration als Insel. Standardmäßig `true`. |
-| `id` | `string` | Eindeutige Kennung für den Tooltip. |
-| `asChild` | `boolean` | Legt fest, ob Props mit dem unmittelbaren Kindelement zusammengeführt werden, anstatt in ein `div` eingehüllt zu werden. |
+***
 
-Das Bewegen des Zeigers über den Auslöser oder das Fokussieren des Auslösers öffnet den Tooltip; das Bewegen des Zeigers auf den eigenen Inhalt des Tooltips (z. B. ein Link darin) hält ihn geöffnet, gemäß [WCAG 1.4.13](https://www.w3.org/WAI/WCAG21/Understanding/content-on-hover-or-focus.html).
+# Props
 
-Das Fokussieren des Auslösers (Tastaturnavigation) öffnet ihn sofort, und das Entfokussieren schließt ihn sofort – die `openDelay`/`closeDelay` gelten nur für Hover.
+| Eigenschaft | CMS-Feldtyp | Standard | Beschreibung / unterstützte Optionen |
+| --- | --- | --- | --- |
+| **Trigger-Text** (`triggerText`) | `string` | `"Hover me"` | Visuelles Label innerhalb des Tooltip-Triggers. |
+| **Tooltip-Inhalt** (`content`) | `string` | - | Ergänzender Hilfetext beim Hover. |
+| **Platzierung** (`placement`) | `select` | `"top"` | Physische Verankerungsrichtung relativ zum Trigger. <br/>• Optionen: `"top"`, `"bottom"`, `"left"`, `"right"` sowie `-start`/`-end`-Varianten. |
+| **Deaktiviert** (`disabled`) | `boolean` | `false` | Deaktiviert die Tooltip-Funktion vollständig. |
+| **Interaktiv erzwingen** (`interactive`) | `boolean` | `true` | Hydriert die Tooltip-Insel zum Binden von Hover/Fokus. |
+| **Verzögerung (ms)** (`delayMs`) | `number` | `300` | Millisekunden, die der Tooltip vor dem Auslösen wartet. |
 
-# Einschränkungen
+***
 
-Die interaktive Insel positioniert und dimensioniert den Tooltip relativ zu seinem Auslöser: Er wechselt auf die gegenüberliegende Seite (z. B. `top` → `bottom`), wenn die angeforderte Platzierung den Viewport überlaufen würde, und begrenzt die Querachse, sodass der Inhalt nie außerhalb des Bildschirms gerendert wird. Es verfolgt Scroll-Container oder Resize-Observer nicht so wie Floating UI – die Neupositionierung läuft nur ab, wenn der Tooltip geöffnet wird und beim Fenster-`resize`.
+# Architecture Notes
+
+- **Intelligente Viewport-Grenzausrichtung:** Die interaktive Preact-Insel verfolgt den Bildschirmplatz dynamisch. Öffnet sich der Tooltip nahe einer Kante, wird die Richtung automatisch umgekehrt (z. B. von unten nach oben) und entlang der Achse verschoben.
+- **Einheitliche Event-Delegation:** Hover-Erkennung, Fokus-Anzeige und Escape-Schließen werden zentral vom Container delegiert, minimiert clientseitige Bindings.
+- **Semantische Overlays:** Tooltips kompilieren in native, barrierefreie Layouts mit `role="tooltip"`, `aria-describedby` und eindeutigen Trigger-IDs ab Werk.

@@ -1,62 +1,122 @@
 ---
 title: Switch Interruptor
-hydration: 2
 category: Forms
+hydration: 2
 ---
 
 import { Switch } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-# Introducción
+# Introduction
 
-Un control que permite al usuario alternar entre los estados activado y desactivado.
+Un control de conmutación binario inspirado en iOS que alterna entre habilitar/deshabilitar una configuración independiente. Común en paneles de ajustes, preferencias de perfil o conmutadores de suscripción. Enfatiza visualmente la semántica de activado/desactivado más que una casilla estándar.
 
-# Uso
+El componente **Switch** está totalmente integrado como bloque `switch` en el **Page Builder**, permitiendo a los autores configurar fácilmente etiqueta, texto de ayuda, color de énfasis de marca, escala de tamaño y estado predeterminado.
+
+***
+
+# Usage
+
+Estos ejemplos ilustran cómo los editores de contenido enlazan y estructuran controles de interruptor.
+
+## 1. Interruptor activado por defecto con texto de ayuda (variante Line)
+
+Un interruptor activado por defecto con texto de ayuda explicativo. Muestra la fluida variante `line` y una paleta de marca verde asignada al estado activo.
 
 <DemoPreview>
-  <Switch defaultChecked interactive>Enable Notifications</Switch>
+  <Switch
+    label="Airplane Mode"
+    helperText="Disable wireless connections"
+    colorPalette="green"
+    defaultChecked
+    interactive
+  />
 </DemoPreview>
-
-```tsx
-import { Switch } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Switch
-      defaultChecked={true}
-      onCheckedChange={(details) => console.log(details.checked)}
-      interactive
-    >
-      Enable Notifications
-    </Switch>
-  );
-}
-```
-
-## Constructor de páginas CMS
-
-Este componente está disponible como un bloque `switch` en el [Constructor de páginas](/docs/PageBuilder) (`content/pages/*.json`):
 
 ```json
 {
   "type": "switch",
-  "label": "Dark Mode",
-  "checked": true,
-  "colorPalette": "blue"
+  "label": "Airplane Mode",
+  "helperText": "Disable wireless connections",
+  "colorPalette": "green",
+  "type": "line",
+  "size": "md",
+  "defaultChecked": true,
+  "interactive": true
 }
 ```
 
-# Propiedades
+## 2. Interruptor compacto apagado por defecto (énfasis rojo)
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `children` | `any` | Contenido de la etiqueta que se renderiza junto al switch. |
-| `class` | `string` | Clases CSS personalizadas. |
-| `checked` | `boolean` | Si el switch está activado (controlado). |
-| `defaultChecked` | `boolean` | El estado inicial activado (no controlado). |
-| `disabled` | `boolean` | Si el switch está deshabilitado. |
-| `onCheckedChange` | `(details: { checked: boolean }) => void` | Callback activado cuando cambia el estado activado. |
+El estado activo de acciones destructivas debe usar acentos de peligro como el rojo. Esta demo usa el nivel de tamaño compacto `sm`.
 
-| `size` | \`"sm" \ | "md" \ | "lg"\` | El tamaño del switch. |
+<DemoPreview>
+  <Switch
+    label="Delete History"
+    helperText="Permanently erase activity logs"
+    colorPalette="red"
+    size="sm"
+    interactive
+  />
+</DemoPreview>
 
-| `interactive` | `boolean` | Fuerza la hidratación como island. |
+```json
+{
+  "type": "switch",
+  "label": "Delete History",
+  "helperText": "Permanently erase activity logs",
+  "colorPalette": "red",
+  "type": "line",
+  "size": "sm",
+  "defaultChecked": false,
+  "interactive": true
+}
+```
+
+## 3. Interruptor deshabilitado con icono en línea
+
+Demuestra estados de interacción combinados: un interruptor deshabilitado pero que muestra su valor seleccionado.
+
+<DemoPreview>
+  <Switch
+    label="Beta Features"
+    helperText="Currently locked by admin"
+    disabled
+    defaultChecked
+    interactive
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "switch",
+  "label": "Beta Features",
+  "helperText": "Currently locked by admin",
+  "disabled": true,
+  "defaultChecked": true,
+  "interactive": true
+}
+```
+
+***
+
+# Props
+
+| Propiedad | Tipo de campo CMS | Predeterminado | Descripción / opciones admitidas |
+| --- | --- | --- | --- |
+| **Texto de etiqueta** (`label`) | `string` | - | Título descriptivo junto a la pista del interruptor. |
+| **Texto de ayuda** (`helperText`) | `string` | - | Nota contextual ligera bajo el interruptor. |
+| **Color de énfasis de marca** (`colorPalette`) | `select` | `"blue"` | Paleta visual del relleno de la pista en estado activo. <br/>• Opciones: blue, green, red, purple, orange, amber, cyan, slate. |
+| **Variante visual** (`variant`) | `select` | `"line"` | Estilo visual de la pista. <br/>• Opciones: `"line"`, `"surface"`, `"subtle"`, `"flushed"`. |
+| **Escala de tamaño** (`size`) | `select` | `"md"` | Controla el tamaño general de la pista. <br/>• Opciones: `"xs"`, `"sm"`, `"md"`, `"lg"`, `"xl"`. |
+| **Marcado por defecto** (`defaultChecked`) | `boolean` | `false` | Si es true, el componente inicia en estado activado. |
+| **Deshabilitado** (`disabled`) | `boolean` | `false` | Desactiva la interacción y aplica una capa atenuada. |
+| **Forzar interactivo** (`interactive`) | `boolean` | `true` | Hidrata el interruptor para enlazar eventos de teclado y conmutación. |
+
+***
+
+# Developer Notes & Accessibility
+
+- **Navegación por teclado:** El control admite interacción nativa — con el foco, `Space` o `Enter` conmutan el estado. El anillo de foco sigue nuestros tokens de diseño.
+- **Cumplimiento WAI-ARIA:** Compila como interruptor semántico (`role="switch"`, `aria-checked`), permitiendo a los lectores de pantalla anunciar el estado binario exacto.
+- **Isla de hidratación:** Como diseño avanzado que captura eventos de conmutación, cercado de foco y gestión de estado accesible, Switch opera como una isla condicional de Nivel 2 (`"interactive": true`).

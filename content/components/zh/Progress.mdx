@@ -7,81 +7,107 @@ hydration: 3
 import { Progress } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-# 简介
+# Introduction
 
-一个以线性条或圆形指示器展示操作完成进度的组件。
+一个用于传达操作完成进度的可视化状态组件。它通过标准线性条跟踪器或现代圆形表盘指示器显示实时状态值。主要用于在多步骤向导、内容上传、文件处理或系统安装过程中引导用户。
 
-# 用法
+**Progress** 组件已作为 `progress` 区块完全集成到 **Page Builder** 中，使内容作者和开发人员能够直接在 CMS 中轻松配置视觉范围、主题、尺寸、标签和指示器布局。
 
-## 线性进度
+***
+
+# Usage
+
+以下示例展示了内容编辑人员如何绑定和构建交互式进度指示器。
+
+## 1. 带状态标签的标准线性进度条
+
+显示下载或处理进度的经典线性条指示器，带有活动标签详情和格式化百分比文本。
 
 <DemoPreview>
-  <div style={{ width: "100%", maxWidth: "320px" }}>
-    <Progress value={72} showValueText />
+  <div style={{ width: "100%", maxWidth: "360px" }}>
+    <Progress label="System Backup" value={72} showValueText />
   </div>
 </DemoPreview>
-
-```tsx
-import { Progress } from "../components/ui";
-
-export default function MyPage() {
-  return <Progress value={72} showValueText />;
-}
-```
-
-## 圆形进度
-
-<DemoPreview>
-  <Progress type="circular" value={40} showValueText />
-</DemoPreview>
-
-```tsx
-import { Progress } from "../components/ui";
-
-export default function MyPage() {
-  return <Progress type="circular" value={40} showValueText />;
-}
-```
-
-## CMS 页面构建器
-
-该组件可作为 `progress` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用：
 
 ```json
 {
   "type": "progress",
+  "label": "System Backup",
   "value": 72,
+  "showValueText": true,
+  "type": "linear",
+  "size": "md"
+}
+```
+
+## 2. 紧凑型圆形进度表
+
+将完成指标渲染为紧凑的圆形表盘。适用于统计概览图表、迷你仪表盘小组件或独立网格项。
+
+<DemoPreview>
+  <Progress type="circular" value={40} showValueText label="Storage Used" />
+</DemoPreview>
+
+```json
+{
+  "type": "progress",
+  "label": "Storage Used",
+  "type": "circular",
+  "value": 40,
   "showValueText": true
 }
 ```
 
-# 属性
+## 3. 带自定义颜色（成功绿）的强调条纹进度
 
-## Progress
+演示如何将专用颜色主题调色板、条纹视觉图案和大的视觉布局比例应用到进度操作条。
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "360px" }}>
+    <Progress
+      label="Uploading media files"
+      colorPalette="green"
+      striped
+      value={85}
+      size="lg"
+      showValueText
+    />
+  </div>
+</DemoPreview>
 
-| `value` | \`number \ | null\` | 当前值。 |
+```json
+{
+  "type": "progress",
+  "label": "Uploading media files",
+  "value": 85,
+  "showValueText": true,
+  "striped": true,
+  "colorPalette": "green",
+  "size": "lg"
+}
+```
 
-| `min` | `number` | 最小值。默认：`0`。 |
-| `max` | `number` | 最大值。默认：`100`。 |
-| `label` | `Child` | 显示在指示器上方的标签。 |
-| `showValueText` | `boolean` | 是否显示数值文本。默认：`false`。 |
-| `valueText` | `Child` | 用于显示的自定义数值文本。 |
+***
 
-| `type` | \`"linear" \ | "circular"\` | 进度的视觉样式。默认：`"linear"`。 |
-| `variant` | \`"solid" \ | "subtle"\` | 视觉变体。 |
+# Props
 
-| `shape` | \`"square" \ | "rounded" \ | "full"\` | 指示器的形状。 |
+| 属性 | CMS 字段类型 | 默认值 | 描述 / 支持的选项 |
+| --- | --- | --- | --- |
+| **进度标签** (`label`) | `string` | - | 位于指示器轨道上方可选的描述性标题。 |
+| **当前值** (`value`) | `number` | `0` | 数值完成度。设为 `null` 可渲染不确定（加载中）状态。 |
+| **最小值** (`min`) | `number` | `0` | 进度标尺的下限。 |
+| **最大值** (`max`) | `number` | `100` | 进度标尺的上限。 |
+| **显示百分比** (`showValueText`) | `boolean` | `false` | 勾选后，在跟踪器旁显示精确的数值百分比文本。 |
+| **指示器类型** (`type`) | `select` | `"linear"` | 进度布局的视觉设计格式。 <br/>• 选项：`"linear"`、`"circular"`。 |
+| **视觉变体** (`variant`) | `select` | `"solid"` | 轨道与填充区间的视觉样式。 <br/>• 选项：`"solid"`、`"subtle"`。 |
+| **边框形状** (`shape`) | `select` | `"full"` | 应用于线性轨道的圆角。 <br/>• 选项：`"square"`、`"rounded"`、`"full"`。 |
+| **条纹轨道** (`striped`) | `boolean` | `false` | 在线性条上渲染视觉斜纹图案。 |
+| **颜色主题** (`colorPalette`) | `select` | `"blue"` | 应用于轨道进度填充的主题调色板。 <br/>• 选项：blue、green、red、purple、orange、amber、cyan、slate。 |
+| **尺寸比例** (`size`) | `select` | `"md"` | 控制垂直高度或圆形半径比例。 <br/>• 选项：`"xs"`、`"sm"`、`"md"`、`"lg"`、`"xl"`。 |
 
-| `striped` | `boolean` | 是否显示条纹填充（线性）。 |
-| `animated` | `boolean` | 填充是否带动画。 |
+***
 
-| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg" \ | "xl"\` | 指示器的尺寸。 |
+# Developer Notes & Accessibility
 
-| `class` | `string` | 根元素的自定义 CSS 类。 |
-
-# 子组件
-
-`Progress.Root`, `Progress.Track`, `Progress.Range`, `Progress.Circle`, `Progress.CircleTrack`, `Progress.CircleRange`, `Progress.Label`, `Progress.ValueText`, `Progress.View`
+- **无需注水（纯静态）：** 进度条组件纯粹通过布局绑定和标准 CSS 动画运行，被指定为纯静态组件（Tier 3），零客户端 JavaScript 包体积。
+- **WAI-ARIA 合规性：** 在底层，该组件编译为标准语义进度包装器（`role="progressbar"`、`aria-valuenow`、`aria-valuemin`、`aria-valuemax`）。如果 value 属性未设置或为 null，它会自动切换到不确定（加载中）状态。

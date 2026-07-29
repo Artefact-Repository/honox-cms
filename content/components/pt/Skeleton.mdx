@@ -7,73 +7,128 @@ hydration: 3
 import { Skeleton } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-# Introdução
+# Introduction
 
-Um espaço reservado usado para indicar que o conteúdo está carregando, com uma variedade de opções de animação e forma.
+O componente `Skeleton` é um elemento de espaço reservado de alto desempenho que indica que o conteúdo está carregando. Ao renderizar espaços geométricos que simulam o layout, evita saltos bruscos de conteúdo (CLS) enquanto dados remotos carregam.
 
-# Uso
+O componente suporta diferentes formas geométricas (colunas de texto, blocos quadrados e avatares circulares), bem como loops de animação responsivos (como brilho ou pulso) diretamente via configuração visual.
 
-## Skeleton básico
+***
+
+# Usage
+
+Você pode construir estados de mockup para cartões, perfis e listas assim:
+
+## 1. Espaço reservado de bloco de texto multilínha
+
+Simula um parágrafo ou campo de descrição enquanto aguarda o texto do artigo. Renderiza colunas empilhadas com um ciclo de pulso sutil automático.
 
 <DemoPreview>
-  <div style={{ display: "flex", flexDirection: "column", gap: "1rem", width: "100%", maxWidth: "320px" }}>
-    <Skeleton shape="circle" size="12" />
-    <Skeleton height="6" width="40" />
+  <div style={{ width: "100%", maxWidth: "320px" }}>
     <Skeleton shape="text" noOfLines={3} />
   </div>
 </DemoPreview>
-
-```tsx
-import { Skeleton, SkeletonCircle, SkeletonText } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <div>
-      <SkeletonCircle size="12" />
-      <Skeleton height="6" width="40" />
-      <SkeletonText noOfLines={3} />
-    </div>
-  );
-}
-```
-
-## Construtor de páginas CMS
-
-Este componente está disponível como um bloco `skeleton` no [Construtor de Páginas](/docs/PageBuilder) (`content/pages/*.json`). As opções `shape` do CMS são `box`/`circle`/`text`, mapeadas para a propriedade real `shape` (`box` recai para o padrão simples):
 
 ```json
 {
   "type": "skeleton",
   "shape": "text",
-  "noOfLines": 3
+  "noOfLines": 3,
+  "variant": "pulse"
 }
 ```
 
-# Propriedades
+***
 
-## Skeleton
+## 2. Espaço reservado de avatar circular
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `loading` | `boolean` | Se deve exibir o skeleton. Padrão: `true`. |
-| `circle` | `boolean` | Renderiza o skeleton como um círculo. |
+Renderiza uma forma circular que coincide com fotos de perfil ou ícones de avatar. Combine com esqueletos de texto para simular cabeçalhos de usuário.
 
-| `variant` | \`"pulse" \ | "shine" \ | "none"\` | O estilo de animação. |
+<DemoPreview>
+  <div style={{ width: "100%" }}>
+    <Skeleton shape="circle" size="12" />
+  </div>
+</DemoPreview>
 
-| `class` | `string` | Classes CSS personalizadas para o elemento raiz. |
+```json
+{
+  "type": "skeleton",
+  "shape": "circle",
+  "variant": "pulse"
+}
+```
 
-Todos os outros atributos nativos de `<div>` (por exemplo, `style`, `id`, `width`, `height`) são repassados ao elemento subjacente.
+***
 
-## SkeletonCircle
+## 3. Contêiner de caixa com brilho (mockup de cartão)
 
-Mesmas propriedades que `Skeleton`, pré-configurado com `circle`.
+Um contêiner retangular com animação de reflexo diagonal brilhante, ideal para cartões de mídia ou mockups de banner.
 
-## SkeletonText
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <Skeleton shape="box" height="32" />
+  </div>
+</DemoPreview>
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `noOfLines` | `number` | Número de linhas a exibir. Padrão: `3`. |
+```json
+{
+  "type": "skeleton",
+  "shape": "box",
+  "variant": "shine"
+}
+```
 
-| `gap` | \`string \ | number\` | Espaço entre as linhas. Padrão: `"2"`. |
+***
 
-Mais todas as propriedades de `Skeleton`.
+## 4. Alternância de conteúdo no estado carregado
+
+Quando os dados do cliente terminam de carregar, `loaded: true` revela instantaneamente os blocos filhos (como um cabeçalho ou cartão real) e interrompe o fundo de espaço reservado.
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <Skeleton loaded={true}>
+      <div style={{ padding: "1rem", border: "1px solid var(--colors-gray-4)", borderRadius: "8px" }}>
+        <h3>Account Connected</h3>
+        <p style={{ fontSize: "0.85rem", color: "var(--colors-gray-11)", marginTop: "4px" }}>API key sync complete.</p>
+      </div>
+    </Skeleton>
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "skeleton",
+  "loaded": true,
+  "children": [
+    {
+      "blockType": "heading",
+      "text": "Account Connected",
+      "size": "sm"
+    },
+    {
+      "blockType": "text",
+      "content": "API key sync complete."
+    }
+  ]
+}
+```
+
+***
+
+# Props
+
+| Propriedade | Tipo de campo CMS | Padrão | Descrição / opções suportadas |
+| --- | --- | --- | --- |
+| **Forma** (`shape`) | `select` | `"box"` | Formato geométrico do recurso. <br/>• Opções: `"box"` (cartões/imagens), `"circle"` (avatares), `"text"` (colunas de parágrafo). |
+| **Variante de animação** (`variant`) | `select` | `"pulse"` | Estilo de animação. <br/>• Opções: `"pulse"` (brilho gradual), `"shine"` (reflexo diagonal), `"none"` (preenchimento estático). |
+| **Número de linhas** (`noOfLines`) | `number` | `3` | Total de colunas ao usar `shape: "text"`. |
+| **Estado carregado** (`loaded`) | `boolean` | `false` | Se true, ignora a máscara e exibe os filhos. |
+| **Blocos filhos** (`children`) | `list` | - | Componentes do page builder ocultos até `loaded: true`. |
+
+***
+
+# Architecture Notes
+
+- **Zero deslocamento de layout:** Parâmetros geométricos (altura/largura CSS grid) são processados no servidor antes da hidratação, preservando limites proporcionais e evitando o CLS.
+- **Brilho acelerado por GPU:** Reflexos e pulsos usam transforms CSS de alto desempenho, garantindo 60fps mesmo em dispositivos móveis básicos.
+- **Mapeamento dinâmico:** Envolver componentes com Skeleton permite buscar fluxos de dados do cliente de forma assíncrona, transitando sem interrupção de espaços para estados visíveis.

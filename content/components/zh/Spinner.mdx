@@ -7,42 +7,81 @@ hydration: 3
 import { Spinner } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-# 简介
+# Introduction
 
-用于指示加载状态的组件。
+`Spinner` 组件是一个动画圆形指示器，用于表示活跃的等待状态。非常适合快速过渡、表单提交和加载弹窗浮层，可通过明确的缩放范围和无障碍描述进行自定义。
 
-# 用法
+***
+
+# Usage
+
+你可以按以下方式定位和配置 spinner：
+
+## 1. 标准内联加载器
+
+默认加载器，适用于在区块、页面居中容器或侧边栏面板中指示系统进度。
 
 <DemoPreview>
   <Spinner size="md" label="Loading..." />
 </DemoPreview>
 
-```tsx
-import { Spinner } from "../components/ui";
-
-export default function MyPage() {
-  return <Spinner size="md" label="Loading..." />;
+```json
+{
+  "type": "spinner",
+  "size": "md",
+  "label": "Loading..."
 }
 ```
 
-## CMS 页面构建器
+***
 
-该组件可作为 `spinner` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用：
+## 2. 强调大号加载器
+
+具备大尺寸视觉跟踪，通常用作整页重载或初始工作区同步时的中心焦点。
+
+<DemoPreview>
+  <Spinner size="lg" label="Synchronizing data..." />
+</DemoPreview>
 
 ```json
 {
   "type": "spinner",
   "size": "lg",
-  "label": "Loading"
+  "label": "Synchronizing data..."
 }
 ```
 
-# 属性
+***
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `class` | `string` | 自定义 CSS 类。 |
+## 3. 微型子指示器（按钮/上下文加载器）
 
-| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg" \ | "xl" \ | "2xl" \ | "inherit"\` | 加载指示器的尺寸。 |
+用于在密集仪表盘或紧凑上下文卡片中表示单个资源重新加载的小号加载器。
 
-| `label` | `string` | 供屏幕阅读器使用的无障碍标签。 |
+<DemoPreview>
+  <Spinner size="sm" label="Connecting..." />
+</DemoPreview>
+
+```json
+{
+  "type": "spinner",
+  "size": "sm",
+  "label": "Connecting..."
+}
+```
+
+***
+
+# Props
+
+| 属性 | CMS 字段类型 | 默认值 | 描述 / 支持的选项 |
+| --- | --- | --- | --- |
+| **尺寸比例** (`size`) | `select` | `"md"` | 控制圆形加载器的直径和线宽。 <br/>• 选项：`"xs"`、`"sm"`、`"md"`、`"lg"`、`"xl"`、`"2xl"`。 |
+| **无障碍标签** (`label`) | `string` | - | 无障碍屏幕阅读器软件播报的替代描述。强烈建议保留以确保页面合规。 |
+
+***
+
+# Architecture Notes
+
+- **开箱即用的无障碍：** 每个 spinner 都编译为原生 `role="status"` 包裹层，包含仅供屏幕阅读器的标签（`class="sr-only"`），确保屏幕阅读器正确播报活跃进度。
+- **纯 SVG 渲染：** Spinner 动画使用轻量矢量路径（`<svg>`）通过 CSS 关键帧旋转，无需重型资源依赖或静态图片加载。
+- **最佳布局尺寸：** 尺寸比例精确对应设计系统的间距令牌，保证在按钮、告警或自定义卡片中对齐。

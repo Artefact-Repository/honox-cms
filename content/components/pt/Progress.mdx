@@ -7,81 +7,107 @@ hydration: 3
 import { Progress } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-# Introdução
+# Introduction
 
-Um componente que mostra o progresso de conclusão de uma operação como uma barra linear ou um indicador circular.
+Um componente de estado visual que comunica o progresso de conclusão de uma operação. Exibe valores de estado em tempo real através de uma barra linear padrão ou de um mostrador circular moderno. Usado principalmente para guiar usuários durante assistentes multi-etapas, uploads de conteúdo, processamento de arquivos ou instalações do sistema.
 
-# Uso
+O componente **Progress** está totalmente integrado como bloco `progress` no **Page Builder**, permitindo que autores e desenvolvedores configurem facilmente intervalos visuais, temas, tamanhos, rótulos e layouts de indicadores diretamente no CMS.
 
-## Progresso linear
+***
+
+# Usage
+
+Estes exemplos ilustram como os editores de conteúdo vinculam e estruturam indicadores de progresso interativos.
+
+## 1. Barra de progresso linear padrão com rótulo de estado
+
+Um indicador de barra linear clássico que mostra o progresso de download ou processamento com detalhes de rótulo ativo e texto de porcentagem formatado.
 
 <DemoPreview>
-  <div style={{ width: "100%", maxWidth: "320px" }}>
-    <Progress value={72} showValueText />
+  <div style={{ width: "100%", maxWidth: "360px" }}>
+    <Progress label="System Backup" value={72} showValueText />
   </div>
 </DemoPreview>
-
-```tsx
-import { Progress } from "../components/ui";
-
-export default function MyPage() {
-  return <Progress value={72} showValueText />;
-}
-```
-
-## Progresso circular
-
-<DemoPreview>
-  <Progress type="circular" value={40} showValueText />
-</DemoPreview>
-
-```tsx
-import { Progress } from "../components/ui";
-
-export default function MyPage() {
-  return <Progress type="circular" value={40} showValueText />;
-}
-```
-
-## Construtor de páginas do CMS
-
-Este componente está disponível como um bloco `progress` no [Construtor de Páginas](/docs/PageBuilder) (`content/pages/*.json`):
 
 ```json
 {
   "type": "progress",
+  "label": "System Backup",
   "value": 72,
+  "showValueText": true,
+  "type": "linear",
+  "size": "md"
+}
+```
+
+## 2. Medidor de progresso circular compacto
+
+Renderiza a métrica de conclusão como um mostrador circular compacto. Útil para gráficos de resumo estatístico, widgets de dashboard ou itens de grade isolados.
+
+<DemoPreview>
+  <Progress type="circular" value={40} showValueText label="Storage Used" />
+</DemoPreview>
+
+```json
+{
+  "type": "progress",
+  "label": "Storage Used",
+  "type": "circular",
+  "value": 40,
   "showValueText": true
 }
 ```
 
-# Propriedades
+## 3. Progresso listrado acentuado com cor personalizada (verde de sucesso)
 
-## Progress
+Demonstra como aplicar uma paleta de tema dedicada, um padrão de listras visual e uma escala de layout grande a uma barra de progresso.
 
-| Prop | Type | Description |
-| --- | --- | --- |
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "360px" }}>
+    <Progress
+      label="Uploading media files"
+      colorPalette="green"
+      striped
+      value={85}
+      size="lg"
+      showValueText
+    />
+  </div>
+</DemoPreview>
 
-| `value` | \`number \ | null\` | O valor atual. |
+```json
+{
+  "type": "progress",
+  "label": "Uploading media files",
+  "value": 85,
+  "showValueText": true,
+  "striped": true,
+  "colorPalette": "green",
+  "size": "lg"
+}
+```
 
-| `min` | `number` | O valor mínimo. Padrão: `0`. |
-| `max` | `number` | O valor máximo. Padrão: `100`. |
-| `label` | `Child` | Rótulo a exibir acima do indicador. |
-| `showValueText` | `boolean` | Se deve exibir o texto do valor. Padrão: `false`. |
-| `valueText` | `Child` | Texto de valor personalizado a exibir. |
+***
 
-| `type` | \`"linear" \ | "circular"\` | O estilo visual do progresso. Padrão: `"linear"`. |
-| `variant` | \`"solid" \ | "subtle"\` | A variante visual. |
+# Props
 
-| `shape` | \`"square" \ | "rounded" \ | "full"\` | A forma do indicador. |
+| Propriedade | Tipo de campo CMS | Padrão | Descrição / opções suportadas |
+| --- | --- | --- | --- |
+| **Rótulo de progresso** (`label`) | `string` | - | Cabeçalho descritivo opcional acima da pista. |
+| **Valor atual** (`value`) | `number` | `0` | Valor numérico de conclusão. Use `null` para um estado indeterminado (carregando). |
+| **Valor mínimo** (`min`) | `number` | `0` | Limite inferior da escala de progresso. |
+| **Valor máximo** (`max`) | `number` | `100` | Limite superior da escala de progresso. |
+| **Exibir porcentagem** (`showValueText`) | `boolean` | `false` | Exibe o texto de porcentagem exato ao lado da pista. |
+| **Tipo de indicador** (`type`) | `select` | `"linear"` | Formato visual do layout. <br/>• Opções: `"linear"`, `"circular"`. |
+| **Variante visual** (`variant`) | `select` | `"solid"` | Estilo visual da pista e do preenchimento. <br/>• Opções: `"solid"`, `"subtle"`. |
+| **Forma da borda** (`shape`) | `select` | `"full"` | Arredondamento de cantos das barras lineares. <br/>• Opções: `"square"`, `"rounded"`, `"full"`. |
+| **Pista listrada** (`striped`) | `boolean` | `false` | Renderiza um padrão diagonal listrado em barras lineares. |
+| **Tema de cor** (`colorPalette`) | `select` | `"blue"` | Paleta de tema do preenchimento. <br/>• Opções: blue, green, red, purple, orange, amber, cyan, slate. |
+| **Escala de tamanho** (`size`) | `select` | `"md"` | Controla a altura ou o raio circular. <br/>• Opções: `"xs"`, `"sm"`, `"md"`, `"lg"`, `"xl"`. |
 
-| `striped` | `boolean` | Se deve exibir um preenchimento listrado (linear). |
-| `animated` | `boolean` | Se o preenchimento anima. |
+***
 
-| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg" \ | "xl"\` | O tamanho do indicador. |
+# Developer Notes & Accessibility
 
-| `class` | `string` | Classes CSS personalizadas para o elemento raiz. |
-
-# Subcomponentes
-
-`Progress.Root`, `Progress.Track`, `Progress.Range`, `Progress.Circle`, `Progress.CircleTrack`, `Progress.CircleRange`, `Progress.Label`, `Progress.ValueText`, `Progress.View`
+- **Sem hidratação (somente estático):** O componente Progress opera puramente via ligações de layout e animações CSS padrão, sendo um componente estático (Tier 3) sem JavaScript do lado do cliente.
+- **Conformidade WAI-ARIA:** Internamente, compila para invólucros semânticos de progresso (`role="progressbar"`, `aria-valuenow`, `aria-valuemin`, `aria-valuemax`). Se `value` não estiver definido ou for nulo, muda automaticamente para um estado de carregamento indeterminado.

@@ -4,61 +4,109 @@ category: Forms
 hydration: 2
 ---
 
-import { SegmentGroup } from "../../../app/components/ui";
+import { SegmentGroup, Segment } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-Un groupe de boutons de type radio qui ressemblent à un seul contrôle segmenté.
+# Introduction
 
-## Utilisation
+Un contrôle de sélection unique et compact qui présente des options mutuellement exclusives dans une piste segmentée horizontale. C'est une excellente alternative pour la navigation par onglets, les commutateurs de vue, les filtres de période, les options de tri ou toute barre d'outils à sélection unique.
+
+Le composant **SegmentGroup** est totalement intégré en tant que bloc `segmentGroup` dans le **Page Builder**, permettant aux auteurs de configurer facilement les options, la couleur d'accent de marque et l'échelle de taille globale.
+
+***
+
+# Usage
+
+Ces exemples illustrent comment les éditeurs de contenu lient et structurent des contrôles segmentés interactifs.
+
+## 1. Groupe segmenté horizontal de base
+
+Un groupe segmenté simple avec deux options. Montre un commutateur d'étiquettes natif avec un accent de marque global.
 
 <DemoPreview>
-  <SegmentGroup
-    label="View"
-    items={[
-      { label: "List", value: "list" },
-      { label: "Grid", value: "grid" },
-    ]}
-  />
+  <SegmentGroup defaultValue="day" colorPalette="blue" interactive>
+    <Segment value="day" label="Day" />
+    <Segment value="week" label="Week" />
+  </SegmentGroup>
 </DemoPreview>
-
-### Constructeur de pages CMS
-
-Ce composant est disponible sous forme de bloc `segmentGroup` dans [Page Builder](/docs/PageBuilder) (`content/pages/*.json`) :
 
 ```json
 {
   "type": "segmentGroup",
-  "label": "View",
+  "defaultValue": "day",
+  "colorPalette": "blue",
   "items": [
-    { "label": "List", "value": "list" },
-    { "label": "Grid", "value": "grid" }
+    { "value": "day", "label": "Day" },
+    { "value": "week", "label": "Week" }
   ]
 }
 ```
 
-## Propriétés
+## 2. Groupe segmenté détaillé avec icônes et tailles
 
-| Propriété | Type | Défaut | Description |
-| --- | --- | --- | --- |
-| `label` | `string` | - | Étiquette de groupe. |
-| `items` | `SegmentGroupItem[]` | - | Tableau d'éléments avec « label » et « value ». |
+Un groupe segmenté avec icônes en ligne, libellés et plusieurs échelles de taille (sm, md, lg) pour démontrer le rythme visuel.
 
-## Configuration du CMS
+<DemoPreview>
+  <SegmentGroup defaultValue="grid" size="md" interactive>
+    <Segment value="grid" label="Grid" icon={<span>▦</span>} />
+    <Segment value="list" label="List" icon={<span>☰</span>} />
+    <Segment value="compact" label="Compact" icon={<span>≣</span>} />
+  </SegmentGroup>
+</DemoPreview>
 
-```yaml
-- label: SegmentGroup
-  name: segment-group
-  widget: object
-  fields:
-    - { label: Label, name: label, widget: string, required: false }
-    - label: Items
-      name: items
-      widget: list
-      fields:
-        - { label: Label, name: label, widget: string }
-        - { label: Value, name: value, widget: string }
+```json
+{
+  "type": "segmentGroup",
+  "defaultValue": "grid",
+  "size": "md",
+  "items": [
+    { "value": "grid", "label": "Grid", "icon": "▦" },
+    { "value": "list", "label": "List", "icon": "☰" },
+    { "value": "compact", "label": "Compact", "icon": "≣" }
+  ]
+}
 ```
 
-## Hydratation
+## 3. Variante avec segment désactivé et présélectionné
 
-Niveau 2 : s'hydrate lorsque « value », « defaultValue » ou « onValueChange » est fourni.
+Démontre des états combinés : un segment présélectionné, un autre désactivé (par exemple indisponible).
+
+<DemoPreview>
+  <SegmentGroup defaultValue="published" interactive>
+    <Segment value="published" label="Published" />
+    <Segment value="drafts" label="Drafts" />
+    <Segment value="archived" label="Archived" disabled />
+  </SegmentGroup>
+</DemoPreview>
+
+```json
+{
+  "type": "segmentGroup",
+  "defaultValue": "published",
+  "items": [
+    { "value": "published", "label": "Published" },
+    { "value": "drafts", "label": "Drafts" },
+    { "value": "archived", "label": "Archived", "disabled": true }
+  ]
+}
+```
+
+***
+
+# Props
+
+| Propriété | Type de champ CMS | Défaut | Description / options prises en charge |
+| --- | --- | --- | --- |
+| **Sous-options** (`items`) | `list` | - | Liste de blocs d'options ; chacun représente un Segment (requiert value / label / icon). |
+| **Valeur par défaut** (`defaultValue`) | `string` | - | Valeur du segment présélectionné au montage. |
+| **Couleur d'accent de marque** (`colorPalette`) | `select` | `"blue"` | Palette d'accent visuel de la piste sélectionnée. <br/>• Options : blue, green, red, purple, orange, amber, cyan, slate. |
+| **Échelle de taille** (`size`) | `select` | `"md"` | Contrôle la taille globale et le remplissage de la piste. <br/>• Options : `"sm"`, `"md"`, `"lg"`. |
+| **Forcer interactif** (`interactive`) | `boolean` | `true` | Hydrate le groupe pour lier les événements clavier et pointeur. |
+
+***
+
+# Developer Notes & Accessibility
+
+- **Navigation clavier (Roving tabindex) :** Le groupe utilise le modèle de tabindex mobile. Tout le groupe partage un point de tabulation ; les utilisateurs se déplacent avec les flèches (gauche/droite) et Space ou Entrée sélectionne le segment focalisé.
+- **Conformité WAI-ARIA :** Le conteneur rend des rôles radio sémantiques natifs (`role="radiogroup"`, `role="radio"`, `aria-checked`), permettant aux lecteurs d'écran d'annoncer le contrôle comme une entité sélectionnable unique.
+- **Îlot d'hydratation :** En tant que mise en page avancée capturant les changements de sélection, l'enclos de focus et les interactions clavier, SegmentGroup fonctionne comme un îlot conditionnel de Niveau 2 (`"interactive": true`).

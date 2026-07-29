@@ -7,90 +7,143 @@ hydration: 1
 import { Popover, Button } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-# Einführung
+# Introduction
 
-Ein interaktives Element, das zusätzliche Inhalte in einer Ebene über seinem Anker anzeigt.
+Die `Popover`-Komponente ist ein interaktives Overlay-Element, das Zusatzdetails, Aktionen oder kontextbezogene Formulare in einer schwebenden Karte anzeigt, die relativ zu einem Anker-Triggerelement positioniert ist.
 
-# Verwendung
+Speziell für unsere Zero-JS-Static-Rendering-Architektur und das bedingte Hydration-Modell konzipiert, nutzt der Popover effiziente, Page-Builder-freundliche Bindings. Er bleibt im HTML-Layout vollständig statisch, bis er als interaktive Preact-Insel hydriert wird, um Umschalt- und Escape-Auslöser reibungslos zu verarbeiten.
+
+***
+
+# Usage
+
+Diese Beispiele zeigen, wie Redakteure Popover-Blöcke konfigurieren und binden.
+
+## 1. Einfacher informativer Popover
+
+Ein sauberer, rein textbasierter Popover – ideal, um Begriffe zu erklären, Definitionen anzubieten oder leichte Hinweistexte anzuzeigen, ohne das Hauptlayout zu überladen.
 
 <DemoPreview>
   <Popover
-    placement="right"
-    trigger={<Button>Open Popover</Button>}
-    title="Title"
-    description="Description"
-    body="Popover Body"
+    interactive
+    trigger={<Button variant="outline">Learn More</Button>}
+    title="Data Residency"
+    description="Your profile data is stored securely in compliant Frankfurt (EU) server nodes."
   />
 </DemoPreview>
-
-```tsx
-import { Popover } from "../components/ui/popover";
-import { Button } from "../components/ui/button";
-
-<Popover
-  placement="right"
-  trigger={<Button>Open Popover</Button>}
-  title="Title"
-  description="Description"
-  body="Popover Body"
-/>;
-```
-
-## CMS-Seitenbauer
-
-Diese Komponente ist als `popover`-Block im [Seitenbauer](/docs/PageBuilder) (`content/pages/*.json`) verfügbar:
 
 ```json
 {
   "type": "popover",
-  "triggerText": "Open Popover",
-  "title": "Title",
-  "description": "Description",
-  "body": "Popover Body"
+  "triggerText": "Learn More",
+  "title": "Data Residency",
+  "description": "Your profile data is stored securely in compliant Frankfurt (EU) server nodes."
 }
 ```
 
-# Eigenschaften
+## 2. Erweiterter Popover mit Inhalt und Footer-Aktionen
 
-## Root
+Ein Onboarding-Popover mit klar getrennten Abschnitten: einem informativen Header, Fließtext und benutzerdefinierten Aktionsbuttons im Footer-Slot.
 
-| Eigenschaft | Typ | Beschreibung |
-| --- | --- | --- |
-| `children` | `any` | Popover-Unterkomponenten. |
-| `open` | `boolean` | Legt fest, ob das Popover geöffnet ist (gesteuert). |
-| `defaultOpen` | `boolean` | Anfänglicher Öffnungszustand (ungesteuert). Standard `false`. |
-| `onOpenChange` | `(details: { open: boolean }) => void` | Wird aufgerufen, wenn das Popover geöffnet oder geschlossen wird. |
+<DemoPreview>
+  <Popover
+    interactive
+    trigger={<Button variant="outline">Setup Account</Button>}
+    title="Configure API Integrations"
+    description="Connect with external tools seamlessly."
+    body="Your subscription allows up to 5 concurrent server channels. Ensure your client secret credentials are copied before proceeding."
+    footer={<Button size="sm">Connect Keys</Button>}
+    showArrow={true}
+  />
+</DemoPreview>
 
-| `placement` | \`"top" \ | "bottom" \ | "left" \ | "right"\` | Auf welcher Seite des Auslösers der Inhalt geöffnet wird. Standard `"bottom"`. Wechselt bei zu wenig Platz automatisch auf die gegenüberliegende Seite. |
+```json
+{
+  "type": "popover",
+  "triggerText": "Setup Account",
+  "title": "Configure API Integrations",
+  "description": "Connect with external tools seamlessly.",
+  "body": "Your subscription allows up to 5 concurrent server channels. Ensure your client secret credentials are copied before proceeding.",
+  "footer": "Connect Keys",
+  "showArrow": true
+}
+```
 
-| `interactive` | `boolean` | Erzwingt die Hydratisierung als Insel. Standardmäßig `true`. |
-| `id` | `string` | Eindeutige Kennung für das Popover. |
-| `closeOnEscape` | `boolean` | Schließen, wenn Escape gedrückt wird. Standard `true`. |
-| `closeOnInteractOutside` | `boolean` | Schließen bei Zeigerinteraktion außerhalb oder wenn der Fokus das Popover verlässt. Standard `true`. |
-| `onClose` | `() => void` | Rückruf, der beim Schließen des Popovers ausgelöst wird. |
-| `onToggle` | `() => void` | Rückruf, der beim Umschalten des Popovers ausgelöst wird. |
+## 3. Popover mit benutzerdefiniertem SVG-Trigger und verschachtelten Kind-Blöcken
 
-## Trigger
+Für komplexere Dashboard-Panels können Popover benutzerdefinierte SVG-Trigger (mit Roh-Markup innerhalb von `triggerIcon`) einbetten und Listen untergeordneter Komponenten (wie verschachtelte Badges, Text oder zusätzliche Buttons) in der schwebenden Karte rendern.
 
-| Eigenschaft | Typ | Beschreibung |
-| --- | --- | --- |
-| `asChild` | `boolean` | Legt fest, ob die Eigenschaften auf das unmittelbare Kindelement zusammengeführt werden. |
+<DemoPreview>
+  <Popover
+    interactive
+    trigger={
+      <Button variant="outline">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style={{ width: "16px", height: "16px", marginRight: "6px" }}>
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="16" x2="12" y2="12" />
+          <line x1="12" y1="8" x2="12.01" y2="8" />
+        </svg>
+        System Status
+      </Button>
+    }
+    title="System Heartbeat"
+    description="Operational health checks"
+    showArrow={true}
+    closable={true}
+  >
+    <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
+      <span style={{ padding: "2px 8px", background: "var(--colors-green-3)", borderRadius: "4px", fontSize: "0.75rem", color: "white" }}>API: OK</span>
+      <span style={{ padding: "2px 8px", background: "var(--colors-green-3)", borderRadius: "4px", fontSize: "0.75rem", color: "white" }}>DB: OK</span>
+    </div>
+  </Popover>
+</DemoPreview>
 
-# Einschränkungen
+```json
+{
+  "type": "popover",
+  "triggerText": "System Status",
+  "triggerIcon": "<circle cx=\"12\" cy=\"12\" r=\"10\" /><line x1=\"12\" y1=\"16\" x2=\"12\" y2=\"12\" /><line x1=\"12\" y1=\"8\" x2=\"12.01\" y2=\"8\" />",
+  "triggerAriaLabel": "System Operations Status Info",
+  "title": "System Heartbeat",
+  "description": "Operational health checks",
+  "showArrow": true,
+  "closable": true,
+  "children": [
+    {
+      "blockType": "badge",
+      "text": "API: OK",
+      "colorPalette": "green"
+    },
+    {
+      "blockType": "badge",
+      "text": "DB: OK",
+      "colorPalette": "green"
+    }
+  ]
+}
+```
 
-Die interaktive Insel positioniert und dimensioniert das Popover relativ zu seinem Auslöser:
-sie wechselt auf die gegenüberliegende Seite (z. B. `bottom` → `top`), wenn die angeforderte
-Platzierung den Viewport überlaufen würde, und klemmt die Querachse, sodass der
-Inhalt nie außerhalb des Bildschirms gerendert wird. Im Gegensatz zu Floating UI werden
-Scroll-Container oder Resize-Observer nicht verfolgt — die Neupositionierung läuft nur bei
-einem Fenster-`resize` neu, solange das Popover geöffnet ist, und (da der Positionierer über
-`position: absolute` an den eigenen Wrapper des Auslösers verankert ist) bewegt sich das
-Popover beim Scrollen der Seite automatisch mit dem Auslöser mit.
+***
 
-Das Verschachteln des Auslösers eines Popovers im Inhalt eines anderen Popovers wird
-unterstützt (die Klick-Delegation ist pro Popover-Instanz gekapselt), jedoch nicht das
-Verschachteln eines Popovers im Auslöser eines Tooltips oder umgekehrt — die beiden
-Komponenten koordinieren den Besitz von `data-part` nicht über Komponententypen hinweg.
+# Props
 
-Die `_closed`-Exit-Animation (`scale-fade-out`) läuft ab, bevor das Popover
-tatsächlich aus dem Layout entfernt wird — das Schließen blendet es nicht sofort aus.
+| Eigenschaft | CMS-Feldtyp | Standard | Beschreibung / unterstützte Optionen |
+| --- | --- | --- | --- |
+| **Trigger-Text** (`triggerText`) | `string` | `"Click me"` | Das im Umschalt-Button des Popovers gedruckte visuelle Label. |
+| **Trigger-Icon SVG** (`triggerIcon`) | `string` | - | Roh-SVG-Markup (z. B. `<path d="..." />`), das neben dem Text in den Button eingefügt wird. |
+| **Trigger-ARIA-Label** (`triggerAriaLabel`) | `string` | - | Beschreibendes Label für Screenreader. Erforderlich, wenn der Trigger nur ein Icon ohne Text ist. |
+| **Titel** (`title`) | `string` | - | Der fett gedruckte Kopftext oben auf der Karte. |
+| **Beschreibung** (`description`) | `string` | - | Begleit-Untertitel unter dem Header. |
+| **Fließtext** (`body`) | `string` | - | Hauptabsatz im mittleren Bereich des Popovers. |
+| **Footer-Text** (`footer`) | `string` | - | Zusammenfassungstext oder Buttons am unteren Rand der Karte. |
+| **Pfeil anzeigen** (`showArrow`) | `boolean` | `true` | Rendert bei `true` eine kleine Spitze vom Kartenrand zum Trigger. |
+| **Schließbar** (`closable`) | `boolean` | `true` | Rendert einen kleinen Schließen-Button in der oberen Ecke des Popovers. |
+| **Kind-Blöcke** (`children`) | `list` | - | Verschachtelte Page-Builder-Blöcke (Text, Badges, Buttons), die direkt in die Body-Liste eingefügt werden. |
+
+***
+
+# Architecture Notes
+
+- **Intelligente Viewport-Grenzausrichtung:** Die interaktive Preact-Insel verfolgt den Bildschirmplatz dynamisch. Öffnet sich der Popover nahe einer Kante, wird die Richtung automatisch umgekehrt (z. B. von unten nach oben) und entlang der Achse verschoben, um Abschneiden zu verhindern.
+- **Einheitliche Event-Delegation:** Öffnen, Schließen, Klick-außerhalb und Escape werden zentral vom Root-Element delegiert. Das minimiert clientseitige Event-Bindings.
+- **Semantische Overlays:** Popover kompilieren in native, barrierefreie Layouts mit `role="dialog"`, `aria-haspopup="dialog"` und `aria-expanded="true|false"` – volle Screenreader-Kompatibilität ab Werk.

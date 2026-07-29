@@ -9,56 +9,42 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Einführung
 
-Ein Navigations- oder Layout-Element, das Inhalte in umschaltbare, sich gegenseitig ausschließende Panels organisiert.
+Eine visuelle Layout-Komponente, die dichte, verwandte Informationen in mehrere sich gegenseitig ausschließende Panels organisiert. Nutzer können nahtlos zwischen Panels wechseln, ohne neue Seiten zu laden oder das Layout zu überladen.
 
 # Verwendung
+Die **Tabs**-Komponente ist als `tabs`-Block vollständig im **Page Builder** integriert, sodass Autoren Tab-Ansichten leicht erstellen, visuelle Eigenschaften konfigurieren und verschachtelte Blöcke direkt in Vorlagen anordnen können.
+
+***
+
+
+Diese Konfigurationen zeigen genau, wie Page-Builder-Block-Items konstruiert werden.
+
+## 1. Klassische horizontale Tabs (Line-Variante)
+
+Unser Standard-Layout mit unterstrichenem Trigger-Indikator und flüssigen Gleitübergängen. Perfekt für Produktfunktionen, Details oder Dokumentations-Untermenüs.
 
 <DemoPreview>
-  <Tabs defaultValue="features" interactive variant="enclosed" size="md">
-    <Tabs.List>
-      <Tabs.Trigger value="features">⚡ Key Features</Tabs.Trigger>
-      <Tabs.Trigger value="pricing">💎 Pricing Plans</Tabs.Trigger>
-      <Tabs.Indicator />
-    </Tabs.List>
-
-    <Tabs.Content value="features">
-      Our Hono/JSX Tabs component supports zero runtime styled-system classes, smooth sliding indicator transitions, and native keyboard interaction.
-    </Tabs.Content>
-
-    <Tabs.Content value="pricing">
-      Flexible subscription pricing for individuals, start-ups, and scaling enterprise workspaces.
-    </Tabs.Content>
-  </Tabs>
+  <div style={{ width: "100%", maxWidth: "600px" }}>
+    <Tabs defaultValue="features" interactive variant="line" size="md">
+      <Tabs.List>
+        <Tabs.Trigger value="features">⚡ Key Features</Tabs.Trigger>
+        <Tabs.Trigger value="pricing">💎 Pricing Plans</Tabs.Trigger>
+        <Tabs.Indicator />
+      </Tabs.List>
+      <Tabs.Content value="features">
+        Our Hono/JSX Tabs component supports zero runtime styled-system classes, smooth sliding indicator transitions, and native keyboard interaction.
+      </Tabs.Content>
+      <Tabs.Content value="pricing">
+        Flexible subscription pricing for individuals, start-ups, and scaling enterprise workspaces.
+      </Tabs.Content>
+    </Tabs>
+  </div>
 </DemoPreview>
-
-```tsx
-import { Tabs } from "../components/ui/tabs";
-
-<Tabs defaultValue="features" interactive variant="enclosed" size="md">
-  <Tabs.List>
-    <Tabs.Trigger value="features">⚡ Key Features</Tabs.Trigger>
-    <Tabs.Trigger value="pricing">💎 Pricing Plans</Tabs.Trigger>
-    <Tabs.Indicator />
-  </Tabs.List>
-
-  <Tabs.Content value="features">
-    Our Hono/JSX Tabs component supports zero-runtime classes, smooth sliding transitions, and native keyboard interaction.
-  </Tabs.Content>
-
-  <Tabs.Content value="pricing">
-    Flexible subscription pricing for individuals, start-ups, and scaling enterprise workspaces.
-  </Tabs.Content>
-</Tabs>;
-```
-
-## CMS-Seitenbauer
-
-Diese Komponente ist als `tabs`-Block im [Seitenbauer](/docs/PageBuilder) (`content/pages/*.json`) verfügbar und wurde mit einer klaren, vereinfachten API entworfen:
 
 ```json
 {
   "type": "tabs",
-  "variant": "enclosed",
+  "variant": "line",
   "size": "md",
   "items": [
     {
@@ -67,7 +53,7 @@ Diese Komponente ist als `tabs`-Block im [Seitenbauer](/docs/PageBuilder) (`cont
       "content": [
         {
           "type": "text",
-          "content": "Our high-end tabs component is lightning fast."
+          "content": "Our Hono/JSX Tabs component supports zero runtime styled-system classes, smooth sliding indicator transitions, and native keyboard interaction."
         }
       ]
     },
@@ -77,7 +63,7 @@ Diese Komponente ist als `tabs`-Block im [Seitenbauer](/docs/PageBuilder) (`cont
       "content": [
         {
           "type": "text",
-          "content": "Starting from $0/mo."
+          "content": "Flexible subscription pricing for individuals, start-ups, and scaling enterprise workspaces."
         }
       ]
     }
@@ -85,27 +71,79 @@ Diese Komponente ist als `tabs`-Block im [Seitenbauer](/docs/PageBuilder) (`cont
 }
 ```
 
-# Eigenschaften
+## 2. Geschlossener Ordner-Stil (kompakt)
 
-## Wurzel
+Rendert die Tab-Liste mit umrandeten Button-Gehäusen ähnlich Ordner-Trennern. Excel lent für Dashboard-Menüs, Interface-Einstellungen oder kompakte Konfigurationsbereiche.
 
-| Eigenschaft | Typ | Beschreibung |
-| --- | --- | --- |
-| `defaultValue` | `string` | Der anfänglich ausgewählte Tab-Wert beim Rendern (unkontrolliert). |
-| `value` | `string` | Der gesteuerte ausgewählte Tab-Wert. |
-| `variant` | `"line" \| "subtle" \| "enclosed"` | Visuelle Erscheinung der Registerkarten-Liste und des Indikators. Standard `"line"`. |
-| `size` | `"xs" \| "sm" \| "md" \| "lg"` | Gesamthöhe, Abstände und Innenabstand der Registerkarten-Elemente. Standard `"md"`. |
-| `orientation` | `"horizontal" \| "vertical"` | Der Layout-Fluss der Auslöser. Standard `"horizontal"`. |
-| `activationMode` | `"automatic" \| "manual"` | Im manuellen Modus werden Auslöser bei Klick mit Enter/Leertaste aktiviert; im automatischen Modus werden sie beim Fokussieren sofort aktiviert. Standard `"automatic"`. |
-| `loopFocus` | `boolean` | Legt fest, ob der Tastaturfokus an den Anfang oder das Ende der Liste zurückkehrt. Standard `true`. |
-| `lazyMount` | `boolean` | Verzögert das Rendern der Tab-Inhaltspanels, bis sie erstmals aufgerufen werden. Standard `false`. |
-| `unmountOnExit` | `boolean` | Entfernt Tab-Panel-Elemente aus dem DOM, sobald sie inaktiv werden. Standard `false`. |
-| `onValueChange` | `(details: { value: string }) => void` | Wird aufgerufen, wenn sich der aktive Tab-Wert ändert. |
-| `onFocusChange` | `(details: { value: string }) => void` | Wird aufgerufen, wenn ein anderer Tab-Auslöser den Tastatur- oder Klickfokus erhält. |
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "600px" }}>
+    <Tabs defaultValue="profile" interactive variant="enclosed" size="sm">
+      <Tabs.List>
+        <Tabs.Trigger value="profile">User Profile</Tabs.Trigger>
+        <Tabs.Trigger value="security">Security</Tabs.Trigger>
+        <Tabs.Indicator />
+      </Tabs.List>
+      <Tabs.Content value="profile">
+        Manage personal information, billing details, and customized regional preferences.
+      </Tabs.Content>
+      <Tabs.Content value="security">
+        Configure multi-factor authentication codes, view active sessions, and update credentials.
+      </Tabs.Content>
+    </Tabs>
+  </div>
+</DemoPreview>
 
-# Barrierefreiheit
+```json
+{
+  "type": "tabs",
+  "variant": "enclosed",
+  "size": "sm",
+  "items": [
+    {
+      "value": "profile",
+      "label": "User Profile",
+      "content": [
+        {
+          "type": "text",
+          "content": "Manage personal information, billing details, and customized regional preferences."
+        }
+      ]
+    },
+    {
+      "value": "security",
+      "label": "Security",
+      "content": [
+        {
+          "type": "text",
+          "content": "Configure multi-factor authentication codes, view active sessions, and update credentials."
+        }
+      ]
+    }
+  ]
+}
+```
 
-Diese Komponente entspricht vollständig dem **WAI-ARIA Tabs Design Pattern**:
-- Setzt `role="tablist"` auf dem Listen-Container und ordnet `aria-orientation` dem Layout zu.
-- Setzt `role="tab"` auf die Auslöser, wobei `aria-selected` mit dem aktiven Zustand übereinstimmt und `aria-controls` auf die Panel-IDs verweist.
-- Tastaturunterstützung: ArrowRight/ArrowLeft (oder ArrowDown/ArrowUp bei vertikaler Ausrichtung) navigiert mit einem wandernden tabIndex zwischen den Auslösern. Home/End bewegt den Fokus sofort an die Endpunkte. Enter/Space aktiviert im manuellen Modus die Auslöser.
+***
+
+# Props
+
+| Eigenschaft | CMS-Feldtyp | Standard | Beschreibung / unterstützte Optionen |
+| --- | --- | --- | --- |
+| **Tab-Items** (`items`) | `list` | - | Array von Tab-Blöcken. Jedes Item benötigt ein eindeutiges `value`, `label` und eine `content`-Blockliste. |
+| **Visuelle Variante** (`variant`) | `select` | `"line"` | Visueller Erscheinungsstil. <br/>• `"line"` — Minimale Text-Trigger mit Unterstrich-Indikator. <br/>• `"subtle"` — Schattierte, abgerundete Tags. <br/>• `"enclosed"` — Klassisches umrandetes Ordner-Tab-Design. |
+| **Größenstufe** (`size`) | `select` | `"md"` | Steuert Padding, Abstände und Schriftgröße. <br/>• Optionen: `"xs"`, `"sm"`, `"md"`, `"lg"`. |
+| **Ausrichtung** (`orientation`) | `select` | `"horizontal"` | Achsenrichtung der Trigger-Liste. `"horizontal"` oder `"vertical"`. |
+| **Aktivierungsmodus** (`activationMode`) | `select` | `"automatic"` | • `"automatic"` — Panel wechselt bei Fokus sofort. <br/>• `"manual"` — Nur bei Space/Enter. |
+| **Loop-Fokus** (`loopFocus`) | `boolean` | `true` | Zykliert Tastaturfokus am Ende zurück zum ersten Item. |
+| **Lazy Mounting** (`lazyMount`) | `boolean` | `false` | Verzögert das Rendern inaktiver Panels bis zum ersten Besuch. |
+
+***
+
+# Accessibility & Developer Notes
+
+Diese Komponente erfüllt ab Werk das **WAI-ARIA Tabs Design Pattern**. Bei Hydratation implementiert sie folgende Ebenen:
+
+- **Semantische Rollen:** `role="tablist"` auf der Liste, `role="tab"` auf Triggern, `aria-selected` für den aktiven Zustand, `aria-controls` referenziert Panel-IDs.
+- **Roving-Fokus-Navigation:** Pfeiltasten navigieren per Fokus-Roaming `tabIndex`. `Home`/`End` springen zu den Enden.
+- **Dynamischer CSS-Gleit-Indikator:** Absolut positionierter Slider fragt Positionsmetriken ab und animiert flüssig ohne Layout-Thrashing.
+- **Umgehung von Hono-Reconciler-Grenzen:** In Preact-Inseln manipuliert der State-Manager Trigger-Attribute (`data-selected`, `aria-selected`, `tabindex`, `hidden`) direkt bei Events, unabhängig von der Reconciler-Zeitleiste.

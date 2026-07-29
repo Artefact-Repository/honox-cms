@@ -1,7 +1,7 @@
 ---
 title: Switch Commutateur
-hydration: 2
 category: Forms
+hydration: 2
 ---
 
 import { Switch } from "../../../app/components/ui";
@@ -9,54 +9,114 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introduction
 
-Un contrôle qui permet à l'utilisateur de basculer entre les états coché et non coché.
+Un contrôle de bascule binaire inspiré d'iOS qui alterne entre activer/désactiver un réglage indépendant. Courant dans les panneaux de paramètres, préférences de profil ou commutateurs d'abonnement. Il souligne visuellement la sémantique activé/désactivé plus qu'une case à cocher standard.
 
-# Utilisation
+Le composant **Switch** est totalement intégré en tant que bloc `switch` dans le **Page Builder**, permettant aux auteurs de configurer facilement libellé, texte d'aide, couleur d'accent de marque, échelle de taille et état par défaut.
+
+***
+
+# Usage
+
+Ces exemples illustrent comment les éditeurs de contenu lient et structurent des contrôles de commutateur.
+
+## 1. Commutateur activé par défaut avec texte d'aide (variante Line)
+
+Un commutateur activé par défaut avec un texte d'aide explicatif. Montre la variante fluide `line` et une palette de marque verte assignée à l'état actif.
 
 <DemoPreview>
-  <Switch defaultChecked interactive>Enable Notifications</Switch>
+  <Switch
+    label="Airplane Mode"
+    helperText="Disable wireless connections"
+    colorPalette="green"
+    defaultChecked
+    interactive
+  />
 </DemoPreview>
-
-```tsx
-import { Switch } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Switch
-      defaultChecked={true}
-      onCheckedChange={(details) => console.log(details.checked)}
-      interactive
-    >
-      Enable Notifications
-    </Switch>
-  );
-}
-```
-
-## Constructeur de pages CMS
-
-Ce composant est disponible sous forme de bloc `switch` dans [Page Builder](/docs/PageBuilder) (`content/pages/*.json`) :
 
 ```json
 {
   "type": "switch",
-  "label": "Dark Mode",
-  "checked": true,
-  "colorPalette": "blue"
+  "label": "Airplane Mode",
+  "helperText": "Disable wireless connections",
+  "colorPalette": "green",
+  "type": "line",
+  "size": "md",
+  "defaultChecked": true,
+  "interactive": true
 }
 ```
 
-# Propriétés
+## 2. Commutateur compact éteint par défaut (accent rouge)
 
-| Propriété | Type | Description |
-| --- | --- | --- |
-| `children` | `any` | Contenu de l’étiquette à afficher à côté du commutateur. |
-| `class` | `string` | Classes CSS personnalisées. |
-| `checked` | `boolean` | Si l'interrupteur est vérifié (contrôlé). |
-| `defaultChecked` | `boolean` | L'état vérifié initial (non contrôlé). |
-| `disabled` | `boolean` | Si le commutateur est désactivé. |
-| `onCheckedChange` | `(details: { checked: boolean }) => void` | Rappel déclenché lorsque l'état vérifié change. |
+L'état actif d'actions destructrices doit utiliser des accents de danger comme le rouge. Cette démo utilise la taille compacte `sm`.
 
-| `size` | \`"sm" \ | "md" \ | "lg"\` | The size of the switch. |
+<DemoPreview>
+  <Switch
+    label="Delete History"
+    helperText="Permanently erase activity logs"
+    colorPalette="red"
+    size="sm"
+    interactive
+  />
+</DemoPreview>
 
-| `interactive` | `boolean` | Force l’hydratation comme une île. |
+```json
+{
+  "type": "switch",
+  "label": "Delete History",
+  "helperText": "Permanently erase activity logs",
+  "colorPalette": "red",
+  "type": "line",
+  "size": "sm",
+  "defaultChecked": false,
+  "interactive": true
+}
+```
+
+## 3. Commutateur désactivé avec icône en ligne
+
+Démontre des états combinés : un commutateur désactivé mais affichant sa valeur sélectionnée.
+
+<DemoPreview>
+  <Switch
+    label="Beta Features"
+    helperText="Currently locked by admin"
+    disabled
+    defaultChecked
+    interactive
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "switch",
+  "label": "Beta Features",
+  "helperText": "Currently locked by admin",
+  "disabled": true,
+  "defaultChecked": true,
+  "interactive": true
+}
+```
+
+***
+
+# Props
+
+| Propriété | Type de champ CMS | Défaut | Description / options prises en charge |
+| --- | --- | --- | --- |
+| **Texte du libellé** (`label`) | `string` | - | Titre descriptif à côté de la piste. |
+| **Texte d'aide** (`helperText`) | `string` | - | Note contextuelle légère sous le commutateur. |
+| **Couleur d'accent de marque** (`colorPalette`) | `select` | `"blue"` | Palette visuelle du remplissage en état actif. <br/>• Options : blue, green, red, purple, orange, amber, cyan, slate. |
+| **Variante visuelle** (`variant`) | `select` | `"line"` | Style visuel de la piste. <br/>• Options : `"line"`, `"surface"`, `"subtle"`, `"flushed"`. |
+| **Échelle de taille** (`size`) | `select` | `"md"` | Contrôle la taille globale de la piste. <br/>• Options : `"xs"`, `"sm"`, `"md"`, `"lg"`, `"xl"`. |
+| **Coché par défaut** (`defaultChecked`) | `boolean` | `false` | Si true, le composant démarre activé. |
+| **Désactivé** (`disabled`) | `boolean` | `false` | Désactive l'interaction et atténue le contrôle. |
+| **Forcer interactif** (`interactive`) | `boolean` | `true` | Hydrate le commutateur pour lier les événements clavier et de bascule. |
+
+***
+
+# Developer Notes & Accessibility
+
+- **Navigation clavier :** Le contrôle prend en charge l'interaction native — au focus, `Space` ou `Entrée` bascule l'état. L'anneau de focus suit nos tokens de design.
+- **Conformité WAI-ARIA :** Compile en commutateur sémantique (`role="switch"`, `aria-checked`), permettant aux lecteurs d'écran d'annoncer l'état binaire exact.
+- **Îlot d'hydratation :** En tant que mise en page avancée capturant les événements de bascule, l'enclos de focus et la gestion d'état accessible, Switch fonctionne comme un îlot conditionnel de Niveau 2 (`"interactive": true`).

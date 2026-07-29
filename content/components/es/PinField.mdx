@@ -7,61 +7,125 @@ hydration: 2
 import { PinField } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-Una entrada segmentada para códigos cortos de longitud fija: contraseñas de un solo uso, códigos de verificación por SMS/correo, PIN. Cada carácter tiene su propia casilla, con navegación por teclado, pegado/autocompletado, y las mismas convenciones de etiqueta/texto de ayuda/texto de error/validador que `Field`.
+# Introduction
 
-## Uso
+Un control de entrada segmentado e interactivo diseñado para introducir cadenas alfanuméricas cortas de longitud fija, como códigos de verificación, contraseñas de un solo uso (OTP), tokens de inicio de sesión por SMS y valores PIN. Cuenta con ciclo automático de enfoque del cursor, borrado con retroceso, saneamiento de pegado y descriptores de accesibilidad totalmente unificados.
+
+El componente **PinField** está totalmente integrado como bloque `pinField` en el **Page Builder**, lo que permite a autores y desarrolladores configurar fácilmente longitudes de código, formatos de verificación y estados de entrada directamente en el CMS.
+
+***
+
+# Usage
+
+Estos ejemplos ilustran cómo los editores de contenido enlazan y estructuran componentes de campo PIN personalizados.
+
+## 1. Entrada estándar de verificación SMS de 6 dígitos
+
+Una entrada PIN numérica estándar configurada con 6 cajas segmentadas, optimizada para verificaciones por correo o SMS.
 
 <DemoPreview>
-  <div style={{ width: "100%", maxWidth: "320px" }}>
+  <div style={{ width: "100%", maxWidth: "360px" }}>
     <PinField
       label="Verification code"
-      helperText="Check your email for the 6-digit code"
+      helperText="Enter the 6-digit confirmation code we sent to your address."
       count={6}
       otp
       blurOnComplete
-      validator={(value) => value !== "000000" || "That code isn't valid"}
+      interactive
     />
   </div>
 </DemoPreview>
 
-## Formato de carácter
+```json
+{
+  "type": "pinField",
+  "label": "Verification code",
+  "helperText": "Enter the 6-digit confirmation code we sent to your address.",
+  "count": 6,
+  "otp": true,
+  "blurOnComplete": true,
+  "interactive": true
+}
+```
 
-`format` (`"numeric"` | `"alphanumeric"` | `"alphabetic"`, por defecto `"numeric"`) restringe lo que acepta cada casilla y elige el teclado móvil adecuado mediante `inputMode`. Pasa `pattern` con una expresión regular personalizada para sobrescribirlo.
+## 2. Entrada de contraseña oculta y segura (4 dígitos)
 
-## Autocompletado
+Muestra un módulo PIN seguro de 4 dígitos. La propiedad `mask` protege la escritura reemplazando los caracteres con glifos de punto de seguridad genéricos.
 
-`otp` marca el campo como un código de un solo uso por SMS/correo. En lugar de poner `autocomplete="one-time-code"` en cada casilla (lo que hace que navegadores y gestores de contraseñas muestren un aviso de autocompletado en todas a la vez), solo la casilla que el usuario llenaría a continuación lo anuncia — y acepta la longitud completa del código, para que una sugerencia del teclado o un pegado completo se distribuya automáticamente entre las demás casillas. El resto desactiva el autocompletado y se oculta a los gestores de contraseñas.
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "240px" }}>
+    <PinField
+      label="Security PIN"
+      placeholder="•"
+      count={4}
+      mask
+      interactive
+    />
+  </div>
+</DemoPreview>
 
-## Comportamiento de teclado y puntero
+```json
+{
+  "type": "pinField",
+  "label": "Security PIN",
+  "placeholder": "•",
+  "count": 4,
+  "mask": true,
+  "interactive": true
+}
+```
 
-Escribir un carácter válido llena la casilla actual y avanza el foco; el contenido de una casilla enfocada se selecciona primero (`selectOnFocus`, activado por defecto), así que escribir siempre reemplaza. **Backspace** en una casilla vacía la limpia y retrocede a la anterior; **flechas izquierda/derecha** mueven el foco entre casillas. Pegar o un autocompletado del sistema distribuye caracteres desde la casilla donde cae. **Tab** y el foco por clic no pueden saltar más allá de la primera casilla vacía.
+## 3. Código promocional alfanumérico personalizado (variante flushed)
 
-## Validación
+Renderiza un selector de código de 5 cajas usando formato alfanumérico y una variante de borde `flushed` distinta.
 
-Igual que `Field`, `PinField` acepta un `validator` que se ejecuta sobre el valor unido y puede devolver `false` (error genérico) o una cadena (mensaje personalizado). Solo se revalida una vez que todas las casillas están llenas.
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "300px" }}>
+    <PinField
+      label="Promo Coupon Code"
+      placeholder="-"
+      count={5}
+      format="alphanumeric"
+      variant="flushed"
+      interactive
+    />
+  </div>
+</DemoPreview>
 
-## Formularios: autoenvío y reinicio
+```json
+{
+  "type": "pinField",
+  "label": "Promo Coupon Code",
+  "placeholder": "-",
+  "count": 5,
+  "format": "alphanumeric",
+  "variant": "flushed",
+  "interactive": true
+}
+```
 
-`form` asocia la entrada oculta de envío con un `<form id>` en el documento (omítelo si el campo ya vive dentro del formulario). `autoSubmit` llama a `form.requestSubmit()` en cuanto se llenan todas las casillas, tras disparar `onAutoSubmit`; pulsar **Enter** en cualquier casilla también intenta enviar. Reiniciar el formulario vacía el campo.
+***
 
-## Propiedades
+# Props
 
-| Prop | Type | Default | Description |
+| Propiedad | Tipo de campo CMS | Predeterminado | Descripción / opciones admitidas |
 | --- | --- | --- | --- |
-| `count` | `number` | `4` | Número de casillas. |
-| `value` / `defaultValue` | `string[]` | - | Valor controlado/no controlado, una entrada por casilla (fuerza el modo interactivo). |
-| `format` | `"numeric" \| "alphanumeric" \| "alphabetic"` | `"numeric"` | Clase de carácter aceptada por casilla. |
-| `pattern` | `string` | - | Expresión regular personalizada por carácter, sobrescribe `format`. |
-| `otp` | `boolean` | - | Dirige el autocompletado `one-time-code` solo a la casilla activa. |
-| `mask` | `boolean` | - | Renderiza cada casilla como `type="password"`. |
-| `blurOnComplete` | `boolean` | - | Quita el foco de la última casilla al completarse. |
-| `selectOnFocus` | `boolean` | `true` | Selecciona el contenido de la casilla al enfocarla. |
-| `form` | `string` | - | Asocia la entrada oculta, `autoSubmit` y el reinicio con un `<form id>`. |
-| `autoSubmit` | `boolean` | - | Llama a `form.requestSubmit()` al completarse (fuerza el modo interactivo). |
-| `validator` | `(value: string) => boolean \| string` | - | Valida el valor unido (fuerza el modo interactivo). |
-| `label` / `helperText` / `errorText` | `Child` | - | Etiqueta, texto de ayuda y texto de error. |
-| `interactive` | `boolean` | - | Fuerza o impide la hidratación. |
+| **Texto de etiqueta** (`label`) | `string` | - | Encabezado visual principal situado sobre los segmentos de entrada. |
+| **Texto de ayuda** (`helperText`) | `string` | - | Instrucciones descriptivas mostradas bajo las cajas de entrada. |
+| **Mensaje de error** (`errorText`) | `string` | - | Mensaje de validación mostrado cuando las entradas fallan la validación. |
+| **Cantidad de cajas** (`count`) | `number` | `4` | Número de cajas de segmento de entrada a generar. |
+| **Clase de carácter** (`format`) | `select` | `"numeric"` | Restringe los caracteres aceptados. <br/>• Opciones: `"numeric"`, `"alphanumeric"`, `"alphabetic"`. |
+| **Máscara de carácter** (`mask`) | `boolean` | `false` | Al activarse, oculta los valores escritos para entradas seguras. |
+| **Autorrelleno OTP** (`otp`) | `boolean` | `false` | Habilita la detección de autocompletado de códigos en móviles. |
+| **Envío automático** (`autoSubmit`) | `boolean` | `false` | Envía el formulario envolvente al completar el último segmento. |
+| **Variante visual** (`variant`) | `select` | `"outline"` | Estilo visual de cada caja. <br/>• Opciones: `"outline"`, `"subtle"`, `"surface"`, `"flushed"`. |
+| **Escala de tamaño** (`size`) | `select` | `"md"` | Controla el ancho y alto de las cajas. <br/>• Opciones: `"xs"`, `"sm"`, `"md"`, `"lg"`, `"xl"`. |
+| **Forzar interactivo** (`interactive`) | `boolean` | `true` | Hidrata los campos para enlazar disparadores y saneamiento de pegado. |
 
-## Hidratación
+***
 
-Nivel 2: Se hidrata cuando está presente `value`, `defaultValue`, `onValueChange`, `onValueComplete`, `onValueInvalid`, `validator`, `autoSubmit` u `onAutoSubmit`.
+# Developer Notes & Accessibility
+
+- **Isla de hidratación:** Como diseño avanzado que captura eventos de pegado, sanea entradas y gestiona saltos de cursor entre entradas en límites de enfoque móvil, PinField opera como una isla condicional de Nivel 2 (`"interactive": true`).
+- **Cumplimiento WAI-ARIA:** La componente envuelve cada segmento con etiquetas de diseño y accesibilidad adecuadas (`role="group"`, `aria-label`). Los usuarios pueden recorrer los segmentos con las flechas o la tecla de retroceso.
+- **Integración de formularios:** Incluye un `<input>` nativo oculto que lleva la cadena de código completa. Las reglas de autoenvío llaman a `form.requestSubmit()` al completar la entrada, enviándola al formulario padre más cercano.

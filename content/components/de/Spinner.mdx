@@ -7,42 +7,81 @@ hydration: 3
 import { Spinner } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-# Einführung
+# Introduction
 
-Eine Komponente, die einen Ladezustand anzeigt.
+Die `Spinner`-Komponente ist ein animierter kreisförmiger Indikator, der aktive Wartezustände darstellt. Ideal für schnelle Übergänge, Formularübermittlungen und Lade-Overlays, anpassbar mit expliziten Skalierungsbereichen und barrierefreien Beschreibungen.
 
-# Verwendung
+***
+
+# Usage
+
+So positionierst und konfigurierst du Spinner:
+
+## 1. Standard Inline-Lader
+
+Ein Standard-Lader, ideal, um Systemfortschritt in Abschnitten, zentrierten Containern oder Sidebar-Panels anzuzeigen.
 
 <DemoPreview>
   <Spinner size="md" label="Loading..." />
 </DemoPreview>
 
-```tsx
-import { Spinner } from "../components/ui";
-
-export default function MyPage() {
-  return <Spinner size="md" label="Loading..." />;
+```json
+{
+  "type": "spinner",
+  "size": "md",
+  "label": "Loading..."
 }
 ```
 
-## CMS-Seitenbauer
+***
 
-Diese Komponente ist als `spinner`-Block im [Seitenbauer](/docs/PageBuilder) (`content/pages/*.json`) verfügbar:
+## 2. Akzentuierter großer Lader
+
+Mit großflächiger visueller Spur, üblich als Mittelpunkt bei vollständigen Seitenneuladungen oder anfänglichen Workspace-Synchronisierungen.
+
+<DemoPreview>
+  <Spinner size="lg" label="Synchronizing data..." />
+</DemoPreview>
 
 ```json
 {
   "type": "spinner",
   "size": "lg",
-  "label": "Loading"
+  "label": "Synchronizing data..."
 }
 ```
 
-# Eigenschaften
+***
 
-| Eigenschaft | Typ | Beschreibung |
-| --- | --- | --- |
-| `class` | `string` | Benutzerdefinierte CSS-Klassen. |
+## 3. Winziger Sub-Indikator (Button/Kontext-Lader)
 
-| `size` | `"xs" \| "sm" \| "md" \| "lg" \| "xl" \| "2xl" \| "inherit"` | Die Größe des Spinners. |
+Ein kleiner Lader für dichte Dashboards oder kompakte Kontextkarten, um das erneute Laden einzelner Assets anzudeuten.
 
-| `label` | `string` | Ein barrierefreies Label für Screenreader. |
+<DemoPreview>
+  <Spinner size="sm" label="Connecting..." />
+</DemoPreview>
+
+```json
+{
+  "type": "spinner",
+  "size": "sm",
+  "label": "Connecting..."
+}
+```
+
+***
+
+# Props
+
+| Eigenschaft | CMS-Feldtyp | Standard | Beschreibung / unterstützte Optionen |
+| --- | --- | --- | --- |
+| **Größenstufe** (`size`) | `select` | `"md"` | Steuert Durchmesser und Linienstärke des Kreisladers. <br/>• Optionen: `"xs"`, `"sm"`, `"md"`, `"lg"`, `"xl"`, `"2xl"`. |
+| **Barrierefreies Label** (`label`) | `string` | - | Alternative Beschreibung für Screenreader. Dringend empfohlen für Konformität. |
+
+***
+
+# Architecture Notes
+
+- **Barrierefrei ab Werk:** Jeder Spinner kompiliert mit nativem `role="status"`-Wrapper und nur für Screenreader sichtbaren Labels (`class="sr-only"`), sodass Fortschritt korrekt angesagt wird.
+- **Reines SVG-Rendering:** Spinner-Animationen nutzen leichte Vektorpfade (`<svg>`), rotiert via CSS-Keyframes – ohne schwere Asset-Abhängigkeiten.
+- **Optimale Layout-Größe:** Größenstufen entsprechen exakt den Spacing-Tokens des Designsystems, garantieren Ausrichtung in Buttons, Alerts oder Karten.

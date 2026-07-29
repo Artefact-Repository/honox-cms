@@ -9,56 +9,42 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introduction
 
-Un élément de navigation ou de mise en page qui organise le contenu en panneaux commutables et mutuellement exclusifs.
+Un composant de mise en page visuelle qui organise des informations denses et liées en plusieurs panneaux mutuellement exclusifs. Les utilisateurs peuvent basculer entre les panneaux sans charger de nouvelles pages ni encombrer la zone.
 
-# Utilisation
+Le composant **Tabs** est totalement intégré en tant que bloc `tabs` dans le **Page Builder**, permettant aux auteurs de construire des vues à onglets, configurer les propriétés visuelles et arranger les blocs imbriqués directement dans les modèles.
+
+***
+
+# Usage
+
+Ces configurations montrent exactement comment les éléments de bloc du page-builder sont construits.
+
+## 1. Onglets horizontaux classiques (variante Line)
+
+Notre mise en page standard avec un indicateur de déclenchement souligné et des transitions glissantes fluides. Parfait pour les fonctionnalités produit, détails ou sous-menus de documentation.
 
 <DemoPreview>
-  <Tabs defaultValue="features" interactive variant="enclosed" size="md">
-    <Tabs.List>
-      <Tabs.Trigger value="features">⚡ Key Features</Tabs.Trigger>
-      <Tabs.Trigger value="pricing">💎 Pricing Plans</Tabs.Trigger>
-      <Tabs.Indicator />
-    </Tabs.List>
-
-    <Tabs.Content value="features">
-      Our Hono/JSX Tabs component supports zero runtime styled-system classes, smooth sliding indicator transitions, and native keyboard interaction.
-    </Tabs.Content>
-
-    <Tabs.Content value="pricing">
-      Flexible subscription pricing for individuals, start-ups, and scaling enterprise workspaces.
-    </Tabs.Content>
-  </Tabs>
+  <div style={{ width: "100%", maxWidth: "600px" }}>
+    <Tabs defaultValue="features" interactive variant="line" size="md">
+      <Tabs.List>
+        <Tabs.Trigger value="features">⚡ Key Features</Tabs.Trigger>
+        <Tabs.Trigger value="pricing">💎 Pricing Plans</Tabs.Trigger>
+        <Tabs.Indicator />
+      </Tabs.List>
+      <Tabs.Content value="features">
+        Our Hono/JSX Tabs component supports zero runtime styled-system classes, smooth sliding indicator transitions, and native keyboard interaction.
+      </Tabs.Content>
+      <Tabs.Content value="pricing">
+        Flexible subscription pricing for individuals, start-ups, and scaling enterprise workspaces.
+      </Tabs.Content>
+    </Tabs>
+  </div>
 </DemoPreview>
-
-```tsx
-import { Tabs } from "../components/ui/tabs";
-
-<Tabs defaultValue="features" interactive variant="enclosed" size="md">
-  <Tabs.List>
-    <Tabs.Trigger value="features">⚡ Key Features</Tabs.Trigger>
-    <Tabs.Trigger value="pricing">💎 Pricing Plans</Tabs.Trigger>
-    <Tabs.Indicator />
-  </Tabs.List>
-
-  <Tabs.Content value="features">
-    Our Hono/JSX Tabs component supports zero-runtime classes, smooth sliding transitions, and native keyboard interaction.
-  </Tabs.Content>
-
-  <Tabs.Content value="pricing">
-    Flexible subscription pricing for individuals, start-ups, and scaling enterprise workspaces.
-  </Tabs.Content>
-</Tabs>;
-```
-
-## Constructeur de pages CMS
-
-Ce composant est disponible sous forme de bloc « onglets » dans [Page Builder](/docs/PageBuilder) (`content/pages/*.json`), conçu avec une API propre et aplatie :
 
 ```json
 {
   "type": "tabs",
-  "variant": "enclosed",
+  "variant": "line",
   "size": "md",
   "items": [
     {
@@ -67,7 +53,7 @@ Ce composant est disponible sous forme de bloc « onglets » dans [Page Builde
       "content": [
         {
           "type": "text",
-          "content": "Our high-end tabs component is lightning fast."
+          "content": "Our Hono/JSX Tabs component supports zero runtime styled-system classes, smooth sliding indicator transitions, and native keyboard interaction."
         }
       ]
     },
@@ -77,7 +63,7 @@ Ce composant est disponible sous forme de bloc « onglets » dans [Page Builde
       "content": [
         {
           "type": "text",
-          "content": "Starting from $0/mo."
+          "content": "Flexible subscription pricing for individuals, start-ups, and scaling enterprise workspaces."
         }
       ]
     }
@@ -85,25 +71,79 @@ Ce composant est disponible sous forme de bloc « onglets » dans [Page Builde
 }
 ```
 
-# Propriétés
+## 2. Style dossier fermé (taille compacte)
 
-## Racine
+Rend la liste d'onglets avec des boutons à enveloppe bordée semblables à des séparateurs de dossier. Excellent pour menus de tableau de bord, préférences d'interface ou sections de paramètres compactes.
 
-| Propriété | Type | Description |
-| --- | --- | --- |
-| `defaultValue` | `string` | La valeur de tabulation sélectionnée initiale lors du rendu (non contrôlé). |
-| `value` | `string` | La valeur de tabulation sélectionnée contrôlée. |
-| `variant` | \`"line" \ | "subtil" \ | "enclosed"\` | Visual appearance of the tabs list and indicator. Default `"line"`. |
-| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg"\` | The overall height, spacing and padding of tab items. Default `"md"`. |
-| `orientation` | \`"horizontal" \ | "verticale"\` | The layout flow of triggers. Default `"horizontal"`. |
-| `activationMode` | \`"automatic" \ | "manuel"\` | In manual mode, triggers are activated on Enter/Space click; in automatic mode, they activate instantly on focus. Default `"automatic"`. |
-| `loopFocus` | `boolean` | Indique si le focus du clavier revient au début ou à la fin de la liste. Par défaut « vrai ». |
-| `lazyMount` | `boolean` | Retardez le rendu des panneaux de contenu des onglets jusqu'à leur première visite. Par défaut `false`. |
-| `unmountOnExit` | `boolean` | Détruisez les éléments du panneau à onglets du DOM lorsqu'ils deviennent inactifs. Par défaut `false`. |
-| `onValueChange` | `(details: { value: string }) => void` | Appelé lorsque la valeur de l'onglet actif change. |
-| `onFocusChange` | `(details: { value: string }) => void` | Appelé lorsqu'un autre déclencheur d'onglet reçoit le focus clavier ou clic. |
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "600px" }}>
+    <Tabs defaultValue="profile" interactive variant="enclosed" size="sm">
+      <Tabs.List>
+        <Tabs.Trigger value="profile">User Profile</Tabs.Trigger>
+        <Tabs.Trigger value="security">Security</Tabs.Trigger>
+        <Tabs.Indicator />
+      </Tabs.List>
+      <Tabs.Content value="profile">
+        Manage personal information, billing details, and customized regional preferences.
+      </Tabs.Content>
+      <Tabs.Content value="security">
+        Configure multi-factor authentication codes, view active sessions, and update credentials.
+      </Tabs.Content>
+    </Tabs>
+  </div>
+</DemoPreview>
 
-# Accessibilité
+```json
+{
+  "type": "tabs",
+  "variant": "enclosed",
+  "size": "sm",
+  "items": [
+    {
+      "value": "profile",
+      "label": "User Profile",
+      "content": [
+        {
+          "type": "text",
+          "content": "Manage personal information, billing details, and customized regional preferences."
+        }
+      ]
+    },
+    {
+      "value": "security",
+      "label": "Security",
+      "content": [
+        {
+          "type": "text",
+          "content": "Configure multi-factor authentication codes, view active sessions, and update credentials."
+        }
+      ]
+    }
+  ]
+}
+```
 
-Ce composant est entièrement conforme au **modèle de conception des onglets WAI-ARIA** :
-- Définit `role="tablist"` sur le conteneur de liste et `aria-orientation` mappé à la mise en page.- Définit `role="tab"` sur les déclencheurs, avec `aria-selected` correspondant à l'état actif et `aria-controls` référençant les ID du panneau.- Prise en charge du clavier : ArrowRight/ArrowLeft (ou ArrowDown/ArrowUp lorsqu'il est vertical) navigue dans les déclencheurs avec tabIndex itinérant. Accueil/Fin déplace immédiatement le focus vers les points de terminaison. Enter/Space active les déclencheurs en mode manuel.
+***
+
+# Props
+
+| Propriété | Type de champ CMS | Défaut | Description / options prises en charge |
+| --- | --- | --- | --- |
+| **Éléments d'onglet** (`items`) | `list` | - | Tableau de blocs d'onglets. Chaque item requiert `value` unique, texte `label` et liste `content` de nœuds enfants. |
+| **Variante visuelle** (`variant`) | `select` | `"line"` | Style d'apparence. <br/>• `"line"` — Déclencheurs texte minimaux avec indicateur souligné. <br/>• `"subtle"` — Étiquettes à fond arrondi ombré. <br/>• `"enclosed"` — Design d'onglet dossier bordé traditionnel. |
+| **Échelle de taille** (`size`) | `select` | `"md"` | Contrôle padding, espacement et taille de police. <br/>• Options : `"xs"`, `"sm"`, `"md"`, `"lg"`. |
+| **Orientation** (`orientation`) | `select` | `"horizontal"` | Axe structurel de la liste de déclencheurs. `"horizontal"` ou `"vertical"`. |
+| **Mode d'activation** (`activationMode`) | `select` | `"automatic"` | • `"automatic"` — Le panneau change au focus. <br/>• `"manual"` — Uniquement sur Space/Entrée. |
+| **Boucle de focus** (`loopFocus`) | `boolean` | `true` | Fait reboucler le focus clavier au premier item en fin de liste. |
+| **Montage différé** (`lazyMount`) | `boolean` | `false` | Retarde le rendu des panneaux inactifs jusqu'au premier accès. |
+
+***
+
+# Accessibility & Developer Notes
+
+Ce composant respecte nativement le **Modèle de Conception WAI-ARIA Tabs**. Lors de l'hydratation, il implémente les couches critiques suivantes :
+
+- **Attribution de rôles sémantiques :** `role="tablist"` sur la liste, `role="tab"` sur les déclencheurs, `aria-selected` reflète l'état actif, `aria-controls` référence les IDs de panneau automatiquement.
+- **Navigation focus roving :** Les flèches clavier naviguent via `tabIndex` de focus mobile. `Home` ou `End` sautent aux extrémités.
+- **Indicateur glissant CSS dynamique :** Un slider absolu interroge les métriques de position du déclencheur actif pour animer sans thrashing de mise en page.
+- **Contournement des limites Hono Reconciler :** Dans les îlots Preact enveloppant du HTML statique, le gestionnaire d'état manipule directement les attributs (`data-selected`, `aria-selected`, `tabindex`, `hidden`) lors des événements, garantissant des performances indépendantes de la timeline du reconciler.

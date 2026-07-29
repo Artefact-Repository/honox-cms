@@ -9,131 +9,122 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introduction
 
-Un composant de saisie de texte multiligne qui s'intègre au contexte « Field ». Il peut être utilisé seul ou dans le cadre d'un composant « Field ».
+Un contrôle de saisie de texte libre multiligne pour capturer des entrées utilisateur plus longues, comme commentaires, descriptions, retours ou soumissions de formulaires longs. Il fonctionne comme une mise en page totalement accessible dans l'architecture client sans JS.
 
-# Utilisation
+Le composant **Textarea** est totalement intégré en tant que bloc `textarea` dans le **Page Builder**, permettant aux auteurs de configurer facilement espaces réservés, indices d'aide, règles de validation, échelle de taille et comportement d'auto-redimensionnement.
 
-## Autonome avec intégration sur le terrain
+***
 
-`Textarea` s'enroule automatiquement dans un `Field` si vous fournissez `label`, `helperText`, etc.
+# Usage
+
+Ces exemples illustrent comment les éditeurs de contenu lient et structurent des zones de texte.
+
+## 1. Zone de texte standard avec texte d'aide
+
+Une entrée multiligne par défaut avec libellé et texte d'aide explicatif. Idéal pour les champs de retour simples.
 
 <DemoPreview>
-  <div style={{ width: "100%", maxWidth: "320px" }}>
+  <div style={{ width: "100%", maxWidth: "420px" }}>
     <Textarea
-      label="Bio"
-      placeholder="Write here..."
-      rows={4}
-      minLength={10}
+      label="Public Comment"
+      placeholder="Share your thoughts..."
+      helperText="Comments are visible to all workspace members."
       interactive
     />
   </div>
 </DemoPreview>
 
-```tsx
-import { Textarea } from "../components/ui";
+```json
+{
+  "type": "textarea",
+  "label": "Public Comment",
+  "placeholder": "Share your thoughts...",
+  "helperText": "Comments are visible to all workspace members.",
+  "interactive": true
+}
+```
 
-export default function MyPage() {
-  return (
+## 2. Zone compacte avec compteur de caractères et longueur max
+
+Une zone de taille moyenne avec limite de caractères et auto-redimensionnement activé, affichant le compteur en direct.
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "420px" }}>
     <Textarea
-      label="Bio"
-      placeholder="Write here..."
-      rows={4}
-      minLength={10}
+      label="Status Update"
+      placeholder="What's happening?"
+      maxLength={200}
+      showCount
+      autoresize
+      size="sm"
       interactive
     />
-  );
-}
-```
-
-## Variantes
-
-```tsx
-import { Stack } from "../design-system/jsx";
-import { Textarea } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Stack gap="4">
-      <Textarea variant="outline" placeholder="Outline" />
-      <Textarea variant="surface" placeholder="Surface" />
-      <Textarea variant="subtle" placeholder="Subtle" />
-      <Textarea variant="flushed" placeholder="Flushed" />
-    </Stack>
-  );
-}
-```
-
-## Tailles
-
-```tsx
-import { Stack } from "../design-system/jsx";
-import { Textarea } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Stack gap="4">
-      <Textarea size="xs" placeholder="Extra Small" />
-      <Textarea size="sm" placeholder="Small" />
-      <Textarea size="md" placeholder="Medium" />
-      <Textarea size="lg" placeholder="Large" />
-      <Textarea size="xl" placeholder="Extra Large" />
-    </Stack>
-  );
-}
-```
-
-## À l'intérieur d'un composant Field
-
-Vous pouvez également l'utiliser dans un composant « Field » pour des mises en page plus complexes.
-
-```tsx
-import { Field, Textarea } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Field label="Comments">
-      <Textarea placeholder="Leave a comment..." interactive />
-    </Field>
-  );
-}
-```
-
-## Constructeur de pages CMS
-
-Ce composant est disponible sous forme de bloc `textarea` dans [Page Builder](/docs/PageBuilder) (`content/pages/*.json`) :
+  </div>
+</DemoPreview>
 
 ```json
 {
   "type": "textarea",
-  "label": "Bio",
-  "helperText": "Tell us about yourself.",
-  "rows": 4
+  "label": "Status Update",
+  "placeholder": "What's happening?",
+  "maxLength": 200,
+  "showCount": true,
+  "autoresize": true,
+  "size": "sm",
+  "interactive": true
 }
 ```
 
-# Propriétés
+## 3. Zone de texte avec état d'erreur invalide
 
-| Propriété | Type | Description |
-| --- | --- | --- |
-| `class` | `string` | Classes CSS personnalisées. |
+Démontre l'état visuel d'erreur, active les bordures d'invalidation et pré-remplit un message d'erreur pour affichage client.
 
-| `variant` | \`"outline" \ | "surface" \ | "subtle" \ | "flushed"\` | The visual style of the textarea. |
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "420px" }}>
+    <Textarea
+      label="Account Bio"
+      placeholder="Tell us about yourself"
+      invalid
+      errorText="Bio cannot contain profanity."
+      interactive
+    />
+  </div>
+</DemoPreview>
 
-| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg" \ | "xl"\` | The size of the textarea. |
+```json
+{
+  "type": "textarea",
+  "label": "Account Bio",
+  "placeholder": "Tell us about yourself",
+  "invalid": true,
+  "errorText": "Bio cannot contain profanity.",
+  "interactive": true
+}
+```
 
-| `resize` | \`"none" \ | "les deux" \ | "horizontal" \ | "vertical"\` | Whether the textarea can be resized. |
+***
 
-| `label` | `string` | L'étiquette du champ (lorsqu'il est utilisé comme champ autonome). |
-| `helperText` | `string` | Le texte d'assistance pour le champ. |
-| `errorText` | `string` | Le texte d'erreur pour le champ. |
-| `value` | `string` | La valeur actuelle. |
-| `defaultValue` | `string` | La valeur initiale. |
-| `onValueChange` | `(val: string) => void` | Rappel déclenché lorsque la valeur change. |
-| `onInput` | `(e: any) => void` | Gestionnaire d’événements pour les modifications d’entrée. |
-| `rows` | `number` | Nombre de lignes de texte visibles. |
-| `placeholder` | `string` | Texte d'indice. |
-| `minLength` | `number` | Validation de la longueur minimale. |
+# Props
 
-| `validator` | \`(val: string) => boolean \ | chaîne\` | Custom validation logic. |
+| Propriété | Type de champ CMS | Défaut | Description / options prises en charge |
+| --- | --- | --- | --- |
+| **Texte du libellé** (`label`) | `string` | - | Titre descriptif au-dessus de la zone. |
+| **Texte d'espace réservé** (`placeholder`) | `string` | - | Texte fantôme dans le champ vide. |
+| **Indice d'aide** (`helperText`) | `string` | - | Note contextuelle légère sous le champ. |
+| **Auto-redimensionnement** (`autoresize`) | `boolean` | `false` | S'adapte à la hauteur du contenu, supprime les barres de défilement statiques. |
+| **Longueur max** (`maxLength`) | `number` | - | Limite supérieure de caractères saisissables. |
+| **Afficher le compteur** (`showCount`) | `boolean` | `false` | Rend un compteur en direct (ex. `12/200`). |
+| **Variante visuelle** (`variant`) | `select` | `"outline"` | Thème de bordure et de remplissage. <br/>• Options : `"outline"`, `"surface"`, `"subtle"`, `"flushed"`. |
+| **Échelle de taille** (`size`) | `select` | `"md"` | Contrôle padding et taille de police. <br/>• Options : `"xs"`, `"sm"`, `"md"`, `"lg"`, `"xl"`. |
+| **Largeur** (`width`) | `select` | `"full"` | Comportement de largeur de bloc. <br/>• Options : `"full"`, `"fit"`. |
+| **État invalide** (`invalid`) | `boolean` | `false` | Active les bordures d'erreur et l'état invalide. |
+| **Désactivé** (`disabled`) | `boolean` | `false` | Désactive l'interaction et atténue le champ. |
+| **Forcer interactif** (`interactive`) | `boolean` | `true` | Hydrate la zone pour lier les événements client. |
 
-| `interactive` | `boolean` | Force l’hydratation comme une île. |
+***
+
+# Developer Notes & Accessibility
+
+- **Intégration de formulaire native :** Compile en `<textarea>` natif avec `name` et `form`, garantissant l'usabilité native sans JS.
+- **Conformité WAI-ARIA :** Les relations libellé/erreur sont liées via `label`, `aria-invalid` et `aria-describedby`, assurant l'annonce des erreurs de validation par les lecteurs d'écran.
+- **Auto-redimensionnement intelligent :** `autoresize` ajuste dynamiquement la hauteur de défilement à la frappe, sans reflows coûteux.

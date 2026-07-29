@@ -7,58 +7,44 @@ hydration: 2
 import { Tabs, Stack, Badge } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-# 简介
+# Introduction
 
-用于将内容组织为可切换、互斥面板的导航或布局元素。
+一个视觉布局组件，将密集的相关信息组织到多个互斥的面板中。用户无需加载新页面或弄乱画布，即可在面板间无缝切换。
 
-# 用法
+**Tabs** 组件已作为 `tabs` 区块完全集成到 **Page Builder** 中，使作者能够轻松构建选项卡视图、配置视觉属性并直接在模板中排列嵌套区块。
+
+***
+
+# Usage
+
+以下配置精确展现了 page-builder 区块项的构建方式。
+
+## 1. 经典横向选项卡（Line 变体）
+
+我们的标准布局，带有下划线触发指示器和流畅的滑动过渡。非常适合标准产品功能、详情或文档子菜单。
 
 <DemoPreview>
-  <Tabs defaultValue="features" interactive variant="enclosed" size="md">
-    <Tabs.List>
-      <Tabs.Trigger value="features">⚡ Key Features</Tabs.Trigger>
-      <Tabs.Trigger value="pricing">💎 Pricing Plans</Tabs.Trigger>
-      <Tabs.Indicator />
-    </Tabs.List>
-
-    <Tabs.Content value="features">
-      Our Hono/JSX Tabs component supports zero runtime styled-system classes, smooth sliding indicator transitions, and native keyboard interaction.
-    </Tabs.Content>
-
-    <Tabs.Content value="pricing">
-      Flexible subscription pricing for individuals, start-ups, and scaling enterprise workspaces.
-    </Tabs.Content>
-  </Tabs>
+  <div style={{ width: "100%", maxWidth: "600px" }}>
+    <Tabs defaultValue="features" interactive variant="line" size="md">
+      <Tabs.List>
+        <Tabs.Trigger value="features">⚡ Key Features</Tabs.Trigger>
+        <Tabs.Trigger value="pricing">💎 Pricing Plans</Tabs.Trigger>
+        <Tabs.Indicator />
+      </Tabs.List>
+      <Tabs.Content value="features">
+        Our Hono/JSX Tabs component supports zero runtime styled-system classes, smooth sliding indicator transitions, and native keyboard interaction.
+      </Tabs.Content>
+      <Tabs.Content value="pricing">
+        Flexible subscription pricing for individuals, start-ups, and scaling enterprise workspaces.
+      </Tabs.Content>
+    </Tabs>
+  </div>
 </DemoPreview>
-
-```tsx
-import { Tabs } from "../components/ui/tabs";
-
-<Tabs defaultValue="features" interactive variant="enclosed" size="md">
-  <Tabs.List>
-    <Tabs.Trigger value="features">⚡ Key Features</Tabs.Trigger>
-    <Tabs.Trigger value="pricing">💎 Pricing Plans</Tabs.Trigger>
-    <Tabs.Indicator />
-  </Tabs.List>
-
-  <Tabs.Content value="features">
-    Our Hono/JSX Tabs component supports zero-runtime classes, smooth sliding transitions, and native keyboard interaction.
-  </Tabs.Content>
-
-  <Tabs.Content value="pricing">
-    Flexible subscription pricing for individuals, start-ups, and scaling enterprise workspaces.
-  </Tabs.Content>
-</Tabs>;
-```
-
-## CMS 页面构建器
-
-该组件可作为 `tabs` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用，采用简洁、扁平化的 API 设计：
 
 ```json
 {
   "type": "tabs",
-  "variant": "enclosed",
+  "variant": "line",
   "size": "md",
   "items": [
     {
@@ -67,7 +53,7 @@ import { Tabs } from "../components/ui/tabs";
       "content": [
         {
           "type": "text",
-          "content": "Our high-end tabs component is lightning fast."
+          "content": "Our Hono/JSX Tabs component supports zero runtime styled-system classes, smooth sliding indicator transitions, and native keyboard interaction."
         }
       ]
     },
@@ -77,7 +63,7 @@ import { Tabs } from "../components/ui/tabs";
       "content": [
         {
           "type": "text",
-          "content": "Starting from $0/mo."
+          "content": "Flexible subscription pricing for individuals, start-ups, and scaling enterprise workspaces."
         }
       ]
     }
@@ -85,27 +71,79 @@ import { Tabs } from "../components/ui/tabs";
 }
 ```
 
-# 属性
+## 2. 封闭文件夹样式（紧凑尺寸）
 
-## 根组件
+以带边框的按钮外壳渲染选项卡列表，类似文件夹分隔符。非常适合仪表盘菜单、界面偏好或紧凑设置区。
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `defaultValue` | `string` | 渲染时的初始选中标签值（非受控）。 |
-| `value` | `string` | 受控的选中标签值。 |
-| `variant` | \`"line" \ | "subtle" \ | "enclosed"\` | 标签列表与指示器的视觉外观。默认 `"line"`。 |
-| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg"\` | 标签项的整体高度、间距与内边距。默认 `"md"`。 |
-| `orientation` | \`"horizontal" \ | "vertical"\` | 触发器的布局流向。默认 `"horizontal"`。 |
-| `activationMode` | \`"automatic" \ | "manual"\` | 在手动模式下，触发器在 Enter/Space 点击时激活；在自动模式下，在获得焦点时立即激活。默认 `"automatic"`。 |
-| `loopFocus` | `boolean` | 键盘焦点是否在列表的首尾之间循环。默认 `true`。 |
-| `lazyMount` | `boolean` | 延迟渲染标签内容面板，直到首次访问。默认 `false`。 |
-| `unmountOnExit` | `boolean` | 当标签面板变为非激活时，将其从 DOM 中销毁。默认 `false`。 |
-| `onValueChange` | `(details: { value: string }) => void` | 激活标签值发生变化时调用。 |
-| `onFocusChange` | `(details: { value: string }) => void` | 不同的标签触发器获得键盘或点击焦点时调用。 |
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "600px" }}>
+    <Tabs defaultValue="profile" interactive variant="enclosed" size="sm">
+      <Tabs.List>
+        <Tabs.Trigger value="profile">User Profile</Tabs.Trigger>
+        <Tabs.Trigger value="security">Security</Tabs.Trigger>
+        <Tabs.Indicator />
+      </Tabs.List>
+      <Tabs.Content value="profile">
+        Manage personal information, billing details, and customized regional preferences.
+      </Tabs.Content>
+      <Tabs.Content value="security">
+        Configure multi-factor authentication codes, view active sessions, and update credentials.
+      </Tabs.Content>
+    </Tabs>
+  </div>
+</DemoPreview>
 
-# 无障碍
+```json
+{
+  "type": "tabs",
+  "variant": "enclosed",
+  "size": "sm",
+  "items": [
+    {
+      "value": "profile",
+      "label": "User Profile",
+      "content": [
+        {
+          "type": "text",
+          "content": "Manage personal information, billing details, and customized regional preferences."
+        }
+      ]
+    },
+    {
+      "value": "security",
+      "label": "Security",
+      "content": [
+        {
+          "type": "text",
+          "content": "Configure multi-factor authentication codes, view active sessions, and update credentials."
+        }
+      ]
+    }
+  ]
+}
+```
 
-该组件完全符合 **WAI-ARIA Tabs 设计模式**：
-- 在列表容器上设置 `role="tablist"`，并将 `aria-orientation` 映射到布局。
-- 在触发器上设置 `role="tab"`，其中 `aria-selected` 对应激活状态，`aria-controls` 引用面板 ID。
-- 键盘支持：ArrowRight/ArrowLeft（垂直时为 ArrowDown/ArrowUp）通过 focus-roving tabIndex 在触发器间导航。Home/End 立即将焦点移动到两端。在手动模式下，Enter/Space 激活触发器。
+***
+
+# Props
+
+| 属性 | CMS 字段类型 | 默认值 | 描述 / 支持的选项 |
+| --- | --- | --- | --- |
+| **选项卡项** (`items`) | `list` | - | 选项卡区块数组。每项需唯一 `value`（用于键跟踪）、`label` 文本以及包含子布局节点的 `content` 区块列表。 |
+| **视觉变体** (`variant`) | `select` | `"line"` | 视觉外观风格。 <br/>• `"line"` — 带下划线滑动指示器的最小文本触发器。 <br/>• `"subtle"` — 带阴影圆角背景的标签。 <br/>• `"enclosed"` — 传统带边框文件夹选项卡设计。 |
+| **尺寸比例** (`size`) | `select` | `"md"` | 控制内边距、间距和触发标签字体大小。 <br/>• 选项：`"xs"`、`"sm"`、`"md"`、`"lg"`。 |
+| **布局方向** (`orientation`) | `select` | `"horizontal"` | 触发列表的结构轴向，可为 `"horizontal"` 或 `"vertical"`。 |
+| **激活模式** (`activationMode`) | `select` | `"automatic"` | • `"automatic"` — 触发器获得键盘焦点时面板内容立即切换。 <br/>• `"manual"` — 仅在显式按下 Space 或 Enter 键时更新面板内容。 |
+| **循环焦点** (`loopFocus`) | `boolean` | `true` | 在按方向键越过末尾时，将键盘焦点循环回到第一项。 |
+| **惰性挂载** (`lazyMount`) | `boolean` | `false` | 延迟渲染非活动选项卡面板，直到首次访问其特定触发器。 |
+
+***
+
+# Accessibility & Developer Notes
+
+此组件开箱即用地符合 **WAI-ARIA Tabs 设计模式**。注水后，组件实现以下关键无障碍层：
+
+- **语义角色分配：** 在列表容器上设置 `role="tablist"`，在触发器上设置 `role="tab"`，`aria-selected` 反映活动状态，`aria-controls` 自动引用面板 ID。
+- **Roving 焦点导航：** 键盘方向键通过焦点漫游 `tabIndex` 平滑导航触发器。按 `Home` 或 `End` 立即跳到端点。
+- **动态 CSS 滑动指示器：** 具备绝对定位的视觉滑块指示器，查询活动触发器的位置指标以平滑平移动画，避免布局抖动。
+- **绕过 Hono Reconciler 限制：** 在包裹静态 HTML 的 Preact 孤岛中，状态管理器在事件时直接操纵触发器属性（如 `data-selected`、`aria-selected`、`tabindex`、`hidden`），保证性能独立于 reconciler 时间线。

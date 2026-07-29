@@ -7,74 +7,92 @@ hydration: 1
 import { Tooltip, Button } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-# 简介
+# Introduction
 
-用于在悬停或聚焦时显示上下文信息的组件。
+`Tooltip` 组件是一个上下文浮层元素，用于在用户将指针悬停或聚焦触发元素时显示补充性、非交互式的描述性文本。
 
-# 用法
+该组件专为我们的零 JS 静态渲染架构和条件式注水模型而构建，使用高效的页面构建器友好绑定，使内容作者能够无缝地将上下文提示附加到任意 UI 元素上。
 
-## 高层封装
+***
+
+# Usage
+
+以下示例展示了内容作者如何配置和绑定 Tooltip 区块。
+
+## 1. 与按钮触发器关联的基础工具栏提示
+
+一个经典的悬停提示，解释按钮操作，使用默认的交互放置（顶部居中）。
 
 <DemoPreview>
-  <Tooltip content="This is the tooltip content" placement="bottom" showArrow asChild>
-    <Button>Hover me</Button>
-  </Tooltip>
+  <Tooltip
+    interactive
+    trigger={<Button variant="outline">Submit Report</Button>}
+    content="Sends your compiled analytics to the billing department."
+  />
 </DemoPreview>
-
-```tsx
-import { Tooltip } from "../components/ui/tooltip";
-import { Button } from "../components/ui/button";
-
-export default function MyPage() {
-  return (
-    <Tooltip content="This is the tooltip content" placement="bottom" showArrow asChild>
-      <Button>Hover me</Button>
-    </Tooltip>
-  );
-}
-```
-
-当触发器本身已是可聚焦元素（如 `Button`、链接……）时，优先使用 `asChild`：它会将 tooltip 的 `aria-describedby`、悬停/聚焦监听器和 `data-*` 属性直接合并到该元素上。不使用 `asChild` 时，触发器会被包裹在一个额外的 `<div tabindex="0">` 中 —— 适合包裹本身不可聚焦的无生命内容（纯文本、图标），但当子元素本身可交互时，会额外增加一个多余的 Tab 停靠点。
-
-## CMS 页面构建器
-
-该组件可作为 `tooltip` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用。CMS 触发器是一个普通字符串 `triggerText`，会自动包裹在带 `asChild` 的 outline `Button` 中（与 `Popover`/`HoverCard` 使用的模式相同）：
 
 ```json
 {
   "type": "tooltip",
-  "content": "Free cancellation up to 24 hours before check-in.",
-  "triggerText": "Cancellation Policy",
-  "placement": "top",
-  "showArrow": true
+  "triggerText": "Submit Report",
+  "content": "Sends your compiled analytics to the billing department."
 }
 ```
 
-# 属性
+## 2. 多侧边栏定位与禁用提示
 
-## Tooltip（高层封装）
+同一组件通过 `placement` 属性在多个方向（底部、右侧、左侧）重新定位，以适配狭窄面板。第二项展示了 `disabled` 变体，当交互被禁用时不显示提示。
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `children` | `any` | 触发 tooltip 的元素。 |
-| `content` | `any` | 在 tooltip 中显示的内容。 |
-| `showArrow` | `boolean` | 是否显示指向触发器的箭头。 |
+<DemoPreview>
+  <div style={{ display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap" }}>
+    <Tooltip
+      interactive
+      placement="bottom"
+      trigger={<Button variant="outline">Bottom Hint</Button>}
+      content="Appears below the trigger."
+    />
+    <Tooltip
+      interactive
+      placement="right"
+      trigger={<Button variant="outline">Right Hint</Button>}
+      content="Appears to the right side."
+    />
+    <Tooltip
+      interactive
+      disabled
+      trigger={<Button variant="outline">Disabled Hint</Button>}
+      content="Won't show while disabled."
+    />
+  </div>
+</DemoPreview>
 
-| `placement` | \`"top" \ | "bottom" \ | "left" \ | "right"\` | 内容在触发器的哪一侧打开。默认 `"top"`。若视口空间不足，会自动翻转到相反一侧。 |
+```json
+{
+  "type": "tooltip",
+  "triggerText": "Bottom Hint",
+  "content": "Appears below the trigger.",
+  "placement": "bottom",
+  "interactive": true
+}
+```
 
-| `open` | `boolean` | Tooltip 是否打开（受控）。 |
-| `defaultOpen` | `boolean` | 初始打开状态（非受控）。默认 `false`。 |
-| `onOpenChange` | `(details: { open: boolean }) => void` | Tooltip 打开或关闭时调用。 |
-| `openDelay` | `number` | 悬停后显示的延迟（毫秒）。默认 `100`。 |
-| `closeDelay` | `number` | 鼠标移出后隐藏的延迟（毫秒）。默认 `100`。 |
-| `closeOnEscape` | `boolean` | 按下 Escape 时关闭。默认 `true`。 |
-| `disabled` | `boolean` | Tooltip 是否禁用。 |
-| `interactive` | `boolean` | 强制作为岛屿水合。默认为 `true`。 |
-| `id` | `string` | Tooltip 的唯一标识符。 |
-| `asChild` | `boolean` | 是否将属性合并到直接子元素上，而非包裹在一个 `div` 中。 |
+***
 
-将指针悬停到触发器上或聚焦触发器会打开 tooltip；将指针移到 tooltip 自身的内容上（例如其中的链接）会保持其打开，符合 [WCAG 1.4.13](https://www.w3.org/WAI/WCAG21/Understanding/content-on-hover-or-focus.html)。聚焦触发器（键盘导航）会立即打开，失焦会立即关闭 —— `openDelay`/`closeDelay` 仅适用于悬停。
+# Props
 
-# 限制
+| 属性 | CMS 字段类型 | 默认值 | 描述 / 支持的选项 |
+| --- | --- | --- | --- |
+| **触发文本** (`triggerText`) | `string` | `"Hover me"` | 打印在提示触发器内部的视觉标签。 |
+| **提示内容** (`content`) | `string` | - | 悬停时显示的补充性辅助描述文本。 |
+| **放置定位** (`placement`) | `select` | `"top"` | 浮层相对于触发器的实体锚定方向。 <br/>• 选项：`"top"`、`"bottom"`、`"left"`、`"right"`，以及对应的 `-start` / `-end` 变体。 |
+| **禁用** (`disabled`) | `boolean` | `false` | 完全禁用提示功能，阻止浮层渲染。 |
+| **强制交互** (`interactive`) | `boolean` | `true` | 注水提示孤岛以绑定悬停/聚焦事件。 |
+| **延迟毫秒** (`delayMs`) | `number` | `300` | 提示浮层在触发前保持的毫秒数。 |
 
-交互式岛屿会根据其触发器定位并调整 tooltip 的大小：当请求的 placement 会溢出视口时，它会翻转到相反的一侧（如 `top` → `bottom`），并夹紧交叉轴以防止内容渲染到屏幕外。它不像 Floating UI 那样跟踪滚动容器或 resize 监听器 —— 重新定位仅在 tooltip 打开时以及窗口 `resize` 时重新运行。
+***
+
+# Architecture Notes
+
+- **智能视口边界对齐：** 交互式 Preact 孤岛会动态跟踪屏幕空间。若提示在视口边缘附近打开，它会自动翻转方向（例如从底部切换为顶部）并在其轴线上偏移，防止内容被裁剪。
+- **统一事件委托：** 悬停检测、聚焦显示与 Esc 关闭等交互从容器上的中央监听器干净地委托处理，最小化客户端事件绑定。
+- **语义化浮层：** Tooltip 编译为原生可访问的布局，开箱即用地包含 `role="tooltip"`、`aria-describedby` 和唯一触发器 ID 等语义属性，确保完全的屏幕阅读器兼容性。

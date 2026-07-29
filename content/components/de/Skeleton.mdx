@@ -7,73 +7,128 @@ hydration: 3
 import { Skeleton } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-# Einführung
+# Introduction
 
-Ein Platzhalter, der anzeigt, dass Inhalte geladen werden, mit verschiedenen Animations- und Formoptionen.
+Die `Skeleton`-Komponente ist ein performantes Platzhalterelement, das anzeigt, dass Inhalte gerade geladen werden. Durch geometrische Layout-Platzhalter verhindert sie beim Laden von Remote-Daten unerwartete Layout-Sprünge (CLS).
 
-# Verwendung
+Die Komponente unterstützt verschiedene geometrische Formen (Textspalten, Quadrate, Kreis-Avatare) sowie responsive Animationsschleifen (wie Glühen oder Pulsieren) direkt über visuelle Konfiguration.
 
-## Einfaches Skeleton
+***
+
+# Usage
+
+So konstruierst du Mockup-Zustände für Karten, Profile und Listen:
+
+## 1. Mehrzeiliger Textblock-Platzhalter
+
+Simuliert einen Absatz oder ein Beschreibungsfeld während des Wartens auf Artikeltext. Rendert automatisch gestapelte Spalten mit dezenter Puls-Animation.
 
 <DemoPreview>
-  <div style={{ display: "flex", flexDirection: "column", gap: "1rem", width: "100%", maxWidth: "320px" }}>
-    <Skeleton shape="circle" size="12" />
-    <Skeleton height="6" width="40" />
+  <div style={{ width: "100%", maxWidth: "320px" }}>
     <Skeleton shape="text" noOfLines={3} />
   </div>
 </DemoPreview>
-
-```tsx
-import { Skeleton, SkeletonCircle, SkeletonText } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <div>
-      <SkeletonCircle size="12" />
-      <Skeleton height="6" width="40" />
-      <SkeletonText noOfLines={3} />
-    </div>
-  );
-}
-```
-
-## CMS-Seitenbauer
-
-Diese Komponente ist als `skeleton`-Block im [Seitenbauer](/docs/PageBuilder) (`content/pages/*.json`) verfügbar. Die CMS-`shape`-Optionen sind `box`/`circle`/`text` und werden dem echten `shape`-Attribut zugeordnet (`box` fällt auf den einfachen Standard zurück):
 
 ```json
 {
   "type": "skeleton",
   "shape": "text",
-  "noOfLines": 3
+  "noOfLines": 3,
+  "variant": "pulse"
 }
 ```
 
-# Eigenschaften
+***
 
-## Skeleton
+## 2. Kreisförmiger Avatar-Platzhalter
 
-| Eigenschaft | Typ | Beschreibung |
-| --- | --- | --- |
-| `loading` | `boolean` | Legt fest, ob das Skeleton angezeigt wird. Standard: `true`. |
-| `circle` | `boolean` | Rendert das Skeleton als Kreis. |
+Rendert eine kreisförmige Form für Profilbilder oder Avatar-Icons. Kombinierbar mit Text-Skeletten für Nutzer-Header.
 
-| `variant` | \`"pulse" \ | "shine" \ | "none"\` | Der Animationsstil. |
+<DemoPreview>
+  <div style={{ width: "100%" }}>
+    <Skeleton shape="circle" size="12" />
+  </div>
+</DemoPreview>
 
-| `class` | `string` | Benutzerdefinierte CSS-Klassen für das Wurzelelement. |
+```json
+{
+  "type": "skeleton",
+  "shape": "circle",
+  "variant": "pulse"
+}
+```
 
-Alle anderen nativen `<div>`-Attribute (z. B. `style`, `id`, `width`, `height`) werden an das zugrunde liegende Element weitergegeben.
+***
 
-## SkeletonCircle
+## 3. Hochglanz-Box-Container (Karten-Mockup)
 
-Dieselben Eigenschaften wie `Skeleton`, vorkonfiguriert mit `circle`.
+Ein rechteckiger Box-Container mit diagonaler Glanz-Reflexionsanimation, ideal für Medienkarten oder Banner-Mockups.
 
-## SkeletonText
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <Skeleton shape="box" height="32" />
+  </div>
+</DemoPreview>
 
-| Eigenschaft | Typ | Beschreibung |
-| --- | --- | --- |
-| `noOfLines` | `number` | Anzahl der anzuzeigenden Zeilen. Standard: `3`. |
+```json
+{
+  "type": "skeleton",
+  "shape": "box",
+  "variant": "shine"
+}
+```
 
-| `gap` | \`string \ | number\` | Abstand zwischen den Zeilen. Standard: `"2"`. |
+***
 
-Zuzüglich aller `Skeleton`-Eigenschaften.
+## 4. Geladener Zustand (Inhaltsumschaltung)
+
+Sobald Client-Daten geladen sind, zeigt `loaded: true` sofort die verschachtelten Kind-Blöcke (wie eine Überschrift oder echte Karte) und stoppt den Platzhalter-Hintergrund.
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <Skeleton loaded={true}>
+      <div style={{ padding: "1rem", border: "1px solid var(--colors-gray-4)", borderRadius: "8px" }}>
+        <h3>Account Connected</h3>
+        <p style={{ fontSize: "0.85rem", color: "var(--colors-gray-11)", marginTop: "4px" }}>API key sync complete.</p>
+      </div>
+    </Skeleton>
+  </div>
+</DemoPreview>
+
+```json
+{
+  "type": "skeleton",
+  "loaded": true,
+  "children": [
+    {
+      "blockType": "heading",
+      "text": "Account Connected",
+      "size": "sm"
+    },
+    {
+      "blockType": "text",
+      "content": "API key sync complete."
+    }
+  ]
+}
+```
+
+***
+
+# Props
+
+| Eigenschaft | CMS-Feldtyp | Standard | Beschreibung / unterstützte Optionen |
+| --- | --- | --- | --- |
+| **Form** (`shape`) | `select` | `"box"` | Geometrisches Format der Ressource. <br/>• Optionen: `"box"` (Karten/Bilder), `"circle"` (Avatare), `"text"` (Absatzspalten). |
+| **Animationsvariante** (`variant`) | `select` | `"pulse"` | Animationsstil. <br/>• Optionen: `"pulse"` (Glühen), `"shine"` (diagonales Glänzen), `"none"` (statisch). |
+| **Zeilenzahl** (`noOfLines`) | `number` | `3` | Anzahl der Spalten bei `shape: "text"`. |
+| **Geladen** (`loaded`) | `boolean` | `false` | Bei `true` wird die Maske übersprungen und Kinder direkt angezeigt. |
+| **Kind-Blöcke** (`children`) | `list` | - | Verschachtelte Page-Builder-Blöcke, verborgen bis `loaded: true`. |
+
+***
+
+# Architecture Notes
+
+- **Keine Layout-Sprünge:** Geometrische Maße (CSS-Grid-Höhe/-Breite) werden server-seitig vor der Hydration geparst. Das bewahrt proportionale Grenzen und vermeidet kumulative Layout-Verschiebung (CLS).
+- **GPU-beschleunigtes Glänzen:** Reflexionen und Pulse nutzen performante CSS-Transforms. Garantiert 60fps selbst auf schwächeren Mobilgeräten.
+- **Dynamische Inhaltsabbildung:** Skeleton-Umschläge erlauben asynchrones Laden von Client-Datenströmen mit nahtlosem Übergang vom Platzhalter zum sichtbaren Zustand.

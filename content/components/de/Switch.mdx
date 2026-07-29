@@ -1,62 +1,122 @@
 ---
 title: Switch Schalter
-hydration: 2
 category: Forms
+hydration: 2
 ---
 
 import { Switch } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-# Einführung
+# Introduction
 
-Eine Steuerung, mit der der Benutzer zwischen aktiviertem und deaktiviertem Zustand umschalten kann.
+Ein von iOS inspiriertes binäres Schalterelement zum Umschalten zwischen aktiviert/deaktiviert für eine einzelne unabhängige Einstellung. Häufig in Einstellungsbereichen, Profilpräferenzen oder Abo-Schaltern. Visuell betont es die Ein/Aus-Semantik stärker als eine Standard-Checkbox.
 
-# Verwendung
+Die **Switch**-Komponente ist als `switch`-Block vollständig in den **Page Builder** integriert, sodass Autoren Label, Hilfetext, Markenakzentfarbe, Größe und Vorauswahl leicht konfigurieren können.
+
+***
+
+# Usage
+
+Diese Beispiele zeigen, wie Redakteure Schalter binden und strukturieren.
+
+## 1. Standardmäßig aktiver Schalter mit Hilfetext (Line-Variante)
+
+Ein voraktivierter Schalter mit erklärendem Hilfetext. Zeigt die flüssige `line`-Variante und eine grüne Akzentpalette für den aktiven Zustand.
 
 <DemoPreview>
-  <Switch defaultChecked interactive>Enable Notifications</Switch>
+  <Switch
+    label="Airplane Mode"
+    helperText="Disable wireless connections"
+    colorPalette="green"
+    defaultChecked
+    interactive
+  />
 </DemoPreview>
-
-```tsx
-import { Switch } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Switch
-      defaultChecked={true}
-      onCheckedChange={(details) => console.log(details.checked)}
-      interactive
-    >
-      Enable Notifications
-    </Switch>
-  );
-}
-```
-
-## CMS-Seitenbauer
-
-Diese Komponente ist als `switch`-Block im [Seitenbauer](/docs/PageBuilder) (`content/pages/*.json`) verfügbar:
 
 ```json
 {
   "type": "switch",
-  "label": "Dark Mode",
-  "checked": true,
-  "colorPalette": "blue"
+  "label": "Airplane Mode",
+  "helperText": "Disable wireless connections",
+  "colorPalette": "green",
+  "type": "line",
+  "size": "md",
+  "defaultChecked": true,
+  "interactive": true
 }
 ```
 
-# Eigenschaften
+## 2. Kompakter Schalter standardmäßig aus (Akzent Rot)
 
-| Eigenschaft | Typ | Beschreibung |
-| --- | --- | --- |
-| `children` | `any` | Beschriftungsinhalt, der neben dem Schalter gerendert wird. |
-| `class` | `string` | Benutzerdefinierte CSS-Klassen. |
-| `checked` | `boolean` | Legt fest, ob der Schalter aktiviert ist (kontrolliert). |
-| `defaultChecked` | `boolean` | Der anfängliche Aktivierungszustand (unkontrolliert). |
-| `disabled` | `boolean` | Legt fest, ob der Schalter deaktiviert ist. |
-| `onCheckedChange` | `(details: { checked: boolean }) => void` | Rückruf, der ausgelöst wird, wenn sich der Aktivierungszustand ändert. |
+Ein aktiver Zustand für destruktive Aktionen sollte Gefahrenakzente wie Rot verwenden. Diese Demo nutzt die kompakte `sm`-Größe.
 
-| `size` | `"sm" \| "md" \| "lg"` | Die Größe des Schalters. |
+<DemoPreview>
+  <Switch
+    label="Delete History"
+    helperText="Permanently erase activity logs"
+    colorPalette="red"
+    size="sm"
+    interactive
+  />
+</DemoPreview>
 
-| `interactive` | `boolean` | Erzwingt die Hydration als Insel. |
+```json
+{
+  "type": "switch",
+  "label": "Delete History",
+  "helperText": "Permanently erase activity logs",
+  "colorPalette": "red",
+  "type": "line",
+  "size": "sm",
+  "defaultChecked": false,
+  "interactive": true
+}
+```
+
+## 3. Deaktivierter Schalter mit Inline-Icon
+
+Zeigt kombinierte Interaktionszustände: ein deaktivierter, aber seinen Wert anzeigender Schalter.
+
+<DemoPreview>
+  <Switch
+    label="Beta Features"
+    helperText="Currently locked by admin"
+    disabled
+    defaultChecked
+    interactive
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "switch",
+  "label": "Beta Features",
+  "helperText": "Currently locked by admin",
+  "disabled": true,
+  "defaultChecked": true,
+  "interactive": true
+}
+```
+
+***
+
+# Props
+
+| Eigenschaft | CMS-Feldtyp | Standard | Beschreibung / unterstützte Optionen |
+| --- | --- | --- | --- |
+| **Label-Text** (`label`) | `string` | - | Beschreibender Titel neben der Schalterbahn. |
+| **Hilfetext** (`helperText`) | `string` | - | Leichte kontextuelle Hinweise unter dem Schalter. |
+| **Markenakzentfarbe** (`colorPalette`) | `select` | `"blue"` | Visuelle Palette der Bahnfüllung im aktiven Zustand. <br/>• Optionen: blue, green, red, purple, orange, amber, cyan, slate. |
+| **Visuelle Variante** (`variant`) | `select` | `"line"` | Visueller Stil der Bahn. <br/>• Optionen: `"line"`, `"surface"`, `"subtle"`, `"flushed"`. |
+| **Größenstufe** (`size`) | `select` | `"md"` | Steuert die Gesamtgröße der Schalterbahn. <br/>• Optionen: `"xs"`, `"sm"`, `"md"`, `"lg"`, `"xl"`. |
+| **Vorausgewählt** (`defaultChecked`) | `boolean` | `false` | Bei `true` startet der Schalter aktiviert. |
+| **Deaktiviert** (`disabled`) | `boolean` | `false` | Deaktiviert Interaktion und dimmt den Schalter. |
+| **Interaktiv erzwingen** (`interactive`) | `boolean` | `true` | Hydriert den Schalter zum Binden von Tastatur- und Umschaltevents. |
+
+***
+
+# Developer Notes & Accessibility
+
+- **Tastaturnavigation:** Das Steuerelement unterstützt native Tastaturinteraktion – Fokus und `Space` oder `Enter` schalten den Zustand. Der Fokusring folgt unseren Design-Tokens.
+- **WAI-ARIA-Konformität:** Kompiliert zu semantischen Schaltern (`role="switch"`, `aria-checked`), sodass Screenreader den exakten Binärzustand ansagen.
+- **Hydration Island:** Als Advanced-Layout, das Umschaltevents, Fokus-Einfriedung und Barrierefreiheits-Status verwaltet, läuft Switch als Tier-2-bedingte Insel (`"interactive": true`).

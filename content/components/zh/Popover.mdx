@@ -7,79 +7,143 @@ hydration: 1
 import { Popover, Button } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-# 简介
+# Introduction
 
-一个交互式元素，在锚点之上的一层中显示额外内容。
+`Popover` 组件是一个交互式浮层元素，用于在相对于锚点触发元素的浮动卡片中显示附加详情、操作或上下文表单。
 
-# 用法
+该组件专为我们的零 JS 静态渲染架构和条件式注水模型而构建，使用高效的页面构建器友好绑定。在作为交互式 Preact 孤岛注水以平滑处理切换和 Esc 触发之前，它在 HTML 布局中始终保持完全静态。
+
+***
+
+# Usage
+
+以下示例展示了内容作者如何配置和绑定 Popover 区块。
+
+## 1. 基础信息型 Popover
+
+一个干净、纯文本的弹出框，非常适合解释术语、提供定义或显示轻量提示消息，而不会使主页面布局变得杂乱。
 
 <DemoPreview>
   <Popover
-    placement="right"
-    trigger={<Button>Open Popover</Button>}
-    title="Title"
-    description="Description"
-    body="Popover Body"
+    interactive
+    trigger={<Button variant="outline">Learn More</Button>}
+    title="Data Residency"
+    description="Your profile data is stored securely in compliant Frankfurt (EU) server nodes."
   />
 </DemoPreview>
-
-```tsx
-import { Popover } from "../components/ui/popover";
-import { Button } from "../components/ui/button";
-
-<Popover
-  placement="right"
-  trigger={<Button>Open Popover</Button>}
-  title="Title"
-  description="Description"
-  body="Popover Body"
-/>;
-```
-
-## CMS 页面构建器
-
-该组件可作为 `popover` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用：
 
 ```json
 {
   "type": "popover",
-  "triggerText": "Open Popover",
-  "title": "Title",
-  "description": "Description",
-  "body": "Popover Body"
+  "triggerText": "Learn More",
+  "title": "Data Residency",
+  "description": "Your profile data is stored securely in compliant Frankfurt (EU) server nodes."
 }
 ```
 
-# 属性
+## 2. 带正文内容与页脚操作的高级 Popover
 
-## Root
+一个引导式弹出框，包含不同区块：信息头部、正文文本，以及在页脚插槽中嵌套的自定义操作按钮。
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `children` | `any` | Popover 子组件。 |
-| `open` | `boolean` | Popover 是否打开（受控）。 |
-| `defaultOpen` | `boolean` | 初始打开状态（非受控）。默认 `false`。 |
-| `onOpenChange` | `(details: { open: boolean }) => void` | Popover 打开或关闭时调用。 |
+<DemoPreview>
+  <Popover
+    interactive
+    trigger={<Button variant="outline">Setup Account</Button>}
+    title="Configure API Integrations"
+    description="Connect with external tools seamlessly."
+    body="Your subscription allows up to 5 concurrent server channels. Ensure your client secret credentials are copied before proceeding."
+    footer={<Button size="sm">Connect Keys</Button>}
+    showArrow={true}
+  />
+</DemoPreview>
 
-| `placement` | \`"top" \ | "bottom" \ | "left" \ | "right"\` | 内容在触发元素的哪一侧打开。默认 `"bottom"`。若视口空间不足，会自动翻转到相反一侧。 |
+```json
+{
+  "type": "popover",
+  "triggerText": "Setup Account",
+  "title": "Configure API Integrations",
+  "description": "Connect with external tools seamlessly.",
+  "body": "Your subscription allows up to 5 concurrent server channels. Ensure your client secret credentials are copied before proceeding.",
+  "footer": "Connect Keys",
+  "showArrow": true
+}
+```
 
-| `interactive` | `boolean` | 强制作为岛屿水合。默认 `true`。 |
-| `id` | `string` | Popover 的唯一标识符。 |
-| `closeOnEscape` | `boolean` | 按下 Escape 时关闭。默认 `true`。 |
-| `closeOnInteractOutside` | `boolean` | 在外部发生指针交互，或焦点离开 Popover 时关闭。默认 `true`。 |
-| `onClose` | `() => void` | Popover 关闭时触发的回调。 |
-| `onToggle` | `() => void` | Popover 切换时触发的回调。 |
+## 3. 带自定义 SVG 触发器与嵌套子区块的 Popover
 
-## Trigger
+对于更复杂的仪表盘面板，弹出框可以嵌入自定义 SVG 触发器（在 `triggerIcon` 中使用原始标记），并在浮动卡片内渲染子组件列表（如嵌套 Badge、Text 或额外操作按钮）。
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `asChild` | `boolean` | 是否将属性合并到直接子元素上。 |
+<DemoPreview>
+  <Popover
+    interactive
+    trigger={
+      <Button variant="outline">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style={{ width: "16px", height: "16px", marginRight: "6px" }}>
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="16" x2="12" y2="12" />
+          <line x1="12" y1="8" x2="12.01" y2="8" />
+        </svg>
+        System Status
+      </Button>
+    }
+    title="System Heartbeat"
+    description="Operational health checks"
+    showArrow={true}
+    closable={true}
+  >
+    <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
+      <span style={{ padding: "2px 8px", background: "var(--colors-green-3)", borderRadius: "4px", fontSize: "0.75rem", color: "white" }}>API: OK</span>
+      <span style={{ padding: "2px 8px", background: "var(--colors-green-3)", borderRadius: "4px", fontSize: "0.75rem", color: "white" }}>DB: OK</span>
+    </div>
+  </Popover>
+</DemoPreview>
 
-# 限制
+```json
+{
+  "type": "popover",
+  "triggerText": "System Status",
+  "triggerIcon": "<circle cx=\"12\" cy=\"12\" r=\"10\" /><line x1=\"12\" y1=\"16\" x2=\"12\" y2=\"12\" /><line x1=\"12\" y1=\"8\" x2=\"12.01\" y2=\"8\" />",
+  "triggerAriaLabel": "System Operations Status Info",
+  "title": "System Heartbeat",
+  "description": "Operational health checks",
+  "showArrow": true,
+  "closable": true,
+  "children": [
+    {
+      "blockType": "badge",
+      "text": "API: OK",
+      "colorPalette": "green"
+    },
+    {
+      "blockType": "badge",
+      "text": "DB: OK",
+      "colorPalette": "green"
+    }
+  ]
+}
+```
 
-交互式岛屿会相对于其触发元素定位并调整 Popover 的大小：当请求的 placement 会溢出视口时，它会翻转到相反一侧（例如 `bottom` → `top`），并对交叉轴进行裁剪，使内容永远不会渲染到屏幕之外。它不会像 Floating UI 那样跟踪滚动容器或 resize 观察器 —— 重新定位仅在 Popover 打开时窗口 `resize` 时重新运行，并且（由于定位器通过 `position: absolute` 锚定到触发元素自身的包裹元素）滚动页面时会随触发元素一起移动。
+***
 
-支持将一个 Popover 的触发元素嵌套到另一个 Popover 的内容中（点击委托按每个 Popover 实例划分作用域），但不支持将 Popover 嵌套到 Tooltip 的触发元素中，反之亦然 —— 这两个组件不会跨组件类型协调 `data-part` 的所有权。
+# Props
 
-`_closed` 退出动画（`scale-fade-out`）会在 Popover 真正从布局中移除之前播放 —— 关闭不会使其立即隐藏。
+| 属性 | CMS 字段类型 | 默认值 | 描述 / 支持的选项 |
+| --- | --- | --- | --- |
+| **触发文本** (`triggerText`) | `string` | `"Click me"` | 打印在弹出框切换按钮内部的视觉标签。 |
+| **触发图标 SVG** (`triggerIcon`) | `string` | - | 要注入触发按钮（与触发文本并列）的原始 SVG 标记元素（例如 `<path d="..." />`）。 |
+| **触发 ARIA 标签** (`triggerAriaLabel`) | `string` | - | 供屏幕阅读器使用的描述性标签。若触发器仅有图标而无文本，则此项为必填。 |
+| **标题** (`title`) | `string` | - | 渲染在弹出卡片顶部的粗体标题文本。 |
+| **描述** (`description`) | `string` | - | 标题下方显示的配套副标题/描述。 |
+| **正文文本** (`body`) | `string` | - | 渲染在弹出框中部的主要段落文本。 |
+| **页脚文本** (`footer`) | `string` | - | 渲染在卡片底部区域的摘要文本或按钮。 |
+| **显示箭头指示器** (`showArrow`) | `boolean` | `true` | 为 true 时，渲染一个从卡片边缘指向触发器的细小视觉尖角。 |
+| **可关闭** (`closable`) | `boolean` | `true` | 在弹出框顶角渲染一个细小的视觉关闭触发按钮。 |
+| **子区块** (`children`) | `list` | - | 嵌套的页面构建器区块（如文本、徽章或按钮），直接附加到弹出框的正文列表中。 |
+
+***
+
+# Architecture Notes
+
+- **智能视口边界对齐：** 交互式 Preact 孤岛会动态跟踪屏幕空间。若弹出框在视口边缘附近打开，它会自动翻转方向（例如从底部对齐切换为顶部对齐）并沿其轴线偏移，以防止内容被裁剪。
+- **统一事件委托：** 打开与关闭交互，以及点击外部关闭和 Esc 键处理，都从弹出框根元素上的中央监听器干净地委托处理。这最大限度地减少了客户端事件绑定。
+- **语义化浮层：** Popover 编译为原生、可访问的布局，开箱即用地包含 `role="dialog"`、`aria-haspopup="dialog"` 和 `aria-expanded="true|false"` 等语义属性，确保完全的屏幕阅读器兼容性。

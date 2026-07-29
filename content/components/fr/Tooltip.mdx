@@ -9,87 +9,90 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introduction
 
-Un composant pour afficher des informations contextuelles en survol ou en focus.
+Le composant `Tooltip` est un élément superposé contextuel affichant un texte descriptif complémentaire et non interactif lorsque le pointeur survole ou focalise l'élément déclencheur.
 
-# Utilisation
+Conçu spécifiquement pour notre architecture de rendu statique Zero-JS et le modèle d'hydratation conditionnelle, le Tooltip utilise des liaisons efficaces et compatibles avec le page builder, permettant aux auteurs d'épingler des indices contextuels à n'importe quel élément d'UI sans friction.
 
-## Wrapper de haut niveau
+***
+
+# Usage
+
+Ces exemples illustrent comment les auteurs de contenu configurent et lient des blocs tooltip.
+
+## 1. Tooltip de base associé à un bouton
+
+Une info-bulle de survol classique expliquant l'action du bouton, avec placement par défaut (haut centré).
 
 <DemoPreview>
-  <Tooltip content="This is the tooltip content" placement="bottom" showArrow asChild>
-    <Button>Hover me</Button>
-  </Tooltip>
+  <Tooltip
+    interactive
+    trigger={<Button variant="outline">Submit Report</Button>}
+    content="Sends your compiled analytics to the billing department."
+  />
 </DemoPreview>
-
-```tsx
-import { Tooltip } from "../components/ui/tooltip";
-import { Button } from "../components/ui/button";
-
-export default function MyPage() {
-  return (
-    <Tooltip content="This is the tooltip content" placement="bottom" showArrow asChild>
-      <Button>Hover me</Button>
-    </Tooltip>
-  );
-}
-```
-
-Préférez `asChild` lorsque le déclencheur est déjà un élément focalisable (un
-`Button`, un lien, …) : il fusionne le `aria-describeby` de l'info-bulle, le survol/le focus
-les écouteurs et les attributs `data-*` directement sur cet élément. Sans
-`asChild`, le déclencheur est enveloppé dans un `<div tabindex="0">` supplémentaire — utile
-pour envelopper du contenu inerte (texte brut, icône) qui n'est pas lui-même focalisable,
-mais cela ajoute un deuxième taquet de tabulation redondant lorsque l'enfant est déjà
-interactif.
-
-## Constructeur de pages CMS
-
-Ce composant est disponible sous forme de bloc `tooltip` dans [Page Builder](/docs/PageBuilder) (`content/pages/*.json`). Le déclencheur CMS est une simple chaîne `triggerText`, enveloppée automatiquement dans un contour `Button` avec `asChild` (le même modèle que `Popover`/`HoverCard` utilise) :
 
 ```json
 {
   "type": "tooltip",
-  "content": "Free cancellation up to 24 hours before check-in.",
-  "triggerText": "Cancellation Policy",
-  "placement": "top",
-  "showArrow": true
+  "triggerText": "Submit Report",
+  "content": "Sends your compiled analytics to the billing department."
 }
 ```
 
-# Propriétés
+## 2. Placement multi-directionnel et tooltip désactivé
 
-## Info-bulle (wrapper de haut niveau)
+Le même composant est repositionné dans plusieurs directions (bas, droite, gauche) via la propriété `placement` pour s'adapter aux panneaux étroits. Le troisième montre la variante `disabled`, qui n'affiche rien quand l'interaction est désactivée.
 
-| Propriété | Type | Description |
-| --- | --- | --- |
-| `children` | `any` | L'élément qui déclenche l'info-bulle. |
-| `content` | `any` | Le contenu à afficher dans l’info-bulle. |
-| `showArrow` | `boolean` | S'il faut afficher une flèche pointant vers le déclencheur. |
+<DemoPreview>
+  <div style={{ display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap" }}>
+    <Tooltip
+      interactive
+      placement="bottom"
+      trigger={<Button variant="outline">Bottom Hint</Button>}
+      content="Appears below the trigger."
+    />
+    <Tooltip
+      interactive
+      placement="right"
+      trigger={<Button variant="outline">Right Hint</Button>}
+      content="Appears to the right side."
+    />
+    <Tooltip
+      interactive
+      disabled
+      trigger={<Button variant="outline">Disabled Hint</Button>}
+      content="Won't show while disabled."
+    />
+  </div>
+</DemoPreview>
 
-| `placement` | \`"top" \ | "bas" \ | "left" \ | "right"\` | Which side of the trigger the content opens on. Default `"top"`. Flips to the opposite side automatically if there isn't enough viewport room. |
+```json
+{
+  "type": "tooltip",
+  "triggerText": "Bottom Hint",
+  "content": "Appears below the trigger.",
+  "placement": "bottom",
+  "interactive": true
+}
+```
 
-| `open` | `boolean` | Si l'info-bulle est ouverte (contrôlée). |
-| `defaultOpen` | `boolean` | État ouvert initial (non contrôlé). Par défaut `false`. |
-| `onOpenChange` | `(details: { open: boolean }) => void` | Appelé lorsque l'info-bulle s'ouvre ou se ferme. |
-| `openDelay` | `number` | Délai (ms) avant l'affichage en survol. Par défaut « 100 ». |
-| `closeDelay` | `number` | Délai (ms) avant de se cacher lors du retrait de la souris. Par défaut « 100 ». |
-| `closeOnEscape` | `boolean` | Fermez lorsque vous appuyez sur Échap. Par défaut « vrai ». |
-| `disabled` | `boolean` | Si l'info-bulle est désactivée. |
-| `interactive` | `boolean` | Force l’hydratation comme une île. La valeur par défaut est « vrai ». |
-| `id` | `string` | Identifiant unique de l'info-bulle. |
-| `asChild` | `boolean` | S'il faut fusionner les accessoires sur l'élément enfant immédiat au lieu de les envelopper dans un « div ». |
+***
 
-Passer la souris sur le déclencheur ou le concentrer ouvre l'info-bulle ; déplacer le pointeur
-sur le propre contenu de l'info-bulle (par exemple un lien à l'intérieur) la maintient ouverte, par
-[WCAG 1.4.13](https://www.w3.org/WAI/WCAG21/Understanding/content-on-hover-or-focus.html).
-La mise au point du déclencheur (navigation au clavier) l'ouvre immédiatement et le flou
-le ferme immédiatement — les `openDelay`/`closeDelay` ne s'appliquent qu'au survol.
+# Props
 
-# Limites
+| Propriété | Type de champ CMS | Défaut | Description / options prises en charge |
+| --- | --- | --- | --- |
+| **Texte du déclencheur** (`triggerText`) | `string` | `"Hover me"` | Libellé visuel imprimé dans le déclencheur. |
+| **Contenu du tooltip** (`content`) | `string` | - | Texte descriptif complémentaire au survol. |
+| **Placement** (`placement`) | `select` | `"top"` | Direction d'ancrage physique relative au déclencheur. <br/>• Options : `"top"`, `"bottom"`, `"left"`, `"right"`, plus variantes `-start`/`-end`. |
+| **Désactivé** (`disabled`) | `boolean` | `false` | Désactive totalement la fonction tooltip. |
+| **Forcer interactif** (`interactive`) | `boolean` | `true` | Hydrate l'îlot tooltip pour lier les événements survol/focus. |
+| **Délai (ms)** (`delayMs`) | `number` | `300` | Millisecondes d'attente avant le déclenchement. |
 
-L'îlot interactif positionne et dimensionne l'info-bulle par rapport à son
-déclencheur : il se retourne du côté opposé (par exemple "haut" → "bas") lorsque le
-le placement demandé déborderait de la fenêtre et serrerait l'axe transversal de manière à
-le contenu n'est jamais rendu hors écran. Il ne suit pas les conteneurs de défilement ou
-redimensionner les observateurs comme le fait l'interface utilisateur flottante : le repositionnement ne se réexécute que lorsque
-l'info-bulle s'ouvre et sur la fenêtre « redimensionner ».
+***
+
+# Architecture Notes
+
+- **Alignement intelligent des limites du viewport :** L'îlot Preact interactif suit l'espace d'affichage dynamiquement. S'il s'ouvre près d'un bord, il inverse la direction automatiquement (ex. bas vers haut) et se décale sur son axe.
+- **Délégation unifiée des événements :** Détection de survol, affichage au focus et fermeture Échap sont délégués centralement depuis le conteneur, minimisant les liaisons client.
+- **Overlays sémantiques :** Les tooltips compilent en layouts natifs et accessibles avec `role="tooltip"`, `aria-describedby` et IDs de déclencheur uniques d'emblée.

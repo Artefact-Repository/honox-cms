@@ -1,5 +1,5 @@
 ---
-title: Tooltip Descrição Instantânea
+title: Tooltip Dica
 category: Overlays
 hydration: 1
 ---
@@ -7,74 +7,92 @@ hydration: 1
 import { Tooltip, Button } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-# Introdução
+# Introduction
 
-Um componente para exibir informações contextuais ao passar o cursor ou focar.
+O componente `Tooltip` é um elemento sobreposto de contexto que exibe texto descritivo complementar e não interativo quando o ponteiro paira ou foca o elemento de disparo.
 
-# Uso
+Construído especificamente para nossa arquitetura de renderização estática Zero-JS e para o modelo de hidratação condicional, o Tooltip usa vinculações eficientes e amigáveis ao page builder, permitindo que os autores fixem dicas contextuais a qualquer elemento de UI sem atrito.
 
-## Wrapper de alto nível
+***
+
+# Usage
+
+Estes exemplos ilustram como os autores de conteúdo configuram e vinculam blocos tooltip.
+
+## 1. Tooltip base associado a um botão
+
+Uma dica de hover clássica que explica a ação do botão, usando o posicionamento interativo padrão (topo central).
 
 <DemoPreview>
-  <Tooltip content="This is the tooltip content" placement="bottom" showArrow asChild>
-    <Button>Hover me</Button>
-  </Tooltip>
+  <Tooltip
+    interactive
+    trigger={<Button variant="outline">Submit Report</Button>}
+    content="Sends your compiled analytics to the billing department."
+  />
 </DemoPreview>
-
-```tsx
-import { Tooltip } from "../components/ui/tooltip";
-import { Button } from "../components/ui/button";
-
-export default function MyPage() {
-  return (
-    <Tooltip content="This is the tooltip content" placement="bottom" showArrow asChild>
-      <Button>Hover me</Button>
-    </Tooltip>
-  );
-}
-```
-
-Prefira `asChild` quando o trigger já for um elemento focável (um `Button`, um link, …): ele mescla o `aria-describedby` do tooltip, os listeners de hover/focus e os atributos `data-*` diretamente nesse elemento. Sem `asChild`, o trigger é envolvido em uma `<div tabindex="0">` extra — útil para envolver conteúdo inerte (texto simples, um ícone) que não é em si focável, mas adiciona uma segunda parada de tabulação redundante quando o filho já é interativo.
-
-## Construtor de páginas CMS
-
-Este componente está disponível como um bloco `tooltip` no [Construtor de páginas](/docs/PageBuilder) (`content/pages/*.json`). O trigger do CMS é uma simples string `triggerText`, automaticamente envolvida em um `Button` outline com `asChild` (o mesmo padrão que `Popover`/`HoverCard` usam):
 
 ```json
 {
   "type": "tooltip",
-  "content": "Free cancellation up to 24 hours before check-in.",
-  "triggerText": "Cancellation Policy",
-  "placement": "top",
-  "showArrow": true
+  "triggerText": "Submit Report",
+  "content": "Sends your compiled analytics to the billing department."
 }
 ```
 
-# Propriedades
+## 2. Posicionamento multidirecional e tooltip desabilitado
 
-## Tooltip (wrapper de alto nível)
+O mesmo componente é reposicionado em várias direções (baixo, direita, esquerda) via propriedade `placement` para se adaptar a painéis estreitos. O terceiro mostra a variante `disabled`, que não exibe a dica quando a interação está desativada.
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `children` | `any` | O elemento que aciona o tooltip. |
-| `content` | `any` | O conteúdo a ser exibido dentro do tooltip. |
-| `showArrow` | `boolean` | Se deve exibir uma seta apontando para o trigger. |
+<DemoPreview>
+  <div style={{ display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap" }}>
+    <Tooltip
+      interactive
+      placement="bottom"
+      trigger={<Button variant="outline">Bottom Hint</Button>}
+      content="Appears below the trigger."
+    />
+    <Tooltip
+      interactive
+      placement="right"
+      trigger={<Button variant="outline">Right Hint</Button>}
+      content="Appears to the right side."
+    />
+    <Tooltip
+      interactive
+      disabled
+      trigger={<Button variant="outline">Disabled Hint</Button>}
+      content="Won't show while disabled."
+    />
+  </div>
+</DemoPreview>
 
-| `placement` | \`"top" \ | "bottom" \ | "left" \ | "right"\` | O lado do trigger em que o conteúdo é aberto. Padrão `"top"`. Inverte automaticamente para o lado oposto se não houver espaço suficiente no viewport. |
+```json
+{
+  "type": "tooltip",
+  "triggerText": "Bottom Hint",
+  "content": "Appears below the trigger.",
+  "placement": "bottom",
+  "interactive": true
+}
+```
 
-| `open` | `boolean` | Se o tooltip está aberto (controlado). |
-| `defaultOpen` | `boolean` | Estado inicial aberto (não controlado). Padrão `false`. |
-| `onOpenChange` | `(details: { open: boolean }) => void` | Chamado quando o tooltip abre ou fecha. |
-| `openDelay` | `number` | Atraso (ms) antes de exibir ao passar o cursor. Padrão `100`. |
-| `closeDelay` | `number` | Atraso (ms) antes de ocultar ao retirar o cursor. Padrão `100`. |
-| `closeOnEscape` | `boolean` | Fecha quando Escape é pressionado. Padrão `true`. |
-| `disabled` | `boolean` | Se o tooltip está desabilitado. |
-| `interactive` | `boolean` | Força a hidratação como island. Padrão `true`. |
-| `id` | `string` | Identificador único para o tooltip. |
-| `asChild` | `boolean` | Se deve mesclar as propriedades no elemento filho imediato em vez de envolvê-lo em uma `div`. |
+***
 
-Passar o cursor sobre ou focar o trigger abre o tooltip; mover o ponteiro sobre o próprio conteúdo do tooltip (por exemplo, um link dentro dele) o mantém aberto, conforme [WCAG 1.4.13](https://www.w3.org/WAI/WCAG21/Understanding/content-on-hover-or-focus.html). Focar o trigger (navegação por teclado) o abre imediatamente, e perder o foco o fecha imediatamente — `openDelay`/`closeDelay` se aplicam apenas ao hover.
+# Props
 
-# Limitações
+| Propriedade | Tipo de campo CMS | Padrão | Descrição / opções suportadas |
+| --- | --- | --- | --- |
+| **Texto do gatilho** (`triggerText`) | `string` | `"Hover me"` | Rótulo visual impresso dentro do gatilho. |
+| **Conteúdo do tooltip** (`content`) | `string` | - | Texto descritivo complementar exibido ao passar o cursor. |
+| **Posicionamento** (`placement`) | `select` | `"top"` | Direção de ancoragem física relativa ao gatilho. <br/>• Opções: `"top"`, `"bottom"`, `"left"`, `"right"`, mais variantes `-start`/`-end`. |
+| **Desabilitado** (`disabled`) | `boolean` | `false` | Desativa totalmente a função de tooltip. |
+| **Forçar interativo** (`interactive`) | `boolean` | `true` | Hidrata a ilha do tooltip para vincular eventos de hover/foco. |
+| **Atraso (ms)** (`delayMs`) | `number` | `300` | Milissegundos que o tooltip aguarda antes de disparar. |
 
-O island interativo posiciona e dimensiona o tooltip em relação ao seu trigger: ele inverte para o lado oposto (por exemplo, `top` → `bottom`) quando o posicionamento solicitado transbordaria o viewport, e limita o eixo transversal para que o conteúdo nunca seja renderizado fora da tela. Ele não rastreia contêineres de rolagem ou observadores de redimensionamento da forma como o Floating UI faz — o reposicionamento só é executado novamente quando o tooltip abre e no `resize` da janela.
+***
+
+# Architecture Notes
+
+- **Alinhamento inteligente de limites do viewport:** A ilha interativa de Preact rastreia o espaço de tela dinamicamente. Se o tooltip abre perto de uma borda, inverte a direção automaticamente (ex. baixo para cima) e se desloca no seu eixo.
+- **Delegação unificada de eventos:** Detecção de hover, exibição por foco e fechamento Escape são delegados centralmente a partir do contêiner, minimizando vinculações no cliente.
+- **Overlays semânticos:** Os tooltips compilam em layouts nativos e acessíveis com `role="tooltip"`, `aria-describedby` e IDs de gatilho únicos por padrão.

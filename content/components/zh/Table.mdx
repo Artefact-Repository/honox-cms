@@ -7,11 +7,19 @@ hydration: 2
 import { Table } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-# 简介
+# Introduction
 
-用于展示表格数据的灵活组件。
+`Table` 组件是一个强大的布局元素，用于在客户端页面上清晰地渲染复杂的表格数据集结构。它完整支持零 JS 响应式模板和数据驱动的 CMS 配置模式，支持干净的纵向滚动包裹、动态列对齐预设以及悬停高亮。
 
-# 用法
+***
+
+# Usage
+
+你可以轻松地从仪表盘直接映射数据并美化表格样式。
+
+## 1. 带自定义对齐的基础纯文本表格
+
+使用 `plain` 变体的标准文本清单，价格右对齐以便阅读。
 
 <DemoPreview>
   <div style={{ width: "100%" }}>
@@ -31,82 +39,90 @@ import { DemoPreview } from "../../../app/components/demo-preview";
   </div>
 </DemoPreview>
 
-```tsx
-import { Table } from "../components/ui";
-
-export default function MyPage() {
-  const columns = [
-    { header: "Name", key: "name" },
-    { header: "Category", key: "category" },
-    { header: "Price", key: "price", align: "end" },
-  ];
-
-  const rows = [
-    { name: "Laptop", category: "Electronics", price: "$999.00" },
-    { name: "Coffee Mug", category: "Home & Kitchen", price: "$15.00" },
-  ];
-
-  return (
-    <Table
-      variant="plain"
-      caption="Product Inventory"
-      columns={columns}
-      rows={rows}
-      footer={
-        <tr>
-          <td colSpan={2}>Total</td>
-          <td style={{ textAlign: "end" }}>$1,014.00</td>
-        </tr>
-      }
-    />
-  );
+```json
+{
+  "type": "table",
+  "variant": "plain",
+  "columns": [
+    { "header": "Name", "key": "name" },
+    { "header": "Category", "key": "category" },
+    { "header": "Price", "key": "price", "align": "end" }
+  ],
+  "rows": "[{\"name\": \"Laptop\", \"category\": \"Electronics\", \"price\": \"$999.00\"}, {\"name\": \"Coffee Mug\", \"category\": \"Home & Kitchen\", \"price\": \"$15.00\"}]"
 }
 ```
 
-## CMS 页面构建器
+***
 
-该组件可作为 `table` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用。由于行数据无法拥有固定的 CMS 结构，`rows` 是一个 JSON 编码的字符串字段，在渲染时解析：
+## 2. 斑马纹交互表格（Surface 变体）
+
+具备交替行阴影斑马纹、交互悬停高亮以及结构边框。
+
+<DemoPreview>
+  <div style={{ width: "100%" }}>
+    <Table
+      variant="surface"
+      striped={true}
+      interactive={true}
+      columnBorder={true}
+      columns={[
+        { header: "System Service", key: "service" },
+        { header: "Server Node", key: "node", align: "center" },
+        { header: "Status", key: "status", align: "end" },
+      ]}
+      rows={[
+        { service: "Auth Endpoint", node: "EU-West", status: "Online" },
+        { service: "Payment API", node: "US-East", status: "Degraded" },
+        { service: "File Storage", node: "APAC-South", status: "Online" }
+      ]}
+    />
+  </div>
+</DemoPreview>
 
 ```json
 {
   "type": "table",
+  "variant": "surface",
+  "striped": true,
+  "interactive": true,
+  "columnBorder": true,
   "columns": [
-    { "header": "Room", "key": "room" },
-    { "header": "Price", "key": "price", "align": "end" }
+    { "header": "System Service", "key": "service" },
+    { "header": "Server Node", "key": "node", "align": "center" },
+    { "header": "Status", "key": "status", "align": "end" }
   ],
-  "rows": "[{\"room\": \"Cabin Loft\", \"price\": \"$180/night\"}, {\"room\": \"Cabin Suite\", \"price\": \"$240/night\"}]",
-  "variant": "plain",
-  "striped": true
+  "rows": "[{\"service\": \"Auth Endpoint\", \"node\": \"EU-West\", \"status\": \"Online\"}, {\"service\": \"Payment API\", \"node\": \"US-East\", \"status\": \"Degraded\"}, {\"service\": \"File Storage\", \"node\": \"APAC-South\", \"status\": \"Online\"}]"
 }
 ```
 
-# 属性
+***
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `columns` | `TableColumn[]` | 表格列的配置。 |
-| `rows` | `any[]` | 要在表格中显示的数据。 |
+# Props
 
-| `caption` | \`string \ | JSX.Element\` | 显示在顶部或底部的可选标题。 |
+| 属性 | CMS 字段类型 | 默认值 | 描述 / 支持的选项 |
+| --- | --- | --- | --- |
+| **列配置** (`columns`) | `list` | - | 列配置的有序列表（详见下方 Column 子属性）。 |
+| **行数据** (`rows`) | `text` | - | 表示表格行的原始 JSON 序列化数组字符串（例如 `"[{\"item\": \"Laptop\"}]"`），在服务器端渲染时自动解析。 |
+| **视觉变体** (`variant`) | `select` | `"plain"` | 表格容器的总体设计布局风格。 <br/>• 选项：`"plain"`、`"surface"`。 |
+| **斑马纹** (`striped`) | `boolean` | `false` | 为 true 时，为交替行渲染微妙的浅色背景阴影，提升数据可读性。 |
+| **行高亮** (`interactive`) | `boolean` | `false` | 在桌面端启用跨活动单元格的鼠标悬停背景动画。 |
+| **列边框** (`columnBorder`) | `boolean` | `false` | 在表格列之间渲染垂直分隔边框线。 |
+| **粘性表头** (`stickyHeader`) | `boolean` | `false` | 滚动时将主表头行固定在表格视口顶部。 |
 
-| `footer` | `JSX.Element` | 可选的页脚内容。 |
+### Column 列表属性（`columns`）
 
-| `variant` | \`"plain" \ | "surface"\` | 表格的视觉样式。 |
+`columns` 列表参数中的每一项都接受以下字段：
 
-| `striped` | `boolean` | 是否对行显示斑马纹。 |
-| `interactive` | `boolean` | 行是否显示悬停状态。 |
-| `columnBorder` | `boolean` | 是否在列之间显示边框。 |
-| `stickyHeader` | `boolean` | 滚动时表头是否保持可见。 |
-| `class` | `string` | 根元素的自定义 CSS 类。 |
+| 子属性 | 类型 | 必填 | 描述 / 支持的选项 |
+| --- | --- | --- | --- |
+| **表头文本** (`header`) | `string` | 是 | 渲染在表头行内的列标题。 |
+| **项键** (`key`) | `string` | 是 | 行数据对象中直接映射到该单元格的属性键。 |
+| **文本对齐** (`align`) | `select` | `"start"` | 单元格值的对齐方式，用于数值右对齐。 <br/>• 选项：`"start"`、`"center"`、`"end"`。 |
 
-### TableColumn
+***
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
+# Architecture Notes
 
-| `header` | \`string \ | JSX.Element\` | 表头文本或元素。 |
-
-| `key` | `string` | 行数据对象中的键。 |
-| `render` | `(row, index) => JSX.Element` | 单元格的自定义渲染函数。 |
-
-| `align` | \`"start" \ | "center" \ | "end"\` | 列的文本对齐方式。 |
+- **优化的 JSON 字符串强制转换：** 由于每个表格区块的原始行结构动态变化，Sveltia CMS 通过 `rows` 字段以转义的 JSON 数组字符串传递行项目。该字符串在渲染时安全解析，保证包体积最优，无需繁重的负载序列化。
+- **纯 CSS 布局整洁：** 表头、列轮廓和斑马纹依赖轻量且健壮的 Panda CSS 工具变量，消除布局跳动，并在移动端触控屏上即时渲染。
+- **滚动固定：** 使用 `stickyHeader` 固定列头时，利用溢出包裹内表头的标准 `position: sticky`，绕过客户端脚本中昂贵的滚动事件监听。

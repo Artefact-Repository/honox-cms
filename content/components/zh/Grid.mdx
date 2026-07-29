@@ -1,5 +1,5 @@
 ---
-title: Grid 网格
+title: Grid 网格布局
 category: Layout
 hydration: 3
 ---
@@ -9,24 +9,43 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # 简介
 
-一个响应式的 CSS Grid 布局原语。既可以用显式的列/行数量来排列子元素，也可以让它们基于最小子元素宽度自动适配——两种都支持响应式（按断点）取值。
+高度响应式且灵活的 CSS Grid 布局容器，用于构建基于网格的页面结构与界面布局。可使用显式的列数或行数排列子元素，也可基于最小子元素宽度自动适配，无需编写显式的媒体查询。它完整支持按断点的响应式布局配置。
 
-# 用法
+**Grid** 组件也已作为 `grid` 区块完全集成到 **Page Builder** 中，使内容作者和开发人员能够直接在 CMS 中轻松构建响应式结构、卡片列表和并排控件。
 
-## 固定列数
+***
+
+# Features
+
+- **动态列与行：** 使用数值或自定义 CSS 模板定义轻松指定网格轨道。
+- **自动适配缩放：** 定义最小子元素宽度阈值（`minChildWidth`），容器即可在空间允许时自动将子元素流入列中。
+- **响应式断点：** 原生支持跨预定义系统断点（`base`、`sm`、`md`、`lg`、`xl`、`2xl`）的响应式配置。
+- **多态渲染：** 通过 `as` 属性渲染为任意语义化 HTML 标签，或通过 `asChild` 属性将网格样式委托给单个子组件。
+- **零布局跳动性能：** 样式编译为优化的静态 Panda CSS 工具类，避免客户端 JavaScript 测量开销。
+
+***
+
+# Usage
+
+这些示例展示了如何通过代码（JSX/TSX）和 Page Builder JSON 配置构建网格组件。
+
+## 1. 固定列结构
+
+指定显式列数，将三个元素并排显示。非常适合功能网格、指标布局或导航结构。
 
 <DemoPreview>
   <Grid columns={3} gap="4" style={{ width: "100%" }}>
-    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-blue-3)", borderRadius: "8px" }}>1</div>
-    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-blue-3)", borderRadius: "8px" }}>2</div>
-    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-blue-3)", borderRadius: "8px" }}>3</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Column 1</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Column 2</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Column 3</div>
   </Grid>
 </DemoPreview>
 
+### JSX / TSX
 ```tsx
 import { Grid } from "../components/ui";
 
-export default function MyPage() {
+export default function Example() {
   return (
     <Grid columns={3} gap="4">
       <div>1</div>
@@ -37,71 +56,7 @@ export default function MyPage() {
 }
 ```
 
-## 按最小子元素宽度自动适配
-
-无需断点——随着容器尺寸变化，列会自动增减。
-
-<DemoPreview>
-  <Grid minChildWidth="120px" gap="4" style={{ width: "100%" }}>
-    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>A</div>
-    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>B</div>
-    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>C</div>
-    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>D</div>
-  </Grid>
-</DemoPreview>
-
-```tsx
-import { Grid } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Grid minChildWidth="120px" gap="4">
-      <div>A</div>
-      <div>B</div>
-      <div>C</div>
-      <div>D</div>
-    </Grid>
-  );
-}
-```
-
-## 响应式列数
-
-```tsx
-import { Grid } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Grid columns={{ base: 1, md: 2, lg: 3 }} gap="4">
-      <div>1</div>
-      <div>2</div>
-      <div>3</div>
-    </Grid>
-  );
-}
-```
-
-## 独立的列间距与行间距
-
-```tsx
-import { Grid } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Grid columns={2} columnGap="6" rowGap="2">
-      <div>1</div>
-      <div>2</div>
-      <div>3</div>
-      <div>4</div>
-    </Grid>
-  );
-}
-```
-
-## CMS 页面构建器
-
-该组件在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中作为 `grid` 区块提供：
-
+### Page Builder JSON
 ```json
 {
   "type": "grid",
@@ -115,17 +70,179 @@ export default function MyPage() {
 }
 ```
 
-# 属性
+***
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `children` | `any` | 网格内部要渲染的内容。 |
-| `class` | `string` | 自定义 CSS 类名。 |
-| `columns` | `number \| string \| Responsive<...>` | 列数（`repeat(columns, minmax(0, 1fr))`）。若同时设置了 `minChildWidth`，则本属性优先。 |
-| `rows` | `number \| string \| Responsive<...>` | 行数（`repeat(rows, minmax(0, 1fr))`）。 |
-| `minChildWidth` | `number \| string \| Responsive<...>` | 自动适配尽可能多的列，每列至少此宽（`repeat(auto-fit, minmax(width, 1fr))`）。设置了 `columns` 时忽略。 |
-| `gap` | `string \| number \| Responsive<...>` | 单元格之间的间距。除非设置了 `columnGap`/`rowGap`，否则默认 `"8px"`。 |
-| `columnGap` | `string \| number \| Responsive<...>` | 仅列之间的间距。 |
-| `rowGap` | `string \| number \| Responsive<...>` | 仅行之间的间距。 |
+## 2. 按最小宽度自动适配列
 
-`Responsive<T>` 接受纯值或按断点的对象，例如 `{ base: 1, md: 2, lg: 3 }`，使用与设计系统其余部分相同的断点（`base`、`sm`、`md`、`lg`、`xl`、`2xl`）。
+列会随着屏幕缩放自动添加或移除。这避免了定义断点的需要，开箱即用地确保完全响应式的卡片容器。
+
+<DemoPreview>
+  <Grid minChildWidth="120px" gap="4" style={{ width: "100%" }}>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>Card A</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>Card B</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>Card C</div>
+  </Grid>
+</DemoPreview>
+
+### JSX / TSX
+```tsx
+import { Grid } from "../components/ui";
+
+export default function Example() {
+  return (
+    <Grid minChildWidth="120px" gap="4">
+      <div>Card A</div>
+      <div>Card B</div>
+      <div>Card C</div>
+    </Grid>
+  );
+}
+```
+
+### Page Builder JSON
+```json
+{
+  "type": "grid",
+  "minChildWidth": "120px",
+  "gap": "4",
+  "children": [
+    { "type": "text", "content": "Card A" },
+    { "type": "text", "content": "Card B" },
+    { "type": "text", "content": "Card C" }
+  ]
+}
+```
+
+***
+
+## 3. 响应式列分配
+
+在移动端显示单列，平板缩放到两列，桌面端显示三列。
+
+### Programmatic Usage (TSX)
+
+```tsx
+import { Grid } from "@/components/ui";
+
+export default function ResponsiveGrid() {
+  return (
+    <Grid columns={{ base: 1, md: 2, lg: 3 }} gap="6">
+      <div>Responsive Grid Item 1</div>
+      <div>Responsive Grid Item 2</div>
+      <div>Responsive Grid Item 3</div>
+    </Grid>
+  );
+}
+```
+
+### Page Builder Configuration (CMS JSON)
+
+### JSX / TSX
+```tsx
+import { Grid } from "../components/ui";
+
+export default function Example() {
+  return (
+    <Grid columns={{ base: 1, md: 2, lg: 3 }} gap="6">
+      <div>Responsive Grid Item 1</div>
+      <div>Responsive Grid Item 2</div>
+      <div>Responsive Grid Item 3</div>
+    </Grid>
+  );
+}
+```
+
+### Page Builder JSON
+```json
+{
+  "type": "grid",
+  "columns": "{\"base\": 1, \"md\": 2, \"lg\": 3}",
+  "gap": "6",
+  "children": [
+    { "type": "text", "content": "Responsive Grid Item 1" },
+    { "type": "text", "content": "Responsive Grid Item 2" },
+    { "type": "text", "content": "Responsive Grid Item 3" }
+  ]
+}
+```
+
+***
+
+## 4. 分离列间距与行间距
+
+行与列之间的间距可独立配置，以创建非对称网格或更紧凑的行包装。
+
+<DemoPreview>
+  <Grid columns={2} columnGap="6" rowGap="2" style={{ width: "100%" }}>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-green-3)", borderRadius: "8px" }}>1</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-green-3)", borderRadius: "8px" }}>2</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-green-3)", borderRadius: "8px" }}>3</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-green-3)", borderRadius: "8px" }}>4</div>
+  </Grid>
+</DemoPreview>
+
+### JSX / TSX
+```tsx
+import { Grid } from "../components/ui";
+
+export default function Example() {
+  return (
+    <Grid columns={2} columnGap="6" rowGap="2">
+      <div>1</div>
+      <div>2</div>
+      <div>3</div>
+      <div>4</div>
+    </Grid>
+  );
+}
+```
+
+### Page Builder JSON
+```json
+{
+  "type": "grid",
+  "columns": 2,
+  "columnGap": "6",
+  "rowGap": "2",
+  "children": [
+    { "type": "text", "content": "1" },
+    { "type": "text", "content": "2" },
+    { "type": "text", "content": "3" },
+    { "type": "text", "content": "4" }
+  ]
+}
+```
+
+***
+
+# Props
+
+| 属性 | 类型 / CMS 字段类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| `columns` | `number \| string \| Responsive<...>` | - | 显式列数（如 `3` 或 `"3"`）。可接收断点对象或 CMS 中的 JSON 字符串（如 `'{"base": 1, "md": 3}'`）。优先级高于 `minChildWidth`。 |
+| `rows` | `number \| string \| Responsive<...>` | - | 显式行数。适用于结构化模板布局。 |
+| `minChildWidth` | `number \| string \| Responsive<...>` | - | 自动适配列的宽度阈值（如 `"120px"`、`"16rem"`）。若指定了 `columns` 则忽略此项。 |
+| `gap` | `string \| number \| Responsive<...>` | `"8px"` | 相邻单元格之间的间距。 |
+| `columnGap` | `string \| number \| Responsive<...>` | - | 仅作用于网格列的水平间距。 |
+| `rowGap` | `string \| number \| Responsive<...>` | - | 仅作用于网格行的垂直间距。 |
+| `class` | `string` | - | 自定义 CSS 类覆盖。 |
+| `children` | `any \| list` | - | 排列在网格容器内的嵌套布局或视觉区块集合。 |
+
+> **响应式值：** `Responsive<T>` 接受平铺值或按响应式断点映射的对象（如 `{ base: 1, md: 2, lg: 3 }`）。设计系统支持标准断点范围：`base`、`sm`、`md`、`lg`、`xl` 和 `2xl`。
+
+***
+
+# Hydration & Architecture
+
+### Tier-3 表现层布局原语
+`Grid` 组件在项目的 Island Hydration 架构中被归类为** Tier-3 表现层组件**。它持有零客户端响应式状态，不处理任何事件触发。因此：
+- 它**永不挂载交互式客户端孤岛**。
+- 直接编译为零 JS 静态 HTML，开销绝对为零。
+- 显式的 `interactive` 属性既不需要也不被支持。
+
+### Developer Implementation Notes
+- **Panda CSS 模式集成：** 在底层，该组件将 columns、rows 和 gap 定义转换为 Panda CSS 的 `grid` 工具结构，生成高性能的原子 CSS 类。
+- **响应式 JSON 字符串：** 在 Sveltia CMS 中编写页面时，响应式值（如断点列配置）应写为 JSON 序列化字符串（如 `'{"base": 1, "md": 2}'`）。它们会在运行时自动解析并转换为断点样式。
+
+### Accessibility Compliance
+- **自然的 DOM 流：** 容器保留顺序的键盘导航（`Tab` 索引）和 DOM 树读取顺序。确保子元素布局与逻辑视觉序列一致，以保持文档对屏幕阅读器的无障碍一致性。

@@ -9,24 +9,42 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Einführung
 
-Ein responsives CSS-Grid-Layout-Primitive. Ordnen Sie Kinder mit einer expliziten Spalten-/Zeilenzahl an, oder lassen Sie sie automatisch an eine Mindestkindbreite anpassen — beides unterstützt responsive (pro Breakpoint) Werte.
+Ein hochgradig responsiver und flexibler CSS-Grid-Layout-Container zum Aufbau rasterbasierter Seitenstrukturen und Interface-Layouts. Ordne Kindelemente mit expliziter Spalten- oder Zeilenzahl an, oder lasse sie dynamisch per Mindestbreite automatisch fließen – ohne explizite Media Queries. Vollständig unterstützt responsives, breakpoint-basiertes Layout.
 
 # Verwendung
+Die **Grid**-Komponente ist als `grid`-Block vollständig im **Page Builder** integriert, sodass Redakteure und Entwickler responsive Strukturen, Kartenlisten und nebeneinander liegende Controls direkt im CMS bauen können.
 
-## Feste Spalten
+***
+
+- **Dynamische Spalten & Zeilen:** Leicht Spuren über numerische Werte oder CSS-Template-Definitionen festlegen.
+- **Auto-Fit-Skalierung:** Ein Mindestbreiten-Schwellenwert (`minChildWidth`) lässt den Container Kindelemente platzsparend in Spalten fließen lassen.
+- **Responsive Breakpoints:** Native Unterstützung für Breakpoint-Konfigurationen (`base`, `sm`, `md`, `lg`, `xl`, `2xl`).
+- **Polymorphe Darstellung:** Per `as` als semantisches HTML-Tag rendern, oder via `asChild` Grid-Styles auf ein Kind delegieren.
+- **Zero-Layout-Shift:** Styles kompilieren zu optimierten statischen Panda-CSS-Utilities ohne JS-Messaufwand.
+
+***
+
+# Usage
+
+Diese Beispiele zeigen, wie Grid-Komponenten per Code (JSX/TSX) und Page-Builder-JSON konstruiert werden.
+
+## 1. Feste Spaltenstruktur
+
+Explizite Spaltenzahl, die drei Elemente nebeneinander anzeigt. Ideal für Feature-Grids, Metrik-Layouts oder Navigation.
 
 <DemoPreview>
   <Grid columns={3} gap="4" style={{ width: "100%" }}>
-    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-blue-3)", borderRadius: "8px" }}>1</div>
-    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-blue-3)", borderRadius: "8px" }}>2</div>
-    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-blue-3)", borderRadius: "8px" }}>3</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Column 1</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Column 2</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-blue-3)", borderRadius: "8px" }}>Column 3</div>
   </Grid>
 </DemoPreview>
 
+### JSX / TSX
 ```tsx
 import { Grid } from "../components/ui";
 
-export default function MyPage() {
+export default function Example() {
   return (
     <Grid columns={3} gap="4">
       <div>1</div>
@@ -37,71 +55,7 @@ export default function MyPage() {
 }
 ```
 
-## Auto-Anpassung an Mindestkindbreite
-
-Keine Breakpoints nötig — Spalten werden automatisch hinzugefügt oder entfernt, während sich der Container vergrößert/verkleinert.
-
-<DemoPreview>
-  <Grid minChildWidth="120px" gap="4" style={{ width: "100%" }}>
-    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>A</div>
-    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>B</div>
-    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>C</div>
-    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>D</div>
-  </Grid>
-</DemoPreview>
-
-```tsx
-import { Grid } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Grid minChildWidth="120px" gap="4">
-      <div>A</div>
-      <div>B</div>
-      <div>C</div>
-      <div>D</div>
-    </Grid>
-  );
-}
-```
-
-## Responsive Spaltenanzahl
-
-```tsx
-import { Grid } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Grid columns={{ base: 1, md: 2, lg: 3 }} gap="4">
-      <div>1</div>
-      <div>2</div>
-      <div>3</div>
-    </Grid>
-  );
-}
-```
-
-## Getrennte Spalten- und Zeilenabstände
-
-```tsx
-import { Grid } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Grid columns={2} columnGap="6" rowGap="2">
-      <div>1</div>
-      <div>2</div>
-      <div>3</div>
-      <div>4</div>
-    </Grid>
-  );
-}
-```
-
-## CMS-Seitenbauer
-
-Diese Komponente ist als `grid`-Block im [Seitenbauer](/docs/PageBuilder) (`content/pages/*.json`) verfügbar:
-
+### Page Builder JSON
 ```json
 {
   "type": "grid",
@@ -115,17 +69,179 @@ Diese Komponente ist als `grid`-Block im [Seitenbauer](/docs/PageBuilder) (`cont
 }
 ```
 
-# Eigenschaften
+***
 
-| Eigenschaft | Typ | Beschreibung |
-| --- | --- | --- |
-| `children` | `any` | Innerhalb des Rasters zu rendernder Inhalt. |
-| `class` | `string` | Benutzerdefinierte CSS-Klassen. |
-| `columns` | `number \| string \| Responsive<...>` | Anzahl der Spalten (`repeat(columns, minmax(0, 1fr))`). Hat Vorrang vor `minChildWidth`, wenn beide gesetzt sind. |
-| `rows` | `number \| string \| Responsive<...>` | Anzahl der Zeilen (`repeat(rows, minmax(0, 1fr))`). |
-| `minChildWidth` | `number \| string \| Responsive<...>` | Passt automatisch so viele Spalten ein, wie Platz haben, jede mindestens so breit (`repeat(auto-fit, minmax(width, 1fr))`). Wird ignoriert, wenn `columns` gesetzt ist. |
-| `gap` | `string \| number \| Responsive<...>` | Abstand zwischen Zellen. Standard `"8px"`, sofern `columnGap`/`rowGap` nicht gesetzt ist. |
-| `columnGap` | `string \| number \| Responsive<...>` | Abstand nur zwischen Spalten. |
-| `rowGap` | `string \| number \| Responsive<...>` | Abstand nur zwischen Zeilen. |
+## 2. Auto-Fit-Spalten per Mindestbreite
 
-`Responsive<T>` akzeptiert entweder einen einfachen Wert oder ein pro-Breakpoint-Objekt, z. B. `{ base: 1, md: 2, lg: 3 }`, mit denselben Breakpoints wie der Rest des Design-Systems (`base`, `sm`, `md`, `lg`, `xl`, `2xl`).
+Spalten werden beim Skalieren automatisch hinzugefügt oder entfernt. Vermeidet Breakpoint-Definitionen und sorgt out-of-the-box für responsive Kartencontainer.
+
+<DemoPreview>
+  <Grid minChildWidth="120px" gap="4" style={{ width: "100%" }}>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>Card A</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>Card B</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-purple-3)", borderRadius: "8px" }}>Card C</div>
+  </Grid>
+</DemoPreview>
+
+### JSX / TSX
+```tsx
+import { Grid } from "../components/ui";
+
+export default function Example() {
+  return (
+    <Grid minChildWidth="120px" gap="4">
+      <div>Card A</div>
+      <div>Card B</div>
+      <div>Card C</div>
+    </Grid>
+  );
+}
+```
+
+### Page Builder JSON
+```json
+{
+  "type": "grid",
+  "minChildWidth": "120px",
+  "gap": "4",
+  "children": [
+    { "type": "text", "content": "Card A" },
+    { "type": "text", "content": "Card B" },
+    { "type": "text", "content": "Card C" }
+  ]
+}
+```
+
+***
+
+## 3. Responsive Spaltenzuweisung
+
+Eine einzelne Spalte auf Mobilgeräten, zwei Spalten auf Tablets, drei Spalten auf Desktop.
+
+### Programmatic Usage (TSX)
+
+```tsx
+import { Grid } from "@/components/ui";
+
+export default function ResponsiveGrid() {
+  return (
+    <Grid columns={{ base: 1, md: 2, lg: 3 }} gap="6">
+      <div>Responsive Grid Item 1</div>
+      <div>Responsive Grid Item 2</div>
+      <div>Responsive Grid Item 3</div>
+    </Grid>
+  );
+}
+```
+
+### Page Builder Configuration (CMS JSON)
+
+### JSX / TSX
+```tsx
+import { Grid } from "../components/ui";
+
+export default function Example() {
+  return (
+    <Grid columns={{ base: 1, md: 2, lg: 3 }} gap="6">
+      <div>Responsive Grid Item 1</div>
+      <div>Responsive Grid Item 2</div>
+      <div>Responsive Grid Item 3</div>
+    </Grid>
+  );
+}
+```
+
+### Page Builder JSON
+```json
+{
+  "type": "grid",
+  "columns": "{\"base\": 1, \"md\": 2, \"lg\": 3}",
+  "gap": "6",
+  "children": [
+    { "type": "text", "content": "Responsive Grid Item 1" },
+    { "type": "text", "content": "Responsive Grid Item 2" },
+    { "type": "text", "content": "Responsive Grid Item 3" }
+  ]
+}
+```
+
+***
+
+## 4. Getrennte Spalten- und Zeilenabstände
+
+Abstände zwischen Zeilen und Spalten lassen sich unabhängig konfigurieren, um asymmetrische Raster oder dichtere Zeilenverpackung zu erzeugen.
+
+<DemoPreview>
+  <Grid columns={2} columnGap="6" rowGap="2" style={{ width: "100%" }}>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-green-3)", borderRadius: "8px" }}>1</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-green-3)", borderRadius: "8px" }}>2</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-green-3)", borderRadius: "8px" }}>3</div>
+    <div style={{ padding: "1rem", textAlign: "center", background: "var(--colors-green-3)", borderRadius: "8px" }}>4</div>
+  </Grid>
+</DemoPreview>
+
+### JSX / TSX
+```tsx
+import { Grid } from "../components/ui";
+
+export default function Example() {
+  return (
+    <Grid columns={2} columnGap="6" rowGap="2">
+      <div>1</div>
+      <div>2</div>
+      <div>3</div>
+      <div>4</div>
+    </Grid>
+  );
+}
+```
+
+### Page Builder JSON
+```json
+{
+  "type": "grid",
+  "columns": 2,
+  "columnGap": "6",
+  "rowGap": "2",
+  "children": [
+    { "type": "text", "content": "1" },
+    { "type": "text", "content": "2" },
+    { "type": "text", "content": "3" },
+    { "type": "text", "content": "4" }
+  ]
+}
+```
+
+***
+
+# Props
+
+| Eigenschaft | Typ / CMS-Feldtyp | Standard | Beschreibung |
+| --- | --- | --- | --- |
+| `columns` | `number \| string \| Responsive<...>` | - | Explizite Spaltenzahl (z. B. `3` oder `"3"`). Akzeptiert Breakpoint-Objekt oder JSON-String im CMS (z. B. `'{"base": 1, "md": 3}'`). Hat Vorrang vor `minChildWidth`. |
+| `rows` | `number \| string \| Responsive<...>` | - | Explizite Zeilenzahl. Nützlich für strukturierte Template-Layouts. |
+| `minChildWidth` | `number \| string \| Responsive<...>` | - | Breitenschwellenwert für Auto-Fit-Spalten (z. B. `"120px"`, `"16rem"`). Ignoriert, wenn `columns` gesetzt. |
+| `gap` | `string \| number \| Responsive<...>` | `"8px"` | Abstand zwischen aufeinanderfolgenden Zellen. |
+| `columnGap` | `string \| number \| Responsive<...>` | - | Nur horizontaler Abstand zwischen Spalten. |
+| `rowGap` | `string \| number \| Responsive<...>` | - | Nur vertikaler Abstand zwischen Zeilen. |
+| `class` | `string` | - | Benutzerdefinierte CSS-Klassen-Überschreibungen. |
+| `children` | `any \| list` | - | Sammlung verschachtelter Layout- oder visueller Blöcke im Grid. |
+
+> **Responsive Werte:** `Responsive<T>` akzeptiert einen flachen Wert oder ein nach Breakpoints gemapptes Objekt (z. B. `{ base: 1, md: 2, lg: 3 }`). Das Designsystem unterstützt `base`, `sm`, `md`, `lg`, `xl` und `2xl`.
+
+***
+
+# Hydration & Architecture
+
+### Tier-3 Presentational Layout Primitive
+Die `Grid`-Komponente ist als **Tier-3-Presentational-Komponente** klassifiziert. Sie hält null clientseitigen State und behandelt keine Events. Folglich:
+- Sie **mountet niemals eine interaktive Client-Insel**.
+- Kompiliert direkt zu Zero-JS-Static-HTML ohne Bundle-Overhead.
+- Ein explizites `interactive`-Prop wird weder benötigt noch unterstützt.
+
+### Developer Implementation Notes
+- **Panda CSS Pattern Integration:** Übersetzt columns, rows und gaps in Panda-CSS-`grid`-Utilities mit atomaren Klassen.
+- **Responsive JSON Strings:** In Sveltia CMS sollten responsive Werte als JSON-Strings geschrieben werden (z. B. `'{"base": 1, "md": 2}'`). Sie werden zur Laufzeit geparst.
+
+### Accessibility Compliance
+- **Natural DOM Flow:** Der Container bewahrt sequenzielle TAB-Navigation und DOM-Lesereihenfolge. Kindelemente sollten mit der logischen visuellen Sequenz alignen, damit Screenreader konsistent bleiben.

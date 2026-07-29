@@ -9,41 +9,19 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 # Introduction
 
-Un contrôle déroulant pour choisir une ou plusieurs options dans une liste — une alternative accessible et stylisée à l'élément natif `<select>`.
+Un contrôle de sélection déroulant personnalisé permettant aux utilisateurs de choisir une ou plusieurs options dans une liste prédéfinie. Ce composant sert d'alternative entièrement accessible, stylable et responsive à l'élément `<select>` natif du navigateur.
 
-Quand chercher autre chose :
+Le composant **Select** est totalement intégré en tant que bloc `select` dans le **Page Builder**, permettant aux auteurs et développeurs de configurer facilement options visuelles, espaces réservés, tailles, sélections multiples et thèmes de couleur directement dans le CMS.
 
-- Avec moins de \~5 options, un « RadioGroup » est généralement plus clair.- Si l'utilisateur doit pouvoir taper pour filtrer les options, utilisez « Combobox ».
-Le composant restitue un `<select>` natif visuellement caché à côté de l'interface utilisateur personnalisée, donc un accessoire « name » le fait participer à la soumission de formulaire régulière sans câblage supplémentaire.
+***
 
-# Interaction au clavier
+# Usage
 
-Le déclencheur est un bouton `role="combobox"` ; le focus reste dessus tandis que l'option en surbrillance est signalée via `aria-activedescendant`.
+Ces exemples illustrent comment les éditeurs de contenu lient et structurent des menus déroulants interactifs.
 
-| Key | Behavior |
-| --- | --- |
-| `Enter` / `Space` | Open the list; when open, select the highlighted option. |
-| `ArrowDown` / `ArrowUp` | Open the list, or move the highlight (wraps, skips disabled options). |
-| `Home` / `End` | Highlight the first / last enabled option. |
-| `Escape` | Close the list. |
-| `Tab` | Close the list and move focus on. |
-| Printable characters | Typeahead: jumps to the first option whose label matches the typed prefix. When the list is closed (single mode), the match is selected directly, like a native `<select>`. |
+## 1. Sélection standard d'une option
 
-L'ouverture de la liste met en surbrillance l'option actuellement sélectionnée (ou la première option activée) et la navigation au clavier maintient l'option en surbrillance affichée.
-
-# Hydratation
-
-**Niveau 1 — auto-interactif.** L'ouverture de la liste déroulante et la sélection d'une option nécessitent le client JS, et il n'y a pas de solution de repli statique (le `<select>` natif est visuellement masqué et n'existe que pour la soumission de formulaires), donc `Select` s'hydrate par défaut. Passez `interactive={false}` pour forcer un rendu purement statique.
-
-| `interactive` prop | Résultat |
-| --- | --- |
-| omitted | Hydrates as an island |
-| `true` | Hydrates as an island |
-| `false` | Static — no client JS |
-
-Toutes les décisions d'interactivité dans la bibliothèque sont acheminées via l'assistant partagé `shouldHydrate()` dans `app/components/ui/island-utils.ts`.
-
-# Utilisation
+Une liste déroulante standard à une option permettant de choisir le framework préféré. Comprend un libellé et un texte d'espace réservé personnalisés.
 
 <DemoPreview>
   <Select
@@ -56,116 +34,119 @@ Toutes les décisions d'interactivité dans la bibliothèque sont acheminées vi
     ]}
     label="Framework"
     placeholder="Select a framework"
-    allowClear
+    interactive
   />
 </DemoPreview>
-
-```tsx
-import { Select } from "../components/ui";
-
-const items = [
-  { label: "React", value: "react" },
-  { label: "Solid", value: "solid" },
-  { label: "Svelte", value: "svelte", disabled: true },
-  { label: "Vue", value: "vue" },
-  { label: "Hono", value: "hono" },
-];
-
-export default function MyPage() {
-  return (
-    <Select
-      items={items}
-      label="Framework"
-      placeholder="Select a framework"
-      allowClear
-    />
-  );
-}
-```
-
-## Sélection multiple
-
-La liste reste ouverte pendant que les options sont basculées et le déclencheur affiche les étiquettes sélectionnées jointes par des virgules.
-
-```tsx
-<Select
-  multiple
-  items={items}
-  label="Frameworks"
-  placeholder="Select frameworks"
-  defaultValue={["hono"]}
-/>
-```
-
-## Sous une forme
-
-Le `<select>` natif caché porte la sélection, donc une publication sous forme simple fonctionne :
-
-```tsx
-<form method="post" action="/frameworks">
-  <Select name="framework" items={items} label="Framework" required />
-  <Button type="submit">Save</Button>
-</form>
-```
-
-## Tailles et variantes
-
-```tsx
-<Select items={items} size="sm" placeholder="Small" />
-<Select items={items} size="lg" variant="surface" placeholder="Large surface" />
-<Select items={items} invalid placeholder="Invalid state" />
-```
-
-## Constructeur de pages CMS
-
-Ce composant est disponible sous forme de bloc `select` dans [Page Builder](/docs/PageBuilder) (`content/pages/*.json`) :
 
 ```json
 {
   "type": "select",
   "label": "Framework",
   "placeholder": "Select a framework",
+  "interactive": true,
   "items": [
     { "label": "React", "value": "react" },
+    { "label": "Solid", "value": "solid" },
+    { "label": "Svelte", "value": "svelte", "disabled": true },
+    { "label": "Vue", "value": "vue" },
     { "label": "Hono", "value": "hono" }
   ]
 }
 ```
 
-# Propriétés
+## 2. Sélection multiple avec style personnalisé (variante Surface)
 
-| Propriété | Type | Description |
-| --- | --- | --- |
-| `items` | `SelectItem[]` | Les options à afficher dans la liste. |
-| `label` | `Child` | Étiquette rendue au-dessus du déclencheur et associée à celui-ci. |
-| `placeholder` | `string` | Texte affiché dans le déclencheur alors que rien n'est sélectionné. |
-| `allowClear` | `boolean` | Affiche un bouton d'effacement une fois qu'une sélection existe. |
-| `multiple` | `boolean` | Permet de sélectionner plusieurs options ; la liste reste ouverte lors du basculement. |
-| `defaultValue` | `string[]` | Sélection initiale (non contrôlée). Alias ​​de `selectedValues`. |
-| `selectedValues` | `string[]` | Sélection initiale (identique à `defaultValue`). |
-| `deselectable` | `boolean` | En mode simple, cliquer à nouveau sur l'option sélectionnée l'efface. |
-| `name` | `string` | Nom du `<select>` natif masqué, pour la soumission du formulaire. |
-| `disabled` | `boolean` | Désactive tout le contrôle. |
-| `invalid` | `boolean` | Marque le contrôle comme invalide (`aria-invalid`, bordure d'erreur). |
-| `readOnly` | `boolean` | La sélection est visible mais la liste ne peut pas être ouverte. |
-| `required` | `boolean` | Marque le contrôle requis (`aria-required`, sélection masquée `required`). |
-| `open` | `boolean` | État ouvert contrôlé de la liste déroulante. |
+Démontre comment activer plusieurs sélections actives, affichant les étiquettes de déclenchement séparées par des virgules. Présente également une variante visuelle `surface` distincte.
 
-| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg" \ | "xl"\` | Size of the trigger and list. Defaults to `md`. |
+<DemoPreview>
+  <Select
+    multiple
+    variant="surface"
+    size="lg"
+    items={[
+      { label: "Tailwind CSS", value: "tailwind" },
+      { label: "Panda CSS", value: "panda" },
+      { label: "Vanilla Extract", value: "vanilla" },
+    ]}
+    label="CSS Frameworks"
+    placeholder="Choose frameworks"
+    defaultValue={["panda"]}
+    interactive
+  />
+</DemoPreview>
 
-| `variant` | \`"outline" \ | "surface"\` | Visual variant of the trigger. Defaults to `outline`. |
+```json
+{
+  "type": "select",
+  "label": "CSS Frameworks",
+  "placeholder": "Choose frameworks",
+  "multiple": true,
+  "variant": "surface",
+  "size": "lg",
+  "defaultValue": ["panda"],
+  "interactive": true,
+  "items": [
+    { "label": "Tailwind CSS", "value": "tailwind" },
+    { "label": "Panda CSS", "value": "panda" },
+    { "label": "Vanilla Extract", "value": "vanilla" }
+  ]
+}
+```
 
-| `interactive` | `boolean` | Annule la décision d’hydratation (voir ci-dessous). |
-| `onValueChange` | `(values: string[]) => void` | Appelé avec la sélection complète à chaque fois qu'elle change (sélectionner, désélectionner, effacer). |
-| `onItemSelect` | `(value: string) => void` | Appelé avec la valeur de l’option avec laquelle a interagi. |
-| `onClear` | `() => void` | Appelé lorsque le bouton d'effacement vide la sélection. |
-| `onOpenChange` | `(open: boolean) => void` | Appelé lorsque la liste déroulante s'ouvre ou se ferme. |
+## 3. Sélecteur déroulant désactivé
 
-> Les accessoires de rappel ne fonctionnent que lorsque le Select est composé à partir de code côté client (à l'intérieur d'une autre île). Les accessoires sérialisés à partir d’une route rendue par le serveur doivent être des données simples.
-## Sélectionner un élément
+Montre un élément select temporairement indisponible ou en lecture seule. Cet état désactive toutes les interactions, empêchant l'ouverture ou la focalisation de la liste.
 
-| Propriété | Type | Description |
-| --- | --- | --- |
-| `label` | `string` | Le texte affiché pour l’option. Également utilisé pour la correspondance de frappe. |
-| `value` | `string` | La valeur unique de l'option. |
-| `disabled` | `boolean` | Si l'option peut être sélectionnée. |
+<DemoPreview>
+  <Select
+    disabled
+    items={[
+      { label: "English", value: "en" },
+      { label: "Deutsch", value: "de" },
+    ]}
+    label="Language Settings"
+    placeholder="Select Language"
+    interactive
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "select",
+  "label": "Language Settings",
+  "placeholder": "Select Language",
+  "disabled": true,
+  "interactive": true,
+  "items": [
+    { "label": "English", "value": "en" },
+    { "label": "Deutsch", "value": "de" }
+  ]
+}
+```
+
+***
+
+# Props
+
+| Propriété | Type de champ CMS | Défaut | Description / options prises en charge |
+| --- | --- | --- | --- |
+| **Texte du libellé** (`label`) | `string` | - | Texte descriptif au-dessus du déclencheur. |
+| **Espace réservé** (`placeholder`) | `string` | - | Texte fantôme dans le bouton quand rien n'est sélectionné. |
+| **Liste d'options** (`items`) | `list` | - | Liste d'options avec `label`, `value` et `disabled` optionnel. |
+| **Sélection multiple** (`multiple`) | `boolean` | `false` | Active plusieurs options ; le menu reste ouvert. |
+| **Valeur par défaut** (`defaultValue`) | `list` | - | Valeurs préselectionnées au chargement. |
+| **Désélectionnable** (`deselectable`) | `boolean` | `false` | Permet d'effacer la sélection unique par nouveau clic. |
+| **Nom du formulaire** (`name`) | `string` | - | Attribut name HTML standard pour les soumissions. |
+| **Désactivé** (`disabled`) | `boolean` | `false` | Désactive l'interaction et atténue le menu. |
+| **État invalide** (`invalid`) | `boolean` | `false` | Active les bordures d'erreur et l'état invalide. |
+| **Variante visuelle** (`variant`) | `select` | `"outline"` | Thème de bordure et de remplissage. <br/>• Options : `"outline"`, `"surface"`. |
+| **Échelle de taille** (`size`) | `select` | `"md"` | Contrôle espacement, padding et taille de police. <br/>• Options : `"xs"`, `"sm"`, `"md"`, `"lg"`, `"xl"`. |
+| **Forcer interactif** (`interactive`) | `boolean` | `true` | Hydrate le déclencheur et le menu comme îlot interactif. |
+
+***
+
+# Developer Notes & Accessibility
+
+- **Îlot d'hydratation :** Comme Select nécessite du JavaScript client pour basculer les menus, filtrer les options et lier les touches, il est hydraté par défaut en îlot Preact interactif (`"interactive": true`).
+- **Conformité WAI-ARIA :** Le composant agit comme une combobox sémantique personnalisée haute fidélité. Le focus reste sur le déclencheur (`role="combobox"`), les options sont gérées via `aria-activedescendant`, `aria-expanded` et `aria-controls`. Les flèches, `Home`/`End` et `Escape` fonctionnent immédiatement.
+- **Intégration de formulaire :** Il émet un `<select>` natif masqué avec des `<option>` correspondants. Les soumissions HTTP POST standard fonctionnent nativement sans sérialisation d'état JS.

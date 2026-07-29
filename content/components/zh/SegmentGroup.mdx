@@ -4,61 +4,109 @@ category: Forms
 hydration: 2
 ---
 
-import { SegmentGroup } from "../../../app/components/ui";
+import { SegmentGroup, Segment } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-一组外观类似单个分段控件、行为类似单选按钮的按钮。
+# Introduction
 
-## 用法
+一个紧凑的单选控件，用于在水平分段轨道中呈现互斥的选项。它是 Tab 导航、视图切换器、时间区间筛选器、排序选项或任何仅允许单一选择的工具栏的绝佳替代方案。
+
+**SegmentGroup** 组件已作为 `segmentGroup` 区块完全集成到 **Page Builder** 中，使作者能够轻松配置选项、品牌强调色和整体尺寸比例。
+
+***
+
+# Usage
+
+以下示例展示了内容编辑人员如何绑定和构建交互式分段控件。
+
+## 1. 基础横向分段组
+
+一个包含两个选项的基础分段组。演示原生标签分段切换，并附带全局品牌强调点。
 
 <DemoPreview>
-  <SegmentGroup
-    label="View"
-    items={[
-      { label: "List", value: "list" },
-      { label: "Grid", value: "grid" },
-    ]}
-  />
+  <SegmentGroup defaultValue="day" colorPalette="blue" interactive>
+    <Segment value="day" label="Day" />
+    <Segment value="week" label="Week" />
+  </SegmentGroup>
 </DemoPreview>
-
-### CMS 页面构建器
-
-该组件可作为 `segmentGroup` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用：
 
 ```json
 {
   "type": "segmentGroup",
-  "label": "View",
+  "defaultValue": "day",
+  "colorPalette": "blue",
   "items": [
-    { "label": "List", "value": "list" },
-    { "label": "Grid", "value": "grid" }
+    { "value": "day", "label": "Day" },
+    { "value": "week", "label": "Week" }
   ]
 }
 ```
 
-## 属性
+## 2. 带图标和多种尺寸的细分段组
 
-| 属性 | 类型 | 默认 | 说明 |
-| --- | --- | --- | --- |
-| `label` | `string` | - | 组标签。 |
-| `items` | `SegmentGroupItem[]` | - | 包含 `label` 和 `value` 的条目数组。 |
+一个渲染了内联图标、标签以及多种尺寸比例（sm、md、lg）的分段组，用于演示视觉节奏。
 
-## CMS 配置
+<DemoPreview>
+  <SegmentGroup defaultValue="grid" size="md" interactive>
+    <Segment value="grid" label="Grid" icon={<span>▦</span>} />
+    <Segment value="list" label="List" icon={<span>☰</span>} />
+    <Segment value="compact" label="Compact" icon={<span>≣</span>} />
+  </SegmentGroup>
+</DemoPreview>
 
-```yaml
-- label: SegmentGroup
-  name: segment-group
-  widget: object
-  fields:
-    - { label: Label, name: label, widget: string, required: false }
-    - label: Items
-      name: items
-      widget: list
-      fields:
-        - { label: Label, name: label, widget: string }
-        - { label: Value, name: value, widget: string }
+```json
+{
+  "type": "segmentGroup",
+  "defaultValue": "grid",
+  "size": "md",
+  "items": [
+    { "value": "grid", "label": "Grid", "icon": "▦" },
+    { "value": "list", "label": "List", "icon": "☰" },
+    { "value": "compact", "label": "Compact", "icon": "≣" }
+  ]
+}
 ```
 
-## 水合
+## 3. 禁用与预选分段变体
 
-Tier-2：当提供了 `value`、`defaultValue` 或 `onValueChange` 时进行水合。
+演示组合状态：预选一个分段，禁用另一个（例如暂不可用）。
+
+<DemoPreview>
+  <SegmentGroup defaultValue="published" interactive>
+    <Segment value="published" label="Published" />
+    <Segment value="drafts" label="Drafts" />
+    <Segment value="archived" label="Archived" disabled />
+  </SegmentGroup>
+</DemoPreview>
+
+```json
+{
+  "type": "segmentGroup",
+  "defaultValue": "published",
+  "items": [
+    { "value": "published", "label": "Published" },
+    { "value": "drafts", "label": "Drafts" },
+    { "value": "archived", "label": "Archived", "disabled": true }
+  ]
+}
+```
+
+***
+
+# Props
+
+| 属性 | CMS 字段类型 | 默认值 | 描述 / 支持的选项 |
+| --- | --- | --- | --- |
+| **子选项** (`items`) | `list` | - | 选项子区块的列表，每个代表一个 Segment 元素（需包含 value / label / icon）。 |
+| **默认选中值** (`defaultValue`) | `string` | - | 挂载时预选分段的 value。 |
+| **品牌强调色** (`colorPalette`) | `select` | `"blue"` | 应用于选中分段轨道的视觉强调调色板。 <br/>• 选项：blue、green、red、purple、orange、amber、cyan、slate。 |
+| **尺寸比例** (`size`) | `select` | `"md"` | 控制分段轨道的整体尺寸与内边距。 <br/>• 选项：`"sm"`、`"md"`、`"lg"`。 |
+| **强制交互** (`interactive`) | `boolean` | `true` | 对分段组进行注水，以绑定键盘和指针事件。 |
+
+***
+
+# Developer Notes & Accessibility
+
+- **键盘导航（Roving tabindex）：** 分段组使用 roving tabindex 模式。整个组共享一个 tab 停靠点；用户使用左右方向键在选项间移动，Space 或 Enter 选中当前聚焦项。
+- **WAI-ARIA 合规性：** 容器渲染原生语义 radio 角色（`role="radiogroup"`、`role="radio"`、`aria-checked`），使屏幕阅读器能正确播报控件为单一可选实体。
+- **注水孤岛：** 作为一个捕获选择切换、焦点围栏和键盘交互的高级布局，SegmentGroup 作为 Tier-2 条件性孤岛运行（`"interactive": true`）。

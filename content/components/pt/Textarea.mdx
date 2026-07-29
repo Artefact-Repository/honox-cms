@@ -7,133 +7,124 @@ hydration: 2
 import { Textarea } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-# Introdução
+# Introduction
 
-Um componente de entrada de texto multilinha que se integra com o contexto `Field`. Pode ser usado de forma independente ou como parte de um componente `Field`.
+Um controle de entrada de texto livre multilinha para capturar entradas de usuário mais longas, como comentários, descrições, feedback ou envios de formulário extensos. Funciona como um layout totalmente acessível na arquitetura de renderização sem JS no cliente.
 
-# Uso
+O componente **Textarea** está totalmente integrado como bloco `textarea` no **Page Builder**, permitindo que os autores configurem facilmente espaços reservados, dicas de ajuda, regras de validação, escala de tamanho e comportamento de autoajuste.
 
-## Uso independente com integração de Field
+***
 
-`Textarea` se envolve automaticamente em um `Field` se você fornecer `label`, `helperText`, etc.
+# Usage
+
+Estes exemplos ilustram como os editores de conteúdo vinculam e estruturam áreas de texto.
+
+## 1. Área de texto padrão com dica de ajuda
+
+Uma entrada multilínea padrão com rótulo e texto de ajuda explicativo. Ideal para campos de feedback simples.
 
 <DemoPreview>
-  <div style={{ width: "100%", maxWidth: "320px" }}>
+  <div style={{ width: "100%", maxWidth: "420px" }}>
     <Textarea
-      label="Bio"
-      placeholder="Write here..."
-      rows={4}
-      minLength={10}
+      label="Public Comment"
+      placeholder="Share your thoughts..."
+      helperText="Comments are visible to all workspace members."
       interactive
     />
   </div>
 </DemoPreview>
 
-```tsx
-import { Textarea } from "../components/ui";
+```json
+{
+  "type": "textarea",
+  "label": "Public Comment",
+  "placeholder": "Share your thoughts...",
+  "helperText": "Comments are visible to all workspace members.",
+  "interactive": true
+}
+```
 
-export default function MyPage() {
-  return (
+## 2. Área compacta com contador de caracteres e tamanho máximo
+
+Uma área de tamanho médio com limite de caracteres e autoajuste de altura ativado, exibindo o contador em tempo real.
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "420px" }}>
     <Textarea
-      label="Bio"
-      placeholder="Write here..."
-      rows={4}
-      minLength={10}
+      label="Status Update"
+      placeholder="What's happening?"
+      maxLength={200}
+      showCount
+      autoresize
+      size="sm"
       interactive
     />
-  );
-}
-```
-
-## Variantes
-
-```tsx
-import { Stack } from "../design-system/jsx";
-import { Textarea } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Stack gap="4">
-      <Textarea variant="outline" placeholder="Outline" />
-      <Textarea variant="surface" placeholder="Surface" />
-      <Textarea variant="subtle" placeholder="Subtle" />
-      <Textarea variant="flushed" placeholder="Flushed" />
-    </Stack>
-  );
-}
-```
-
-## Tamanhos
-
-```tsx
-import { Stack } from "../design-system/jsx";
-import { Textarea } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Stack gap="4">
-      <Textarea size="xs" placeholder="Extra Small" />
-      <Textarea size="sm" placeholder="Small" />
-      <Textarea size="md" placeholder="Medium" />
-      <Textarea size="lg" placeholder="Large" />
-      <Textarea size="xl" placeholder="Extra Large" />
-    </Stack>
-  );
-}
-```
-
-## Dentro de um componente Field
-
-Você também pode usá-lo dentro de um componente `Field` para layouts mais complexos.
-
-```tsx
-import { Field, Textarea } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Field label="Comments">
-      <Textarea placeholder="Leave a comment..." interactive />
-    </Field>
-  );
-}
-```
-
-## Construtor de páginas CMS
-
-Este componente está disponível como um bloco `textarea` no [Construtor de páginas](/docs/PageBuilder) (`content/pages/*.json`):
+  </div>
+</DemoPreview>
 
 ```json
 {
   "type": "textarea",
-  "label": "Bio",
-  "helperText": "Tell us about yourself.",
-  "rows": 4
+  "label": "Status Update",
+  "placeholder": "What's happening?",
+  "maxLength": 200,
+  "showCount": true,
+  "autoresize": true,
+  "size": "sm",
+  "interactive": true
 }
 ```
 
-# Propriedades
+## 3. Área de texto com estado de erro inválido
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `class` | `string` | Classes CSS personalizadas. |
+Demonstra o estado visual de erro, ativa as bordas de invalidação e pré-carrega uma mensagem de erro para exibição no cliente.
 
-| `variant` | \`"outline" \ | "surface" \ | "subtle" \ | "flushed"\` | O estilo visual do textarea. |
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "420px" }}>
+    <Textarea
+      label="Account Bio"
+      placeholder="Tell us about yourself"
+      invalid
+      errorText="Bio cannot contain profanity."
+      interactive
+    />
+  </div>
+</DemoPreview>
 
-| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg" \ | "xl"\` | O tamanho do textarea. |
+```json
+{
+  "type": "textarea",
+  "label": "Account Bio",
+  "placeholder": "Tell us about yourself",
+  "invalid": true,
+  "errorText": "Bio cannot contain profanity.",
+  "interactive": true
+}
+```
 
-| `resize` | \`"none" \ | "both" \ | "horizontal" \ | "vertical"\` | Se o textarea pode ser redimensionado. |
+***
 
-| `label` | `string` | O rótulo do campo (quando usado como Field independente). |
-| `helperText` | `string` | O texto de ajuda do campo. |
-| `errorText` | `string` | O texto de erro do campo. |
-| `value` | `string` | O valor atual. |
-| `defaultValue` | `string` | O valor inicial. |
-| `onValueChange` | `(val: string) => void` | Callback acionado quando o valor muda. |
-| `onInput` | `(e: any) => void` | Manipulador de eventos para mudanças de entrada. |
-| `rows` | `number` | Número de linhas de texto visíveis. |
-| `placeholder` | `string` | Texto de sugestão. |
-| `minLength` | `number` | Validação de comprimento mínimo. |
+# Props
 
-| `validator` | \`(val: string) => boolean \ | string\` | Lógica de validação personalizada. |
+| Propriedade | Tipo de campo CMS | Padrão | Descrição / opções suportadas |
+| --- | --- | --- | --- |
+| **Texto do rótulo** (`label`) | `string` | - | Título descritivo acima da área. |
+| **Texto de espaço reservado** (`placeholder`) | `string` | - | Texto fantasma dentro do campo vazio. |
+| **Dica de ajuda** (`helperText`) | `string` | - | Nota contextual leve abaixo do campo. |
+| **Autoajuste** (`autoresize`) | `boolean` | `false` | Adapta-se à altura do conteúdo, eliminando barras de rolagem estáticas. |
+| **Tamanho máximo** (`maxLength`) | `number` | - | Limite superior de caracteres inseríveis. |
+| **Mostrar contador** (`showCount`) | `boolean` | `false` | Renderiza um contador em tempo real (ex. `12/200`). |
+| **Variante visual** (`variant`) | `select` | `"outline"` | Tema de borda e preenchimento. <br/>• Opções: `"outline"`, `"surface"`, `"subtle"`, `"flushed"`. |
+| **Escala de tamanho** (`size`) | `select` | `"md"` | Controla preenchimento e tamanho de fonte. <br/>• Opções: `"xs"`, `"sm"`, `"md"`, `"lg"`, `"xl"`. |
+| **Largura** (`width`) | `select` | `"full"` | Comportamento de largura de bloco. <br/>• Opções: `"full"`, `"fit"`. |
+| **Estado inválido** (`invalid`) | `boolean` | `false` | Ativa bordas de erro e estado inválido. |
+| **Desabilitado** (`disabled`) | `boolean` | `false` | Desativa a interação e aplica camada atenuada. |
+| **Forçar interativo** (`interactive`) | `boolean` | `true` | Hidrata a área para vincular eventos do cliente. |
 
-| `interactive` | `boolean` | Força a hidratação como island. |
+***
+
+# Developer Notes & Accessibility
+
+- **Integração de formulário nativa:** Compila como `<textarea>` nativo com `name` e `form`, garantindo usabilidade nativa sem JS.
+- **Conformidade WAI-ARIA:** As relações rótulo/erro são vinculadas via `label`, `aria-invalid` e `aria-describedby`, assegurando que leitores de tela anunciem erros de validação.
+- **Autoajuste inteligente:** `autoresize` ajusta dinamicamente a altura de rolagem ao digitar, sem reflows custosos.

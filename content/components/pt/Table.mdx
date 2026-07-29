@@ -7,11 +7,19 @@ hydration: 2
 import { Table } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-# Introdução
+# Introduction
 
-Um componente flexível para exibir dados tabulares.
+O componente `Table` é um elemento de layout robusto que renderiza claramente estruturas de conjuntos de dados tabulares complexos em páginas do cliente. Com suporte completo a modelos responsivos sem JS e esquemas de configuração de CMS orientados a dados, oferece envoltura de rolagem vertical, alinhamento dinâmico de colunas e realce ao passar o cursor.
 
-# Uso
+***
+
+# Usage
+
+Você pode mapear dados e estilizar tabelas facilmente a partir do painel.
+
+## 1. Tabela de texto simples com alinhamento personalizado
+
+Uma lista de texto padrão com a variante `plain` e preços alinhados à direita para facilitar a leitura.
 
 <DemoPreview>
   <div style={{ width: "100%" }}>
@@ -31,82 +39,90 @@ Um componente flexível para exibir dados tabulares.
   </div>
 </DemoPreview>
 
-```tsx
-import { Table } from "../components/ui";
-
-export default function MyPage() {
-  const columns = [
-    { header: "Name", key: "name" },
-    { header: "Category", key: "category" },
-    { header: "Price", key: "price", align: "end" },
-  ];
-
-  const rows = [
-    { name: "Laptop", category: "Electronics", price: "$999.00" },
-    { name: "Coffee Mug", category: "Home & Kitchen", price: "$15.00" },
-  ];
-
-  return (
-    <Table
-      variant="plain"
-      caption="Product Inventory"
-      columns={columns}
-      rows={rows}
-      footer={
-        <tr>
-          <td colSpan={2}>Total</td>
-          <td style={{ textAlign: "end" }}>$1,014.00</td>
-        </tr>
-      }
-    />
-  );
+```json
+{
+  "type": "table",
+  "variant": "plain",
+  "columns": [
+    { "header": "Name", "key": "name" },
+    { "header": "Category", "key": "category" },
+    { "header": "Price", "key": "price", "align": "end" }
+  ],
+  "rows": "[{\"name\": \"Laptop\", \"category\": \"Electronics\", \"price\": \"$999.00\"}, {\"name\": \"Coffee Mug\", \"category\": \"Home & Kitchen\", \"price\": \"$15.00\"}]"
 }
 ```
 
-## Construtor de páginas CMS
+***
 
-Este componente está disponível como um bloco `table` no [Construtor de páginas](/docs/PageBuilder) (`content/pages/*.json`). Como os dados das linhas não podem ter uma estrutura CMS fixa, `rows` é um campo de string codificado em JSON, analisado no momento da renderização:
+## 2. Tabela interativa com listras zebrada (variante Surface)
+
+Com linhas alternadas sombreadas em zebrado, realce interativo ao passar o cursor e bordas estruturais.
+
+<DemoPreview>
+  <div style={{ width: "100%" }}>
+    <Table
+      variant="surface"
+      striped={true}
+      interactive={true}
+      columnBorder={true}
+      columns={[
+        { header: "System Service", key: "service" },
+        { header: "Server Node", key: "node", align: "center" },
+        { header: "Status", key: "status", align: "end" },
+      ]}
+      rows={[
+        { service: "Auth Endpoint", node: "EU-West", status: "Online" },
+        { service: "Payment API", node: "US-East", status: "Degraded" },
+        { service: "File Storage", node: "APAC-South", status: "Online" }
+      ]}
+    />
+  </div>
+</DemoPreview>
 
 ```json
 {
   "type": "table",
+  "variant": "surface",
+  "striped": true,
+  "interactive": true,
+  "columnBorder": true,
   "columns": [
-    { "header": "Room", "key": "room" },
-    { "header": "Price", "key": "price", "align": "end" }
+    { "header": "System Service", "key": "service" },
+    { "header": "Server Node", "key": "node", "align": "center" },
+    { "header": "Status", "key": "status", "align": "end" }
   ],
-  "rows": "[{\"room\": \"Cabin Loft\", \"price\": \"$180/night\"}, {\"room\": \"Cabin Suite\", \"price\": \"$240/night\"}]",
-  "variant": "plain",
-  "striped": true
+  "rows": "[{\"service\": \"Auth Endpoint\", \"node\": \"EU-West\", \"status\": \"Online\"}, {\"service\": \"Payment API\", \"node\": \"US-East\", \"status\": \"Degraded\"}, {\"service\": \"File Storage\", \"node\": \"APAC-South\", \"status\": \"Online\"}]"
 }
 ```
 
-# Propriedades
+***
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `columns` | `TableColumn[]` | Configuração para as colunas da tabela. |
-| `rows` | `any[]` | Dados a exibir na tabela. |
+# Props
 
-| `caption` | \`string \ | JSX.Element\` | Legenda opcional exibida na parte superior ou inferior. |
+| Propriedade | Tipo de campo CMS | Padrão | Descrição / opções suportadas |
+| --- | --- | --- | --- |
+| **Colunas** (`columns`) | `list` | - | Lista ordenada de configurações de colunas (detalhes abaixo). |
+| **Dados de linhas** (`rows`) | `text` | - | String de array JSON serializada bruta das linhas (ex. `"[{\"item\": \"Laptop\"}]"`), parseada automaticamente na renderização. |
+| **Variante** (`variant`) | `select` | `"plain"` | Estilo geral de layout do contêiner. <br/>• Opções: `"plain"`, `"surface"`. |
+| **Listras zebradas** (`striped`) | `boolean` | `false` | Se true, sombreia linhas alternadas. |
+| **Realce de linhas** (`interactive`) | `boolean` | `false` | Ativa animação de fundo ao passar o cursor em células ativas. |
+| **Bordas de coluna** (`columnBorder`) | `boolean` | `false` | Renderiza separadores verticais entre colunas. |
+| **Cabeçalho fixo** (`stickyHeader`) | `boolean` | `false` | Fixa a linha de cabeçalho no topo do viewport durante a rolagem. |
 
-| `footer` | `JSX.Element` | Conteúdo de rodapé opcional. |
+### Propriedades da lista Column (`columns`)
 
-| `variant` | \`"plain" \ | "surface"\` | O estilo visual da tabela. |
+Cada entrada na lista `columns` aceita os seguintes campos:
 
-| `striped` | `boolean` | Se deve exibir um listrado zebra nas linhas. |
-| `interactive` | `boolean` | Se as linhas devem exibir estados de hover. |
-| `columnBorder` | `boolean` | Se devem ser exibidas bordas entre colunas. |
-| `stickyHeader` | `boolean` | Se o cabeçalho deve permanecer visível ao rolar. |
-| `class` | `string` | Classes CSS personalizadas para o elemento raiz. |
+| Sub-propriedade | Tipo | Obrigatório | Descrição / opções suportadas |
+| --- | --- | --- | --- |
+| **Texto de cabeçalho** (`header`) | `string` | Sim | Título de coluna na linha de cabeçalho. |
+| **Chave de item** (`key`) | `string` | Sim | Chave de propriedade no objeto de linha para esta célula. |
+| **Alinhamento de texto** (`align`) | `select` | `"start"` | Alinhamento dos valores. <br/>• Opções: `"start"`, `"center"`, `"end"`. |
 
-### TableColumn
+***
 
-| Property | Type | Description |
-| --- | --- | --- |
+# Architecture Notes
 
-| `header` | \`string \ | JSX.Element\` | Texto ou elemento do cabeçalho. |
-
-| `key` | `string` | Chave no objeto de dados da linha. |
-| `render` | `(row, index) => JSX.Element` | Função de renderização personalizada para a célula. |
-
-| `align` | \`"start" \ | "center" \ | "end"\` | Alinhamento do texto para a coluna. |
+- **Conversão otimizada de strings JSON:** Como as estruturas de linha variam dinamicamente por bloco, o Sveltia CMS entrega as linhas como uma string de array JSON escapada no campo `rows`. Ela é parseada com segurança na renderização, garantindo um bundle mínimo.
+- **Higiene de layout CSS puro:** Cabeçalhos, contornos e listras zebradas usam variáveis utilitárias leves do Panda CSS, eliminando deslocamentos e renderizando instantaneamente no mobile.
+- **Fixação de rolagem:** `stickyHeader` usa `position: sticky` padrão em cabeçalhos dentro de um wrapper com overflow, evitando ouvintes de scroll caros.

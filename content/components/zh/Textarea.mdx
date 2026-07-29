@@ -1,5 +1,5 @@
 ---
-title: Textarea 文本域
+title: Textarea 多行文本框
 category: Forms
 hydration: 2
 ---
@@ -7,133 +7,124 @@ hydration: 2
 import { Textarea } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-# 简介
+# Introduction
 
-一个与 `Field` 上下文集成的多行文本输入组件。它可以单独使用，也可以作为 `Field` 组件的一部分。
+一个多行自由文本输入控件，用于捕获较长的用户输入，例如评论、描述、反馈或长表单提交。它在客户端渲染的零 JS 架构中作为完全无障碍的布局运行。
 
-# 用法
+**Textarea** 组件已作为 `textarea` 区块完全集成到 **Page Builder** 中，使作者能够轻松配置占位符、帮助提示、验证规则、尺寸比例和自动调整行为。
 
-## 配合 Field 集成的独立使用
+***
 
-`Textarea` 在提供 `label`、`helperText` 等时会自动包裹在 `Field` 中。
+# Usage
+
+以下示例展示了内容编辑人员如何绑定和构建文本区域。
+
+## 1. 带帮助提示的标准文本区域
+
+默认的多行输入，包含标签和解释性辅助文本。非常适合简单的反馈字段。
 
 <DemoPreview>
-  <div style={{ width: "100%", maxWidth: "320px" }}>
+  <div style={{ width: "100%", maxWidth: "420px" }}>
     <Textarea
-      label="Bio"
-      placeholder="Write here..."
-      rows={4}
-      minLength={10}
+      label="Public Comment"
+      placeholder="Share your thoughts..."
+      helperText="Comments are visible to all workspace members."
       interactive
     />
   </div>
 </DemoPreview>
 
-```tsx
-import { Textarea } from "../components/ui";
+```json
+{
+  "type": "textarea",
+  "label": "Public Comment",
+  "placeholder": "Share your thoughts...",
+  "helperText": "Comments are visible to all workspace members.",
+  "interactive": true
+}
+```
 
-export default function MyPage() {
-  return (
+## 2. 带字符计数与最大长度验证的紧凑区域
+
+一个中等大小的区域，设置了最大字符限制并启用了自动调整高度，实时显示字符计数。
+
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "420px" }}>
     <Textarea
-      label="Bio"
-      placeholder="Write here..."
-      rows={4}
-      minLength={10}
+      label="Status Update"
+      placeholder="What's happening?"
+      maxLength={200}
+      showCount
+      autoresize
+      size="sm"
       interactive
     />
-  );
-}
-```
-
-## 变体
-
-```tsx
-import { Stack } from "../design-system/jsx";
-import { Textarea } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Stack gap="4">
-      <Textarea variant="outline" placeholder="Outline" />
-      <Textarea variant="surface" placeholder="Surface" />
-      <Textarea variant="subtle" placeholder="Subtle" />
-      <Textarea variant="flushed" placeholder="Flushed" />
-    </Stack>
-  );
-}
-```
-
-## 尺寸
-
-```tsx
-import { Stack } from "../design-system/jsx";
-import { Textarea } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Stack gap="4">
-      <Textarea size="xs" placeholder="Extra Small" />
-      <Textarea size="sm" placeholder="Small" />
-      <Textarea size="md" placeholder="Medium" />
-      <Textarea size="lg" placeholder="Large" />
-      <Textarea size="xl" placeholder="Extra Large" />
-    </Stack>
-  );
-}
-```
-
-## 在 Field 组件内部
-
-你也可以将其用于 `Field` 组件内部，以实现更复杂的布局。
-
-```tsx
-import { Field, Textarea } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <Field label="Comments">
-      <Textarea placeholder="Leave a comment..." interactive />
-    </Field>
-  );
-}
-```
-
-## CMS 页面构建器
-
-该组件可作为 `textarea` 区块在 [页面构建器](/docs/PageBuilder)（`content/pages/*.json`）中使用：
+  </div>
+</DemoPreview>
 
 ```json
 {
   "type": "textarea",
-  "label": "Bio",
-  "helperText": "Tell us about yourself.",
-  "rows": 4
+  "label": "Status Update",
+  "placeholder": "What's happening?",
+  "maxLength": 200,
+  "showCount": true,
+  "autoresize": true,
+  "size": "sm",
+  "interactive": true
 }
 ```
 
-# 属性
+## 3. 无效错误状态文本区域
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `class` | `string` | 自定义 CSS 类。 |
+演示错误视觉状态，启用 invalidate 视觉边界并预填错误信息以供客户端显示。
 
-| `variant` | \`"outline" \ | "surface" \ | "subtle" \ | "flushed"\` | 文本域的视觉样式。 |
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "420px" }}>
+    <Textarea
+      label="Account Bio"
+      placeholder="Tell us about yourself"
+      invalid
+      errorText="Bio cannot contain profanity."
+      interactive
+    />
+  </div>
+</DemoPreview>
 
-| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg" \ | "xl"\` | 文本域的尺寸。 |
+```json
+{
+  "type": "textarea",
+  "label": "Account Bio",
+  "placeholder": "Tell us about yourself",
+  "invalid": true,
+  "errorText": "Bio cannot contain profanity.",
+  "interactive": true
+}
+```
 
-| `resize` | \`"none" \ | "both" \ | "horizontal" \ | "vertical"\` | 文本域是否可调整大小。 |
+***
 
-| `label` | `string` | 字段的标签（当作为独立 Field 使用时）。 |
-| `helperText` | `string` | 字段的辅助文本。 |
-| `errorText` | `string` | 字段的错误文本。 |
-| `value` | `string` | 当前值。 |
-| `defaultValue` | `string` | 初始值。 |
-| `onValueChange` | `(val: string) => void` | 值发生变化时触发的回调。 |
-| `onInput` | `(e: any) => void` | 输入变化时的事件处理器。 |
-| `rows` | `number` | 可见的文本行数。 |
-| `placeholder` | `string` | 提示文本。 |
-| `minLength` | `number` | 最小长度校验。 |
+# Props
 
-| `validator` | \`(val: string) => boolean \ | string\` | 自定义校验逻辑。 |
+| 属性 | CMS 字段类型 | 默认值 | 描述 / 支持的选项 |
+| --- | --- | --- | --- |
+| **标签文本** (`label`) | `string` | - | 渲染在文本区域上方的描述性标题。 |
+| **占位符文本** (`placeholder`) | `string` | - | 空字段内的幽灵提示文本。 |
+| **帮助提示** (`helperText`) | `string` | - | 显示在字段下方、输入边框外的轻量上下文说明。 |
+| **自动调整大小** (`autoresize`) | `boolean` | `false` | 调整为内容高度，消除静态滚动条。 |
+| **最大长度** (`maxLength`) | `number` | - | 限制可输入字符总数的上限。 |
+| **启用字符计数** (`showCount`) | `boolean` | `false` | 在字段角落渲染实时计数器（如 `12/200`）。 |
+| **视觉变体** (`variant`) | `select` | `"outline"` | 边框与填充主题。 <br/>• 选项：`"outline"`、`"surface"`、`"subtle"`、`"flushed"`。 |
+| **尺寸比例** (`size`) | `select` | `"md"` | 控制内边距和字体大小。 <br/>• 选项：`"xs"`、`"sm"`、`"md"`、`"lg"`、`"xl"`。 |
+| **宽度** (`width`) | `select` | `"full"` | 块宽行为。 <br/>• 选项：`"full"`、`"fit"`。 |
+| **无效状态** (`invalid`) | `boolean` | `false` | 触发错误边框并显示无效视觉状态。 |
+| **禁用** (`disabled`) | `boolean` | `false` | 禁用用户交互并应用变暗覆盖层。 |
+| **强制交互** (`interactive`) | `boolean` | `true` | 注水文本区域以绑定客户端事件。 |
 
-| `interactive` | `boolean` | 强制作为岛屿水合。 |
+***
+
+# Developer Notes & Accessibility
+
+- **原生表单集成：** 编译为带 `name` 和 `form` 属性的标准原生 `<textarea>`，保证在静态/JS 禁用环境下的原生可用性。
+- **WAI-ARIA 合规性：** 标签/错误关系通过标准 `label` 关联、`aria-invalid` 和 `aria-describedby` 正确绑定，确保屏幕阅读器播报验证错误。
+- **智能自动调整：** `autoresize` 在按键时动态调整 textarea 的滚动高度，无需昂贵的布局回流，提升体验。

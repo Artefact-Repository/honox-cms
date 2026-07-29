@@ -7,61 +7,125 @@ hydration: 2
 import { PinField } from "../../../app/components/ui";
 import { DemoPreview } from "../../../app/components/demo-preview";
 
-用于短固定长度验证码的分段输入框——一次性密码、短信/邮箱验证码、PIN 码。每个字符占一个方框，支持键盘导航、粘贴/自动填充，并与 `Field` 共用相同的标签、帮助文本、错误文本与校验器约定。
+# Introduction
 
-## 用法
+一个交互式分段输入控件，专为输入简短、固定长度的字母数字字符串而设计，例如验证码、一次性密码（OTP）、短信登录令牌和 PIN 值。它具有自动光标焦点循环、退格回删、粘贴净化以及完全统一的无障碍描述符。
+
+**PinField** 组件已作为 `pinField` 区块完全集成到 **Page Builder** 中，使内容作者和开发人员能够直接在 CMS 中轻松配置代码长度、验证格式和输入状态。
+
+***
+
+# Usage
+
+以下示例展示了内容编辑人员如何绑定和构建自定义 PIN 输入组件。
+
+## 1. 标准 6 位短信验证码输入
+
+配置了 6 个分段框的标准数字 PIN 输入，针对电子邮件或短信验证码进行了优化。
 
 <DemoPreview>
-  <div style={{ width: "100%", maxWidth: "320px" }}>
+  <div style={{ width: "100%", maxWidth: "360px" }}>
     <PinField
       label="Verification code"
-      helperText="Check your email for the 6-digit code"
+      helperText="Enter the 6-digit confirmation code we sent to your address."
       count={6}
       otp
       blurOnComplete
-      validator={(value) => value !== "000000" || "That code isn't valid"}
+      interactive
     />
   </div>
 </DemoPreview>
 
-## 字符格式
+```json
+{
+  "type": "pinField",
+  "label": "Verification code",
+  "helperText": "Enter the 6-digit confirmation code we sent to your address.",
+  "count": 6,
+  "otp": true,
+  "blurOnComplete": true,
+  "interactive": true
+}
+```
 
-`format`（`"numeric"` | `"alphanumeric"` | `"alphabetic"`，默认 `"numeric"`）限制每个方框可接受的字符，并据此选择合适的移动端键盘（`inputMode`）。也可传入 `pattern` 使用自定义正则覆盖它。
+## 2. 安全隐藏密码输入（4 位）
 
-## 自动填充
+展示一个安全的 4 位 PIN 模块。设置 mask 属性可通过用通用安全项目符号字形替换字符来保护输入。
 
-`otp` 表示这是短信/邮箱一次性验证码。`autocomplete="one-time-code"` 只会加在用户接下来要填写的那个方框上（而不是每个方框），避免浏览器/密码管理器在所有方框上同时弹出填充提示；该方框还会接受完整验证码长度，方便系统一次性填入后再自动分配到其余方框。其余方框会关闭自动填充并对密码管理器隐藏。
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "240px" }}>
+    <PinField
+      label="Security PIN"
+      placeholder="•"
+      count={4}
+      mask
+      interactive
+    />
+  </div>
+</DemoPreview>
 
-## 键盘与指针行为
+```json
+{
+  "type": "pinField",
+  "label": "Security PIN",
+  "placeholder": "•",
+  "count": 4,
+  "mask": true,
+  "interactive": true
+}
+```
 
-输入合法字符会填充当前框并自动前进；聚焦方框时默认会全选已有内容（`selectOnFocus`），因此直接输入即可替换。空框上按 **Backspace** 会清空并回退到上一框；**方向键左/右** 用于在方框间移动焦点。粘贴或系统自动填充会从落点方框开始依次分配字符。**Tab** 与点击聚焦不会越过第一个空方框。
+## 3. 自定义字母数字促销码（flushed 变体）
 
-## 校验
+使用字母数字格式和独特的 `flushed` 边框变体渲染 5 个框的验证码选择器。
 
-与 `Field` 一样，`PinField` 接受 `validator`，对拼接后的值进行校验，可返回 `false`（通用错误）或字符串（自定义错误信息）；仅在全部填满后才会重新校验。
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "300px" }}>
+    <PinField
+      label="Promo Coupon Code"
+      placeholder="-"
+      count={5}
+      format="alphanumeric"
+      variant="flushed"
+      interactive
+    />
+  </div>
+</DemoPreview>
 
-## 表单：自动提交与重置
+```json
+{
+  "type": "pinField",
+  "label": "Promo Coupon Code",
+  "placeholder": "-",
+  "count": 5,
+  "format": "alphanumeric",
+  "variant": "flushed",
+  "interactive": true
+}
+```
 
-`form` 用于将隐藏的提交输入框与页面中某个 `<form id>` 关联（若字段本身已在表单内则无需设置）。`autoSubmit` 会在全部填满时调用 `form.requestSubmit()`（触发前会先调用 `onAutoSubmit`）；在任意方框按 **Enter** 也会尝试提交。重置表单会将字段清空。
+***
 
-## 属性
+# Props
 
-| 属性 | 类型 | 默认 | 说明 |
+| 属性 | CMS 字段类型 | 默认值 | 描述 / 支持的选项 |
 | --- | --- | --- | --- |
-| `count` | `number` | `4` | 方框数量。 |
-| `value` / `defaultValue` | `string[]` | - | 受控/非受控的值，每个方框一项（会强制启用交互模式）。 |
-| `format` | `"numeric" \| "alphanumeric" \| "alphabetic"` | `"numeric"` | 每个方框接受的字符类型。 |
-| `pattern` | `string` | - | 自定义单字符正则来源，覆盖 `format`。 |
-| `otp` | `boolean` | - | 仅在当前方框上启用 `one-time-code` 自动填充。 |
-| `mask` | `boolean` | - | 以 `type="password"` 渲染每个方框。 |
-| `blurOnComplete` | `boolean` | - | 填满后使最后一个方框失焦。 |
-| `selectOnFocus` | `boolean` | `true` | 聚焦时选中方框内容。 |
-| `form` | `string` | - | 关联的 `<form id>`，用于隐藏输入、`autoSubmit` 与重置。 |
-| `autoSubmit` | `boolean` | - | 填满后调用 `form.requestSubmit()`（会强制启用交互模式）。 |
-| `validator` | `(value: string) => boolean \| string` | - | 校验拼接后的值（会强制启用交互模式）。 |
-| `label` / `helperText` / `errorText` | `Child` | - | 标签、帮助文本与错误文本。 |
-| `interactive` | `boolean` | - | 强制启用或禁用水合。 |
+| **标签文本** (`label`) | `string` | - | 显示在输入分段上方的视觉主标题。 |
+| **辅助文本** (`helperText`) | `string` | - | 显示在输入框下方描述性说明文字。 |
+| **错误信息** (`errorText`) | `string` | - | 当代码条目未通过校验器检查时显示的验证消息。 |
+| **框数量** (`count`) | `number` | `4` | 要生成的输入分段框数量。 |
+| **字符类型** (`format`) | `select` | `"numeric"` | 限制可接受的字符。 <br/>• 选项：`"numeric"`、`"alphanumeric"`、`"alphabetic"`。 |
+| **字符掩码** (`mask`) | `boolean` | `false` | 勾选后，将输入值替换为安全项目符号以保护密码输入。 |
+| **OTP 自动填充** (`otp`) | `boolean` | `false` | 在移动设备上启用一次性代码自动填充检测。 |
+| **自动提交** (`autoSubmit`) | `boolean` | `false` | 最后一个分段填满时立即提交外层表单。 |
+| **视觉变体** (`variant`) | `select` | `"outline"` | 每个框的视觉样式。 <br/>• 选项：`"outline"`、`"subtle"`、`"surface"`、`"flushed"`。 |
+| **尺寸比例** (`size`) | `select` | `"md"` | 控制输入框的宽高。 <br/>• 选项：`"xs"`、`"sm"`、`"md"`、`"lg"`、`"xl"`。 |
+| **强制交互** (`interactive`) | `boolean` | `true` | 对代码字段元素进行注水，以绑定标签触发与粘贴净化。 |
 
-## 水合
+***
 
-第二级：当存在 `value`、`defaultValue`、`onValueChange`、`onValueComplete`、`onValueInvalid`、`validator`、`autoSubmit` 或 `onAutoSubmit` 时进行水合。
+# Developer Notes & Accessibility
+
+- **注水孤岛：** 作为一个捕获粘贴事件、净化条目并处理移动端焦点边界上多输入光标跳转的高级布局，PinField 作为 Tier-2 条件性孤岛运行（`"interactive": true`）。
+- **WAI-ARIA 合规性：** 组件为每个分段输入框包裹了适当的布局与标签（`role="group"`、`aria-label`）。用户可以使用左右方向键或退格键在分段之间无缝切换。
+- **表单集成：** 它包含一个原生的隐藏 `<input>`，携带完整的拼接密码字符串。自动提交规则在输入完成后调用 `form.requestSubmit()`，无缝地将操作提交到最近的父表单。
