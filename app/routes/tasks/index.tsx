@@ -12,6 +12,7 @@ import {
 	Text,
 } from "../../components/ui";
 import { colorPaletteClass } from "../../components/ui/color-palette";
+import TaskCloneAction from "../../islands/task-clone-action";
 import TaskCreateDrawer from "../../islands/task-create-drawer";
 import TaskDeleteConfirm from "../../islands/task-delete-confirm";
 import TaskDetailsDrawer from "../../islands/task-details-drawer";
@@ -475,6 +476,18 @@ export default createRoute(async (c) => {
 									</button>
 									<button
 										type="button"
+										data-task-clone-trigger
+										data-task-slug={task.slug}
+										aria-label={`Clone "${task.title}"`}
+										class={cx(
+											button({ variant: "outline", size: "sm" }),
+											css({ textStyle: "sm", fontWeight: "medium" }),
+										)}
+									>
+										Clone
+									</button>
+									<button
+										type="button"
 										data-task-delete-trigger
 										data-task-slug={task.slug}
 										aria-label={`Delete "${task.title}"`}
@@ -494,6 +507,7 @@ export default createRoute(async (c) => {
 							projectTitleBySlug={Object.fromEntries(projectTitleBySlug)}
 						/>
 						<TaskDeleteConfirm tasks={tasks} />
+						<TaskCloneAction tasks={tasks} />
 					</>
 				)}
 			</div>

@@ -36,6 +36,16 @@ export function requireToken(): string {
 	return token;
 }
 
+async function fileExists(path: string, token: string): Promise<boolean> {
+	try {
+		await fetchFile(path, token);
+		return true;
+	} catch (error) {
+		if (error instanceof GitBackendError && error.status === 404) return false;
+		throw error;
+	}
+}
+
 export async function saveTaskField(
 	slug: string,
 	update: (data: Record<string, unknown>, content: string) => TaskFieldUpdate,
@@ -100,17 +110,7 @@ export async function createTask(input: NewTaskInput): Promise<string> {
 	const slug = slugifyTaskTitle(input.title);
 	const path = `content/tasks/${slug}.md`;
 
-	let exists = true;
-	try {
-		await fetchFile(path, token);
-	} catch (error) {
-		if (error instanceof GitBackendError && error.status === 404) {
-			exists = false;
-		} else {
-			throw error;
-		}
-	}
-	if (exists) {
+	if (await fileExists(path, token)) {
 		throw new TaskSaveError(
 			`A task file already exists at "${path}" — use a different title.`,
 		);
@@ -129,4 +129,39 @@ export async function createTask(input: NewTaskInput): Promise<string> {
 	const content = stringifyFrontmatter(data, input.body ?? "");
 	await createFile(path, content, `Create task "${input.title}"`, token);
 	return slug;
+}
+
+/** Duplicates `content/tasks/{slug}.md` as a new file titled "<title> (Copy)"
+ * — reads the source file's raw content first (rather than reconstructing it
+ * from the list page's `Task`, which only carries a truncated `excerpt`) so
+ * the full body survives the clone intact. Retries with a numeric suffix on
+ * a slug collision, since every clone starts from the same "(Copy)" title
+ * and repeated clicks would otherwise all collide on the same slug. */
+export async function cloneTask(slug: string): Promise<string> {
+	const token = requireToken();
+	const source = await fetchFile(`content/tasks/${slug}.md`, token);
+	const { data, content } = parseFrontmatter(source.content);
+
+	const sourceTitle = (data.title as string) || slug;
+	const cloneTitle = `${sourceTitle} (Copy)`;
+	const baseSlug = slugifyTaskTitle(cloneTitle);
+
+	let cloneSlug = baseSlug;
+	let attempt = 2;
+	while (await fileExists(`content/tasks/${cloneSlug}.md`, token)) {
+		cloneSlug = `${baseSlug}-${attempt}`;
+		attempt += 1;
+	}
+
+	const newContent = stringifyFrontmatter(
+		{ ...data, title: cloneTitle },
+		content,
+	);
+	await createFile(
+		`content/tasks/${cloneSlug}.md`,
+		newContent,
+		`Clone task "${sourceTitle}" as "${cloneTitle}"`,
+		token,
+	);
+	return cloneSlug;
 }
