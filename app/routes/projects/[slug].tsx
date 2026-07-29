@@ -17,7 +17,9 @@ import {
 import { colorPaletteClass } from "../../components/ui/color-palette";
 import { Toaster } from "../../components/ui/toast";
 import TaskBoard from "../../islands/task-board";
+import TaskCreateDrawer from "../../islands/task-create-drawer";
 import {
+	listProjects,
 	listProjectSlugs,
 	loadProjectBySlug,
 	PROJECT_STATUS_COLOR,
@@ -52,8 +54,15 @@ export default createRoute(
 		const project = await loadProjectBySlug(slug);
 		if (!project) return c.notFound();
 
-		const tasks = await listTasksByProject(slug);
+		const [tasks, allProjects] = await Promise.all([
+			listTasksByProject(slug),
+			listProjects(),
+		]);
 		const done = tasks.filter((task) => task.status === "Done").length;
+		const projectItems = allProjects.map((p) => ({
+			label: p.title,
+			value: p.slug,
+		}));
 
 		// Server-side filtering for the no-JS ?q= fallback, same pattern as
 		// /tasks: all rows still render (non-matches hidden) so the Search
@@ -159,6 +168,10 @@ export default createRoute(
 							>
 								Tasks
 							</Anchor>
+							<TaskCreateDrawer
+								projects={projectItems}
+								defaultProjectSlug={slug}
+							/>
 							<Anchor
 								href="/admin"
 								class={cx(

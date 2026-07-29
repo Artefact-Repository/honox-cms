@@ -11,6 +11,7 @@ import {
 	Table,
 	Text,
 } from "../../components/ui";
+import TaskCreateDrawer from "../../islands/task-create-drawer";
 import { listProjects, type Project } from "../../lib/projects";
 import {
 	buildTaskSearchEntries,
@@ -40,6 +41,10 @@ export default createRoute(async (c) => {
 	const projectTitleBySlug = new Map(
 		projects.map((project) => [project.slug, project.title]),
 	);
+	const projectItems = projects.map((project) => ({
+		label: project.title,
+		value: project.slug,
+	}));
 	const assignees = Array.from(
 		new Set(tasks.map((task) => task.assignee).filter(Boolean) as string[]),
 	).sort();
@@ -142,6 +147,7 @@ export default createRoute(async (c) => {
 						>
 							Tasks
 						</Anchor>
+						<TaskCreateDrawer projects={projectItems} />
 						<Anchor
 							href="/admin"
 							class={cx(

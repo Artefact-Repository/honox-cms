@@ -245,6 +245,65 @@ export async function fetchFile(path: string, token: string): Promise<GitFile> {
 	return { content: decodeBase64Utf8(json.content), sha: json.sha };
 }
 
+/** Creates a new file at `path` — same Contents API as `updateFile`, but
+ * omitting `sha` (github/gitea) or using `POST` instead of `PUT` (gitlab),
+ * whichever each backend requires to distinguish "create" from "update". */
+export async function createFile(
+	path: string,
+	content: string,
+	message: string,
+	token: string,
+): Promise<void> {
+	const config = await getRepoConfig();
+	const headers = authHeaders(config.name, token);
+
+	if (config.name === "gitlab") {
+		const projectId = encodeURIComponent(`${config.owner}/${config.repo}`);
+		const filePath = encodeURIComponent(path);
+		const url = `${config.apiRoot}/projects/${projectId}/repository/files/${filePath}`;
+		const response = await fetch(url, {
+			method: "POST",
+			headers: { ...headers, "Content-Type": "application/json" },
+			body: JSON.stringify({
+				branch: config.branch,
+				content: encodeBase64Utf8(content),
+				encoding: "base64",
+				commit_message: message,
+			}),
+		});
+		if (!response.ok) {
+			throw new GitBackendError(
+				response.status === 400
+					? `${path} already exists on the ${config.branch} branch.`
+					: errorMessage(response.status, path, config.branch),
+				response.status,
+			);
+		}
+		return;
+	}
+
+	// github and gitea share the same Contents API shape — omitting `sha`
+	// creates a new file instead of updating one.
+	const url = `${config.apiRoot}/repos/${config.owner}/${config.repo}/contents/${path}`;
+	const response = await fetch(url, {
+		method: "PUT",
+		headers: { ...headers, "Content-Type": "application/json" },
+		body: JSON.stringify({
+			message,
+			content: encodeBase64Utf8(content),
+			branch: config.branch,
+		}),
+	});
+	if (!response.ok) {
+		throw new GitBackendError(
+			response.status === 422
+				? `${path} already exists on the ${config.branch} branch.`
+				: errorMessage(response.status, path, config.branch),
+			response.status,
+		);
+	}
+}
+
 export async function updateFile(
 	path: string,
 	content: string,
