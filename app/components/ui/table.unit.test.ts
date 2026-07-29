@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { TASK_PRIORITIES, TASK_STATUSES } from "../../lib/tasks";
 import { Table } from "./table";
+import { TASK_PRIORITIES, TASK_STATUSES } from "../../lib/tasks";
 
 describe("Table Unit Tests", () => {
 	test("Table component exists", () => {
@@ -30,9 +30,7 @@ describe("Table Unit Tests", () => {
 			{ priority: "Urgent" },
 		];
 
-		const prioritySortValues = mockTasks.map((t) =>
-			TASK_PRIORITIES.indexOf(t.priority as any),
-		);
+		const prioritySortValues = mockTasks.map((t) => TASK_PRIORITIES.indexOf(t.priority as any));
 		expect(prioritySortValues).toEqual([0, 1, 2, 3]);
 	});
 
@@ -44,9 +42,7 @@ describe("Table Unit Tests", () => {
 			{ status: "Done" },
 		];
 
-		const statusSortValues = mockTasks.map((t) =>
-			TASK_STATUSES.indexOf(t.status as any),
-		);
+		const statusSortValues = mockTasks.map((t) => TASK_STATUSES.indexOf(t.status as any));
 		expect(statusSortValues).toEqual([0, 1, 2, 3]);
 	});
 

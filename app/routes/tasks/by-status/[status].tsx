@@ -11,16 +11,16 @@ import {
 	Table,
 	Text,
 } from "../../../components/ui";
-import { listProjects, type Project } from "../../../lib/projects";
+import { type Project, listProjects } from "../../../lib/projects";
 import {
 	buildTaskSearchEntries,
-	listTasks,
+	TASK_STATUSES,
+	TASK_STATUS_COLOR,
 	TASK_PRIORITIES,
 	TASK_PRIORITY_COLOR,
-	TASK_STATUS_COLOR,
-	TASK_STATUSES,
 	type Task,
 	type TaskStatus,
+	listTasks,
 } from "../../../lib/tasks";
 import { filterEntries } from "../../../utils/search";
 
@@ -37,9 +37,7 @@ export default createRoute(
 	ssgParams(() => TASK_STATUSES.map((status) => ({ status }))),
 
 	async (c) => {
-		const statusParam = decodeURIComponent(
-			c.req.param("status") ?? "",
-		) as TaskStatus;
+		const statusParam = decodeURIComponent(c.req.param("status") ?? "") as TaskStatus;
 		if (!TASK_STATUSES.includes(statusParam)) return c.notFound();
 
 		const [allTasks, projects] = await Promise.all([
@@ -275,7 +273,6 @@ export default createRoute(
 									{
 										header: "Task",
 										key: "title",
-										class: css({ maxWidth: "sm" }),
 										render: (task: Task) => (
 											<Anchor
 												href={`/tasks/${task.slug}`}

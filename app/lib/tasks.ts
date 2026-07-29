@@ -12,10 +12,14 @@ import { buildHaystack, type SearchIndexEntry } from "../utils/search";
 // real formatted markdown. Each task's `project` field is a
 // projects-collection slug (the CMS's `relation` widget writes the related
 // entry's slug as a plain string, same shape a hand-authored file has here).
-const taskModules = import.meta.glob("/content/tasks/*.md", {
-	query: "?raw",
-	import: "default",
-}) as Record<string, () => Promise<string>>;
+const taskModules = (
+	typeof import.meta.glob === "function"
+		? import.meta.glob("/content/tasks/*.md", {
+				query: "?raw",
+				import: "default",
+			})
+		: {}
+) as Record<string, () => Promise<string>>;
 
 export type TaskStatus = "To Do" | "In Progress" | "In Review" | "Done";
 export type TaskPriority = "Low" | "Medium" | "High" | "Urgent";

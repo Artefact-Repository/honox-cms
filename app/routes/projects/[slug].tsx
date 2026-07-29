@@ -304,14 +304,23 @@ export default createRoute(
 										{
 											header: "Status",
 											key: "status",
+											sortable: true,
+											sortValue: (task: Task) =>
+												TASK_STATUSES.indexOf(task.status),
 											render: (task: Task) => (
-												<Badge
-													variant="subtle"
-													size="sm"
-													colorPalette={TASK_STATUS_COLOR[task.status]}
+												<Anchor
+													href={`/tasks/by-status/${encodeURIComponent(task.status)}`}
+													variant="plain"
+													class={css({ textDecoration: "none" })}
 												>
-													{task.status}
-												</Badge>
+													<Badge
+														variant="subtle"
+														size="sm"
+														colorPalette={TASK_STATUS_COLOR[task.status]}
+													>
+														{task.status}
+													</Badge>
+												</Anchor>
 											),
 										},
 										{
@@ -321,13 +330,19 @@ export default createRoute(
 											sortValue: (task: Task) =>
 												TASK_PRIORITIES.indexOf(task.priority),
 											render: (task: Task) => (
-												<Badge
-													variant="subtle"
-													size="sm"
-													colorPalette={TASK_PRIORITY_COLOR[task.priority]}
+												<Anchor
+													href={`/tasks/by-priority/${task.priority}`}
+													variant="plain"
+													class={css({ textDecoration: "none" })}
 												>
-													{task.priority}
-												</Badge>
+													<Badge
+														variant="subtle"
+														size="sm"
+														colorPalette={TASK_PRIORITY_COLOR[task.priority]}
+													>
+														{task.priority}
+													</Badge>
+												</Anchor>
 											),
 										},
 										{
