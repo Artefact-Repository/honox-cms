@@ -17,7 +17,6 @@ import TaskProjectEditor from "../../islands/task-project-editor";
 import TaskSubtasks from "../../islands/task-subtasks";
 import { listProjects, loadProjectBySlug } from "../../lib/projects";
 import {
-	descendantsOf,
 	listTaskSlugs,
 	listTasks,
 	loadTaskBySlug,
@@ -62,17 +61,6 @@ export default createRoute(
 			? allTasks.find((t) => t.slug === task.parentTask)
 			: undefined;
 		const subtasks = subtasksOf(allTasks, task.slug);
-		// Excludes this task and its own descendants — unlike `taskItems` above,
-		// "Convert to... Subtask" is picking a *new parent for this task*, so
-		// offering itself or one of its own subtasks would just get silently
-		// flattened back to top-level by buildTaskTree's cycle guard.
-		const excludedFromConvert = new Set([
-			task.slug,
-			...descendantsOf(allTasks, task.slug).map((t) => t.slug),
-		]);
-		const convertTaskItems = allTasks
-			.filter((t) => !excludedFromConvert.has(t.slug))
-			.map((t) => ({ label: t.title, value: t.slug }));
 
 		return c.render(
 			<>
@@ -158,7 +146,7 @@ export default createRoute(
 								assignee={task.assignee}
 								dueDate={task.dueDate}
 								tags={task.tags}
-								tasks={convertTaskItems}
+								tasks={taskItems.filter((t) => t.value !== task.slug)}
 							/>
 						</nav>
 					</div>

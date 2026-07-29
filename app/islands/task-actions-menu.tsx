@@ -1,3 +1,4 @@
+// biome-ignore lint/style/useExportsLast: allow exporting props interface alongside component
 import { css } from "design-system/css";
 import { useState } from "hono/jsx";
 import { IconButton } from "../components/ui/button";
@@ -6,20 +7,18 @@ import { EllipsisIcon } from "../icons/ellipsis";
 import TaskCloneDialog from "./task-clone-dialog";
 import TaskDeleteDialog from "./task-delete-dialog";
 import TaskToProject, { type TaskToProjectProps } from "./task-to-project";
-import TaskToSubtask from "./task-to-subtask";
+import TaskToSubtaskDialog from "./task-to-subtask-dialog";
 
 export interface TaskActionsMenuProps
 	extends Omit<TaskToProjectProps, "open" | "onOpenChange"> {
 	editHref: string;
-	/** Candidate parents for "Convert to... Subtask" — every other task
-	 * except this one and its own descendants. */
 	tasks: { label: string; value: string }[];
 }
 
 export default function TaskActionsMenu(props: TaskActionsMenuProps) {
 	const { editHref, tasks, ...taskProps } = props;
-	const [convertToProjectOpen, setConvertToProjectOpen] = useState(false);
-	const [convertToSubtaskOpen, setConvertToSubtaskOpen] = useState(false);
+	const [convertOpen, setConvertOpen] = useState(false);
+	const [subtaskOpen, setSubtaskOpen] = useState(false);
 	const [cloneOpen, setCloneOpen] = useState(false);
 	const [deleteOpen, setDeleteOpen] = useState(false);
 
@@ -40,16 +39,8 @@ export default function TaskActionsMenu(props: TaskActionsMenuProps) {
 						type: "submenu",
 						label: "Convert to...",
 						items: [
-							{
-								type: "item",
-								label: "Project",
-								value: "convert-to-project",
-							},
-							{
-								type: "item",
-								label: "Subtask",
-								value: "convert-to-subtask",
-							},
+							{ type: "item", label: "Project", value: "convert-to-project" },
+							{ type: "item", label: "Subtask", value: "convert-to-subtask" },
 						],
 					},
 					{ type: "separator" },
@@ -61,23 +52,22 @@ export default function TaskActionsMenu(props: TaskActionsMenuProps) {
 					},
 				]}
 				onSelect={(value) => {
-					if (value === "convert-to-project") setConvertToProjectOpen(true);
-					if (value === "convert-to-subtask") setConvertToSubtaskOpen(true);
+					if (value === "convert-to-project") setConvertOpen(true);
+					if (value === "convert-to-subtask") setSubtaskOpen(true);
 					if (value === "clone") setCloneOpen(true);
 					if (value === "delete") setDeleteOpen(true);
 				}}
 			/>
 			<TaskToProject
 				{...taskProps}
-				open={convertToProjectOpen}
-				onOpenChange={setConvertToProjectOpen}
+				open={convertOpen}
+				onOpenChange={setConvertOpen}
 			/>
-			<TaskToSubtask
-				slug={taskProps.slug}
-				title={taskProps.title}
+			<TaskToSubtaskDialog
+				task={{ slug: taskProps.slug, title: taskProps.title }}
 				tasks={tasks}
-				open={convertToSubtaskOpen}
-				onOpenChange={setConvertToSubtaskOpen}
+				open={subtaskOpen}
+				onOpenChange={setSubtaskOpen}
 			/>
 			<TaskCloneDialog
 				task={{ slug: taskProps.slug, title: taskProps.title }}
