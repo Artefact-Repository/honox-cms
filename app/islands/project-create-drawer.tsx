@@ -1,6 +1,6 @@
 import { css, cx } from "design-system/css";
 import { button } from "design-system/recipes";
-import { useState } from "hono/jsx";
+import { useEffect, useState } from "hono/jsx";
 import { InteractiveCombobox } from "../components/ui/combobox-primitive";
 import { Drawer } from "../components/ui/drawer";
 import { Field } from "../components/ui/field";
@@ -20,32 +20,59 @@ const colorItems = PROJECT_COLOR_PALETTES.map((color) => ({
 	value: color,
 }));
 
+export interface ProjectCreateDrawerInitialValues {
+	title?: string;
+	summary?: string;
+	description?: string;
+	status?: string;
+	colorPalette?: string;
+	owner?: string;
+	startDate?: string;
+	dueDate?: string;
+	tags?: string[];
+}
+
 export interface ProjectCreateDrawerProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
+	/** Prefills the form — e.g. "Convert to Project" seeding it from the
+	 * source task's own fields (see task-to-project.tsx). */
+	initialValues?: ProjectCreateDrawerInitialValues;
 }
 
-const emptyForm = () => ({
-	title: "",
-	summary: "",
-	description: "",
-	status: PROJECT_STATUSES[0],
-	colorPalette: "blue",
-	owner: "",
-	startDate: "",
-	dueDate: "",
-	tags: "",
+const buildForm = (initial?: ProjectCreateDrawerInitialValues) => ({
+	title: initial?.title ?? "",
+	summary: initial?.summary ?? "",
+	description: initial?.description ?? "",
+	status: initial?.status ?? PROJECT_STATUSES[0],
+	colorPalette: initial?.colorPalette ?? "blue",
+	owner: initial?.owner ?? "",
+	startDate: initial?.startDate ?? "",
+	dueDate: initial?.dueDate ?? "",
+	tags: initial?.tags?.join(", ") ?? "",
 });
 
 // Same direct-commit constraint as TaskCreateDrawer — writes straight to the
 // git host via createProject/project-save.ts when a token is available.
 export default function ProjectCreateDrawer(props: ProjectCreateDrawerProps) {
-	const [form, setForm] = useState(emptyForm());
+	const [form, setForm] = useState(buildForm(props.initialValues));
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
+	// Re-seeds the form from `initialValues` each time the drawer opens —
+	// depending only on `open` (not `initialValues`, which callers like
+	// PmsCreateMenu re-create every render) so an in-progress edit doesn't get
+	// clobbered by a parent re-render while the drawer is still open.
+	useEffect(() => {
+		if (props.open) {
+			setForm(buildForm(props.initialValues));
+			setError(null);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [props.open]);
+
 	const resetAndClose = () => {
-		setForm(emptyForm());
+		setForm(buildForm(props.initialValues));
 		setError(null);
 		props.onOpenChange(false);
 	};
