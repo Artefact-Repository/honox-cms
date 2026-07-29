@@ -11,7 +11,9 @@ import {
 	Table,
 	Text,
 } from "../../components/ui";
+import { colorPaletteClass } from "../../components/ui/color-palette";
 import TaskCreateDrawer from "../../islands/task-create-drawer";
+import TaskDeleteConfirm from "../../islands/task-delete-confirm";
 import TaskDetailsDrawer from "../../islands/task-details-drawer";
 import { listProjects, type Project } from "../../lib/projects";
 import {
@@ -459,23 +461,39 @@ export default createRoute(async (c) => {
 							]}
 							rows={tasks}
 							hoverActions={(task: Task) => (
-								<button
-									type="button"
-									data-task-details-trigger
-									data-task-slug={task.slug}
-									class={cx(
-										button({ variant: "outline", size: "sm" }),
-										css({ textStyle: "sm", fontWeight: "medium" }),
-									)}
-								>
-									View Details
-								</button>
+								<>
+									<button
+										type="button"
+										data-task-details-trigger
+										data-task-slug={task.slug}
+										class={cx(
+											button({ variant: "outline", size: "sm" }),
+											css({ textStyle: "sm", fontWeight: "medium" }),
+										)}
+									>
+										View Details
+									</button>
+									<button
+										type="button"
+										data-task-delete-trigger
+										data-task-slug={task.slug}
+										aria-label={`Delete "${task.title}"`}
+										class={cx(
+											button({ variant: "outline", size: "sm" }),
+											colorPaletteClass("red"),
+											css({ textStyle: "sm", fontWeight: "medium" }),
+										)}
+									>
+										Delete
+									</button>
+								</>
 							)}
 						/>
 						<TaskDetailsDrawer
 							tasks={tasks}
 							projectTitleBySlug={Object.fromEntries(projectTitleBySlug)}
 						/>
+						<TaskDeleteConfirm tasks={tasks} />
 					</>
 				)}
 			</div>

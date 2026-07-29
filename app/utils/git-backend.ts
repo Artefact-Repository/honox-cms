@@ -304,6 +304,58 @@ export async function createFile(
 	}
 }
 
+/** Deletes an existing file at `path` — same Contents API as `updateFile`,
+ * `DELETE` instead of `PUT`, needs the current blob `sha`/`blob_id` like an
+ * update does (proves the caller last read the file that's actually there). */
+export async function deleteFile(
+	path: string,
+	sha: string,
+	message: string,
+	token: string,
+): Promise<void> {
+	const config = await getRepoConfig();
+	const headers = authHeaders(config.name, token);
+
+	if (config.name === "gitlab") {
+		const projectId = encodeURIComponent(`${config.owner}/${config.repo}`);
+		const filePath = encodeURIComponent(path);
+		const url = `${config.apiRoot}/projects/${projectId}/repository/files/${filePath}`;
+		const response = await fetch(url, {
+			method: "DELETE",
+			headers: { ...headers, "Content-Type": "application/json" },
+			body: JSON.stringify({
+				branch: config.branch,
+				commit_message: message,
+			}),
+		});
+		if (!response.ok) {
+			throw new GitBackendError(
+				errorMessage(response.status, path, config.branch),
+				response.status,
+			);
+		}
+		return;
+	}
+
+	// github and gitea share the same Contents API shape
+	const url = `${config.apiRoot}/repos/${config.owner}/${config.repo}/contents/${path}`;
+	const response = await fetch(url, {
+		method: "DELETE",
+		headers: { ...headers, "Content-Type": "application/json" },
+		body: JSON.stringify({
+			message,
+			sha,
+			branch: config.branch,
+		}),
+	});
+	if (!response.ok) {
+		throw new GitBackendError(
+			errorMessage(response.status, path, config.branch),
+			response.status,
+		);
+	}
+}
+
 export async function updateFile(
 	path: string,
 	content: string,

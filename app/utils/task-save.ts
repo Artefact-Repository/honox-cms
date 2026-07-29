@@ -6,6 +6,7 @@
 // against whichever git backend is configured (see git-backend.ts).
 import {
 	createFile,
+	deleteFile,
 	fetchFile,
 	GitBackendError,
 	resolveToken,
@@ -55,6 +56,15 @@ export async function saveTaskField(
 		`Update task "${slug}"`,
 		token,
 	);
+}
+
+/** Deletes `content/tasks/{slug}.md` straight on the git host — same
+ * fetch-then-write path as `saveTaskField`, just a delete instead of a write. */
+export async function deleteTask(slug: string): Promise<void> {
+	const token = requireToken();
+	const path = `content/tasks/${slug}.md`;
+	const file = await fetchFile(path, token);
+	await deleteFile(path, file.sha, `Delete task "${slug}"`, token);
 }
 
 /** Turns a task title into the same kind of slug the CMS's `{{slug}}`
