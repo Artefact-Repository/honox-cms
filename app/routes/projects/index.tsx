@@ -13,11 +13,11 @@ import {
 } from "../../components/ui";
 import { colorPaletteClass } from "../../components/ui/color-palette";
 import {
+	listProjects,
 	PROJECT_STATUS_COLOR,
 	type Project,
-	listProjects,
 } from "../../lib/projects";
-import { type Task, listTasks } from "../../lib/tasks";
+import { listTasks, type Task } from "../../lib/tasks";
 
 function projectProgress(project: Project, tasks: Task[]) {
 	const projectTasks = tasks.filter((task) => task.project === project.slug);
@@ -64,7 +64,11 @@ export default createRoute(async (c) => {
 					>
 						<Heading
 							as="span"
-							class={css({ fontSize: "lg", fontWeight: "bold", tracking: "tight" })}
+							class={css({
+								fontSize: "lg",
+								fontWeight: "bold",
+								tracking: "tight",
+							})}
 						>
 							Artefact UI
 						</Heading>

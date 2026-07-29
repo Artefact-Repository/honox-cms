@@ -17,11 +17,11 @@ import {
 } from "../lib/tasks";
 import {
 	clearStoredToken,
-	fetchFileFromGitHub,
+	fetchFile,
 	resolveToken,
 	setStoredToken,
-	updateFileOnGitHub,
-} from "../utils/github-content";
+	updateFile,
+} from "../utils/git-backend";
 import { parseFrontmatter, stringifyFrontmatter } from "../utils/markdown";
 
 function formatDate(value?: string) {
@@ -80,7 +80,7 @@ export default function TaskBoard({ tasks: initialTasks }: TaskBoardProps) {
 		if (!task || task.status === newStatus) return;
 
 		if (!token) {
-			toaster.error("Connect a GitHub token first.");
+			toaster.error("Connect a git host token first.");
 			return;
 		}
 
@@ -92,11 +92,11 @@ export default function TaskBoard({ tasks: initialTasks }: TaskBoardProps) {
 
 		try {
 			const path = `content/tasks/${slug}.md`;
-			const file = await fetchFileFromGitHub(path, token);
+			const file = await fetchFile(path, token);
 			const { data, content } = parseFrontmatter(file.content);
 			data.status = newStatus;
 			const newFileContent = stringifyFrontmatter(data, content);
-			await updateFileOnGitHub(
+			await updateFile(
 				path,
 				newFileContent,
 				file.sha,
@@ -112,9 +112,7 @@ export default function TaskBoard({ tasks: initialTasks }: TaskBoardProps) {
 					t.slug === slug ? { ...t, status: previousStatus } : t,
 				),
 			);
-			toaster.error(
-				error instanceof Error ? error.message : "Failed to save to GitHub.",
-			);
+			toaster.error(error instanceof Error ? error.message : "Failed to save.");
 		} finally {
 			setSavingSlug(null);
 		}
@@ -130,8 +128,8 @@ export default function TaskBoard({ tasks: initialTasks }: TaskBoardProps) {
 				>
 					<Text size="xs">
 						{tokenSource === "sveltia"
-							? "Using your GitHub CMS login — drag a card to move it."
-							: "GitHub connected — drag a card to move it."}
+							? "Using your CMS login — drag a card to move it."
+							: "Connected — drag a card to move it."}
 					</Text>
 					{tokenSource === "manual" && (
 						<button
@@ -165,13 +163,13 @@ export default function TaskBoard({ tasks: initialTasks }: TaskBoardProps) {
 					})}
 				>
 					<Text size="sm" class={css({ color: "fg.muted" })}>
-						Connect a GitHub token (repo contents write access) to drag tasks
-						between columns:
+						Connect a personal access token (repo contents read/write access) to
+						drag tasks between columns:
 					</Text>
 					<input
 						type="password"
 						value={tokenInput}
-						placeholder="ghp_..."
+						placeholder="Personal access token"
 						onInput={(e: Event) =>
 							setTokenInput((e.target as HTMLInputElement).value)
 						}

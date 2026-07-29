@@ -17,7 +17,6 @@ import {
 	listTasks,
 	TASK_PRIORITIES,
 	TASK_PRIORITY_COLOR,
-	TASK_STATUSES,
 	TASK_STATUS_COLOR,
 	TASK_STATUSES,
 	type Task,
@@ -380,8 +379,7 @@ export default createRoute(async (c) => {
 									header: "Status",
 									key: "status",
 									sortable: true,
-									sortValue: (task: Task) =>
-										TASK_STATUSES.indexOf(task.status),
+									sortValue: (task: Task) => TASK_STATUSES.indexOf(task.status),
 									render: (task: Task) => (
 										<Anchor
 											href={`/tasks/by-status/${encodeURIComponent(task.status)}`}

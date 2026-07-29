@@ -16,7 +16,7 @@ export interface TaskProjectEditorProps {
 // Same nested-island trap as the other task editors: `InteractiveCombobox` is
 // imported straight from combobox-primitive, not the `Combobox` wrapper in
 // components/ui (which would hydrate as its own separate island). Saves via
-// the same saveTaskField GitHub-commit path as TaskEditableText, falling
+// the same saveTaskField direct-commit path as TaskEditableText, falling
 // back to the same "local draft, link to the CMS" messaging if no token is
 // connected or the request fails.
 export default function TaskProjectEditor(props: TaskProjectEditorProps) {
@@ -37,16 +37,14 @@ export default function TaskProjectEditor(props: TaskProjectEditorProps) {
 						data: { ...data, project: next },
 					}))
 						.then(() => {
-							toaster.success("Saved to GitHub.", {
+							toaster.success("Saved.", {
 								description: "Committed to main — live once the site rebuilds.",
 							});
 						})
 						.catch((error: unknown) => {
 							setDirty(true);
 							toaster.error(
-								error instanceof Error
-									? error.message
-									: "Failed to save to GitHub.",
+								error instanceof Error ? error.message : "Failed to save.",
 							);
 						})
 						.finally(() => setSaving(false));

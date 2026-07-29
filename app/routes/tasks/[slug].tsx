@@ -10,14 +10,12 @@ import {
 	Stack,
 	Text,
 } from "../../components/ui";
-import { Toaster } from "../../components/ui/toast";
 import TaskActionsMenu from "../../islands/task-actions-menu";
 import TaskEditableText from "../../islands/task-editable-text";
 import TaskProjectEditor from "../../islands/task-project-editor";
 import { listProjects, loadProjectBySlug } from "../../lib/projects";
 import {
 	listTaskSlugs,
-	listTasks,
 	loadTaskBySlug,
 	TASK_PRIORITY_COLOR,
 	TASK_STATUS_COLOR,
@@ -42,29 +40,19 @@ export default createRoute(
 		const task = await loadTaskBySlug(slug);
 		if (!task) return c.notFound();
 
-		const [project, projects, allTasks] = await Promise.all([
+		const [project, projects] = await Promise.all([
 			loadProjectBySlug(task.project),
 			listProjects(),
-			listTasks(),
 		]);
 		const projectItems = projects.map((p) => ({
 			label: p.title,
 			value: p.slug,
 		}));
-		const assigneeItems = Array.from(
-			new Set(
-				allTasks
-					.map((t) => t.assignee)
-					.filter((name): name is string => !!name),
-			),
-		)
-			.sort()
-			.map((name) => ({ label: name, value: name }));
 
 		return c.render(
 			<>
 				<title>{task.title} - Tasks - Artefact</title>
-				<Toaster />
+
 				<header
 					class={css({
 						borderBottomWidth: "1px",
@@ -175,8 +163,6 @@ export default createRoute(
 							as="h1"
 							value={task.title}
 							editHref={`/admin/#/collections/tasks/entries/${task.slug}`}
-							slug={task.slug}
-							field="title"
 							textClass={heading({ size: "3xl" })}
 							placeholder="Task title"
 						/>
@@ -199,7 +185,6 @@ export default createRoute(
 							value={task.project}
 							projects={projectItems}
 							editHref={`/admin/#/collections/tasks/entries/${task.slug}`}
-							slug={task.slug}
 						/>
 						{project && (
 							<Anchor
@@ -210,17 +195,14 @@ export default createRoute(
 								View project →
 							</Anchor>
 						)}
-						{task.assignee && <Avatar size="xs" name={task.assignee} />}
-						<TaskEditableText
-							combobox
-							items={assigneeItems}
-							value={task.assignee ?? ""}
-							editHref={`/admin/#/collections/tasks/entries/${task.slug}`}
-							slug={task.slug}
-							field="assignee"
-							textClass={css({ textStyle: "sm", color: "fg.muted" })}
-							placeholder="Unassigned"
-						/>
+						{task.assignee && (
+							<Stack gap="2" align="center">
+								<Avatar size="xs" name={task.assignee} />
+								<Text size="sm" class={css({ color: "fg.muted" })}>
+									{task.assignee}
+								</Text>
+							</Stack>
+						)}
 						{task.dueDate && (
 							<Text size="sm" class={css({ color: "fg.muted" })}>
 								Due {formatDate(task.dueDate)}
@@ -232,8 +214,6 @@ export default createRoute(
 						<TaskEditableText
 							value={task.body}
 							editHref={`/admin/#/collections/tasks/entries/${task.slug}`}
-							slug={task.slug}
-							field="body"
 							textClass={cx(text({ size: "md" }), css({ color: "fg" }))}
 							placeholder="Description"
 							class={css({ mb: "6" })}
@@ -242,14 +222,15 @@ export default createRoute(
 						/>
 					)}
 
-					<TaskEditableText
-						tags
-						value={task.tags.join(", ")}
-						editHref={`/admin/#/collections/tasks/entries/${task.slug}`}
-						slug={task.slug}
-						field="tags"
-						placeholder="Add tags..."
-					/>
+					{task.tags.length > 0 && (
+						<Stack gap="2" wrap="wrap">
+							{task.tags.map((tag) => (
+								<Badge key={tag} variant="subtle" colorPalette="gray" size="sm">
+									{tag}
+								</Badge>
+							))}
+						</Stack>
+					)}
 				</div>
 			</>,
 		);
