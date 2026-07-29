@@ -112,10 +112,19 @@ export const dropdown = defineSlotRecipe({
 				bg: "border",
 			},
 		},
+		itemText: {
+			// The item's own [data-part="item"] div is the click target the
+			// interactive island's delegated handler reads data-value/role off
+			// of — without this, a click landing on the text node itself (which
+			// also carries its own data-part) gets misread as an unhandled part
+			// and the select silently no-ops.
+			pointerEvents: "none",
+		},
 		itemIndicator: {
 			justifyContent: "flex-end",
 			display: "flex",
 			flex: "1",
+			pointerEvents: "none",
 			_checked: {
 				_icon: {
 					color: "colorPalette.plain.fg",
