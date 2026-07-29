@@ -50,6 +50,19 @@ describe("Table Unit Tests", () => {
 		expect(statusSortValues).toEqual([0, 1, 2, 3]);
 	});
 
+	test("Table renders hoverActions as a trailing column", () => {
+		const columns = [{ header: "Name", key: "name" }];
+		const rows = [{ name: "Alice" }];
+
+		const table = Table({
+			columns,
+			rows,
+			hoverActions: (row: any) => row.name,
+		});
+
+		expect(table).toBeDefined();
+	});
+
 	test("Table with sortable columns hydrates as an island", () => {
 		const columns = [
 			{

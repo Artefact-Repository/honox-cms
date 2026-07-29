@@ -2,7 +2,17 @@ import { defineSlotRecipe } from "@pandacss/dev";
 
 export const table = defineSlotRecipe({
 	className: "table",
-	slots: ["root", "body", "cell", "foot", "head", "header", "row", "caption"],
+	slots: [
+		"root",
+		"body",
+		"cell",
+		"foot",
+		"head",
+		"header",
+		"row",
+		"caption",
+		"hoverActions",
+	],
 	base: {
 		root: {
 			borderCollapse: "collapse",
@@ -32,6 +42,7 @@ export const table = defineSlotRecipe({
 		},
 		row: {
 			_last: { "& td": { boxShadow: "none" } },
+			"&:hover [data-hover-actions]": { opacity: 1, pointerEvents: "auto" },
 		},
 		header: {
 			textAlign: "left",
@@ -61,6 +72,24 @@ export const table = defineSlotRecipe({
 				boxShadow: "inset 0 1px 0 0 var(--shadow-color)!",
 				shadowColor: "border",
 			},
+		},
+		hoverActions: {
+			position: "absolute",
+			insetBlock: "0",
+			insetInlineEnd: "0",
+			display: "inline-flex",
+			alignItems: "center",
+			gap: "2",
+			paddingInline: "3",
+			bg: "gray.surface.bg",
+			borderInlineStartWidth: "1px",
+			borderColor: "border",
+			boxShadow: "md",
+			opacity: 0,
+			pointerEvents: "none",
+			transition: "opacity 0.15s",
+			zIndex: 1,
+			_focusWithin: { opacity: 1, pointerEvents: "auto" },
 		},
 	},
 	defaultVariants: {

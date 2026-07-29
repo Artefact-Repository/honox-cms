@@ -97,6 +97,31 @@ Features shaded alternating row colors with zebra-striping, interactive hover hi
 
 ---
 
+## 3. Row Hover Actions
+
+Pass `hoverActions` to render extra controls (e.g. a "View Details" button) into a zero-width trailing cell that stays hidden until its row is hovered or one of its controls receives keyboard focus. It's absolutely positioned over the row's end, so it never widens the table — it may visually cover the last column(s) while revealed.
+
+<DemoPreview>
+  <div style={{ width: "100%" }}>
+    <Table
+      variant="surface"
+      columns={[
+        { header: "Name", key: "name" },
+        { header: "Category", key: "category" },
+      ]}
+      rows={[
+        { name: "Laptop", category: "Electronics" },
+        { name: "Coffee Mug", category: "Home & Kitchen" },
+      ]}
+      hoverActions={(row) => <a href={`/products/${row.name}`}>View Details</a>}
+    />
+  </div>
+</DemoPreview>
+
+`hoverActions` is a render function (like `column.render`), not a CMS-serializable field — it isn't exposed in the Sveltia CMS `table` block schema.
+
+---
+
 # Props
 
 | Property | CMS Field Type | Default | Description / Supported Options |
@@ -108,6 +133,7 @@ Features shaded alternating row colors with zebra-striping, interactive hover hi
 | **Row Highlights** (`interactive`) | `boolean` | `false` | Enables full mouse-hover background animations across active cells on desktop machines. |
 | **Column Borders** (`columnBorder`) | `boolean` | `false` | Renders a dividing vertical border line between table columns. |
 | **Sticky Header** (`stickyHeader`) | `boolean` | `false` | Pins the main header row to the top of the table scroll viewport during scrolling. |
+| **Hover Actions** (`hoverActions`) | code-only | - | `(row, rowIndex) => JSX.Element`. Renders into a zero-width trailing cell, absolutely positioned over the row's end (may cover the last column(s)), hidden until the row is hovered (or a rendered control gains keyboard focus). Not exposed as a CMS field. |
 
 ### Column List Properties (`columns`)
 

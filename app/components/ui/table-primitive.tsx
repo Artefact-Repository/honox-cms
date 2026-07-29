@@ -44,9 +44,14 @@ function Root(props: RootProps) {
 
 	return (
 		<TableContext.Provider value={styles}>
-			<table class={cx(styles.root, classProp)} {...restProps}>
-				{children}
-			</table>
+			{/* Scrolls horizontally instead of the table forcing the page
+			itself wider than the viewport when column content (e.g. a long
+			task title) can't all fit at once. */}
+			<div class={css({ overflowX: "auto" })}>
+				<table class={cx(styles.root, classProp)} {...restProps}>
+					{children}
+				</table>
+			</div>
 		</TableContext.Provider>
 	);
 }
@@ -121,6 +126,22 @@ function Row(props: JSX.IntrinsicElements["tr"] & PropsWithChildren) {
 	);
 }
 
+function HoverActions(
+	props: JSX.IntrinsicElements["span"] & PropsWithChildren,
+) {
+	const styles = useTableContext();
+	const { class: classProp, children, ...restProps } = props;
+	return (
+		<span
+			data-hover-actions
+			class={cx(styles.hoverActions, classProp)}
+			{...restProps}
+		>
+			{children}
+		</span>
+	);
+}
+
 export interface TableColumn<T = Record<string, unknown>> {
 	header: string | JSX.Element;
 	key: string;
@@ -148,6 +169,13 @@ export interface TableProps<T = Record<string, unknown>> {
 	rows?: T[];
 	/** Extra props (e.g. `data-*` attrs, `id`, `hidden`) merged onto each <tr>. */
 	getRowProps?: (row: T, rowIndex: number) => JSX.IntrinsicElements["tr"];
+	/** Renders into a zero-width trailing cell, absolutely positioned over
+	 * the row's end (may cover the last column(s)) so it never affects
+	 * column layout. Hidden until the row is hovered (or a hover-action
+	 * itself gains keyboard focus). e.g. a "View Details" button. Static
+	 * markup only — like `column.render`, this function is dropped if the
+	 * table hydrates via `TableIsland` (see that file). */
+	hoverActions?: (row: T, rowIndex: number) => JSX.Element;
 
 	// Sections
 	caption?: string | JSX.Element;
@@ -176,6 +204,7 @@ export function TableBase<T = Record<string, unknown>>(props: TableProps<T>) {
 		columns,
 		rows,
 		getRowProps,
+		hoverActions,
 		caption,
 		footer,
 		variant,
@@ -271,6 +300,13 @@ export function TableBase<T = Record<string, unknown>>(props: TableProps<T>) {
 							)}
 						</Header>
 					))}
+					{hoverActions && (
+						<Header
+							key="__hoverActions"
+							class={headerClass}
+							style={{ width: "0", padding: "0", boxShadow: "none" }}
+						/>
+					)}
 				</Row>
 			</Head>
 			<Body class={bodyClass}>
@@ -294,6 +330,14 @@ export function TableBase<T = Record<string, unknown>>(props: TableProps<T>) {
 							{...(row.disabled ? { "data-disabled": true } : {})}
 							{...sortAttrs}
 							{...rowProps}
+							style={
+								hoverActions
+									? {
+											position: "relative",
+											...(rowProps.style as JSX.CSSProperties | undefined),
+										}
+									: (rowProps.style as JSX.CSSProperties | undefined)
+							}
 						>
 							{columns.map((column) => (
 								<Cell
@@ -306,6 +350,25 @@ export function TableBase<T = Record<string, unknown>>(props: TableProps<T>) {
 										: (row[column.key] as any)}
 								</Cell>
 							))}
+							{hoverActions && (
+								<Cell
+									key="__hoverActions"
+									class={cellClass}
+									style={{
+										width: "0",
+										padding: "0",
+										overflow: "visible",
+										boxShadow: "none",
+									}}
+								>
+									{/* Anchored to the <tr> (position:relative above), not this
+									cell — a zero-width containing block can make some engines
+									treat backdrop-filter as having nothing to sample, since the
+									box itself is degenerate even though its absolutely
+									positioned content escapes it visually. */}
+									<HoverActions>{hoverActions(row, rowIndex)}</HoverActions>
+								</Cell>
+							)}
 						</Row>
 					);
 				})}
@@ -316,4 +379,4 @@ export function TableBase<T = Record<string, unknown>>(props: TableProps<T>) {
 }
 
 export type { RootProps };
-export { Body, Caption, Cell, Foot, Head, Header, Root, Row };
+export { Body, Caption, Cell, Foot, Head, Header, HoverActions, Root, Row };
