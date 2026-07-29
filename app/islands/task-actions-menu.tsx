@@ -1,3 +1,4 @@
+import { css } from "design-system/css";
 import { useState } from "hono/jsx";
 import { EllipsisIcon } from "../icons/ellipsis";
 import { IconButton } from "../components/ui/button";
@@ -22,6 +23,7 @@ export default function TaskActionsMenu(props: TaskActionsMenuProps) {
 					</IconButton>
 				}
 				placement="bottomRight"
+				contentClass={css({ minWidth: "48", whiteSpace: "nowrap" })}
 				items={[
 					{ type: "item", label: "Edit", value: "edit", href: editHref },
 					{

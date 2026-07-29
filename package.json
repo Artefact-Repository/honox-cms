@@ -16,6 +16,7 @@
 		"start": "bun run src/main.ts"
 	},
 	"dependencies": {
+		"@huggingface/transformers": "^4.2.0",
 		"hono": "^4.12.31",
 		"honox": "0.1.59",
 		"mdast-util-to-string": "^4.0.0",
