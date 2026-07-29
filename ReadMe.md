@@ -17,6 +17,7 @@ Live demo: [https://honox.chen.so](https://honox.chen.so), [https://honox-ts.ver
 | **API** | Read-only JSON REST API for posts at `/api/posts/*` |
 | **SSG** | Static site generation via `@hono/vite-ssg` |
 | **Deploy** | Cloudflare Pages (`wrangler.jsonc`) |
+| **PMS example** | Git-backed project/task tracker at `/projects` and `/tasks`, sourced from CMS-editable collections |
 
 ---
 
@@ -36,6 +37,11 @@ Locale, where present, always comes **before** the collection/item (`/zh/blog`, 
 | `/docs` (+ `/:locale/docs`) | `app/routes/docs/index.tsx` (+ `app/routes/[locale]/docs/index.tsx`) | Docs index with sidenav |
 | `/docs/:doc` (+ `/:locale/docs/:doc`) | `app/routes/docs/[doc].tsx` (+ `app/routes/[locale]/docs/[doc].tsx`) | Individual doc/component page |
 | `/admin/` | `public/admin/index.html` | Sveltia CMS UI |
+| `/projects` | `app/routes/projects/index.tsx` | Project list with per-project task progress |
+| `/projects/:slug` | `app/routes/projects/[slug].tsx` | Single project — board/list view of its tasks |
+| `/tasks` | `app/routes/tasks/index.tsx` | Task list (table), filterable by search |
+| `/tasks/:slug` | `app/routes/tasks/[slug].tsx` | Individual task detail |
+| `/tasks/by-project/:project`, `/by-assignee/:assignee`, `/by-status/:status`, `/by-priority/:priority` | `app/routes/tasks/by-*/[*].tsx` | Filtered task lists (static) |
 | `/pages/:slug` (+ `/:locale/pages/:slug`) | `app/routes/pages/[slug].tsx` (+ `app/routes/[locale]/pages/[slug].tsx`) | Dynamic CMS-built pages, long form |
 | `/:page` (+ `/:locale/:page`) | `app/routes/[page].tsx` (+ `app/routes/[locale]/[page].tsx`) | Same pages, canonical short form (e.g. `/about`, `/zh/about`) |
 | `/api/posts/index.json` | `app/routes/api/posts/index.json.ts` | Post collection (JSON) |
@@ -66,6 +72,20 @@ See [content/docs/Architecture.md](content/docs/Architecture.md) (served at `/do
 3. **Nesting** — Build complex layouts with recursive nesting (e.g., a Card inside a Stack inside another Stack).
 4. **Render** — The `PageRenderer` component (`app/components/page-renderer.tsx`) maps JSON data to themed UI components, loaded via `app/lib/pages.ts`.
 5. **Translate** — Add `content/pages/<locale>/<slug>.json` for a translated page; `loadPage()` falls back to the default-locale file for anything not translated.
+
+---
+
+## Projects & Tasks (PMS example)
+
+A small Git-backed project management example, showing the same content-as-JSON/Markdown pattern used for pages and posts applied to a different domain — projects in `content/projects/*.json`, tasks in `content/tasks/*.md`. Both collections are editable via `/admin/` like any other CMS collection; there's no database and no drag-and-drop (the site is statically generated, so board changes are Git commits).
+
+- **`/projects`** — list of projects with live progress bars (done/total tasks per project), computed from `content/tasks/*.md`.
+- **`/projects/:slug`** — a single project's board/list view of its tasks.
+- **`/tasks`** — full task table with search, status/priority badges, and row-hover actions (view details in a `Drawer`, clone, delete).
+- **`/tasks/:slug`** — individual task detail page.
+- **`/tasks/by-project/:project`, `/by-assignee/:assignee`, `/by-status/:status`, `/by-priority/:priority`** — pre-filtered, statically generated task lists.
+
+Implementation: `app/lib/projects.ts` and `app/lib/tasks.ts` load/parse the content; `app/islands/task-board.tsx`, `task-details-drawer.tsx`, `task-clone-action.tsx`, `task-delete-confirm.tsx`, `task-editable-text.tsx`, `task-project-editor.tsx`, and `pms-create-menu.tsx` provide the interactive bits.
 
 ---
 
@@ -168,6 +188,14 @@ app/
     [locale]/pages/[slug].tsx       # Same, all locales, long form
     [page].tsx                      # Same pages, short form (English) — /about
     [locale]/[page].tsx             # Same, all locales — /zh/about (canonical)
+    projects/index.tsx              # PMS example — project list
+    projects/[slug].tsx             # PMS example — single project board/list
+    tasks/index.tsx                 # PMS example — task table
+    tasks/[slug].tsx                # PMS example — task detail
+    tasks/by-project/[project].tsx  # PMS example — filtered task lists
+    tasks/by-assignee/[assignee].tsx
+    tasks/by-status/[status].tsx
+    tasks/by-priority/[priority].tsx
     api/posts/                      # Read-only posts REST API
       index.json.ts                 # GET /api/posts/index.json — collection
       [slug].json.ts                # GET /api/posts/:slug.json — single post
@@ -183,6 +211,8 @@ app/
   lib/posts.ts      # Post loading/parsing shared by blog pages + API, locale-aware
   lib/pages.ts      # Page builder JSON loading, locale-aware
   lib/docs.ts       # Docs loading + search index, locale-aware
+  lib/projects.ts   # PMS example — project loading
+  lib/tasks.ts      # PMS example — task loading, search index
 vite.config.ts       # Two build-time copy plugins duplicate the dev-preview-only
                      #   short-form routes' output from their long-form
                      #   equivalent — see the Routes section above
@@ -192,6 +222,8 @@ content/posts/       # Blog post markdown files
 content/posts/<locale>/ # Translated posts, e.g. content/posts/zh/getting-started-with-honox.md
 content/pages/       # Page builder JSON layouts (index.json is the homepage; blog.json/docs.json are just title+intro content for /blog and /docs, not their header — see content/docs/PageBuilder.md)
 content/pages/<locale>/ # Translated page layouts, e.g. content/pages/zh/index.json
+content/projects/    # PMS example — project JSON files
+content/tasks/       # PMS example — task markdown files
 public/admin/        # Sveltia CMS static files
   config.yml          # CMS configuration
   index.html          # CMS UI
