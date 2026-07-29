@@ -4,6 +4,7 @@ import { IconButton } from "../components/ui/button";
 import { Dropdown } from "../components/ui/dropdown";
 import { EllipsisIcon } from "../icons/ellipsis";
 import TaskCloneDialog from "./task-clone-dialog";
+import TaskDeleteDialog from "./task-delete-dialog";
 import TaskToProject, { type TaskToProjectProps } from "./task-to-project";
 
 export interface TaskActionsMenuProps
@@ -15,6 +16,7 @@ export default function TaskActionsMenu(props: TaskActionsMenuProps) {
 	const { editHref, ...taskProps } = props;
 	const [convertOpen, setConvertOpen] = useState(false);
 	const [cloneOpen, setCloneOpen] = useState(false);
+	const [deleteOpen, setDeleteOpen] = useState(false);
 
 	return (
 		<>
@@ -34,10 +36,18 @@ export default function TaskActionsMenu(props: TaskActionsMenuProps) {
 						label: "Convert to Project",
 						value: "convert-to-project",
 					},
+					{ type: "separator" },
+					{
+						type: "item",
+						label: "Delete",
+						value: "delete",
+						class: css({ color: "fg.error" }),
+					},
 				]}
 				onSelect={(value) => {
 					if (value === "convert-to-project") setConvertOpen(true);
 					if (value === "clone") setCloneOpen(true);
+					if (value === "delete") setDeleteOpen(true);
 				}}
 			/>
 			<TaskToProject
@@ -49,6 +59,14 @@ export default function TaskActionsMenu(props: TaskActionsMenuProps) {
 				task={{ slug: taskProps.slug, title: taskProps.title }}
 				open={cloneOpen}
 				onOpenChange={setCloneOpen}
+			/>
+			<TaskDeleteDialog
+				task={{ slug: taskProps.slug, title: taskProps.title }}
+				open={deleteOpen}
+				onOpenChange={setDeleteOpen}
+				onDeleted={() => {
+					window.location.href = "/tasks";
+				}}
 			/>
 		</>
 	);
