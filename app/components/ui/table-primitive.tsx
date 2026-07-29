@@ -1,8 +1,11 @@
-import { cx } from "design-system/css";
+import { css, cx } from "design-system/css";
 import type { TableVariantProps } from "design-system/recipes";
 import { table } from "design-system/recipes";
 import type { JSX, PropsWithChildren } from "hono/jsx";
 import { createContext, useContext } from "hono/jsx";
+import { ChevronDownIcon } from "../../icons/chevron-down";
+import { ChevronUpIcon } from "../../icons/chevron-up";
+import { ChevronsUpDownIcon } from "../../icons/chevrons-up-down";
 
 type TableStyles = ReturnType<typeof table>;
 
@@ -113,6 +116,11 @@ export interface TableColumn<T = Record<string, unknown>> {
 	class?: string;
 	headerClass?: string;
 	align?: "start" | "center" | "end";
+	/** Enables click-to-sort on this column's header (requires hydration —
+	 * `Table` auto-hydrates when any column sets this). */
+	sortable?: boolean;
+	/** Value to compare when sorting; defaults to `row[column.key]`. */
+	sortValue?: (row: T) => string | number | undefined;
 }
 
 export interface TableRow {
@@ -126,6 +134,12 @@ export interface TableProps<T = Record<string, unknown>> {
 	// Data
 	columns?: TableColumn<T>[];
 	rows?: T[];
+	/** Extra props (e.g. `data-*` attrs, `id`, `hidden`) merged onto each <tr>. */
+	getRowProps?: (row: T, rowIndex: number) => JSX.IntrinsicElements["tr"];
+	/** Active sort state (owned by `TableIsland` when any column is `sortable`). */
+	sortColumn?: string;
+	sortDirection?: "asc" | "desc";
+	onSort?: (key: string) => void;
 
 	// Sections
 	caption?: string | JSX.Element;
@@ -153,6 +167,10 @@ export function TableBase<T = Record<string, unknown>>(props: TableProps<T>) {
 	const {
 		columns,
 		rows,
+		getRowProps,
+		sortColumn,
+		sortDirection,
+		onSort,
 		caption,
 		footer,
 		variant,
@@ -207,32 +225,69 @@ export function TableBase<T = Record<string, unknown>>(props: TableProps<T>) {
 							class={column.headerClass || headerClass}
 							style={column.align ? { textAlign: column.align } : undefined}
 						>
-							{column.header}
+							{column.sortable && onSort ? (
+								<button
+									type="button"
+									onClick={() => onSort(column.key)}
+									class={css({
+										all: "unset",
+										display: "inline-flex",
+										alignItems: "center",
+										gap: "1",
+										cursor: "pointer",
+										font: "inherit",
+										color: "inherit",
+									})}
+								>
+									{column.header}
+									{sortColumn === column.key ? (
+										sortDirection === "desc" ? (
+											<ChevronDownIcon width="14" height="14" />
+										) : (
+											<ChevronUpIcon width="14" height="14" />
+										)
+									) : (
+										<ChevronsUpDownIcon
+											width="14"
+											height="14"
+											class={css({ opacity: "0.5" })}
+										/>
+									)}
+								</button>
+							) : (
+								column.header
+							)}
 						</Header>
 					))}
 				</Row>
 			</Head>
 			<Body class={bodyClass}>
-				{rows.map((row: any, rowIndex) => (
-					<Row
-						key={rowIndex}
-						class={row.class || rowClass}
-						{...(interactive && row.onClick ? { onClick: row.onClick } : {})}
-						{...(row.disabled ? { "data-disabled": true } : {})}
-					>
-						{columns.map((column) => (
-							<Cell
-								key={column.key}
-								class={column.class || cellClass}
-								style={column.align ? { textAlign: column.align } : undefined}
-							>
-								{column.render
-									? column.render(row, rowIndex)
-									: (row[column.key] as any)}
-							</Cell>
-						))}
-					</Row>
-				))}
+				{rows.map((row: any, rowIndex) => {
+					const rowProps: Record<string, unknown> = getRowProps
+						? getRowProps(row, rowIndex)
+						: {};
+					return (
+						<Row
+							key={(rowProps.id as string | undefined) ?? rowIndex}
+							class={row.class || rowClass}
+							{...(interactive && row.onClick ? { onClick: row.onClick } : {})}
+							{...(row.disabled ? { "data-disabled": true } : {})}
+							{...rowProps}
+						>
+							{columns.map((column) => (
+								<Cell
+									key={column.key}
+									class={column.class || cellClass}
+									style={column.align ? { textAlign: column.align } : undefined}
+								>
+									{column.render
+										? column.render(row, rowIndex)
+										: (row[column.key] as any)}
+								</Cell>
+							))}
+						</Row>
+					);
+				})}
 			</Body>
 			{footer && <Foot class={footClass}>{footer}</Foot>}
 		</Root>

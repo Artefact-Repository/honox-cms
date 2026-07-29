@@ -11,7 +11,10 @@ export function Table<T = Record<string, unknown>>(props: TableProps<T>) {
 	const hasRowClick = (props.rows ?? []).some(
 		(r) => (r as unknown as TableRow).onClick != null,
 	);
-	if (shouldHydrate(props.interactive, hasRowClick)) {
+	const hasSortableColumn = (props.columns ?? []).some(
+		(column) => column.sortable,
+	);
+	if (shouldHydrate(props.interactive, hasRowClick || hasSortableColumn)) {
 		// `interactive` must be true on the island so TableBase wires row
 		// `onclick` handlers (table-primitive gates them on this flag).
 		return <TableIsland {...props} interactive={true} />;
