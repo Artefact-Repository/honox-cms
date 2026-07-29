@@ -149,7 +149,8 @@ export function whenAnimationEnds(
 			return styleVal.split(",").reduce((max, part) => {
 				const match = /^([\d.]+)(ms|s)$/.exec(part.trim());
 				if (!match) return max;
-				const value = Number.parseFloat(match[1]) * (match[2] === "s" ? 1000 : 1);
+				const value =
+					Number.parseFloat(match[1]) * (match[2] === "s" ? 1000 : 1);
 				return Math.max(max, value);
 			}, 0);
 		};
