@@ -357,6 +357,8 @@ export default createRoute(async (c) => {
 										<Anchor
 											href={`/tasks/${task.slug}`}
 											variant="plain"
+											data-task-details-trigger
+											data-task-slug={task.slug}
 											class={css({
 												display: "block",
 												overflow: "hidden",

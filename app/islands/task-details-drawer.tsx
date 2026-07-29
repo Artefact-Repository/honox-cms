@@ -33,9 +33,11 @@ export interface TaskDetailsDrawerProps {
 // cloning already-rendered DOM back in rather than re-executing it (see its
 // own comment) — a live island nested inside a table cell would have its
 // hooks go dead the same way the Splitter panels[].content bug did. Instead
-// each row only renders a static `[data-task-details-trigger]` button, and
-// this island (rendered as a normal sibling, outside the table) delegates a
-// single document click listener and looks the task up from its own props.
+// each row only renders a static `[data-task-details-trigger]` button (or,
+// for the title column, an `<a href="/tasks/[slug]">` kept as a no-JS
+// fallback), and this island (rendered as a normal sibling, outside the
+// table) delegates a single document click listener and looks the task up
+// from its own props.
 export default function TaskDetailsDrawer({
 	tasks,
 	projectTitleBySlug = {},
@@ -49,6 +51,21 @@ export default function TaskDetailsDrawer({
 				"[data-task-details-trigger]",
 			);
 			if (!trigger) return;
+			if (trigger.tagName === "A") {
+				// Let ctrl/cmd/shift/middle-clicks fall through to the browser's
+				// normal open-in-new-tab/window behavior; only intercept a plain
+				// left-click to open the drawer instead of navigating.
+				if (
+					event.metaKey ||
+					event.ctrlKey ||
+					event.shiftKey ||
+					event.altKey ||
+					event.button !== 0
+				) {
+					return;
+				}
+				event.preventDefault();
+			}
 			const slug = trigger.getAttribute("data-task-slug");
 			const found = slug ? bySlug.get(slug) : undefined;
 			if (found) setTask(found);
