@@ -81,7 +81,14 @@ export const table = defineSlotRecipe({
 			alignItems: "center",
 			gap: "2",
 			paddingInline: "3",
-			bg: "gray.surface.bg",
+			// Same frosted-glass idiom as the site's sticky headers (see e.g.
+			// routes/tasks/index.tsx's <header>) — translucent tinted bg +
+			// blur/saturate, so it reads as glass over whatever it overlaps
+			// rather than a flat opaque patch. Stronger blur than the header's
+			// (20px) since this floats over much sparser content (a couple of
+			// table cells) and needs more radius to read as glass at a glance.
+			bg: { _light: "white.a7", _dark: "black.a7" },
+			backdropFilter: "blur(32px) saturate(180%)",
 			borderInlineStartWidth: "1px",
 			borderColor: "border",
 			boxShadow: "md",
