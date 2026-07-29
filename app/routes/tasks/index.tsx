@@ -14,10 +14,12 @@ import {
 import { colorPaletteClass } from "../../components/ui/color-palette";
 import { Toaster } from "../../components/ui/toast";
 import { ChevronUpIcon } from "../../icons/chevron-up";
+import { EllipsisIcon } from "../../icons/ellipsis";
 import PmsCreateMenu from "../../islands/pms-create-menu";
 import TaskCloneAction from "../../islands/task-clone-action";
 import TaskDeleteConfirm from "../../islands/task-delete-confirm";
 import TaskDetailsDrawer from "../../islands/task-details-drawer";
+import TaskRowActionsMenu from "../../islands/task-row-actions-menu";
 import TaskTreeDnd from "../../islands/task-tree-dnd";
 import TaskTreeToggle from "../../islands/task-tree-toggle";
 import { listProjects, type Project } from "../../lib/projects";
@@ -598,6 +600,18 @@ export default createRoute(async (c) => {
 										>
 											Delete
 										</button>
+										<button
+											type="button"
+											data-task-row-actions-trigger
+											data-task-slug={task.slug}
+											aria-label={`More actions for "${task.title}"`}
+											class={cx(
+												button({ variant: "outline", size: "sm" }),
+												css({ px: "1.5" }),
+											)}
+										>
+											<EllipsisIcon width="16" height="16" />
+										</button>
 									</>
 								)}
 							/>
@@ -608,6 +622,7 @@ export default createRoute(async (c) => {
 						/>
 						<TaskDeleteConfirm tasks={tasks} />
 						<TaskCloneAction tasks={tasks} />
+						<TaskRowActionsMenu tasks={tasks} />
 						<TaskTreeToggle />
 					</>
 				)}

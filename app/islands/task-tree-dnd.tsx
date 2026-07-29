@@ -88,24 +88,24 @@ export default function TaskTreeDnd({ children }: PropsWithChildren) {
 			}
 		};
 
-		// Rows are in pre-order (see buildTaskTree), so a descendant of
-		// `ancestorSlug` is any row after it whose depth stays greater than
-		// the ancestor's — same contiguous-subtree property `descendantsOf` in
-		// lib/tasks.ts relies on.
+		// Walks `candidateSlug`'s own parent chain looking for `ancestorSlug`,
+		// rather than assuming rows are still in the pre-order buildTaskTree
+		// produced — a column-sort click physically reorders `<tr>`s (see
+		// TableSortIsland), so DOM order can't be trusted here once that's
+		// happened. Bounded by row count as a cycle guard.
 		const isDescendant = (
 			ancestorSlug: string,
 			candidateSlug: string,
 			allRows: RowInfo[],
 		): boolean => {
-			const ancestor = allRows.find((r) => r.slug === ancestorSlug);
-			if (!ancestor) return false;
-			const ancestorIndex = allRows.indexOf(ancestor);
-			for (
-				let i = ancestorIndex + 1;
-				i < allRows.length && (allRows[i]?.depth ?? -1) > ancestor.depth;
-				i++
-			) {
-				if (allRows[i]?.slug === candidateSlug) return true;
+			const bySlug = new Map(allRows.map((r) => [r.slug, r]));
+			let current = bySlug.get(candidateSlug);
+			const seen = new Set<string>();
+			for (let i = 0; current?.parentSlug && i < allRows.length; i++) {
+				if (current.parentSlug === ancestorSlug) return true;
+				if (seen.has(current.parentSlug)) return false;
+				seen.add(current.parentSlug);
+				current = bySlug.get(current.parentSlug);
 			}
 			return false;
 		};
@@ -191,9 +191,13 @@ export default function TaskTreeDnd({ children }: PropsWithChildren) {
 					: TASK_ORDER_GAP;
 			} else {
 				newParentSlug = target.parentSlug;
-				const siblings = allRows.filter(
-					(r) => r.parentSlug === newParentSlug && r.slug !== dragged.slug,
-				);
+				// Sorted by orderKey, not DOM order — a prior column sort leaves
+				// rows in an unrelated order (see isDescendant's comment above).
+				const siblings = allRows
+					.filter(
+						(r) => r.parentSlug === newParentSlug && r.slug !== dragged.slug,
+					)
+					.sort((a, b) => a.orderKey - b.orderKey);
 				const targetIndex = siblings.findIndex((r) => r.slug === target.slug);
 				if (zone === "before") {
 					const prev = siblings[targetIndex - 1];
