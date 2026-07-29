@@ -14,7 +14,7 @@ This guide walks through installing the project, running it locally, and underst
 
 * Git, for cloning the repository and for the CMS's git-backed content commits.
 
-***
+---
 
 ## Installation
 
@@ -32,7 +32,7 @@ bun install
 bun panda codegen
 ```
 
-***
+---
 
 ## Running the Dev Server
 
@@ -44,7 +44,7 @@ This starts Vite's dev server (`http://localhost:5173` by default) with HMR. It 
 
 To edit content through the CMS UI instead of hand-editing files under `content/`, open `/admin/` while the dev server is running.
 
-***
+---
 
 ## Building & Previewing
 
@@ -60,7 +60,7 @@ To serve that static output locally through Cloudflare's local runtime (closer t
 bun run preview
 ```
 
-***
+---
 
 ## Testing & Linting
 
@@ -76,7 +76,7 @@ Lint and auto-fix with [Biome](https://biomejs.dev):
 bun run check
 ```
 
-***
+---
 
 ## Deploying
 
@@ -86,4 +86,4 @@ bun run deploy
 
 Builds the site and deploys `dist/` to Cloudflare Pages via `wrangler`. A Vercel target (`vercel.json`) is also configured out of the box if you'd rather deploy there — either way, the output is a fully static site with no server process required at request time.
 
-***
+---

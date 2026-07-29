@@ -13,7 +13,7 @@ An overlay modal container that halts normal user interaction with the page to g
 
 The **Dialog** component is fully integrated as a `dialog` block in the **Page Builder**, enabling content managers to easily define structural triggers (such as clicking an action button), titles, custom footer menus, and modal text directly inside Sveltia CMS.
 
-***
+---
 
 # Hydration & Interactive Behavior
 
@@ -24,7 +24,7 @@ A `Dialog` requires a client-side JavaScript engine to manage critical accessibi
 | `"interactive": true` | Interactive Island (Default) | Fully responsive modal with focus trapping, Escape closures, and overlay dimming. |
 | `"interactive": false` | Static HTML Template | A server-rendered static layout shell with no interactive javascript behavior. |
 
-***
+---
 
 # Usage
 
@@ -102,7 +102,7 @@ Use this format for high-consequence, irreversible destructive confirmations (e.
 }
 ```
 
-***
+---
 
 # Props
 
@@ -118,7 +118,7 @@ Use this format for high-consequence, irreversible destructive confirmations (e.
 | **Custom Footer** (`footer`) | `list` | - | List of blocks rendered on the lower edge. Ideal for custom controls or additional button shortcuts. |
 | **Enable Hydration** (`interactive`) | `boolean` | `true` | When true, hydrates the component as a client-side island to enable overlays, focus trap, and Escape closures. |
 
-***
+---
 
 # Accessibility & Developer Notes
 

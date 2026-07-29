@@ -46,7 +46,7 @@ export function shouldHydrate(interactive: unknown, hasSignal: boolean): boolean
 | `undefined` | `true` | `true` | Automatische Erkennung: Signal vorhanden → hydratisieren |
 | `undefined` | `false` | `false` | Automatische Erkennung: kein Signal → statisch |
 
-***
+---
 
 ## Das 3-Tier-Modell
 
@@ -97,7 +97,7 @@ Gilt für:
 - Statusanzeigen (alert, breadcrumb, loader, skeleton, spinner, progress)
 - Grafik (icon)
 
-***
+---
 
 ## Vollständige Komponentenklassifizierung
 
@@ -161,7 +161,7 @@ Gilt für:
 | `progress` | Fortschrittsbalken (wertgesteuert, standardmäßig statisch) | ✅ |
 | `icon` | SVG-Icon-Wrapper (nur Größe/Farbe, kein Client-Zustand) | ✅ `icon.tsx` |
 
-***
+---
 
 ## Auslösebedingungen pro Tier
 
@@ -219,7 +219,7 @@ Entscheidungsprinzipien:
   `fieldset` ihn fälschlicherweise und ließen `interactive="true"` auf das DOM durchsickern; das wurde
   bei der Bereinigung entfernt.)
 
-***
+---
 
 ## Entscheidungs-Checkliste für neue Komponenten
 
@@ -243,4 +243,4 @@ Gehen Sie die Liste der Reihe nach durch; halten Sie beim ersten Treffer an:
   hinzufügen, auf diese Datei verweisen und ihr Frontmatter-Feld `hydration` (`1` / `2` / `3`)
   entsprechend setzen.
 
-***
+---

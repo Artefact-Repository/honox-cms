@@ -13,7 +13,7 @@ Um controle de entrada fundamental projetado para gerenciar formulários de form
 
 O componente **Field** está totalmente integrado como um bloco interativo `field` no **Page Builder**. Isso permite que criadores de conteúdo e designers redigem campos, coloquem entradas de formulário HTML personalizadas e forneçam lógica de validação instantânea do lado do cliente diretamente do Sveltia CMS sem escrever código de layout repetitivo.
 
-***
+---
 
 # Uso
 
@@ -106,7 +106,7 @@ Demonstra estilos de campos de formulário sob estados de bloco HTML padrão. Is
 }
 ```
 
-***
+---
 
 # Props
 
@@ -125,7 +125,7 @@ Demonstra estilos de campos de formulário sob estados de bloco HTML padrão. Is
 | **Expressão do Validador** (`validator`) | `string` | - | Expressão de função JavaScript avançada que avalia a entrada de string. Reconstruída no lado do cliente via `new Function()`.<br/>*Exemplo:* `(value) => value.includes('@') | 'Invalid email address'` |
 | **Forçar Interativo** (`interactive`) | `boolean` | `true` | Garante a hidratação do lado do cliente como uma ilha interativa para suportar validação de usuário em tempo real. |
 
-***
+---
 
 # Notas do Desenvolvedor e Acessibilidade
 

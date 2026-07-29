@@ -13,7 +13,7 @@ Un contrôle de saisie fondamental conçu pour gérer les formulaires de manièr
 
 Le composant **Field** est entièrement intégré en tant que bloc interactif `field` dans le **Page Builder**. Cela permet aux créateurs de contenu et aux concepteurs de rédiger des champs, de placer des entrées de formulaire HTML personnalisées et de fournir une logique de validation côté client instantanée directement depuis Sveltia CMS sans écrire de code répétitif de mise en page.
 
-***
+---
 
 # Utilisation
 
@@ -106,7 +106,7 @@ Démontre les styles de champs de formulaire sous des états de bloc HTML standa
 }
 ```
 
-***
+---
 
 # Props
 
@@ -125,7 +125,7 @@ Démontre les styles de champs de formulaire sous des états de bloc HTML standa
 | **Expression de Validateur** (`validator`) | `string` | - | Expression de fonction JavaScript avancée évaluant l'entrée de chaîne. Reconstruite côté client via `new Function()`.<br/>*Exemple :* `(value) => value.includes('@') | 'Invalid email address'` |
 | **Forcer Interactif** (`interactive`) | `boolean` | `true` | Assure l'hydratation côté client en tant qu'îlot interactif pour prendre en charge la validation utilisateur en temps réel. |
 
-***
+---
 
 # Notes de Développement et Accessibilité
 

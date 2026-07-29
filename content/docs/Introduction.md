@@ -11,7 +11,7 @@ This is a full-stack starter built on [**HonoX**](https://github.com/honojs/hono
 | [Sveltia CMS](https://sveltiacms.app) | Git-backed content editing at `/admin/` — no database, no backend service |
 | [`@hono/vite-ssg`](https://github.com/honojs/vite-plugins/tree/main/packages/ssg) | Pre-renders every route to static HTML at build time |
 
-***
+---
 
 ## Why This Stack
 
@@ -24,7 +24,7 @@ The UI components started as a port of [Park UI](https://park-ui.com/) ([Ark UI]
 
 [PandaCSS](https://panda-css.com) is used to generate all CSS ahead of time from statically analyzable style calls — no runtime style engine, no class-name collisions, and full type safety on design tokens.
 
-***
+---
 
 ## What's Inside
 

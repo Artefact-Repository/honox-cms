@@ -11,7 +11,7 @@ title: 简介
 | [Sveltia CMS](https://sveltiacms.app) | 基于 Git 的内容编辑，位于 `/admin/` —— 无需数据库，无需后端服务 |
 | [`@hono/vite-ssg`](https://github.com/honojs/vite-plugins/tree/main/packages/ssg) | 在构建时将每条路由预渲染为静态 HTML |
 
-***
+---
 
 ## 为什么选择这套技术栈
 
@@ -24,7 +24,7 @@ title: 简介
 
 [PandaCSS](https://panda-css.com) 用于基于静态可分析的样式调用提前生成全部 CSS —— 没有运行时样式引擎，没有类名冲突，设计 token 拥有完整的类型安全。
 
-***
+---
 
 ## 项目中都有什么
 
@@ -34,7 +34,7 @@ title: 简介
 * **文档**（即本区域），以纯 Markdown 或 MDX 撰写 —— 后者用于需要在正文中嵌入实时渲染示例的页面。
 * **六种语言的国际化**（`en`、`zh`、`es`、`pt`、`fr`、`de`），覆盖文档、组件与站点界面文案。
 
-***
+---
 
 ## 从这里开始
 

@@ -14,7 +14,7 @@ Este proyecto está construido sobre [**HonoX**](https://github.com/honojs/honox
 | SSG | [`@hono/vite-ssg`](https://github.com/honojs/vite-plugins/tree/main/packages/ssg) |
 | Despliegue | Cloudflare Pages (`wrangler.jsonc`) o Vercel (`vercel.json`) |
 
-***
+---
 
 ## La compilación: dos pasadas de Vite, un sitio estático
 
@@ -43,7 +43,7 @@ Esto garantiza una resolución estándar del runtime de Hono y evita errores de 
 
 El plugin `mdx()` se limita únicamente a `include: /\.mdx$/` — el `.md` simple (entradas de blog, la mayoría de los docs) se deja deliberadamente fuera para que los imports `?raw` de `app/utils/markdown.ts` no se corrompan por la transformación MDX.
 
-***
+---
 
 ## Enrutamiento basado en archivos
 
@@ -72,7 +72,7 @@ Las **páginas de inicio de idioma** independientes de la locale se encuentran e
 
 Las locales admitidas se declaran una sola vez, en `ALL_LOCALES` / `TRANSLATED_LOCALES` (`app/lib/i18n.ts`) — esta lista debe permanecer sincronizada con `i18n.locales` de `public/admin/config.yml` y los directorios de rutas espejo `app/routes/<locale>/`.
 
-***
+---
 
 ## Arquitectura de componentes
 
@@ -109,7 +109,7 @@ Los componentes multiparte como `HoverCard` que renderizan hijos a través de lo
 - **Recetas de cuadrícula de diseño:** Las recetas de cuadrícula de diseño para `row` y `col` se compilan mediante programación en variantes estáticas y discretas (extensiones, desplazamientos, órdenes 0 a 24) y se registran en el CSS estático de `panda.config.ts` para admitir la anidación de diseño de página estática en Sveltia CMS y PageRenderer sin hidratación de JavaScript dinámica.
 - **Directorio de iconos SVG centralizado:** La base de código utiliza componentes de iconos SVG individuales y reutilizables ubicados en `app/icons/*` (p. ej. `CloseIcon`, `ChevronDownIcon`, `CheckIcon`, etc.) que aceptan `JSX.IntrinsicElements["svg"]` para reenviar atributos como `width`, `height` y estilos personalizados. Los SVG en línea codificados de forma rígida en los componentes UI y las rutas se han refactorizado para importar desde este directorio de iconos centralizado y promover la reutilización del código y evitar la duplicación.
 
-***
+---
 
 ## Pipelines de contenido e i18n
 
@@ -145,7 +145,7 @@ Para añadir una nueva locale de traducción al repositorio, sigue este flujo de
 5. **Reexportación de ruta:** Reexporta las rutas estándar creando un directorio `app/routes/<locale>/` que coincida con la estructura de archivos de ruta raíz.
 6. **Traducciones:** Proporciona las traducciones de los docs markdown/MDX y las referencias de componentes respectivamente bajo `content/docs/<locale>/*.md` y `content/components/<locale>/*.mdx`.
 
-***
+---
 
 ## Estilo
 
@@ -173,13 +173,13 @@ En el sistema de diseño PandaCSS del proyecto:
 En la config de Panda CSS y los estilos personalizados, **evita usar tokens de color genéricos como `bg` y `fg`** (que compilan a CSS transparente/inválido). En su lugar, usa tokens semánticos explícitos como `gray.surface.bg`, `fg.default` y `gray.outline.border` para preservar los estados de tema adecuados.
 Además, al aplicar estilo a superposiciones emergentes, listas desplegables o componentes de autocompletado (como `app/islands/search.tsx`), usa el token de fondo semántico `gray.surface.bg` para garantizar un fondo sólido en los modos claro/oscuro y evitar el solapamiento de texto.
 
-***
+---
 
 ## CMS
 
 [Sveltia CMS](https://sveltiacms.app) se ejecuta completamente en el cliente en `/admin/`, configurado por `public/admin/config.yml`. `app/server.ts` sirve los archivos estáticos de ese directorio (config, HTML, assets) directamente desde `public/admin/` en lugar de mediante el enrutado normal, por lo que la UI del CMS funciona de manera idéntica en desarrollo y una vez desplegada. Está respaldado por Git: las ediciones realizadas en la UI del CMS se confirman directamente en los archivos de contenido bajo `content/`, que la próxima compilación recoge como cualquier otro cambio.
 
-***
+---
 
 ## Herramientas de desarrollo e integridad
 
@@ -227,7 +227,7 @@ El repositorio utiliza **Biome** para el lint y el formato del código. Para gar
 
 Ejecutar comandos CLI orientados a React (como `@park-ui/cli`) directamente en este repositorio sobrescribirá las implementaciones Hono/JSX personalizadas y las recetas de ranura con modelos específicos de React, rompiendo el modelo SSG/isla de HonoX. Verifica siempre los archivos existentes de la base de código antes de ejecutar scripts externos de instalación de componentes.
 
-***
+---
 
 ## Despliegue
 

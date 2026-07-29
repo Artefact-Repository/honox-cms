@@ -4,7 +4,7 @@ title: Styling & Theming
 
 Dieses Projekt stylt jede Komponente mit [PandaCSS](https://panda-css.com) (typsicheres CSS-in-JS ohne Laufzeit) auf Basis von rohem `hono/jsx` — **nicht** eines von Pandas offiziell unterstützten JSX-Frameworks (React/Vue/Solid/Qwik). Genau diese eine Tatsache — `jsxFramework: undefined` in `panda.config.ts` — ist die Grundursache für nahezu jede Styling-Regression, die dieses Projekt bisher erlebt hat, weil dadurch stillschweigend mehrere Dinge deaktiviert werden, die Panda normalerweise automatisch übernimmt. Diese Seite dokumentiert die daraus resultierende Architektur, die konkreten Bugs, die sie bereits verursacht hat, sowie die Checkliste, der zu folgen ist, damit sie nicht erneut auftreten.
 
-***
+---
 
 ## Wie Styles von einem Recipe zur Seite gelangen
 
@@ -22,7 +22,7 @@ Dieses Projekt stylt jede Komponente mit [PandaCSS](https://panda-css.com) (typs
 
 Die PostCSS-Integration von `vite dev` extrahiert CSS beim Bearbeiten fortlaufend neu, regeneriert dabei aber **nicht** die Recipe-Helper-Dateien `.mjs`/`.d.ts` — das sind einfache generierte Dateien, die der Code direkt importiert (`import { switchRecipe } from "design-system/recipes"`), kein von Vite transformiertes virtuelles Modul. Wird einer `variants`-Definition eines Recipes eine `colorPalette`-Prop hinzugefügt und nur die Datei gespeichert, verwendet `switchRecipe.splitVariantProps()` weiterhin die **veraltete** `variantKeys`-Liste, bis `panda codegen` ausgeführt wird — die neue Prop wird also stillschweigend in „lokale Props" statt in „Varianten-Props" einsortiert und landet entweder als ungültiges Attribut im DOM oder erreicht die Style-Funktion überhaupt nie. **Beide Befehle sind nach dem Bearbeiten jeder Recipe-Datei von Hand auszuführen** — es sollte nicht angenommen werden, dass der Dev-Server das automatisch erkannt hat.
 
-***
+---
 
 ## `staticCss`: warum fast jedes Recipe auf `["*"]` gezwungen wird
 
@@ -30,7 +30,7 @@ Pandas statische Analyse kann CSS nur für Werte im Voraus generieren, die sie w
 
 Genau so ist der Switch-Size-Bug (unten) entstanden, und es handelt sich um eine systemische Gefahr: **jeder Tippfehler zwischen dem Key in `staticCss.recipes` und dem tatsächlichen Export-/Registrierungsnamen des Recipes lässt die Generierung dieses Recipes stillschweigend auf null Nicht-Standard-Varianten fallen** — ohne jeden Fehler, jede Warnung oder jeden Typfehler irgendwo; Panda gibt dann einfach nur Base- + Default-Varianten-CSS aus und sonst nichts. Wird ein brandneues Recipe hinzugefügt, muss dessen Registrierungs-Key-Eintrag sofort zu `staticCss.recipes` hinzugefügt werden, wobei genau zu prüfen ist, dass der Key exakt mit `app/theme/recipes/index.ts` übereinstimmt (im Zweifel den Key in beiden Dateien per `grep` suchen).
 
-***
+---
 
 ## Bekannte Regressionen und die Regeln, die sie verhindern
 
@@ -88,7 +88,7 @@ Ein flaches `defineRecipe` (ohne Slots — `badge.ts`, `anchor.ts`, `button.ts`)
 
 `<Heading size={{ base: "2xl", md: "3xl" }}>` rendert im HTML korrekt `class="heading--size_2xl md:heading--size_3xl"`, aber es wird nie eine `@media`-Regel für die `md:`-Klasse generiert — `staticCss.recipes: ["*"]` erzwingt nur die Generierung literaler, nicht-responsiver Varianten-Klassen, es verknüpft sie nicht kreuzweise mit Breakpoint-Bedingungen. **Niemals ein responsives Objekt als Varianten-Prop übergeben**; stattdessen einen flachen Literal-Wert verwenden, oder einen umschließenden `css()`/Utility-Klassen-Override für die spezifische Eigenschaft, die sich pro Breakpoint ändern muss (reine Utility-Klassen haben diese Einschränkung nicht, nur Recipe-Varianten-Props).
 
-***
+---
 
 ## `colorPalette`-Theming: das zentralisierte Muster
 
@@ -112,7 +112,7 @@ Für einen Teilbereich der Komponenten wurde das jahrelang umgangen, indem **von
 
 Für eine neue Komponente keine pro-Recipe `colorPalette`-Varianten-Map wieder einführen — genau dieses Muster hat die Zentralisierung ersetzt, gerade weil es nicht skaliert und stillschweigend regressiert.
 
-***
+---
 
 ## Token-Farben vs. semantische Tokens
 
@@ -143,7 +143,7 @@ Das setzt den Root-`colorPalette`-Scope, den jedes ungescopte Element erbt. Es i
 
 `fg.default`, `fg.muted`, `fg.subtle`, `border` und `canvas` (deklariert in `semanticTokens.colors` in `app/theme/index.ts`) sind fest auf `colors.gray.*` verdrahtet — **nicht** auf `colors.colorPalette.*`. Das ist beabsichtigt, keine Lücke: Es ist die übliche Radix-/Park-UI-Konvention „ein Akzent + ein Grau" — Fließtext, Rahmen und Seitenhintergrund müssen unabhängig davon, welcher Akzent aktiv ist, neutral bleiben, sowohl wegen Kontrast/Lesbarkeit als auch damit der Akzent als Akzent wahrgenommen wird und nicht die ganze Seite einfärbt. Diese nicht „reparieren", indem sie auf `colorPalette.*` verweisen, in der Erwartung, dass sie dann den Seiten-Akzent übernehmen — das wäre eine Regression, keine Verbesserung. Nur wirklich interaktive/markenbezogene Flächen (der Checked-Zustand eines Controls, die Solid-Füllung eines Buttons, der Hintergrund eines Badges, …) sollten `colorPalette.*` referenzieren — bestätigt als das tatsächliche Muster in jedem Control-Recipe (`switch.ts`, `checkbox.ts`, `badge.ts`, `button.ts`: Der neutrale/unchecked Zustand verwendet ein fest codiertes `gray.*`-Token, der checked/Akzent-Zustand verwendet `colorPalette.*`).
 
-***
+---
 
 ## Verifikations-Checkliste nach jeder Recipe- oder `panda.config.ts`-Änderung
 
@@ -155,7 +155,7 @@ Kein bloßer visueller Blick sollte vertraut werden — die oben genannten Bugs 
 4. `bun test` — die vollständige Unit-Test-Suite ausführen; ein veralteter Test, der ein altes Klassennamen-Format prüft, ist nach einem Styling-Refactor ein häufiger False-Positive — vor der Annahme einer echten Regression lohnt sich ein kurzer Blick hinein.
 5. `git status`/`git diff` der **Quell**-Dateien (`panda.config.ts`, `app/theme/recipes/*.ts`, `app/components/ui/*.tsx`) — niemals `design-system/`, das gitignored ist und verworfen wird. Ein Fix, der „lokal funktioniert", aber nie tatsächlich in den Quelldateien committet wurde, ist kein Fix.
 
-***
+---
 
 ## FAQ
 

@@ -42,7 +42,7 @@ export function shouldHydrate(interactive: unknown, hasSignal: boolean): boolean
 | `undefined` | `true` | `true` | 智能检测：存在信号 → 水合 |
 | `undefined` | `false` | `false` | 智能检测：无信号 → 静态 |
 
-***
+---
 
 ## 三层模型
 
@@ -86,7 +86,7 @@ export function shouldHydrate(interactive: unknown, hasSignal: boolean): boolean
 - 状态指示（alert、breadcrumb、loader、skeleton、spinner、progress）
 - 图形（icon）
 
-***
+---
 
 ## 完整组件分类
 
@@ -148,7 +148,7 @@ export function shouldHydrate(interactive: unknown, hasSignal: boolean): boolean
 | `progress` | 进度条（由值驱动，默认静态） | ✅ |
 | `icon` | SVG 图标包装（仅控制尺寸/颜色，无客户端状态） | ✅ `icon.tsx` |
 
-***
+---
 
 ## 各层触发条件
 
@@ -190,7 +190,7 @@ return <Root {...rest}>{/* 静态结构 */}</Root>;
 - 组件不持有任何客户端状态，也不响应任何事件。
 - 它不声明 `interactive` 属性。（历史上 `badge` / `heading` / `text` / `fieldset` 错误地声明了该属性，并将 `interactive="true"` 泄漏到 DOM 上；已在清理中移除。）
 
-***
+---
 
 ## 新组件的决策清单
 
@@ -209,7 +209,7 @@ return <Root {...rest}>{/* 静态结构 */}</Root>;
 - `interactive` 只是一个“旋钮”：`true` 强制水合，`false` 禁止水合，`undefined` 交由 `hasSignal` 决定。
 - 每个第一层 / 第二层组件都应在其 `content/components/<Component>.mdx` 中新增 `# Hydration` 小节并交叉引用本文件，同时在 frontmatter 中将其 `hydration` 字段（`1` / `2` / `3`）设为对应值。
 
-***
+---
 
 ## 历史清理记录（已修复）
 
@@ -229,7 +229,7 @@ return <Root {...rest}>{/* 静态结构 */}</Root>;
 
 > 注：第 4 条是一个真实的 bug —— `badge` / `heading` / `text` / `fieldset` 会将 `interactive` 作为无效的 HTML 属性渲染到 DOM 上；该问题已优先修复。
 
-***
+---
 
 ## 相关文档
 

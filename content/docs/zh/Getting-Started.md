@@ -14,7 +14,7 @@ title: 快速开始
 
 * Git，用于克隆仓库，也用于 CMS 基于 Git 的内容提交。
 
-***
+---
 
 ## 安装
 
@@ -32,7 +32,7 @@ bun install
 bun panda codegen
 ```
 
-***
+---
 
 ## 运行开发服务器
 
@@ -44,7 +44,7 @@ bun run dev
 
 若想通过 CMS 界面而非手动编辑 `content/` 下的文件来编辑内容，可在开发服务器运行时打开 `/admin/`。
 
-***
+---
 
 ## 构建与预览
 
@@ -60,7 +60,7 @@ bun run build
 bun run preview
 ```
 
-***
+---
 
 ## 测试与 Lint
 
@@ -76,7 +76,7 @@ bun test unit
 bun run check
 ```
 
-***
+---
 
 ## 部署
 
@@ -86,7 +86,7 @@ bun run deploy
 
 构建站点并通过 `wrangler` 将 `dist/` 部署到 Cloudflare Pages。项目也开箱配置了 Vercel 目标（`vercel.json`），如果更倾向于部署到那里也可以直接使用 —— 无论选择哪种方式，产物都是完全静态的站点，请求时无需任何服务端进程。
 
-***
+---
 
 ## 后续阅读
 

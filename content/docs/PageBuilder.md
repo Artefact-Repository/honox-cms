@@ -8,7 +8,7 @@ The [Sveltia CMS](https://sveltiacms.app/en/docs/intro) based dynamic Page Build
 
 Page layouts are saved as JSON files in `content/pages/*.json` and are compiled on demand or statically pre-generated (via Hono SSG) at `/pages/[slug]`. The homepage (`/`) is itself a Page Builder page — `app/routes/index.tsx` renders `content/pages/index.json` through the same `<PageRenderer />` pipeline. Even the header is page-builder content there: `headerBrand`, `headerNav`, and `headerActions` are ordinary block arrays on that same JSON file, rendered through `<PageRenderer>` inside a hardcoded `<header>` shell (the border/blur/sticky styling stays in code; only the brand lockup, nav links, and header buttons are CMS-editable). `content/pages/blog.json` and `content/pages/docs.json` instead carry just `title` and an intro `content` block array for `/blog` and `/docs` — their header/nav chrome (brand, nav links, Edit/Admin, language switcher) is written directly in `app/routes/blog/*.tsx` / `app/routes/docs/*.tsx` and sourced from the `configs` singleton's `headerItems` (see "The `headerItems` block list" below), not from page-builder content, since those pages don't need a *different* header per page the way arbitrary CMS pages might. Only the footer (and, for `/blog`, the post carousel/search/newsletter widgets) stay outside the Page Builder, since those need live post data or bespoke styling the generic block system doesn't support.
 
-***
+---
 
 ## Supported Components
 
@@ -71,7 +71,7 @@ The Page Builder supports a rich palette of over 40 layout, typography, decorati
 * **PaginatedTable**: Interactive dynamic table components with paging support.
 * **Pagination**: Interactive page controllers.
 
-***
+---
 
 ## Architecture
 
@@ -115,7 +115,7 @@ That second argument matters. A page-builder JSON file is already split one-per-
 
 This is also how the header nav can hold more than plain links: a Button block's "Custom onClick" (see Escape Hatches above) works here too, so an editor can add e.g. a "↑ Top" button that smooth-scrolls with no code change — see `content/configs.json`'s `headerItems` for a working example.
 
-***
+---
 
 ## Content Build Pipelines
 
@@ -143,7 +143,7 @@ Page Builder layouts are one of three content types under `content/`, each disco
 
 `app/lib/docs.ts` loads both `.md` and `.mdx` collections side by side and merges them into one sidenav, so which pipeline a given doc uses is an implementation detail invisible to readers — pick `.md` for plain prose and `.mdx` only when a page needs a live component embedded in it.
 
-***
+---
 
 ## Example JSON Structure
 

@@ -4,7 +4,7 @@ title: Style et thématisation
 
 Ce projet met en style chaque composant avec [PandaCSS](https://panda-css.com) (CSS-in-JS typé, sans exécution à l'exécution) au-dessus de `hono/jsx` brut — **pas** l'un des frameworks JSX officiellement pris en charge par Panda (React/Vue/Solid/Qwik). Ce seul fait — `jsxFramework: undefined` dans `panda.config.ts` — est la cause profonde de presque toutes les régressions de style que ce projet a rencontrées, parce qu'il retire silencieusement à la base de code plusieurs choses que Panda fait normalement pour vous. Cette page documente l'architecture qui en résulte, les bugs concrets qu'elle a déjà causés, et la checklist à suivre pour éviter qu'ils ne se reproduisent.
 
-***
+---
 
 ## Comment les styles vont d'une recette à la page
 
@@ -22,7 +22,7 @@ Ce projet met en style chaque composant avec [PandaCSS](https://panda-css.com) (
 
 L'intégration PostCSS de `vite dev` réextrait le CSS à la volée pendant que vous éditez, mais elle ne régénère **pas** les fichiers d'aide de recette `.mjs`/`.d.ts` — ce sont de simples fichiers générés que votre code importe directement (`import { switchRecipe } from "design-system/recipes"`), pas un module virtuel transformé par Vite. Si vous ajoutez une prop `colorPalette` aux `variants` d'une recette et que vous vous contentez d'enregistrer le fichier, `switchRecipe.splitVariantProps()` continue d'utiliser la liste **périmée** de `variantKeys` jusqu'à ce que vous exécutiez `panda codegen` — la nouvelle prop est alors silencieusement routée vers les « props locales » au lieu des « props de variante », et soit fuit vers le DOM comme un attribut invalide, soit n'atteint jamais du tout la fonction de style. **Exécutez les deux commandes à la main après avoir édité un fichier de recette**, ne présumez pas que le serveur de développement l'a détecté.
 
-***
+---
 
 ## `staticCss` : pourquoi presque chaque recette est forcée à `["*"]`
 
@@ -30,7 +30,7 @@ L'analyse statique de Panda ne peut pré-générer du CSS que pour les valeurs q
 
 C'est exactement ainsi que le bug de taille du switch (ci-dessous) est arrivé, et c'est un risque systémique : **toute faute de frappe entre la clé de `staticCss.recipes` et le nom d'export/d'enregistrement réel de la recette fait silencieusement tomber la génération de cette recette à zéro variante non par défaut**, sans aucune erreur, avertissement ou échec de typage nulle part — Panda se contente d'émettre discrètement le CSS de base + variante par défaut et rien d'autre. Si vous ajoutez une toute nouvelle recette, pensez à ajouter immédiatement son entrée à clé d'enregistrement dans `staticCss.recipes`, et vérifiez que la clé correspond exactement à `app/theme/recipes/index.ts` (`grep` la clé dans les deux fichiers en cas de doute).
 
-***
+---
 
 ## Régressions connues et les règles qui les préviennent
 
@@ -88,7 +88,7 @@ Un `defineRecipe` plat (sans emplacements — `badge.ts`, `anchor.ts`, `button.t
 
 `<Heading size={{ base: "2xl", md: "3xl" }}>` se rend correctement en `class="heading--size_2xl md:heading--size_3xl"` dans le HTML, mais aucune règle `@media` pour la classe `md:` n'est jamais générée — `staticCss.recipes: ["*"]` ne force la génération que des classes de variante littérales, non responsives, il ne les multiplie pas avec les conditions de point de rupture. **Ne passez jamais un objet responsive comme prop de variante** ; utilisez une valeur littérale plate, ou un remplacement `css()`/classe utilitaire englobant pour la propriété spécifique qui doit changer par point de rupture (les classes utilitaires ordinaires n'ont pas cette limitation, seules les props de variante de recette l'ont).
 
-***
+---
 
 ## Thématisation `colorPalette` : le motif centralisé
 
@@ -112,7 +112,7 @@ Pendant des années, pour un sous-ensemble de composants, cela a été contourn�
 
 Ne réintroduisez pas une carte de variante `colorPalette` par recette pour un nouveau composant — c'est exactement le motif que cette centralisation a remplacé, précisément parce qu'il ne passe pas à l'échelle et régresse silencieusement.
 
-***
+---
 
 ## Couleurs de tokens vs tokens sémantiques
 
@@ -143,7 +143,7 @@ Cela définit la portée `colorPalette` racine que tout élément sans portée h
 
 `fg.default`, `fg.muted`, `fg.subtle`, `border` et `canvas` (déclarés dans `semanticTokens.colors` d'`app/theme/index.ts`) sont codés en dur directement sur `colors.gray.*` — **pas** `colors.colorPalette.*`. C'est intentionnel, pas une lacune : c'est la convention standard Radix/Park UI « un accent + un gris » — le texte du corps, les bordures et le fond de page doivent rester neutres indépendamment de l'accent actif, à la fois pour le contraste/la lisibilité et pour que l'accent se lise comme un accent plutôt que de teinter toute la page. Ne « corrigez » pas ces tokens pour référencer `colorPalette.*` en espérant qu'ils reprennent l'accent du site ; ce serait une régression, pas une amélioration. Seules les surfaces véritablement interactives/de marque (l'état coché d'un contrôle, le remplissage solide d'un bouton, le fond d'un badge, …) devraient référencer `colorPalette.*` — confirmé comme le motif réel dans chaque recette de contrôle (`switch.ts`, `checkbox.ts`, `badge.ts`, `button.ts` : l'état neutre/non coché utilise un token `gray.*` codé en dur, l'état coché/accent utilise `colorPalette.*`).
 
-***
+---
 
 ## Checklist de vérification après toute modification de recette ou de `panda.config.ts`
 
@@ -155,7 +155,7 @@ Ne faites pas confiance à un coup d'œil visuel — les bugs ci-dessus avaient 
 4. `bun test` — exécutez la suite de tests unitaires complète ; un test périmé affirmant un ancien format de nom de classe est un faux positif courant après un refactoring de style, cela vaut la peine d'une lecture rapide avant de présumer une vraie régression.
 5. `git status`/`git diff` les fichiers **source** (`panda.config.ts`, `app/theme/recipes/*.ts`, `app/components/ui/*.tsx`) — jamais `design-system/`, qui est gitignoré et sera abandonné. Une correction qui « fonctionne localement » mais qui n'a jamais été réellement commitée dans le source n'est pas une correction.
 
-***
+---
 
 ## FAQ
 

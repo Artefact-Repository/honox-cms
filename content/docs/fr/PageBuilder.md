@@ -8,7 +8,7 @@ Le générateur de pages dynamique basé sur [Sveltia CMS](https://sveltiacms.ap
 
 Les mises en page sont enregistrées sous forme de fichiers JSON dans `content/pages/*.json` et sont compilées à la demande ou pré-générées statiquement (via Hono SSG) dans `/pages/[slug]`.
 
-***
+---
 
 ## Composants pris en charge
 
@@ -34,7 +34,7 @@ Le Page Builder prend en charge une riche palette de plus de 40 composants de mi
 
 * **Sélection** : liste déroulante personnalisée à sélection unique/multiple, pouvant être soumise par formulaire.\* **DatePicker** : sélection de dates simples/multiples/plage avec un calendrier contextuel.\* **TagsField** : liste libre de balises de chaîne.\* **RadioGroup** / **RadioCardGroup** : listes de radios personnalisées avec logique de sélection unique accessible.\* **SegmentGroup** : contrôles segmentés coulissants pour la sélection par onglets.\* **Curseur** : composants du curseur de plage.\* **Commutateur** : interrupteurs à bascule.\* **Modifiable** : texte en ligne à cliquer pour modifier.\* **ColorPicker** : sélecteur de couleurs Saturation/Teinte/Alpha avec entrée hexadécimale/RGBA/HSLA.\* **FileUpload** : sélection de fichiers par glisser-déposer ou par clic pour parcourir.\* **Carrousel** : diaporama d'images à lecture automatique ou manuelle.\* **PaginatedTable** : composants de table dynamique interactive avec prise en charge de la pagination.\* **Pagination** : contrôleurs de page interactifs.
 
-***
+---
 
 ## Architecture
 
@@ -59,7 +59,7 @@ Nous utilisons des **ancres et alias YAML** avancés (`&` et `*`) pour contourne
 
 **À noter :** la limite d'imbrication à \~4 niveaux du schéma YAML ne limite que ce que le formulaire du CMS permet à un éditeur non technique de _construire_. La récursivité de `renderChildren` n'a aucune limite de profondeur — un fichier `content/pages/*.json` édité à la main ou généré par programme peut s'imbriquer bien plus profondément que ce que permet l'interface du CMS, et sera tout de même rendu correctement.
 
-***
+---
 
 ## Pipelines de création de contenu
 
@@ -78,7 +78,7 @@ Les mises en page de Page Builder sont l'un des trois types de contenu sous « c
 * Compilé à l'avance par le plugin Vite `@mdx-js/rollup` (configuré dans `vite.config.ts`, limité à `.mdx` afin qu'il n'intercepte jamais les importations brutes `.md` ci-dessus), en utilisant `remark-frontmatter` + `remark-mdx-frontmatter` + `remark-gfm`.\* Chaque fichier `.mdx` devient un véritable composant importable (plus une exportation `frontmatter` distincte), chargé dans `app/lib/docs.ts` via un simple (non `?raw`) `import.meta.glob`.\* Étant donné que la sortie est un composant plutôt qu'une chaîne HTML, les documents `.mdx` peuvent intégrer des exemples interactifs réellement rendus (par exemple, une démo `<Button>` en direct) directement dans la prose — le compromis pour cela est l'étape de compilation au moment de la construction dont `.md` n'a pas besoin.
 `app/lib/docs.ts` charge les collections `.md` et `.mdx` côte à côte et les fusionne en un seul sidenav, de sorte que le pipeline qu'un document donné utilise est un détail d'implémentation invisible pour les lecteurs - choisissez `.md` pour la prose simple et `.mdx` uniquement lorsqu'une page a besoin d'un composant actif intégré.
 
-***
+---
 
 ## Exemple de structure JSON
 

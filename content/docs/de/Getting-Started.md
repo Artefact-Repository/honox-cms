@@ -14,7 +14,7 @@ Diese Anleitung führt durch die Installation des Projekts, das lokale Ausführe
 
 * Git, zum Klonen des Repositories und für die Git-basierten Content-Commits des CMS.
 
-***
+---
 
 ## Installation
 
@@ -32,7 +32,7 @@ bun install
 bun panda codegen
 ```
 
-***
+---
 
 ## Entwicklungsserver starten
 
@@ -44,7 +44,7 @@ Damit startet Vites Entwicklungsserver (standardmäßig `http://localhost:5173`)
 
 Um Inhalte über die CMS-Oberfläche statt manuell in den Dateien unter `content/` zu bearbeiten, `/admin/` öffnen, während der Entwicklungsserver läuft.
 
-***
+---
 
 ## Build & Vorschau
 
@@ -60,7 +60,7 @@ Um dieses statische Ergebnis lokal über die lokale Laufzeitumgebung von Cloudfl
 bun run preview
 ```
 
-***
+---
 
 ## Tests & Lint
 
@@ -76,7 +76,7 @@ Mit [Biome](https://biomejs.dev) linten und automatisch korrigieren:
 bun run check
 ```
 
-***
+---
 
 ## Deployment
 
@@ -86,7 +86,7 @@ bun run deploy
 
 Baut die Seite und deployt `dist/` via `wrangler` auf Cloudflare Pages. Ein Vercel-Ziel (`vercel.json`) ist ebenfalls von Haus aus konfiguriert, falls dort deployt werden soll —— in beiden Fällen ist das Ergebnis eine vollständig statische Seite, die zur Laufzeit keinen Serverprozess benötigt.
 
-***
+---
 
 ## Weiterführend
 

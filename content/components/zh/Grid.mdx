@@ -13,7 +13,7 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 **Grid** 组件也已作为 `grid` 区块完全集成到 **Page Builder** 中，使内容作者和开发人员能够直接在 CMS 中轻松构建响应式结构、卡片列表和并排控件。
 
-***
+---
 
 # Features
 
@@ -23,7 +23,7 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 - **多态渲染：** 通过 `as` 属性渲染为任意语义化 HTML 标签，或通过 `asChild` 属性将网格样式委托给单个子组件。
 - **零布局跳动性能：** 样式编译为优化的静态 Panda CSS 工具类，避免客户端 JavaScript 测量开销。
 
-***
+---
 
 # Usage
 
@@ -70,7 +70,7 @@ export default function Example() {
 }
 ```
 
-***
+---
 
 ## 2. 按最小宽度自动适配列
 
@@ -113,7 +113,7 @@ export default function Example() {
 }
 ```
 
-***
+---
 
 ## 3. 响应式列分配
 
@@ -166,7 +166,7 @@ export default function Example() {
 }
 ```
 
-***
+---
 
 ## 4. 分离列间距与行间距
 
@@ -213,7 +213,7 @@ export default function Example() {
 }
 ```
 
-***
+---
 
 # Props
 
@@ -230,7 +230,7 @@ export default function Example() {
 
 > **响应式值：** `Responsive<T>` 接受平铺值或按响应式断点映射的对象（如 `{ base: 1, md: 2, lg: 3 }`）。设计系统支持标准断点范围：`base`、`sm`、`md`、`lg`、`xl` 和 `2xl`。
 
-***
+---
 
 # Hydration & Architecture
 

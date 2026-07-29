@@ -7,124 +7,102 @@ hydration: 2
 import { TagsField } from "../../app/components/ui";
 import { DemoPreview } from "../../app/components/demo-preview";
 
-A component that allows users to enter multiple tags as a list, with the same
-label / helper text / error text conventions as `Field`.
+# Introduction
 
-## Usage
+The `TagsField` component is an interactive tag-entry control that allows users to type and manage a list of text tags or badges. It supports intuitive keyboard mappings (such as committing on `Enter` and deleting on `Backspace`), item-scoped delete triggers, and comes with the same standard label, helper, and invalid error text support as other field inputs.
+
+The **TagsField** is fully integrated as a `tagsField` (alias `tagsInput`) block in the **Page Builder**, allowing content authors and developers to configure default visual labels, helper instructions, sizing scales, and color themes directly within the CMS.
+
+---
+
+# Usage via CMS Page Builder (JSON)
+
+These examples illustrate how content editors bind and structure interactive tag inputs inside the JSON page schemas (`content/pages/*.json`).
+
+## 1. Standard Tags List Input
+
+A standard tag entry input loaded with initial default tags, complete with visual helper instructions underneath the input box.
 
 <DemoPreview>
-  <div style={{ width: "100%", maxWidth: "320px" }}>
+  <div style={{ width: "100%", maxWidth: "420px" }}>
     <TagsField
-      label="Skills"
-      helperText="Press Enter to add a tag"
-      defaultValue={["React", "Hono"]}
+      label="Development Skills"
+      helperText="Press Enter or comma to commit a tag"
+      defaultValue={["React", "Hono", "Vite"]}
+      interactive
     />
   </div>
 </DemoPreview>
 
-```tsx
-import { TagsField } from "../components/ui";
-
-export default function MyPage() {
-  return (
-    <TagsField
-      label="Skills"
-      helperText="Press Enter to add a tag"
-      defaultValue={["React", "Hono"]}
-      onValueChange={(details) => console.log(details.value)}
-    />
-  );
+```json
+{
+  "type": "tagsField",
+  "label": "Development Skills",
+  "helperText": "Press Enter or comma to commit a tag",
+  "defaultValue": ["React", "Hono", "Vite"],
+  "interactive": true
 }
 ```
 
-## Behaviour
+## 2. Accented Sizing & Visual Style (Subtle Variant)
 
-- **Enter** commits the current input text as a new tag (duplicates are ignored) and clears the input.
-- **Backspace** on an empty input removes the last tag.
-- Clicking a tag's delete trigger (rendered by `Items`) removes that specific tag.
-- Clicking anywhere in the control that isn't a tag focuses the input.
+Features a subtle background card variant and larger visual sizing, customized with a themed color palette for active badges.
 
-## Variants and sizes
-
-`variant` (`"outline"` | `"subtle"` | `"surface"`, default `"outline"`) and `size`
-(`"xs"` | `"sm"` | `"md"` | `"lg"`, default `"md"`) control appearance, matching
-the conventions used by `Field`/`Input`.
-
-```tsx
-<TagsField variant="subtle" size="lg" defaultValue={["React"]} />
-```
-
-## Composition
-
-The default `label`/`helperText`/`errorText` props cover most cases, but the
-underlying parts are also exported for custom layouts:
-
-```tsx
-import { TagsField } from "../components/ui";
-
-<TagsField.Root defaultValue={["React", "Hono"]}>
-  <TagsField.Label>Skills</TagsField.Label>
-  <TagsField.Control>
-    <TagsField.Items />
-    <TagsField.Input placeholder="Add a skill…" />
-  </TagsField.Control>
-  <TagsField.ClearTrigger>Clear all</TagsField.ClearTrigger>
-  <TagsField.HiddenInput name="skills" />
-</TagsField.Root>;
-```
-
-### CMS Page Builder
-
-This component is available as a `tagsField` block in the [Page Builder](/docs/PageBuilder) (`content/pages/*.json`):
+<DemoPreview>
+  <div style={{ width: "100%", maxWidth: "420px" }}>
+    <TagsField
+      label="Property Amenities"
+      defaultValue={["WiFi", "Pool"]}
+      variant="subtle"
+      size="lg"
+      colorPalette="purple"
+      interactive
+    />
+  </div>
+</DemoPreview>
 
 ```json
 {
   "type": "tagsField",
-  "label": "Amenities",
-  "defaultValue": ["WiFi", "Fireplace", "Hot Tub"]
+  "label": "Property Amenities",
+  "defaultValue": ["WiFi", "Pool"],
+  "variant": "subtle",
+  "size": "lg",
+  "colorPalette": "purple",
+  "interactive": true
 }
 ```
 
-## Props
+---
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `value` | `string[]` | - | Controlled tags (forces interactive mode). |
-| `defaultValue` | `string[]` | - | Initial tags. |
-| `inputValue` | `string` | - | Controlled text-input value (forces interactive mode). |
-| `defaultInputValue` | `string` | - | Initial text-input value. |
-| `label` | `Child` | - | The field's label. |
-| `helperText` | `Child` | - | Helper text shown below the tags. |
-| `errorText` | `Child` | - | Error text shown when `invalid` is set. |
-| `invalid` | `boolean` | - | Forces the invalid state, showing `errorText`. |
-| `disabled` | `boolean` | - | Disables the input and delete/clear triggers. |
-| `readOnly` | `boolean` | - | Hides the text input, preventing new tags from being added. |
+# CMS Configuration Reference
 
-| `variant` | \`"outline" \ | "subtle" \ | "surface"\` | `"outline"` | Visual style. |
+These fields map directly to Sveltia CMS block properties under `public/admin/config.yml` or the Page Builder configurations:
 
-| `size` | \`"xs" \ | "sm" \ | "md" \ | "lg"\` | `"md"` | Control size. |
+| Property | CMS Field Type | Default | Description / Supported Options |
+| :--- | :--- | :--- | :--- |
+| **Label Text** (`label`) | `string` | - | The visual text title rendered directly above the tag-entry box. |
+| **Helper Text** (`helperText`) | `string` | - | Small instruction text displayed underneath the control (e.g. `"Press Enter to add"`). |
+| **Error Text** (`errorText`) | `string` | - | Warning text displayed underneath when the input state is toggled to invalid. |
+| **Initial Tags** (`defaultValue`) | `list` | `[]` | List of string values representing tags that are pre-populated upon loading. |
+| **Current Tags** (`value`) | `list` | - | List of string values representing the current tags in the input (controlled). |
+| **Input Name** (`name`) | `string` | - | Form association name of the underlying field, submitting comma-joined values natively. |
+| **Visual Style** (`variant`) | `select` | `"outline"` | Visual background and border styling. <br/>• Options: `"outline"`, `"subtle"`, `"surface"`. |
+| **Size Scale** (`size`) | `select` | `"md"` | Controls overall height, padding, and badge sizes. <br/>• Options: `"xs"`, `"sm"`, `"md"`, `"lg"`. |
+| **Color Theme** (`colorPalette`) | `select` | `"green"` | Visual color accent applied to active tags. <br/>• Options: `blue`, `green`, `red`, `purple`, `orange`, `amber`, `cyan`, `slate`. |
+| **Disabled** (`disabled`) | `boolean` | `false` | Disables user interaction, dims the styling, and hides the delete buttons. |
+| **Read Only** (`readOnly`) | `boolean` | `false` | Converts the tags into a static list by hiding the entry text-input entirely. |
+| **Force Interactive** (`interactive`) | `boolean` | `true` | Hydrates the component as an interactive client-side island to capture keyboard events and manage lists. |
 
-| `name` | `string` | - | Form field name for the hidden submit input (comma-joined tags). |
+---
 
-| `dir` | \`"ltr" \ | "rtl"\` | - | Text direction. |
+# Developer Notes & Accessibility
 
-| `onValueChange` | `(details: { value: string[] }) => void` | - | Fires when a tag is added or removed (forces interactive mode). |
-| `onInputValueChange` | `(details: { inputValue: string }) => void` | - | Fires as the text input changes (forces interactive mode). |
-| `interactive` | `boolean` | - | Forces or forbids hydration as an island. |
-
-## CMS Configuration
-
-```yaml
-- label: Tags Field
-  name: tagsField
-  widget: object
-  fields:
-    - { label: Label, name: label, widget: string, required: false }
-    - { label: Helper Text, name: helperText, widget: string, required: false }
-    - { label: Error Text, name: errorText, widget: string, required: false }
-    - { label: Default Tags, name: defaultValue, widget: list, required: false }
-```
-
-## Hydration
-
-Tier-2: Hydrates when `value`, `inputValue`, `defaultValue`, `defaultInputValue`, `onValueChange`, or `onInputValueChange` is present.
+- **Keyboard Interaction Mechanics:** Renders a highly responsive keyboard-friendly field:
+  - Pressing `Enter` or keying a comma immediately commits the current text as a new tag and clears the text input (duplicate entries are automatically ignored).
+  - Pressing `Backspace` when the text input is empty deletes the last tag in the list.
+  - Clicking anywhere inside the outer container that is not a tag automatically focuses the text cursor.
+- **WAI-ARIA Accessibility Standards:** Renders robust accessibility markup:
+  - The root container acts as an accessible group, managing aria-describedby associations dynamically.
+  - Each tag inside the control gets a focusable close trigger with descriptive `aria-label` tags, ensuring standard screen reader interaction works cleanly.
+- **Hidden Input Form Mapping:** Outputs a native hidden `<input>` element with comma-joined values (`"React,Hono"`). This ensures standard HTML form submissions and server POST actions capture current selections out-of-the-box.

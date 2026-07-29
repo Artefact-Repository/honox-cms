@@ -46,7 +46,7 @@ export function shouldHydrate(interactive: unknown, hasSignal: boolean): boolean
 | `undefined` | `true` | `true` | Smart-detect: signal present → hydrate |
 | `undefined` | `false` | `false` | Smart-detect: no signal → static |
 
-***
+---
 
 ## The 3-Tier Model
 
@@ -97,7 +97,7 @@ Applies to:
 - Status indicators (alert, breadcrumb, loader, skeleton, spinner, progress)
 - Graphics (icon)
 
-***
+---
 
 ## Full Component Classification
 
@@ -161,7 +161,7 @@ Applies to:
 | `progress` | Progress bar (value-driven, static by default) | ✅ |
 | `icon` | SVG icon wrapper (size/color only, no client state) | ✅ `icon.tsx` |
 
-***
+---
 
 ## Trigger Conditions per Tier
 
@@ -219,7 +219,7 @@ Decision principles:
   `fieldset` wrongly declared it and leaked `interactive="true"` onto the DOM; that has
   been removed in cleanup.)
 
-***
+---
 
 ## Decision Checklist for New Components
 
@@ -243,4 +243,4 @@ Walk the list in order; stop at the first match:
   `content/components/<Component>.mdx` and cross-reference this file, and set
   its frontmatter `hydration` field (`1` / `2` / `3`) to match.
 
-***
+---

@@ -14,7 +14,7 @@ Este projeto é construído sobre [**HonoX**](https://github.com/honojs/honox), 
 | SSG | [`@hono/vite-ssg`](https://github.com/honojs/vite-plugins/tree/main/packages/ssg) |
 | Implantação | Cloudflare Pages (`wrangler.jsonc`) ou Vercel (`vercel.json`) |
 
-***
+---
 
 ## O build: duas passadas do Vite, um site estático
 
@@ -43,7 +43,7 @@ Isso garante uma resolução padrão do runtime do Hono e evita erros de runtime
 
 O plugin `mdx()` é restrito a `include: /\.mdx$/` apenas — o `.md` simples (postagens de blog, a maioria dos docs) é deliberadamente deixado de fora para que os imports `?raw` de `app/utils/markdown.ts` não sejam corrompidos pela transformação MDX.
 
-***
+---
 
 ## Roteamento baseado em arquivos
 
@@ -72,7 +72,7 @@ As **páginas iniciais de idioma** independentes de locale ficam no segmento de 
 
 As locales suportadas são declaradas uma única vez, em `ALL_LOCALES` / `TRANSLATED_LOCALES` (`app/lib/i18n.ts`) — esta lista deve permanecer sincronizada com `i18n.locales` de `public/admin/config.yml` e os diretórios de rotas espelhadas `app/routes/<locale>/`.
 
-***
+---
 
 ## Arquitetura de componentes
 
@@ -109,7 +109,7 @@ Componentes multiparte como `HoverCard` que renderizam filhos através das front
 - **Receitas de grade de layout:** As receitas de grade de layout para `row` e `col` são compiladas programaticamente em variantes estáticas e discretas (spans, offsets, ordens 0 a 24) e registradas no CSS estático de `panda.config.ts` para suportar o aninhamento de layout de página estática no Sveltia CMS e PageRenderer sem hidratação de JavaScript dinâmica.
 - **Diretório de ícones SVG centralizado:** A base de código usa componentes de ícone SVG individuais e reutilizáveis localizados em `app/icons/*` (p. ex. `CloseIcon`, `ChevronDownIcon`, `CheckIcon`, etc.) que aceitam `JSX.IntrinsicElements["svg"]` para encaminhar atributos como `width`, `height` e estilos personalizados. Os SVGs inline codificados em hardcode nos componentes de UI e rotas foram refatorados para importar desse diretório de ícones centralizado para promover a reutilização de código e evitar duplicação.
 
-***
+---
 
 ## Pipelines de conteúdo e i18n
 
@@ -145,7 +145,7 @@ Para adicionar uma nova locale de tradução ao repositório, siga este fluxo de
 5. **Reexportação de rota:** Reexporte as rotas padrão criando um diretório `app/routes/<locale>/` que corresponda à estrutura dos arquivos de rota raiz.
 6. **Traduções:** Forneça as traduções dos docs markdown/MDX e das referências de componentes respectivamente sob `content/docs/<locale>/*.md` e `content/components/<locale>/*.mdx`.
 
-***
+---
 
 ## Estilo
 
@@ -173,13 +173,13 @@ No sistema de design PandaCSS do projeto:
 Na config do Panda CSS e estilos personalizados, **evite usar tokens de cor genéricos como `bg` e `fg`** (que compilam para CSS transparente/inválido). Em vez disso, use tokens semânticos explícitos como `gray.surface.bg`, `fg.default` e `gray.outline.border` para preservar os estados de tema adequados.
 Além disso, ao estilizar sobreposições pop-up, listas suspensas ou componentes de autocompletar (como `app/islands/search.tsx`), use o token de fundo semântico `gray.surface.bg` para garantir um fundo sólido nos modos claro/escuro e evitar a sobreposição de texto.
 
-***
+---
 
 ## CMS
 
 [Sveltia CMS](https://sveltiacms.app) é executado inteiramente no cliente em `/admin/`, configurado por `public/admin/config.yml`. `app/server.ts` serve os arquivos estáticos desse diretório (config, HTML, assets) diretamente de `public/admin/` em vez de pelo roteamento normal, então a UI do CMS funciona de forma idêntica em desenvolvimento e após a implantação. Ele é apoiado por Git: as edições feitas na UI do CMS são confirmadas diretamente nos arquivos de conteúdo sob `content/`, que o próximo build coleta como qualquer outra alteração.
 
-***
+---
 
 ## Ferramentas de desenvolvimento e integridade
 
@@ -227,7 +227,7 @@ O repositório utiliza **Biome** para lint e formatação de código. Para garan
 
 Executar comandos CLI orientados a React (como `@park-ui/cli`) diretamente neste repositório sobrescreverá as implementações Hono/JSX personalizadas e as receitas de slot por modelos específicos de React, quebrando o modelo SSG/ilha do HonoX. Sempre verifique os arquivos existentes da base de código antes de executar scripts externos de instalação de componentes.
 
-***
+---
 
 ## Implantação
 

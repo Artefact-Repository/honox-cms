@@ -13,7 +13,7 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 
 **Field** 组件已作为交互式 `field` 区块完全集成到 **Page Builder** 中。这使内容创建者和设计者无需编写布局样板即可直接从 Sveltia CMS 起草字段、放置自定义 HTML 表单输入，并提供即时客户端验证逻辑。
 
-***
+---
 
 # 用法
 
@@ -106,7 +106,7 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 }
 ```
 
-***
+---
 
 # 属性
 
@@ -125,7 +125,7 @@ import { DemoPreview } from "../../../app/components/demo-preview";
 | **验证器表达式** (`validator`) | `string` | - | 评估字符串输入的高级 JavaScript 函数表达式。通过 `new Function()` 在客户端重建。<br/>*示例：* `(value) => value.includes('@') | 'Invalid email address'` |
 | **强制交互** (`interactive`) | `boolean` | `true` | 确保以交互孤岛的形式进行客户端水合，以支持实时用户验证。 |
 
-***
+---
 
 # 开发者说明与无障碍
 

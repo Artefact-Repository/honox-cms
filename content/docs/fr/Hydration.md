@@ -38,7 +38,7 @@ export function shouldHydrate(interactive: unknown, hasSignal: boolean): boolean
 | `undefined` | `true` | `true` | Détection intelligente : signal présent → hydrater |
 | `undefined` | `false` | `false` | Détection intelligente : aucun signal → statique |
 
-***
+---
 
 ## Le modèle à 3 niveaux
 
@@ -74,7 +74,7 @@ l'a déclaré et a divulgué l'attribut sur le DOM - maintenant supprimé).
 S'applique à :
 
 - Typographie (texte, titre, badge)- Disposition (groupe, centre absolu, ensemble de champs)- Indicateurs d'état (alerte, fil d'Ariane, chargeur, squelette, spinner, progression)- Graphiques (icône)
-***
+---
 
 ## Classification complète des composants
 
@@ -136,7 +136,7 @@ S'applique à :
 | `progress` | Progress bar (value-driven, static by default) | ✅ |
 | `icon` | SVG icon wrapper (size/color only, no client state) | ✅ `icon.tsx` |
 
-***
+---
 
 ## Conditions de déclenchement par niveau
 
@@ -174,7 +174,7 @@ Principes de décision :
 - Le composant ne contient aucun état client et ne répond à aucun événement.- Il ne déclare pas de prop « interactive ». (Historiquement `badge` / `titre` / `texte` /  `fieldset` l'a déclaré à tort et a divulgué `interactive="true"` sur le DOM ; ça a
   été supprimé lors du nettoyage.)
 
-***
+---
 
 ## Liste de contrôle de décision pour les nouveaux composants
 
@@ -192,7 +192,7 @@ Parcourez la liste dans l’ordre ; s'arrêter au premier match :
 - Aucun composant ne peut écrire une simple branche `if (interactive) { … }` ; passez toujours par « shouldHydrate ».- « interactif » n'est qu'un « bouton » : « vrai » force, « faux » interdit, « non défini » s'en remet à « hasSignal ».- Chaque composant de niveau 1/niveau 2 doit ajouter une section « # Hydratation » à son  `content/components/<Component>.mdx` et faites une référence croisée à ce fichier, et définissez
   son champ « hydratation » de premier plan (`1` / `2` / `3`) doit correspondre.
 
-***
+---
 
 ## Journal de nettoyage historique (déjà corrigé)
 
@@ -211,7 +211,7 @@ Les divergences suivantes ont été résolues lors du déploiement de la convent
 | 7 | `pagination` / `avatar` | Missing from the tier tables (`pagination` absent entirely; `avatar` mis-classified as Tier-1) and `pagination` over-hydrated in link mode | Ajout de « pagination » + « tags-input » au niveau 2 ; déplacement de « avatar » au niveau 2 (signal de signal de charge) ; Mode lien `pagination` fermé pour que la navigation pure reste statique |
 
 > Remarque : l'élément 4 était un vrai bug — `badge` / `heading` / `text` / `fieldset` serait rendu> « interactif » comme attribut HTML non valide sur le DOM ; il était prioritaire pour la réparation.
-***
+---
 
 ## Documentation connexe
 

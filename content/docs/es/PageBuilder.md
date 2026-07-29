@@ -8,7 +8,7 @@ El Constructor de Páginas dinámico basado en [Sveltia CMS](https://sveltiacms.
 
 Los diseños de página se guardan como archivos JSON en `content/pages/*.json` y se compilan bajo demanda o se pregeneran estáticamente (mediante Hono SSG) en `/pages/[slug]`.
 
-***
+---
 
 ## Componentes admitidos
 
@@ -69,7 +69,7 @@ El Constructor de Páginas admite una rica paleta de más de 40 componentes de l
 * **PaginatedTable**: Componentes de tabla dinámica interactiva con soporte de paginación.
 * **Pagination**: Controladores de página interactivos.
 
-***
+---
 
 ## Arquitectura
 
@@ -94,7 +94,7 @@ Utilizamos **anclas y alias YAML** avanzados (`&` y `*`) para sortear la incapac
 
 **Nota:** el límite de anidado de \~4 niveles del esquema YAML solo limita lo que el formulario del CMS permite _construir_ a un editor no técnico. La recursión de `renderChildren` no tiene límite de profundidad —— un archivo `content/pages/*.json` editado a mano o generado programáticamente puede anidarse mucho más de lo que permite la interfaz del CMS, y aun así se renderizará correctamente.
 
-***
+---
 
 ## Canalizaciones de construcción de contenido
 
@@ -121,7 +121,7 @@ Los layouts del Constructor de Páginas son uno de los tres tipos de contenido b
 
 `app/lib/docs.ts` carga las colecciones `.md` y `.mdx` en paralelo y las fusiona en una sola barra de navegación lateral, por lo que qué canalización usa un documento dado es un detalle de implementación invisible para los lectores — elige `.md` para prosa simple y `.mdx` solo cuando una página necesita un componente activo incrustado.
 
-***
+---
 
 ## Ejemplo de estructura JSON
 

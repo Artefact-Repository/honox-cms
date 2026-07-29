@@ -14,7 +14,7 @@ title: 架构
 | SSG | [`@hono/vite-ssg`](https://github.com/honojs/vite-plugins/tree/main/packages/ssg) |
 | 部署 | Cloudflare Pages（`wrangler.jsonc`）或 Vercel（`vercel.json`） |
 
-***
+---
 
 ## 构建过程：两次 Vite 编译，一个静态站点
 
@@ -43,7 +43,7 @@ importSource = "hono/jsx"
 
 `mdx()` 插件的作用范围被限定为仅 `include: /\.mdx$/`（即只对 `.mdx` 生效）—— 普通的 `.md`（博客文章、绝大多数文档）被刻意排除在外，以免 `app/utils/markdown.ts` 中通过 `?raw` 导入的内容被 MDX 转换破坏。
 
-***
+---
 
 ## 基于文件的路由
 
@@ -72,7 +72,7 @@ importSource = "hono/jsx"
 
 受支持的 locale 在 `ALL_LOCALES` / `TRANSLATED_LOCALES`（`app/lib/i18n.ts`）中一次性声明 —— 该列表必须与 `public/admin/config.yml` 的 `i18n.locales` 以及镜像的 `app/routes/<locale>/` 路由目录保持同步。
 
-***
+---
 
 ## 组件架构
 
@@ -109,7 +109,7 @@ importSource = "hono/jsx"
 - **布局网格配方：** `row` 与 `col` 的布局网格配方被以编程方式编译为静态、离散的变体（跨度、偏移、0 到 24 的排序），并注册到 `panda.config.ts` 的静态 CSS 中，以支持 Sveltia CMS 与 PageRenderer 内的静态页面布局嵌套，无需动态 JavaScript 水合。
 - **集中式 SVG 图标目录：** 代码库使用位于 `app/icons/*` 的、可单独复用的 SVG 图标组件（如 `CloseIcon`、`ChevronDownIcon`、`CheckIcon` 等），它们接受 `JSX.IntrinsicElements["svg"]` 以转发 `width`、`height` 以及自定义样式等属性。原本散落在各 UI 组件与路由中的硬编码内联 SVG 已被重构为从此集中图标目录导入，以提升代码复用并避免重复。
 
-***
+---
 
 ## 内容流水线与 i18n
 
@@ -145,7 +145,7 @@ Sveltia CMS 在 `public/admin/config.yml` 下配置了国际化（i18n），支�
 5. **路由再导出：** 创建与根路由文件结构一致的目录 `app/routes/<locale>/`，重新导出标准路由。
 6. **翻译：** 在 `content/docs/<locale>/*.md` 与 `content/components/<locale>/*.mdx` 下，分别提供 markdown/MDX 文档与组件参考的翻译。
 
-***
+---
 
 ## 样式
 
@@ -173,13 +173,13 @@ Sveltia CMS 在 `public/admin/config.yml` 下配置了国际化（i18n），支�
 在 Panda CSS 配置与自定义样式中，**避免使用通用的颜色 token（如 `bg` 与 `fg`）**（它们会编译为透明/无效的 CSS）。应改用显式的语义 token，例如 `gray.surface.bg`、`fg.default` 与 `gray.outline.border`，以保持正确的主题状态。
 此外，在给弹窗浮层、下拉列表或自动补全组件（如 `app/islands/search.tsx`）设置样式时，使用语义背景 token `gray.surface.bg`，以确保浅色/深色模式下都有不透明背景，避免文字重叠。
 
-***
+---
 
 ## CMS
 
 [Sveltia CMS](https://sveltiacms.app) 完全在客户端运行，位于 `/admin/`，由 `public/admin/config.yml` 配置。`app/server.ts` 直接将该目录的静态文件（配置、HTML、资源）从 `public/admin/` 提供，而不经过普通路由，因此 CMS UI 在开发与部署后表现完全一致。它基于 Git：在 CMS UI 中所做的编辑会直接提交到 `content/` 下的内容文件，下一次构建会像处理其他变更一样拾取它们。
 
-***
+---
 
 ## 开发工具与完整性
 
@@ -227,7 +227,7 @@ _注意：始终使用 `bun test unit` 运行单元测试，以绕开依赖外�
 
 在本仓库中直接运行 React 取向的 CLI 命令（如 `@park-ui/cli`）会用 React 特定的模型覆盖自定义的 Hono/JSX 实现与槽位配方，从而破坏 HonoX 的 SSG/岛屿模型。在运行外部组件安装脚本之前，务必先核对现有代码库文件。
 
-***
+---
 
 ## 部署
 

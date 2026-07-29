@@ -13,7 +13,7 @@ Eine grundlegende Eingabesteuerung, die darauf ausgelegt ist, Formulare sauber u
 
 Die **Field**-Komponente ist vollständig als interaktiver `field`-Block im **Page Builder** integriert. Dies ermöglicht es Content-Erstellern und Designern, Felder zu entwerfen, benutzerdefinierte HTML-Formulareingaben zu platzieren und sofortige clientseitige Validierungslogik direkt aus Sveltia CMS bereitzustellen, ohne Layout-Boilerplate schreiben zu müssen.
 
-***
+---
 
 # Verwendung
 
@@ -106,7 +106,7 @@ Zeigt Formularfeld-Stile unter standardmäßigen HTML-Block-Zuständen. Dies hil
 }
 ```
 
-***
+---
 
 # Props
 
@@ -125,7 +125,7 @@ Zeigt Formularfeld-Stile unter standardmäßigen HTML-Block-Zuständen. Dies hil
 | **Validator-Ausdruck** (`validator`) | `string` | - | Erweiterter JavaScript-Funktionsausdruck zur Auswertung der String-Eingabe. Client-seitig über `new Function()` rekonstruiert.<br/>*Beispiel:* `(value) => value.includes('@') | 'Invalid email address'` |
 | **Interaktion erzwingen** (`interactive`) | `boolean` | `true` | Stellt clientseitige Hydration als interaktive Insel sicher, um Echtzeit-Benutzervalidierung zu unterstützen. |
 
-***
+---
 
 # Entwicklerhinweise & Barrierefreiheit
 

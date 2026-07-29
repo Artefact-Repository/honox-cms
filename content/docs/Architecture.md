@@ -14,7 +14,7 @@ This project is built on [**HonoX**](https://github.com/honojs/honox), a meta-fr
 | SSG | [`@hono/vite-ssg`](https://github.com/honojs/vite-plugins/tree/main/packages/ssg) |
 | Deploy | Cloudflare Pages (`wrangler.jsonc`) or Vercel (`vercel.json`) |
 
-***
+---
 
 ## The Build: Two Vite Passes, One Static Site
 
@@ -43,7 +43,7 @@ This ensures standard Hono runtime resolution and avoids missing JSX dev runtime
 
 The `mdx()` plugin is scoped to `include: /\.mdx$/` only — plain `.md` (blog posts, most docs) is deliberately left alone so `app/utils/markdown.ts`'s `?raw` imports aren't corrupted by the MDX transform.
 
-***
+---
 
 ## File-Based Routing
 
@@ -79,7 +79,7 @@ Supported locales are declared once, in `ALL_LOCALES` / `TRANSLATED_LOCALES` (`a
 
 Picking the wrong one for a new route either silently fails to build (missing `lang` in ssgParams → that locale's static page never gets generated) or silently shadows an existing route (a dynamic segment colliding with a static one at the same depth) — when adding a new locale-scoped route, check whether anything else already claims that exact path shape before choosing.
 
-***
+---
 
 ## Component Architecture
 
@@ -116,7 +116,7 @@ Multi-part components like `HoverCard` that render children across HonoX island 
 - **Layout Grid Recipes:** Layout grid recipes for `row` and `col` are programmatically compiled into static, discrete variants (spans, offsets, orders 0 to 24) and registered in `panda.config.ts` static CSS to support static page layout nesting inside Sveltia CMS and PageRenderer without dynamic JavaScript hydration.
 - **Centralised SVG Icon Directory:** The codebase utilises individual, reusable SVG icon components located in `app/icons/*` (e.g. `CloseIcon`, `ChevronDownIcon`, `CheckIcon`, etc.) that accept `JSX.IntrinsicElements["svg"]` to forward attributes like `width`, `height`, and custom styles. Hardcoded inline SVGs across UI components and routes have been refactored to import from this central icons directory to promote code reusability and prevent duplication.
 
-***
+---
 
 ## Content Pipelines & i18n
 
@@ -158,7 +158,7 @@ To add a new translation locale to the repository, follow this step-by-step work
 
 Note `by-tag`/`by-author`/search routes one level under `/blog/` use a different technique than step 5's directory-per-locale re-export — see "Locale Routing and Legacy Redirects" above for why.
 
-***
+---
 
 ## Styling
 
@@ -186,13 +186,13 @@ In the project's PandaCSS design system:
 In the Panda CSS config and custom styles, **avoid using generic color tokens like `bg` and `fg`** (which compile to transparent/invalid CSS). Instead, use explicit semantic tokens like `gray.surface.bg`, `fg.default`, and `gray.outline.border` to preserve proper theme states.
 Additionally, when styling popup overlays, dropdown lists, or autocomplete components (like `app/islands/search.tsx`), use the semantic background token `gray.surface.bg` to guarantee a solid background across light/dark modes and avoid text overlapping.
 
-***
+---
 
 ## CMS
 
 [Sveltia CMS](https://sveltiacms.app) runs entirely client-side at `/admin/`, configured by `public/admin/config.yml`. `app/server.ts` serves that directory's static files (config, HTML, assets) directly from `public/admin/` rather than through normal routing, so the CMS UI works identically in dev and once deployed. It's Git-backed: edits made in the CMS UI commit directly to content files under `content/`, which the next build picks up like any other change.
 
-***
+---
 
 ## Development Tooling & Integrity
 
@@ -240,7 +240,7 @@ The repository utilises **Biome** for code linting and formatting. To ensure `bu
 
 Running React-oriented CLI commands (such as `@park-ui/cli`) directly in this repository will overwrite custom Hono/JSX implementations and slot recipes with React-specific models, breaking the HonoX SSG/island model. Always verify existing codebase files before running external component installer scripts.
 
-***
+---
 
 ## Deployment
 

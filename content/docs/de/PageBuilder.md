@@ -8,7 +8,7 @@ Der auf [Sveltia CMS](https://sveltiacms.app/en/docs/intro) basierende dynamisch
 
 Seitenlayouts werden als JSON-Dateien in `content/pages/*.json` gespeichert und bei Bedarf kompiliert oder statisch vorab generiert (über Hono SSG) unter `/pages/[slug]`.
 
-***
+---
 
 ## Unterstützte Komponenten
 
@@ -69,7 +69,7 @@ Der Seitenbaukasten unterstützt eine reichhaltige Palette von über 40 Layout-,
 * **PaginatedTable**: Interaktive dynamische Tabellenkomponenten mit Paginierungsunterstützung.
 * **Pagination**: Interaktive Seitensteuerung.
 
-***
+---
 
 ## Architektur
 
@@ -94,7 +94,7 @@ Wir nutzen fortgeschrittene **YAML-Anker und -Aliase** (`&` und `*`), um die Tat
 
 **Hinweis:** Das Verschachtelungslimit von \~4 Ebenen im YAML-Schema begrenzt nur, was das CMS-Formular einer nicht-technischen Redakteurin/einem Redakteur zu _bauen_ erlaubt. Die Rekursion von `renderChildren` selbst hat kein Tiefenlimit — eine von Hand bearbeitete oder programmatisch erzeugte `content/pages/*.json`-Datei kann deutlich tiefer verschachtelt sein, als es die CMS-Oberfläche zulässt, und wird trotzdem korrekt gerendert.
 
-***
+---
 
 ## Content-Build-Pipelines
 
@@ -121,7 +121,7 @@ Seitenbaukasten-Layouts sind einer von drei Inhaltstypen unter `content/`, die j
 
 `app/lib/docs.ts` lädt sowohl die `.md`- als auch die `.mdx`-Sammlungen nebeneinander und führt sie zu einer einzigen Seitennavigation zusammen, sodass es ein für Leser unsichtbares Implementierungsdetail ist, welche Pipeline ein bestimmtes Dokument verwendet — wählen Sie `.md` für reinen Text und `.mdx` nur, wenn eine Seite eine eingebettete lebendige Komponente benötigt.
 
-***
+---
 
 ## Beispiel-JSON-Struktur
 

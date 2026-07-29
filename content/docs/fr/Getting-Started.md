@@ -14,7 +14,7 @@ Ce guide explique comment installer le projet, l'exécuter en local, et présent
 
 * Git, pour cloner le dépôt et pour les commits de contenu du CMS adossé à Git.
 
-***
+---
 
 ## Installation
 
@@ -32,7 +32,7 @@ bun install
 bun panda codegen
 ```
 
-***
+---
 
 ## Lancer le serveur de développement
 
@@ -44,7 +44,7 @@ Cela démarre le serveur de développement Vite (`http://localhost:5173` par dé
 
 Pour éditer le contenu via l'interface du CMS plutôt qu'en modifiant à la main les fichiers sous `content/`, ouvrez `/admin/` pendant que le serveur de développement tourne.
 
-***
+---
 
 ## Build et prévisualisation
 
@@ -60,7 +60,7 @@ Pour servir ce résultat statique en local via le runtime local de Cloudflare (p
 bun run preview
 ```
 
-***
+---
 
 ## Tests et Lint
 
@@ -76,7 +76,7 @@ Linter et corriger automatiquement avec [Biome](https://biomejs.dev) :
 bun run check
 ```
 
-***
+---
 
 ## Déploiement
 
@@ -86,7 +86,7 @@ bun run deploy
 
 Construit le site et déploie `dist/` sur Cloudflare Pages via `wrangler`. Une cible Vercel (`vercel.json`) est également configurée par défaut si vous préférez déployer là-bas —— dans les deux cas, le résultat est un site entièrement statique, sans aucun processus serveur requis au moment de la requête.
 
-***
+---
 
 ## Pour aller plus loin
 

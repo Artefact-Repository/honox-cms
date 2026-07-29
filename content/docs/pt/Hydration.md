@@ -46,7 +46,7 @@ export function shouldHydrate(interactive: unknown, hasSignal: boolean): boolean
 | `undefined` | `true` | `true` | Detecção inteligente: sinal presente → hidratar |
 | `undefined` | `false` | `false` | Detecção inteligente: sem sinal → estático |
 
-***
+---
 
 ## O modelo de 3 níveis
 
@@ -98,7 +98,7 @@ Aplica-se a:
 - Indicadores de status (alert, breadcrumb, loader, skeleton, spinner, progress)
 - Gráficos (icon)
 
-***
+---
 
 ## Classificação completa de componentes
 
@@ -161,7 +161,7 @@ Aplica-se a:
 | `progress` | Barra de progresso (orientada por valor, estática por padrão) | ✅ |
 | `icon` | Envoltório de ícone SVG (apenas tamanho/cor, sem estado do cliente) | ✅ `icon.tsx` |
 
-***
+---
 
 ## Condições de gatilho por nível
 
@@ -219,7 +219,7 @@ Princípios de decisão:
   `fieldset` a declaravam erroneamente, vazando `interactive="true"` para o DOM; isso foi
   removido na limpeza.)
 
-***
+---
 
 ## Lista de verificação de decisão para novos componentes
 
@@ -243,7 +243,7 @@ Percorra a lista em ordem; pare na primeira correspondência:
   `content/components/<Component>.mdx` e referenciar cruzadamente este arquivo, além de definir
   seu campo de frontmatter `hydration` (`1` / `2` / `3`) para corresponder.
 
-***
+---
 
 ## Registro histórico de limpeza (já corrigido)
 
@@ -264,7 +264,7 @@ As divergências a seguir foram resolvidas durante o lançamento da convenção;
 > Nota: o item 4 foi um bug real — `badge` / `heading` / `text` / `fieldset` renderizavam
 > `interactive` como um atributo HTML inválido no DOM; foi priorizado para reparo.
 
-***
+---
 
 ## Documentação relacionada
 

@@ -4,7 +4,7 @@ title: 样式与主题
 
 本项目使用 [PandaCSS](https://panda-css.com)（类型安全、零运行时 CSS-in-JS）为每个组件设置样式，构建在原生 `hono/jsx` 之上 —— **而不是** Panda 官方支持的某个 JSX 框架（React/Vue/Solid/Qwik）之一。这一个事实 —— `panda.config.ts` 中的 `jsxFramework: undefined` —— 是本项目遇到的几乎所有样式回归问题的根本原因，因为它悄悄地让代码库放弃了 Panda 通常为你提供的若干能力。本页记录了由此产生的架构、它已经导致的具体 bug，以及应遵循的检查清单，以防这些问题再次发生。
 
-***
+---
 
 ## 样式如何从 recipe 到达页面
 
@@ -22,7 +22,7 @@ title: 样式与主题
 
 `vite dev` 的 PostCSS 集成会在你编辑时动态重新提取 CSS，但它**不会**重新生成 recipe 辅助函数的 `.mjs`/`.d.ts` 文件 —— 这些是你的代码直接导入的普通生成文件（`import { switchRecipe } from "design-system/recipes"`），而不是经过 Vite 转换的虚拟模块。如果你给某个 recipe 的 `variants` 新增了一个 `colorPalette` prop，却只是保存了文件，`switchRecipe.splitVariantProps()` 会一直使用**过时**的 `variantKeys` 列表，直到你运行 `panda codegen` 为止 —— 于是新 prop 会被悄悄归入「local props」而不是「variant props」，结果要么作为无效属性泄漏到 DOM 上，要么根本到不了样式函数。**每次编辑完任何 recipe 文件后都要手动运行这两个命令**，不要假设开发服务器已经感知到了变更。
 
-***
+---
 
 ## `staticCss`：为什么几乎每个 recipe 都被强制设为 `["*"]`
 
@@ -30,7 +30,7 @@ Panda 的静态分析只能为它能在源码中直接看到字面值的场景�
 
 下文的 switch 尺寸 bug 正是这样产生的，而且这是一个系统性的隐患：**只要 `staticCss.recipes` 的 key 与 recipe 实际的导出/注册名之间有任何一处拼写不一致，就会悄无声息地让该 recipe 的生成结果归零 —— 除默认变体外一个非默认变体都不生成**，而且不会有任何错误、警告或类型报错 —— Panda 只会默默地输出 base 加默认变体的 CSS，仅此而已。如果你新增了一个 recipe，务必立即把它的注册 key 条目加入 `staticCss.recipes`，并仔细核对该 key 与 `app/theme/recipes/index.ts` 中的完全一致（如果不确定，就在两个文件里都 `grep` 一下这个 key）。
 
-***
+---
 
 ## 已知的回归问题及防止它们的规则
 
@@ -88,7 +88,7 @@ variants: {
 
 `<Heading size={{ base: "2xl", md: "3xl" }}>` 在 HTML 中会正确渲染出 `class="heading--size_2xl md:heading--size_3xl"`，但对应 `md:` class 的 `@media` 规则却永远不会被生成 —— `staticCss.recipes: ["*"]` 只会强制生成字面量、非响应式的 variant class，不会把它们与断点条件做叉乘。**永远不要把响应式对象作为 variant prop 传入**；应该使用扁平的字面量值，或者针对需要按断点变化的特定属性，用一个外层的 `css()`/utility class 来覆盖（普通的 utility class 没有这个限制，只有 recipe 的 variant prop 才有）。
 
-***
+---
 
 ## `colorPalette` 主题化：集中式模式
 
@@ -112,7 +112,7 @@ Panda 官方支持的 JSX 框架可以「免费」获得 `colorPalette`：它们
 
 不要为新组件重新引入按 recipe 单独维护的 `colorPalette` variant 映射表 —— 这正是本次集中化改造所取代的模式，原因就是它无法扩展且会悄悄地发生回归。
 
-***
+---
 
 ## Token 颜色 vs. 语义 token
 
@@ -143,7 +143,7 @@ html: {
 
 `fg.default`、`fg.muted`、`fg.subtle`、`border` 与 `canvas`（声明在 `app/theme/index.ts` 的 `semanticTokens.colors` 中）被直接硬编码为 `colors.gray.*` —— **而不是** `colors.colorPalette.*`。这是有意为之，而不是遗漏：这是标准的 Radix/Park UI「一个强调色 + 一个灰色」惯例 —— 正文文字、边框和页面背景必须始终保持中性，无论当前生效的是哪个强调色，这既是为了对比度/可读性，也是为了让强调色读起来像是「点缀」而不是把整个页面都染上颜色。不要「修复」这些 token 让它们引用 `colorPalette.*`，指望它们跟随站点强调色变化；那会是一次回归，而不是改进。只有真正具有交互性/带品牌色的表面（控件的选中态、按钮的实心填充、徽章的背景色……）才应该引用 `colorPalette.*` —— 这一点在每个控件 recipe 中都得到了印证（`switch.ts`、`checkbox.ts`、`badge.ts`、`button.ts`：中性/未选中状态使用硬编码的 `gray.*` token，选中/强调状态使用 `colorPalette.*`）。
 
-***
+---
 
 ## 修改任意 recipe 或 `panda.config.ts` 后的验证清单
 
@@ -155,7 +155,7 @@ html: {
 4. `bun test` —— 运行完整的单元测试套件；样式重构之后，一个断言旧 classname 格式的过时测试是常见的误报，在认定是真的回归之前值得先快速读一下测试代码。
 5. 对**源**文件（`panda.config.ts`、`app/theme/recipes/*.ts`、`app/components/ui/*.tsx`）执行 `git status`/`git diff` —— 绝不要检查 `design-system/`，它已被 gitignore，会被丢弃。一个「本地能用」但源码从未真正提交的修复，根本不算修复。
 
-***
+---
 
 ## FAQ
 

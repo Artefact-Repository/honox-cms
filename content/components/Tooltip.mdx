@@ -13,13 +13,13 @@ A contextual overlay component used to display descriptive, helpful, or suppleme
 
 For tooltip that need to show multiline content, use [HoverCard](HoverCard).
 
-***
+---
 
 # Hydration & Interactive Behavior
 
 Because the Tooltip must dynamically calculate its viewport coordinates on hover and track active keyboard focus, it hydrates as an active client-side island by default. If a static, non-interactive layout placeholder is preferred, set `"interactive": false` to suppress client-side javascript loading.
 
-***
+---
 
 # Usage
 
@@ -69,7 +69,7 @@ A compact, accented tooltip pointing to the right of its trigger. Ideal for desc
 }
 ```
 
-***
+---
 
 # Props
 
@@ -83,7 +83,7 @@ A compact, accented tooltip pointing to the right of its trigger. Ideal for desc
 | **Close Delay** (`closeDelay`) | `number` | `100` | Delay in milliseconds before hiding the tooltip after mouse-out. |
 | **Enable Hydration** (`interactive`) | `boolean` | `true` | When true, hydrates the component as a client island to compute viewport coordinates and manage hover/focus listeners. |
 
-***
+---
 
 # Accessibility & Technical Execution
 
