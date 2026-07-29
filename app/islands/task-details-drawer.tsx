@@ -63,6 +63,7 @@ export default function TaskDetailsDrawer({
 			onOpenChange={(next: boolean) => {
 				if (!next) setTask(null);
 			}}
+			size="lg"
 			title={task?.title ?? ""}
 			description="Task details"
 			footer={
