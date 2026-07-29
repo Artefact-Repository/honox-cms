@@ -1,0 +1,12 @@
+---
+title: Build onboarding flow prototype
+project: mobile-app-launch
+status: In Progress
+priority: High
+assignee: Diego Ramos
+dueDate: 2026-08-20
+tags:
+  - product
+---
+
+Interactive prototype for the first-run onboarding flow.

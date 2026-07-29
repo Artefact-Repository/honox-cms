@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from "hono/jsx";
-import { useEffect, useState } from "hono/jsx";
+import { useEffect, useRef } from "hono/jsx";
 
 // A wrapping controller, not the table's own hydration. `TableBase`'s
 // `columns[].render`/`sortValue` are functions — HonoX hydrates islands by
@@ -21,9 +21,13 @@ import { useEffect, useState } from "hono/jsx";
 // time, and physically reordering those existing `<tr>` nodes on click. It
 // never re-renders cell content, so the real markup is never at risk.
 export default function TableSortIsland({ children }: PropsWithChildren) {
-	const [container, setContainer] = useState<HTMLDivElement | null>(null);
+	const containerRef = useRef<HTMLDivElement | null>(null);
+	const setContainer = (el: HTMLDivElement | null) => {
+		containerRef.current = el;
+	};
 
 	useEffect(() => {
+		const container = containerRef.current;
 		if (!container) return;
 
 		const table = container.querySelector("table");
@@ -79,7 +83,7 @@ export default function TableSortIsland({ children }: PropsWithChildren) {
 		return () => {
 			for (const cleanup of cleanups) cleanup();
 		};
-	}, [container]);
+	}, []);
 
 	return <div ref={setContainer}>{children}</div>;
 }

@@ -10,7 +10,7 @@ import remarkRehype from "remark-rehype";
 import strip from "strip-markdown";
 import { unified } from "unified";
 import { visit } from "unist-util-visit";
-import { parse as parseYaml } from "yaml";
+import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 
 interface FrontmatterData {
 	title?: string;
@@ -41,6 +41,18 @@ export function parseFrontmatter(markdown: string): {
 	const data = (parseYaml(rawFrontmatter) ?? {}) as FrontmatterData;
 
 	return { data, content };
+}
+
+/** Inverse of `parseFrontmatter` — rebuilds a `---`-fenced markdown file from
+ * frontmatter data and a body. Round-tripping through parse+stringify drops
+ * any comments in the original frontmatter block (the `yaml` library doesn't
+ * preserve them), so this is meant for programmatic edits (e.g. the project
+ * board's drag-and-drop writing straight to GitHub), not hand-authored files. */
+export function stringifyFrontmatter(
+	data: FrontmatterData,
+	content: string,
+): string {
+	return `---\n${stringifyYaml(data).trimEnd()}\n---\n\n${content.trimStart()}`;
 }
 
 // mdast-util-to-hast has no built-in option to render GFM table alignment as
