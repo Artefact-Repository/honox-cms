@@ -897,10 +897,21 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 		});
 	};
 
+	// Remembers the MouseEvent a context menu was actually opened with, since
+	// `updatePosition` gets called a second time with no event at all (the
+	// `[open, isRendered]` positioner-sync effect below re-runs it whenever
+	// `isRendered` catches up to `open`, which happens on every open — not
+	// just the ones that started from an actual click). Without this, that
+	// second, event-less call falls through to the submenu branch (below) and
+	// re-anchors a context menu to its own zero-size trigger element instead
+	// of the pointer position it actually opened at.
+	const lastOpenEventRef = useRef<MouseEvent | undefined>(undefined);
+
 	// Positions the top-level (trigger-anchored) menu using the shared
 	// overlay math, or a context menu / submenu using pointer / item-relative
 	// coordinates that overlay-position.ts doesn't model.
 	const updatePosition = (e?: MouseEvent) => {
+		const event = e ?? lastOpenEventRef.current;
 		const trigger = triggerRef.current;
 		const positioner = positionerRef.current;
 		const content = contentRef.current;
@@ -935,9 +946,16 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 		let x = 0;
 		let y = 0;
 
-		if (part === "context-trigger" && e) {
-			x = e.clientX;
-			y = e.clientY;
+		if (part === "context-trigger" && event) {
+			x = event.clientX;
+			// A caller that dispatches its own synthetic `contextmenu` (rather
+			// than a real right-click at the pointer) can mark its trigger
+			// `data-open-upward` to mean "this y is the anchor's *bottom* edge,
+			// grow the menu up from it" — e.g. a per-row "..." button, so the
+			// menu opens above the row instead of covering the ones below it.
+			y = trigger.hasAttribute("data-open-upward")
+				? event.clientY - menuHeight
+				: event.clientY;
 			if (x + menuWidth > window.innerWidth) x -= menuWidth;
 			if (y + menuHeight > window.innerHeight) y -= menuHeight;
 		} else {
@@ -1008,6 +1026,7 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 		e?: MouseEvent,
 		focusItem: "first" | "last" = "first",
 	) => {
+		lastOpenEventRef.current = e;
 		setIsRendered(true);
 		applyOpenState(true, e, focusItem);
 		if (!isControlled) setIsOpen(true);
@@ -1015,6 +1034,7 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 	};
 
 	const handleClose = (source: "trigger" | "menu" = "trigger") => {
+		lastOpenEventRef.current = undefined;
 		applyOpenState(false);
 		if (!isControlled) setIsOpen(false);
 		onOpenChangeRef.current?.(false, { source });
