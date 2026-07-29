@@ -86,40 +86,49 @@ export default function TaskCloneAction({ tasks }: TaskCloneActionProps) {
 			}}
 			title={task ? `Clone "${task.title}"` : "Clone task"}
 			description="Creates a new task file with the same fields and commits it straight to main."
-		>
-			<Stack direction="column" gap="4" class={css({ alignItems: "stretch" })}>
-				<Field
-					label="New task name"
-					value={title}
-					onValueChange={setTitle}
-					required
-				/>
+			// Passed as `body`/`cancel`/`confirm` (not `children`) — Dialog only
+			// applies the recipe's padding and the footer's top border/divider
+			// to those dedicated slots; bare `children` renders unstyled between
+			// them (see task-details-drawer.tsx for the same fix).
+			body={
+				<Stack
+					direction="column"
+					gap="4"
+					class={css({ alignItems: "stretch", width: "full" })}
+				>
+					<Field
+						label="New task name"
+						value={title}
+						onValueChange={setTitle}
+						required
+					/>
 
-				{error && (
-					<Text size="sm" class={css({ color: "fg.error" })}>
-						{error}
-					</Text>
-				)}
-
-				<Stack gap="3" justify="end">
-					<button
-						type="button"
-						onClick={close}
-						disabled={cloning}
-						class={cx(button({ variant: "outline", size: "sm" }))}
-					>
-						Cancel
-					</button>
-					<button
-						type="button"
-						onClick={() => void handleClone()}
-						disabled={cloning || !title.trim()}
-						class={cx(button({ variant: "solid", size: "sm" }))}
-					>
-						{cloning ? "Cloning..." : "Clone"}
-					</button>
+					{error && (
+						<Text size="sm" class={css({ color: "fg.error" })}>
+							{error}
+						</Text>
+					)}
 				</Stack>
-			</Stack>
-		</Dialog>
+			}
+			cancel={
+				<button
+					type="button"
+					disabled={cloning}
+					class={cx(button({ variant: "outline", size: "sm" }))}
+				>
+					Cancel
+				</button>
+			}
+			confirm={
+				<button
+					type="button"
+					onClick={() => void handleClone()}
+					disabled={cloning || !title.trim()}
+					class={cx(button({ variant: "solid", size: "sm" }))}
+				>
+					{cloning ? "Cloning..." : "Clone"}
+				</button>
+			}
+		/>
 	);
 }

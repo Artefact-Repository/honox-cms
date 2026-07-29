@@ -3,7 +3,6 @@ import { button } from "design-system/recipes";
 import { useEffect, useState } from "hono/jsx";
 import { colorPaletteClass } from "../components/ui/color-palette";
 import { Dialog } from "../components/ui/dialog";
-import { Stack } from "../components/ui/stack";
 import { Text } from "../components/ui/text";
 import { toaster } from "../components/ui/toast";
 import type { Task } from "../lib/tasks";
@@ -81,36 +80,39 @@ export default function TaskDeleteConfirm({ tasks }: TaskDeleteConfirmProps) {
 			role="alertdialog"
 			title={task ? `Delete "${task.title}"?` : "Delete task?"}
 			description="This removes the task file and commits straight to main — it can't be undone from here."
-		>
-			<Stack direction="column" gap="4" class={css({ alignItems: "stretch" })}>
-				{error && (
+			// Passed as `body`/`cancel`/`confirm` (not `children`) — Dialog only
+			// applies the recipe's padding and the footer's top border/divider
+			// to those dedicated slots; bare `children` renders unstyled between
+			// them (see task-details-drawer.tsx for the same fix).
+			body={
+				error ? (
 					<Text size="sm" class={css({ color: "fg.error" })}>
 						{error}
 					</Text>
-				)}
-
-				<Stack gap="3" justify="end">
-					<button
-						type="button"
-						onClick={close}
-						disabled={deleting}
-						class={cx(button({ variant: "outline", size: "sm" }))}
-					>
-						Cancel
-					</button>
-					<button
-						type="button"
-						onClick={() => void handleDelete()}
-						disabled={deleting}
-						class={cx(
-							button({ variant: "solid", size: "sm" }),
-							colorPaletteClass("red"),
-						)}
-					>
-						{deleting ? "Deleting..." : "Delete"}
-					</button>
-				</Stack>
-			</Stack>
-		</Dialog>
+				) : undefined
+			}
+			cancel={
+				<button
+					type="button"
+					disabled={deleting}
+					class={cx(button({ variant: "outline", size: "sm" }))}
+				>
+					Cancel
+				</button>
+			}
+			confirm={
+				<button
+					type="button"
+					onClick={() => void handleDelete()}
+					disabled={deleting}
+					class={cx(
+						button({ variant: "solid", size: "sm" }),
+						colorPaletteClass("red"),
+					)}
+				>
+					{deleting ? "Deleting..." : "Delete"}
+				</button>
+			}
+		/>
 	);
 }
