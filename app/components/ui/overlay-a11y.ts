@@ -111,10 +111,14 @@ export function whenAnimationEnds(
 	onDone: () => void,
 ): () => void {
 	let settled = false;
+	let timer: any = null;
+	let rafId: number | null = null;
 
 	const cleanup = () => {
 		el.removeEventListener("animationend", onAnimationEnd);
-		clearTimeout(timer);
+		el.removeEventListener("transitionend", onTransitionEnd);
+		if (timer) clearTimeout(timer);
+		if (rafId !== null) cancelAnimationFrame(rafId);
 	};
 	const finish = () => {
 		if (settled) return;
@@ -125,17 +129,37 @@ export function whenAnimationEnds(
 	const onAnimationEnd = (e: AnimationEvent) => {
 		if (e.target === el) finish();
 	};
-	el.addEventListener("animationend", onAnimationEnd);
+	const onTransitionEnd = (e: TransitionEvent) => {
+		if (e.target === el) finish();
+	};
 
-	const durationMs = getComputedStyle(el)
-		.animationDuration.split(",")
-		.reduce((max, part) => {
-			const match = /^([\d.]+)(ms|s)$/.exec(part.trim());
-			if (!match) return max;
-			const value = Number.parseFloat(match[1]) * (match[2] === "s" ? 1000 : 1);
-			return Math.max(max, value);
-		}, 0);
-	const timer = window.setTimeout(finish, durationMs + 30);
+	el.addEventListener("animationend", onAnimationEnd);
+	el.addEventListener("transitionend", onTransitionEnd);
+
+	// Force a synchronous layout/style reflow so the browser registers the state changes
+	const _unused = el.offsetHeight;
+
+	// Defer duration calculation to the next frame so that browser matches active transition/animation styles
+	rafId = requestAnimationFrame(() => {
+		rafId = null;
+		if (settled) return;
+
+		const computedStyle = getComputedStyle(el);
+		const getDurationMs = (styleVal: string) => {
+			return styleVal.split(",").reduce((max, part) => {
+				const match = /^([\d.]+)(ms|s)$/.exec(part.trim());
+				if (!match) return max;
+				const value = Number.parseFloat(match[1]) * (match[2] === "s" ? 1000 : 1);
+				return Math.max(max, value);
+			}, 0);
+		};
+
+		const animDuration = getDurationMs(computedStyle.animationDuration);
+		const transDuration = getDurationMs(computedStyle.transitionDuration);
+		const maxDuration = Math.max(animDuration, transDuration);
+
+		timer = window.setTimeout(finish, maxDuration + 50);
+	});
 
 	return () => {
 		settled = true;

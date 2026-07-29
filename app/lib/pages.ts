@@ -4,9 +4,11 @@ import type { ComponentBlock } from "../components/block-types";
 // (en), and content/pages/<locale>/*.json for translations — matching the
 // CMS's `structure: multiple_folders` (public/admin/config.yml) with
 // `omit_default_locale_from_file_path: true`, same convention as app/lib/docs.ts.
-const pageModules = import.meta.glob("/content/pages/**/*.json", {
-	import: "default",
-}) as Record<string, () => Promise<unknown>>;
+const pageModules = (
+	typeof import.meta.glob === "function"
+		? import.meta.glob("/content/pages/**/*.json", { import: "default" })
+		: {}
+) as Record<string, () => Promise<unknown>>;
 
 export interface PageData {
 	title?: string;

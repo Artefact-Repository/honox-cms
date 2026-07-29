@@ -76,7 +76,8 @@ describe("Table Unit Tests", () => {
 		const table = Table({ columns, rows });
 
 		expect(table).toBeDefined();
-		// Since it has a sortable column, it should render TableSortIsland wrapper component.
+		// Since it has a sortable column and interactive is omitted, shouldHydrate returns true.
+		// It should render TableSortIsland component.
 		expect(table.tag).toBeDefined();
 		expect(table.tag.name).toBe("TableSortIsland");
 	});
