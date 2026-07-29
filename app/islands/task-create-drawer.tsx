@@ -111,145 +111,8 @@ export default function TaskCreateDrawer(props: TaskCreateDrawerProps) {
 			}
 			title="New Task"
 			description="Creates a task file and commits it to main — same as the CMS."
-		>
-			<Stack direction="column" gap="4" class={css({ alignItems: "stretch" })}>
-				<Field
-					label="Title"
-					value={form.title}
-					onValueChange={(value: string) =>
-						setForm((f) => ({ ...f, title: value }))
-					}
-					required
-				/>
-
-				<div>
-					<Text
-						size="sm"
-						class={css({ fontWeight: "medium", mb: "1.5" })}
-					>
-						Project
-					</Text>
-					<InteractiveCombobox
-						items={props.projects}
-						value={form.project}
-						onValueChange={(value: string) =>
-							setForm((f) => ({ ...f, project: value }))
-						}
-						placeholder="Search projects..."
-						allowClear
-						size="sm"
-					/>
-				</div>
-
-				<Stack gap="4" wrap="wrap" class={css({ alignItems: "stretch" })}>
-					<div class={css({ flex: "1", minWidth: "36" })}>
-						<Text
-							size="sm"
-							class={css({ fontWeight: "medium", mb: "1.5" })}
-						>
-							Status
-						</Text>
-						<InteractiveCombobox
-							items={statusItems}
-							value={form.status}
-							onValueChange={(value: string) =>
-								setForm((f) => ({ ...f, status: value }))
-							}
-							size="sm"
-						/>
-					</div>
-					<div class={css({ flex: "1", minWidth: "36" })}>
-						<Text
-							size="sm"
-							class={css({ fontWeight: "medium", mb: "1.5" })}
-						>
-							Priority
-						</Text>
-						<InteractiveCombobox
-							items={priorityItems}
-							value={form.priority}
-							onValueChange={(value: string) =>
-								setForm((f) => ({ ...f, priority: value }))
-							}
-							size="sm"
-						/>
-					</div>
-				</Stack>
-
-				<Stack gap="4" wrap="wrap" class={css({ alignItems: "stretch" })}>
-					<div class={css({ flex: "1", minWidth: "36" })}>
-						<Field
-							label="Assignee"
-							value={form.assignee}
-							onValueChange={(value: string) =>
-								setForm((f) => ({ ...f, assignee: value }))
-							}
-						/>
-					</div>
-					<div class={css({ flex: "1", minWidth: "36" })}>
-						<Text
-							size="sm"
-							class={css({ fontWeight: "medium", mb: "1.5" })}
-						>
-							Due date
-						</Text>
-						<input
-							type="date"
-							value={form.dueDate}
-							onInput={(e: Event) =>
-								setForm((f) => ({
-									...f,
-									dueDate: (e.target as HTMLInputElement).value,
-								}))
-							}
-							class={css({
-								width: "full",
-								borderWidth: "1px",
-								borderColor: "border",
-								borderRadius: "sm",
-								px: "2.5",
-								py: "1.5",
-								fontSize: "sm",
-								bg: "bg",
-								color: "fg",
-							})}
-						/>
-					</div>
-				</Stack>
-
-				<Field
-					label="Tags"
-					helperText="Comma-separated"
-					value={form.tags}
-					onValueChange={(value: string) =>
-						setForm((f) => ({ ...f, tags: value }))
-					}
-				/>
-
-				<Textarea
-					label="Description"
-					rows={4}
-					value={form.body}
-					onValueChange={(value: string) =>
-						setForm((f) => ({ ...f, body: value }))
-					}
-				/>
-
-				{error && (
-					<Text size="sm" class={css({ color: "fg.error" })}>
-						{error}{" "}
-						<Anchor
-							href="/admin/#/collections/tasks/entries/new"
-							target="_blank"
-							variant="plain"
-						>
-							Create it in the CMS
-						</Anchor>{" "}
-						instead.
-					</Text>
-				)}
-
-				<Stack gap="3" justify="end">
+			footer={
+				<Stack gap="3" justify="end" class={css({ width: "full" })}>
 					<button
 						type="button"
 						onClick={resetAndClose}
@@ -266,7 +129,144 @@ export default function TaskCreateDrawer(props: TaskCreateDrawerProps) {
 						{saving ? "Creating..." : "Create task"}
 					</button>
 				</Stack>
-			</Stack>
-		</Drawer>
+			}
+			// Passed as `body` (not `children`) so this lands inside the
+			// Drawer's own `<Body>` part — the slot with `flex: 1`,
+			// `overflow: auto`, and the bottom padding that keeps content clear
+			// of the absolutely-positioned footer (see drawer.ts). Raw
+			// `children` renders as a sibling of Header/Body/Footer with none
+			// of that, so a form this long would never scroll.
+			body={
+				<Stack
+					direction="column"
+					gap="4"
+					class={css({ alignItems: "stretch", width: "full" })}
+				>
+					<Field
+						label="Title"
+						value={form.title}
+						onValueChange={(value: string) =>
+							setForm((f) => ({ ...f, title: value }))
+						}
+						required
+					/>
+
+					<div>
+						<Text size="sm" class={css({ fontWeight: "medium", mb: "1.5" })}>
+							Project
+						</Text>
+						<InteractiveCombobox
+							items={props.projects}
+							value={form.project}
+							onValueChange={(value: string) =>
+								setForm((f) => ({ ...f, project: value }))
+							}
+							placeholder="Search projects..."
+							allowClear
+							size="sm"
+						/>
+					</div>
+
+					<Stack gap="4" wrap="wrap" class={css({ alignItems: "stretch" })}>
+						<div class={css({ flex: "1", minWidth: "36" })}>
+							<Text size="sm" class={css({ fontWeight: "medium", mb: "1.5" })}>
+								Status
+							</Text>
+							<InteractiveCombobox
+								items={statusItems}
+								value={form.status}
+								onValueChange={(value: string) =>
+									setForm((f) => ({ ...f, status: value }))
+								}
+								size="sm"
+							/>
+						</div>
+						<div class={css({ flex: "1", minWidth: "36" })}>
+							<Text size="sm" class={css({ fontWeight: "medium", mb: "1.5" })}>
+								Priority
+							</Text>
+							<InteractiveCombobox
+								items={priorityItems}
+								value={form.priority}
+								onValueChange={(value: string) =>
+									setForm((f) => ({ ...f, priority: value }))
+								}
+								size="sm"
+							/>
+						</div>
+					</Stack>
+
+					<Stack gap="4" wrap="wrap" class={css({ alignItems: "stretch" })}>
+						<div class={css({ flex: "1", minWidth: "36" })}>
+							<Field
+								label="Assignee"
+								value={form.assignee}
+								onValueChange={(value: string) =>
+									setForm((f) => ({ ...f, assignee: value }))
+								}
+							/>
+						</div>
+						<div class={css({ flex: "1", minWidth: "36" })}>
+							<Text size="sm" class={css({ fontWeight: "medium", mb: "1.5" })}>
+								Due date
+							</Text>
+							<input
+								type="date"
+								value={form.dueDate}
+								onInput={(e: Event) =>
+									setForm((f) => ({
+										...f,
+										dueDate: (e.target as HTMLInputElement).value,
+									}))
+								}
+								class={css({
+									width: "full",
+									borderWidth: "1px",
+									borderColor: "border",
+									borderRadius: "sm",
+									px: "2.5",
+									py: "1.5",
+									fontSize: "sm",
+									bg: "bg",
+									color: "fg",
+								})}
+							/>
+						</div>
+					</Stack>
+
+					<Field
+						label="Tags"
+						helperText="Comma-separated"
+						value={form.tags}
+						onValueChange={(value: string) =>
+							setForm((f) => ({ ...f, tags: value }))
+						}
+					/>
+
+					<Textarea
+						label="Description"
+						rows={4}
+						value={form.body}
+						onValueChange={(value: string) =>
+							setForm((f) => ({ ...f, body: value }))
+						}
+					/>
+
+					{error && (
+						<Text size="sm" class={css({ color: "fg.error" })}>
+							{error}{" "}
+							<Anchor
+								href="/admin/#/collections/tasks/entries/new"
+								target="_blank"
+								variant="plain"
+							>
+								Create it in the CMS
+							</Anchor>{" "}
+							instead.
+						</Text>
+					)}
+				</Stack>
+			}
+		/>
 	);
 }
