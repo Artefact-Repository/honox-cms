@@ -61,7 +61,7 @@ export function Root(props: RootProps) {
 	};
 
 	return (
-		<div id={id} ref={rootRef} data-overlay-root data-scope="dialog">
+		<div id={id} ref={rootRef} data-overlay-root>
 			<DialogContext.Provider value={value}>{children}</DialogContext.Provider>
 		</div>
 	);

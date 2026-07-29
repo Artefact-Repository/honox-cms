@@ -148,6 +148,7 @@ export function Root(props: RootProps) {
 				id={rootId}
 				data-scope="combobox"
 				data-part="root"
+				data-overlay-root
 				class={cx(styles.root, classProp)}
 				style={{ position: "relative", ...style }}
 				{...domProps}

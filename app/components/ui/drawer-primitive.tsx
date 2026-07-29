@@ -61,7 +61,7 @@ export function Root(props: RootProps) {
 	};
 
 	return (
-		<div id={id} ref={rootRef} data-overlay-root data-scope="drawer">
+		<div id={id} ref={rootRef} data-overlay-root>
 			<DrawerContext.Provider value={value}>{children}</DrawerContext.Provider>
 		</div>
 	);

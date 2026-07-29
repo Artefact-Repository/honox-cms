@@ -48,34 +48,6 @@ export function getFocusable(container: HTMLElement): HTMLElement[] {
 }
 
 /**
- * Determines whether the given element is part of a nested component/overlay.
- * Walks up the DOM tree from `el` to `rootEl` and checks for boundary attributes.
- */
-export function isNestedTarget(el: HTMLElement, rootEl: HTMLElement): boolean {
-	let current: HTMLElement | null = el;
-	while (current && current !== rootEl) {
-		if (current !== el) {
-			if (
-				current.hasAttribute("data-overlay-root") ||
-				current.hasAttribute("data-scope") ||
-				current.getAttribute("data-part") === "root"
-			) {
-				return true;
-			}
-		} else {
-			if (
-				current.hasAttribute("data-overlay-root") ||
-				current.hasAttribute("data-scope")
-			) {
-				return true;
-			}
-		}
-		current = current.parentElement;
-	}
-	return false;
-}
-
-/**
  * Inert every sibling along the ancestor chain of each open overlay,
  * except the path to an overlay and except ancestors of any open overlay.
  * Recomputes the whole document so closing one overlay restores the rest.
@@ -406,7 +378,11 @@ export function useOverlay(opts: OverlayOptions) {
 				"[data-part]",
 			) as HTMLElement;
 			if (!target) return;
-			if (isNestedTarget(target, root)) return;
+
+			// Ignore clicks that originate from elements belonging to a nested or different overlay
+			const owner = target.closest("[data-overlay-root]");
+			if (owner && owner !== root) return;
+
 			const dataPart = target.getAttribute("data-part");
 
 			if (dataPart === "backdrop" || dataPart === "positioner") {

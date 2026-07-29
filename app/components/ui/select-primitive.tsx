@@ -164,6 +164,7 @@ function Root(props: RootProps) {
 				id={rootId}
 				data-scope="select"
 				data-part="root"
+				data-overlay-root
 				data-state={open ? "open" : "closed"}
 				data-disabled={disabled ? "" : undefined}
 				data-invalid={invalid ? "" : undefined}

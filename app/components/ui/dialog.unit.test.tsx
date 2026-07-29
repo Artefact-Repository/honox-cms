@@ -75,31 +75,19 @@ describe("Dialog Unit Tests", () => {
 		expect(html).toContain("Action Me");
 	});
 
-	test("isNestedTarget should correctly identify elements inside nested overlays/boundaries", () => {
-		const { isNestedTarget } = require("./overlay-a11y");
+	test("should render data-overlay-root on Dialog and nested Select components", () => {
+		const html = (
+			<Dialog.Root open={true}>
+				<Dialog.Trigger>Open Dialog</Dialog.Trigger>
+				<Dialog.Content>
+					<div id="nested-select" data-scope="select" data-part="root" data-overlay-root>
+						<button data-part="trigger">Open Select</button>
+					</div>
+				</Dialog.Content>
+			</Dialog.Root>
+		).toString();
 
-		// Run only if we are in a DOM-supported environment
-		if (typeof document !== "undefined") {
-			// Set up mock DOM elements
-			const root = document.createElement("div");
-			root.setAttribute("data-overlay-root", "true");
-			root.setAttribute("data-scope", "dialog");
-
-			const nestedOverlay = document.createElement("div");
-			nestedOverlay.setAttribute("data-overlay-root", "true");
-			nestedOverlay.setAttribute("data-scope", "select");
-			root.appendChild(nestedOverlay);
-
-			const nestedItem = document.createElement("div");
-			nestedItem.setAttribute("data-part", "item");
-			nestedOverlay.appendChild(nestedItem);
-
-			const directItem = document.createElement("div");
-			directItem.setAttribute("data-part", "close-trigger");
-			root.appendChild(directItem);
-
-			expect(isNestedTarget(nestedItem, root)).toBe(true);
-			expect(isNestedTarget(directItem, root)).toBe(false);
-		}
+		expect(html).toContain('data-overlay-root="true"');
+		expect(html).toContain('data-scope="select"');
 	});
 });

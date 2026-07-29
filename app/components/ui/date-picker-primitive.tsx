@@ -520,6 +520,7 @@ export function DatePickerRoot(props: DatePickerRootProps) {
 				id={rootId}
 				data-scope="date-picker"
 				data-part="root"
+				data-overlay-root
 				data-state={isOpen ? "open" : "closed"}
 				data-disabled={disabled ? "" : undefined}
 				data-readonly={readOnly ? "" : undefined}
