@@ -25,7 +25,7 @@ export default function TaskProjectEditor(props: TaskProjectEditorProps) {
 	const [saving, setSaving] = useState(false);
 
 	return (
-		<div class={css({ minWidth: "48" })}>
+		<div class={css({ minWidth: "48", maxWidth: "sm" })}>
 			<InteractiveCombobox
 				items={props.projects}
 				value={value}
