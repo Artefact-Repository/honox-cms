@@ -3,7 +3,9 @@ import { css } from "design-system/css";
 import { useState } from "hono/jsx";
 import { IconButton } from "../components/ui/button";
 import { Dropdown } from "../components/ui/dropdown";
+import { toaster } from "../components/ui/toast";
 import { EllipsisIcon } from "../icons/ellipsis";
+import { convertTaskToTopLevel, TaskSaveError } from "../utils/task-save";
 import TaskCloneDialog from "./task-clone-dialog";
 import TaskDeleteDialog from "./task-delete-dialog";
 import TaskToProject, { type TaskToProjectProps } from "./task-to-project";
@@ -12,15 +14,34 @@ import TaskToSubtaskDialog from "./task-to-subtask-dialog";
 export interface TaskActionsMenuProps
 	extends Omit<TaskToProjectProps, "open" | "onOpenChange"> {
 	editHref: string;
+	/** Set when this task already has a parent — swaps the submenu's
+	 * "Subtask" option for "Task" (clears the parent instead of prompting
+	 * for a new one). */
+	parentTask?: string;
 	tasks: { label: string; value: string }[];
 }
 
 export default function TaskActionsMenu(props: TaskActionsMenuProps) {
-	const { editHref, tasks, ...taskProps } = props;
+	const { editHref, parentTask, tasks, ...taskProps } = props;
 	const [convertOpen, setConvertOpen] = useState(false);
 	const [subtaskOpen, setSubtaskOpen] = useState(false);
 	const [cloneOpen, setCloneOpen] = useState(false);
 	const [deleteOpen, setDeleteOpen] = useState(false);
+
+	const handleConvertToTopLevel = async () => {
+		try {
+			await convertTaskToTopLevel(taskProps.slug);
+			toaster.success(`Made "${taskProps.title}" a top-level task.`, {
+				description: "Committed to main — live once the site rebuilds.",
+			});
+		} catch (err) {
+			toaster.error(
+				err instanceof TaskSaveError || err instanceof Error
+					? err.message
+					: "Failed to convert the task.",
+			);
+		}
+	};
 
 	return (
 		<>
@@ -40,7 +61,13 @@ export default function TaskActionsMenu(props: TaskActionsMenuProps) {
 						label: "Convert to...",
 						items: [
 							{ type: "item", label: "Project", value: "convert-to-project" },
-							{ type: "item", label: "Subtask", value: "convert-to-subtask" },
+							parentTask
+								? { type: "item", label: "Task", value: "convert-to-task" }
+								: {
+										type: "item",
+										label: "Subtask",
+										value: "convert-to-subtask",
+									},
 						],
 					},
 					{ type: "separator" },
@@ -54,6 +81,7 @@ export default function TaskActionsMenu(props: TaskActionsMenuProps) {
 				onSelect={(value) => {
 					if (value === "convert-to-project") setConvertOpen(true);
 					if (value === "convert-to-subtask") setSubtaskOpen(true);
+					if (value === "convert-to-task") void handleConvertToTopLevel();
 					if (value === "clone") setCloneOpen(true);
 					if (value === "delete") setDeleteOpen(true);
 				}}

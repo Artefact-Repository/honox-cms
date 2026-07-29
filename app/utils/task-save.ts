@@ -55,15 +55,15 @@ export async function deleteTask(slug: string): Promise<void> {
 	await deleteFile(path, file.sha, `Delete task "${slug}"`, token);
 }
 
-/** Sets `parentTask` on an existing task — same direct-commit path as every
- * other field edit (see `saveTaskField`), just named for the task detail
- * page's "Convert to... Subtask" action. */
-export async function convertTaskToSubtask(
-	slug: string,
-	parentSlug: string,
-): Promise<void> {
+/** Clears `parentTask` on an existing task — the task detail page's
+ * "Convert to... Task" action, offered instead of "...Subtask" once a task
+ * already has a parent (see task-actions-menu.tsx). Same direct-commit path
+ * as every other field edit; `data.parentTask = undefined` is enough to drop
+ * the key entirely, since `stringifyFrontmatter`'s YAML serializer omits
+ * `undefined` values the same way `JSON.stringify` would. */
+export async function convertTaskToTopLevel(slug: string): Promise<void> {
 	await saveTaskField(slug, (data) => ({
-		data: { ...data, parentTask: parentSlug },
+		data: { ...data, parentTask: undefined },
 	}));
 }
 
