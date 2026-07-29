@@ -642,6 +642,14 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 	const filteredItems = items.filter((item) =>
 		item.label.toLowerCase().includes(filterText.toLowerCase()),
 	);
+	// `.filter()` above returns a new array identity every render, so the
+	// listener-attaching effect below reads this ref instead of closing over
+	// `filteredItems` directly — otherwise that array in its dependency array
+	// makes the effect tear down and reattach its DOM listeners on every
+	// render (even a mere hover-triggered highlightedIndex change), and a
+	// click landing in that reattachment gap gets silently dropped.
+	const filteredItemsRef = useRef(filteredItems);
+	filteredItemsRef.current = filteredItems;
 
 	const fallbackId = useId();
 	const rootId = idProp || `combobox-${fallbackId}`;
@@ -836,7 +844,7 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 		const handleKeyDown = (e: KeyboardEvent) => {
 			const currentOpen = root.getAttribute("data-state") === "open";
 			// Get indices of all non-disabled items currently matched/rendered
-			const enabledIndices = filteredItems
+			const enabledIndices = filteredItemsRef.current
 				.map((item, index) => (item.disabled ? null : index))
 				.filter((idx): idx is number => idx !== null);
 
@@ -954,7 +962,8 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 				inputElement.removeEventListener("blur", handleBlur);
 			}
 		};
-	}, [rootId, filteredItems]);
+		// `filteredItems` deliberately excluded — see `filteredItemsRef` above.
+	}, [rootId]);
 
 	return (
 		<Root

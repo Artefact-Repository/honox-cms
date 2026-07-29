@@ -101,8 +101,17 @@ export const combobox = defineSlotRecipe({
 				bg: "border",
 			},
 		},
+		itemText: {
+			// InteractiveCombobox's delegated click handler reads
+			// data-part/data-value off `e.target.closest("[data-part]")` — a click
+			// landing on this span (which carries its own data-part="item-text")
+			// resolves to itself instead of bubbling to the parent item, silently
+			// no-op'ing the selection. Same fix as dropdown.ts's itemText.
+			pointerEvents: "none",
+		},
 		itemIndicator: {
 			color: "colorPalette.plain.fg",
+			pointerEvents: "none",
 		},
 		indicatorGroup: {
 			display: "flex",
