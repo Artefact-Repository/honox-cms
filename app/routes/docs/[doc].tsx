@@ -621,17 +621,21 @@ export default createRoute(
 
 						{/* Sider (see docsShellProps.siderClass) scrolls its own overflow
 						    independently of the page, so a deep doc list can leave the
-						    active link scrolled out of view on load. Placed in `content`
-						    (rendered inside `<main>`) so by the time it runs, the sider's
-						    HTML already precedes it in the DOM (Layout puts header's
-						    mobile-nav copy, then aside, before main). `block: "nearest"`
-						    no-ops when already visible, and no-ops on the closed
-						    mobile-nav <details> copy since it has no layout box there. */}
+						    active link scrolled out of view on load. The initial run below
+						    (right after the sider's HTML, which precedes this script in the
+						    DOM — see Layout: header's mobile-nav copy, then aside, then
+						    main) isn't enough on its own: the sidenav's Collapsible groups
+						    are client islands, and their hydration swaps in a freshly
+						    rendered subtree shortly after, which drops the scroll position
+						    back to 0. The MutationObserver re-runs the scroll once
+						    hydration settles, then disconnects. `block: "nearest"` no-ops
+						    when already visible, and no-ops on the closed mobile-nav
+						    <details> copy since it has no layout box there. */}
 						<script
 							// biome-ignore lint/security/noDangerouslySetInnerHtml: static, non-user-controlled script
 							dangerouslySetInnerHTML={{
 								__html:
-									'(function(){try{document.querySelectorAll(\'[aria-current="page"]\').forEach(function(el){el.scrollIntoView({block:"nearest"});});}catch(e){}})();',
+									"(function(){try{var run=function(){document.querySelectorAll('[aria-current=\"page\"]').forEach(function(el){el.scrollIntoView({block:'nearest'});});};run();var targets=document.querySelectorAll('aside, details');if(window.MutationObserver&&targets.length){var scheduled=false;var onMutate=function(){if(scheduled)return;scheduled=true;requestAnimationFrame(function(){scheduled=false;run();});};var observer=new MutationObserver(onMutate);targets.forEach(function(t){observer.observe(t,{childList:true,subtree:true});});setTimeout(function(){observer.disconnect();},3000);}}catch(e){}})();",
 							}}
 						/>
 
