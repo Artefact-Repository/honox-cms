@@ -172,6 +172,7 @@ function renderDropdownItem(
 	index: number,
 	size?: DropdownVariantProps["size"],
 	interactive = true,
+	onSelect?: (value: string) => void,
 ): JSX.Element {
 	switch (item.type) {
 		case "separator":
@@ -219,7 +220,7 @@ function renderDropdownItem(
 						<ItemGroupLabel>{radioGroup.label}</ItemGroupLabel>
 					)}
 					{radioGroup.items.map((radioItem, idx) =>
-						renderDropdownItem(radioItem, idx, size, interactive),
+						renderDropdownItem(radioItem, idx, size, interactive, onSelect),
 					)}
 				</RadioItemGroup>
 			);
@@ -233,7 +234,7 @@ function renderDropdownItem(
 						<ItemGroupLabel>{groupItem.label}</ItemGroupLabel>
 					)}
 					{groupItem.items.map((child, idx) =>
-						renderDropdownItem(child, idx, size, interactive),
+						renderDropdownItem(child, idx, size, interactive, onSelect),
 					)}
 				</ItemGroup>
 			);
@@ -247,6 +248,7 @@ function renderDropdownItem(
 					item={submenuItem}
 					size={size}
 					interactive={interactive}
+					onSelect={onSelect}
 				/>
 			);
 		}
@@ -300,10 +302,12 @@ function DropdownSubmenu({
 	item,
 	size,
 	interactive,
+	onSelect,
 }: {
 	item: DropdownSubmenuItem;
 	size?: DropdownVariantProps["size"];
 	interactive: boolean;
+	onSelect?: (value: string) => void;
 }) {
 	const styles = dropdown({ size });
 	const triggerItem = (
@@ -316,7 +320,7 @@ function DropdownSubmenu({
 		<Positioner placement="rightTop" class={styles.positioner}>
 			<Content class={styles.content}>
 				{item.items.map((child, idx) =>
-					renderDropdownItem(child, idx, size, interactive),
+					renderDropdownItem(child, idx, size, interactive, onSelect),
 				)}
 			</Content>
 		</Positioner>
@@ -329,6 +333,7 @@ function DropdownSubmenu({
 				trigger={["hover", "click"]}
 				placement="rightTop"
 				disabled={item.disabled}
+				onSelect={onSelect}
 			>
 				{triggerItem}
 				{positioner}
@@ -403,7 +408,7 @@ function DropdownRoot(props: DropdownProps) {
 		const menuContent = items ? (
 			<Content class={cx(styles.content, contentClass)}>
 				{items.map((item, index) =>
-					renderDropdownItem(item, index, variantProps.size, true),
+					renderDropdownItem(item, index, variantProps.size, true, onSelect),
 				)}
 			</Content>
 		) : null;
@@ -455,7 +460,7 @@ function DropdownRoot(props: DropdownProps) {
 	const menuContent = items ? (
 		<Content class={cx(styles.content, contentClass)}>
 			{items.map((item, index) =>
-				renderDropdownItem(item, index, variantProps.size, false),
+				renderDropdownItem(item, index, variantProps.size, false, onSelect),
 			)}
 		</Content>
 	) : null;
