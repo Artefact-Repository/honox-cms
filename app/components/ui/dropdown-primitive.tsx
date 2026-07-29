@@ -941,6 +941,16 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 		// escape their content's normal box via fixed, viewport-relative
 		// coordinates computed by hand.
 		positioner.style.position = "fixed";
+		// `position: fixed` alone doesn't establish a stacking context — with
+		// no z-index of its own (only the *content* child has one, via the
+		// recipe class), this positioner just stacks in plain DOM order
+		// relative to whatever else is on the page. In practice that meant a
+		// table row's hover-revealed action buttons (their own
+		// `position: relative` + `z-index` stacking context) could render on
+		// top of an open context menu the instant the pointer moved over that
+		// row. Setting z-index here directly forces a real top-level stacking
+		// context, matching `--dropdown-z-index` (see dropdown.ts).
+		positioner.style.zIndex = "var(--z-index-dropdown, 1000)";
 		const menuWidth = content?.offsetWidth || 200;
 		const menuHeight = content?.offsetHeight || 200;
 		let x = 0;
