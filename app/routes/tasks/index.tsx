@@ -469,17 +469,6 @@ export default createRoute(async (c) => {
 								<>
 									<button
 										type="button"
-										data-task-details-trigger
-										data-task-slug={task.slug}
-										class={cx(
-											button({ variant: "outline", size: "sm" }),
-											css({ textStyle: "sm", fontWeight: "medium" }),
-										)}
-									>
-										View Details
-									</button>
-									<button
-										type="button"
 										data-task-clone-trigger
 										data-task-slug={task.slug}
 										aria-label={`Clone "${task.title}"`}
