@@ -516,6 +516,32 @@ function InteractivePopoverRoot(props: InteractivePopoverProps) {
 	const prevFocusRef = useRef<HTMLElement | null>(null);
 	const isFirstRender = useRef(true);
 
+	const [renderOpen, setRenderOpen] = useState(open);
+
+	useEffect(() => {
+		if (open) {
+			setRenderOpen(true);
+		} else {
+			const root = document.getElementById(rootId);
+			if (root && renderOpen) {
+				const contentEl = root.querySelector(
+					'[data-part="content"]',
+				) as HTMLElement | null;
+				const positionerEl = root.querySelector(
+					'[data-part="positioner"]',
+				) as HTMLElement | null;
+				const animatedEl = contentEl || positionerEl;
+				if (animatedEl) {
+					const cleanup = whenAnimationEnds(animatedEl, () => {
+						setRenderOpen(false);
+					});
+					return cleanup;
+				}
+			}
+			setRenderOpen(false);
+		}
+	}, [open, renderOpen, rootId]);
+
 	const handleOpenChange = (nextOpen: boolean) => {
 		if (!isControlled) {
 			setIsOpen(nextOpen);
@@ -735,7 +761,7 @@ function InteractivePopoverRoot(props: InteractivePopoverProps) {
 			data-state={open ? "open" : "closed"}
 			style={{ position: "relative", display: "inline-block" }}
 		>
-			<Root id={idProp} {...rest} open={open}>
+			<Root id={idProp} {...rest} open={renderOpen}>
 				{children}
 			</Root>
 		</div>

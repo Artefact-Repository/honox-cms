@@ -329,6 +329,32 @@ export function InteractiveTooltip(props: InteractiveTooltipProps) {
 	const fallbackId = useId();
 	const rootId = idProp || `tooltip-${fallbackId}`;
 
+	const [renderOpen, setRenderOpen] = useState(open);
+
+	useEffect(() => {
+		if (open) {
+			setRenderOpen(true);
+		} else {
+			const root = document.getElementById(rootId);
+			if (root && renderOpen) {
+				const contentEl = root.querySelector(
+					'[data-part="content"]',
+				) as HTMLElement | null;
+				const positionerEl = root.querySelector(
+					'[data-part="positioner"]',
+				) as HTMLElement | null;
+				const animatedEl = contentEl || positionerEl;
+				if (animatedEl) {
+					const cleanup = whenAnimationEnds(animatedEl, () => {
+						setRenderOpen(false);
+					});
+					return cleanup;
+				}
+			}
+			setRenderOpen(false);
+		}
+	}, [open, renderOpen, rootId]);
+
 	const handleOpenChangeRef = useRef<(nextOpen: boolean) => void>(() => {});
 	useEffect(() => {
 		handleOpenChangeRef.current = (nextOpen: boolean) => {
@@ -529,7 +555,7 @@ export function InteractiveTooltip(props: InteractiveTooltipProps) {
 			data-state={open ? "open" : "closed"}
 			style={{ position: "relative", display: "inline-block" }}
 		>
-			<TooltipRoot id={idProp} open={open} placement={placement}>
+			<TooltipRoot id={idProp} open={renderOpen} placement={placement}>
 				{children}
 			</TooltipRoot>
 		</div>

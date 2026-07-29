@@ -782,6 +782,32 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 	}
 	const rootId = rootIdRef.current;
 
+	const [renderOpen, setRenderOpen] = useState(open);
+
+	useEffect(() => {
+		if (open) {
+			setRenderOpen(true);
+		} else {
+			const root = document.getElementById(rootId);
+			if (root && renderOpen) {
+				const contentEl = root.querySelector(
+					'[data-part="content"]',
+				) as HTMLElement | null;
+				const positionerEl = root.querySelector(
+					'[data-part="positioner"]',
+				) as HTMLElement | null;
+				const animatedEl = contentEl || positionerEl;
+				if (animatedEl) {
+					const cleanup = whenAnimationEnds(animatedEl, () => {
+						setRenderOpen(false);
+					});
+					return cleanup;
+				}
+			}
+			setRenderOpen(false);
+		}
+	}, [open, renderOpen, rootId]);
+
 	const rootRef = useRef<HTMLElement | null>(null);
 	const triggerRef = useRef<HTMLElement | null>(null);
 	const contentRef = useRef<HTMLElement | null>(null);
@@ -1330,7 +1356,7 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 			<DropdownRoot
 				{...rest}
 				disabled={disabled}
-				open={open}
+				open={renderOpen}
 				rendered={isRendered}
 				destroyOnHidden={destroyOnHidden}
 				classNames={classNames}

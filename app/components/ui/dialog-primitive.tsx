@@ -6,11 +6,12 @@ import {
 	cloneElement,
 	createContext,
 	useContext,
+	useEffect,
 	useId,
 	useRef,
 	useState,
 } from "hono/jsx";
-import { hasPart, useOverlay } from "./overlay-a11y";
+import { hasPart, useOverlay, whenAnimationEnds } from "./overlay-a11y";
 
 type DialogStyles = ReturnType<typeof dialog>;
 
@@ -425,6 +426,32 @@ export function InteractiveDialog(props: InteractiveDialogProps) {
 	const rootId = idProp || `dialog-${fallbackId}`;
 	const rootRef = useRef<HTMLElement>(null);
 
+	const [renderOpen, setRenderOpen] = useState(open);
+
+	useEffect(() => {
+		if (open) {
+			setRenderOpen(true);
+		} else {
+			const root = rootRef.current;
+			if (root && renderOpen) {
+				const contentEl = root.querySelector(
+					'[data-part="content"]',
+				) as HTMLElement | null;
+				const backdropEl = root.querySelector(
+					'[data-part="backdrop"]',
+				) as HTMLElement | null;
+				const animatedEl = contentEl || backdropEl;
+				if (animatedEl) {
+					const cleanup = whenAnimationEnds(animatedEl, () => {
+						setRenderOpen(false);
+					});
+					return cleanup;
+				}
+			}
+			setRenderOpen(false);
+		}
+	}, [open, renderOpen]);
+
 	const handleOpenChange = (nextOpen: boolean) => {
 		if (!isControlled) {
 			setIsOpen(nextOpen);
@@ -447,7 +474,7 @@ export function InteractiveDialog(props: InteractiveDialogProps) {
 		<Root
 			{...rest}
 			id={rootId}
-			open={open}
+			open={renderOpen}
 			onOpenChange={handleOpenChange}
 			rootRef={rootRef}
 			dialogRole={dialogRole}

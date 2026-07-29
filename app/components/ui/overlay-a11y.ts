@@ -301,13 +301,12 @@ export function useOverlay(opts: OverlayOptions) {
 				c.setAttribute("data-state", "closed");
 			}
 
-			deactivate();
-
 			cancelPendingHide();
 			const animatedEl = contents[0] || positioners[0] || backdrops[0];
 			if (animatedEl) {
 				cancelPendingHide = whenAnimationEnds(animatedEl, () => {
 					if (root.getAttribute("data-state") === "closed") {
+						deactivate();
 						for (const p of positioners) {
 							p.style.cssText =
 								"display: none !important; visibility: hidden !important;";
@@ -323,6 +322,7 @@ export function useOverlay(opts: OverlayOptions) {
 					}
 				});
 			} else {
+				deactivate();
 				for (const p of positioners) {
 					p.style.cssText =
 						"display: none !important; visibility: hidden !important;";
@@ -448,7 +448,7 @@ export function useOverlay(opts: OverlayOptions) {
 			cancelPendingHide();
 			root.removeEventListener("click", handleClick);
 			window.removeEventListener("keydown", onKeyDown, true);
-			hide(); // Clean up overlay state on unmount
+			deactivate(); // Clean up overlay state on unmount
 		};
 	}, [rootRef]);
 }
