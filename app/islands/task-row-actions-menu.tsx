@@ -120,7 +120,10 @@ export default function TaskRowActionsMenu({ tasks }: TaskRowActionsMenuProps) {
 			const slug = trigger.getAttribute("data-task-slug");
 			if (!slug) return;
 			const rect = trigger.getBoundingClientRect();
-			pendingPointRef.current = { x: rect.left, y: rect.bottom };
+			// `y` is the *bottom* edge to grow up from — see `data-open-upward`
+			// below — not the top, so the menu opens above the row instead of
+			// covering the ones under it.
+			pendingPointRef.current = { x: rect.left, y: rect.top };
 			setSelectedSlug(slug);
 		};
 		document.addEventListener("click", onClick);
@@ -183,6 +186,7 @@ export default function TaskRowActionsMenu({ tasks }: TaskRowActionsMenuProps) {
 						ref={(el) => {
 							contextTriggerRef.current = el as HTMLDivElement | null;
 						}}
+						data-open-upward
 						style={{ position: "fixed", top: "0px", left: "0px" }}
 					/>
 				}
