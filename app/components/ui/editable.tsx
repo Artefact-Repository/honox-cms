@@ -24,7 +24,8 @@ export interface EditableProps extends RootProps {
 }
 
 function Root(props: EditableProps) {
-	const { interactive, label, children, ...rest } = props;
+	const { interactive, label, helperText, errorText, children, ...rest } =
+		props;
 
 	// `Content` is built fresh inside each render path (island or static)
 	// rather than here: HonoX rebuilds an island's `children` from a
@@ -34,15 +35,22 @@ function Root(props: EditableProps) {
 	// editable-primitive.tsx).
 	if (shouldHydrate(interactive, true)) {
 		return (
-			<EditableIsland {...rest} label={label}>
+			<EditableIsland
+				{...rest}
+				label={label}
+				helperText={helperText}
+				errorText={errorText}
+			>
 				{children}
 			</EditableIsland>
 		);
 	}
 
 	return (
-		<RootPrimitive {...rest}>
-			<Content label={label}>{children}</Content>
+		<RootPrimitive {...rest} helperText={helperText} errorText={errorText}>
+			<Content label={label} helperText={helperText} errorText={errorText}>
+				{children}
+			</Content>
 		</RootPrimitive>
 	);
 }

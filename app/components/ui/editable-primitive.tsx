@@ -1,4 +1,4 @@
-import { cx } from "design-system/css";
+import { css, cx } from "design-system/css";
 import type { EditableVariantProps } from "design-system/recipes";
 import { editable } from "design-system/recipes";
 import {
@@ -8,13 +8,21 @@ import {
 	type PropsWithChildren,
 	useContext,
 	useId,
+	useState,
 } from "hono/jsx";
+import { InteractiveCombobox } from "./combobox-primitive";
 
 type EditableStyles = ReturnType<typeof editable>;
 
 export type EditableActivationMode = "focus" | "dblclick" | "click" | "none";
 export type EditableSubmitMode = "enter" | "blur" | "both" | "none";
 export type EditablePlaceholder = string | { edit: string; preview: string };
+
+export interface EditableComboboxItem {
+	label: string;
+	value: string;
+	disabled?: boolean;
+}
 
 export interface EditableTranslations {
 	edit?: string;
@@ -30,6 +38,14 @@ const defaultTranslations: Required<EditableTranslations> = {
 	input: "Edit value",
 };
 
+/** `tags` mode stores its list as a comma-separated string in `value`. */
+function parseTags(value: string): string[] {
+	return value
+		.split(",")
+		.map((tag) => tag.trim())
+		.filter(Boolean);
+}
+
 export interface EditableContextValue {
 	value: string;
 	editing: boolean;
@@ -43,6 +59,12 @@ export interface EditableContextValue {
 	multiline?: boolean;
 	/** Textarea row count when `multiline` is set. @default 3 */
 	rows?: number;
+	/** Renders the input as a searchable combobox instead of a plain text input. */
+	combobox?: boolean;
+	/** Options for `combobox` mode. Preview shows the matching label, not the raw value. */
+	items?: EditableComboboxItem[];
+	/** Renders the value as a tag list (comma-separated string) with an add/remove editor. */
+	tags?: boolean;
 	activationMode: EditableActivationMode;
 	submitMode: EditableSubmitMode;
 	selectOnFocus: boolean;
@@ -51,6 +73,8 @@ export interface EditableContextValue {
 	maxLength?: number;
 	name?: string;
 	form?: string;
+	hasHelperText: boolean;
+	hasErrorText: boolean;
 	styles: EditableStyles;
 	ids: {
 		area: string;
@@ -61,6 +85,8 @@ export interface EditableContextValue {
 		submitTrigger: string;
 		cancelTrigger: string;
 		control: string;
+		helperText: string;
+		errorText: string;
 	};
 	/** Enters edit mode. No-op until hydrated. */
 	edit: () => void;
@@ -94,6 +120,12 @@ export interface RootProps extends EditableVariantProps, PropsWithChildren {
 	multiline?: boolean;
 	/** Textarea row count when `multiline` is set. @default 3 */
 	rows?: number;
+	/** Renders the input as a searchable combobox instead of a plain text input. */
+	combobox?: boolean;
+	/** Options for `combobox` mode. Preview shows the matching label, not the raw value. */
+	items?: EditableComboboxItem[];
+	/** Renders the value as a tag list (comma-separated string) with an add/remove editor. */
+	tags?: boolean;
 	disabled?: boolean;
 	readOnly?: boolean;
 	required?: boolean;
@@ -102,6 +134,8 @@ export interface RootProps extends EditableVariantProps, PropsWithChildren {
 	maxLength?: number;
 	name?: string;
 	form?: string;
+	helperText?: Child;
+	errorText?: Child;
 	translations?: EditableTranslations;
 	onValueChange?: (details: { value: string }) => void;
 	onValueCommit?: (details: { value: string }) => void;
@@ -134,6 +168,7 @@ export function Root(props: RootProps) {
 		selectOnFocus = true,
 		autoResize,
 		rows,
+		items,
 		disabled,
 		readOnly,
 		required,
@@ -142,6 +177,8 @@ export function Root(props: RootProps) {
 		maxLength,
 		name,
 		form,
+		helperText,
+		errorText,
 		translations,
 		onEdit,
 		onCancel,
@@ -167,7 +204,15 @@ export function Root(props: RootProps) {
 		typeof placeholder === "string"
 			? { edit: placeholder, preview: placeholder }
 			: placeholder;
-	const valueText = empty ? (placeholderText?.preview ?? "") : value;
+	const isCombobox = variantProps.combobox as boolean | undefined;
+	// Combobox mode stores the item's `value` (e.g. a slug) but previews its
+	// human `label` — falls back to the raw value if it's not in `items`
+	// (e.g. stale data pointing at a deleted option).
+	const valueText = empty
+		? (placeholderText?.preview ?? "")
+		: isCombobox
+			? (items?.find((item) => item.value === value)?.label ?? value)
+			: value;
 
 	const contextValue: EditableContextValue = {
 		value,
@@ -181,6 +226,9 @@ export function Root(props: RootProps) {
 		autoResize,
 		multiline: variantProps.multiline as boolean | undefined,
 		rows,
+		combobox: isCombobox,
+		items,
+		tags: variantProps.tags as boolean | undefined,
 		activationMode,
 		submitMode,
 		selectOnFocus,
@@ -189,6 +237,8 @@ export function Root(props: RootProps) {
 		maxLength,
 		name,
 		form,
+		hasHelperText: !!helperText,
+		hasErrorText: !!errorText,
 		styles,
 		ids: {
 			area: `editable::${id}::area`,
@@ -199,6 +249,8 @@ export function Root(props: RootProps) {
 			submitTrigger: `editable::${id}::submit-trigger`,
 			cancelTrigger: `editable::${id}::cancel-trigger`,
 			control: `editable::${id}::control`,
+			helperText: `editable::${id}::helper-text`,
+			errorText: `editable::${id}::error-text`,
 		},
 		edit: onEdit ?? (() => {}),
 		cancel: onCancel ?? (() => {}),
@@ -347,7 +399,13 @@ export function Preview(props: PreviewProps) {
 			}
 			{...rest}
 		>
-			{context?.valueText}
+			{context?.tags
+				? parseTags(context.value).map((tag) => (
+						<span key={tag} class={styles.tag}>
+							{tag}
+						</span>
+					))
+				: context?.valueText}
 		</span>
 	);
 }
@@ -363,66 +421,121 @@ export function Input(props: InputProps) {
 	const styles = context?.styles ?? editable();
 	const editing = context?.editing ?? false;
 	const autoResize = context?.autoResize;
+	const multiline = context?.multiline;
+
+	// Selecting an option *is* the commit — there's no separate typed draft to
+	// submit afterward, unlike free text.
+	if (context?.combobox) {
+		return (
+			<div
+				hidden={!editing}
+				class={cx(css({ width: "full" }), classProp)}
+				data-scope="editable"
+				data-part="combobox-input"
+			>
+				<InteractiveCombobox
+					items={context.items ?? []}
+					value={context.value}
+					onValueChange={(next: string) => {
+						context.setValue(next);
+						context.submit({ restoreFocus: true });
+					}}
+					placeholder={context.placeholder?.edit}
+					allowClear
+				/>
+			</div>
+		);
+	}
+
+	if (context?.tags) {
+		return <EditableTagsInput class={classProp} />;
+	}
+	const describedBy = [
+		context?.hasHelperText ? context.ids.helperText : null,
+		context?.invalid && context?.hasErrorText ? context.ids.errorText : null,
+	]
+		.filter(Boolean)
+		.join(" ");
 	const submitOnEnter =
 		context?.submitMode === "enter" || context?.submitMode === "both";
 	const submitOnBlur =
 		context?.submitMode === "blur" || context?.submitMode === "both";
 
+	const handleChange = (e: Event) => {
+		context?.setValue(
+			(e.currentTarget as HTMLInputElement | HTMLTextAreaElement).value,
+		);
+	};
+
+	const handleKeyDown = (e: KeyboardEvent) => {
+		const isSubmitCombo =
+			(e as unknown as { metaKey?: boolean }).metaKey || e.ctrlKey;
+		if (e.key === "Escape") {
+			context?.cancel({ restoreFocus: true });
+			e.preventDefault();
+		} else if (
+			e.key === "Enter" &&
+			// A plain Enter inserts a newline in a `<textarea>` instead of
+			// submitting — only the Cmd/Ctrl+Enter combo commits multiline text.
+			(multiline ? isSubmitCombo : submitOnEnter && !e.shiftKey && !isSubmitCombo)
+		) {
+			context?.submit({ restoreFocus: true });
+			e.preventDefault();
+		}
+		(onKeyDown as ((e: typeof e) => void) | undefined)?.(e);
+	};
+
+	const handleBlur = (e: FocusEvent) => {
+		if (!submitOnBlur) return;
+		const next = e.relatedTarget as HTMLElement | null;
+		if (
+			next?.closest('[data-part="submit-trigger"]') ||
+			next?.closest('[data-part="cancel-trigger"]')
+		) {
+			return;
+		}
+		context?.submit({ restoreFocus: false });
+	};
+
+	const sharedProps = {
+		id: context?.ids.input,
+		name: context?.name,
+		form: context?.form,
+		"aria-label": context?.translations.input,
+		class: cx(styles.input, classProp),
+		"data-scope": "editable",
+		"data-part": "input",
+		hidden: autoResize ? undefined : !editing,
+		placeholder: context?.placeholder?.edit,
+		maxLength: context?.maxLength,
+		required: context?.required,
+		disabled: context?.disabled,
+		"data-disabled": context?.disabled ? "" : undefined,
+		readOnly: context?.readOnly,
+		"data-readonly": context?.readOnly ? "" : undefined,
+		"aria-invalid": context?.invalid ? "true" : undefined,
+		"aria-describedby": describedBy || undefined,
+		"data-invalid": context?.invalid ? "" : undefined,
+		"data-autoresize": autoResize ? "" : undefined,
+		// Controlled `value` (not `defaultValue`) — hono/jsx's SSR renderer
+		// serialises `defaultValue` as a dead attribute that never reaches the
+		// live DOM property, so the field would render empty on first paint.
+		value: context?.value ?? "",
+		onChange: handleChange,
+		onKeyDown: handleKeyDown,
+		onBlur: handleBlur,
+		...rest,
+	};
+
+	if (multiline) {
+		return <textarea {...sharedProps} rows={context?.rows ?? 3} />;
+	}
+
 	return (
 		<input
-			id={context?.ids.input}
+			{...sharedProps}
 			type="text"
-			name={context?.name}
-			form={context?.form}
-			aria-label={context?.translations.input}
-			class={cx(styles.input, classProp)}
-			data-scope="editable"
-			data-part="input"
-			hidden={autoResize ? undefined : !editing}
-			placeholder={context?.placeholder?.edit}
-			maxLength={context?.maxLength}
-			required={context?.required}
-			disabled={context?.disabled}
-			data-disabled={context?.disabled ? "" : undefined}
-			readOnly={context?.readOnly}
-			data-readonly={context?.readOnly ? "" : undefined}
-			aria-invalid={context?.invalid ? "true" : undefined}
-			data-invalid={context?.invalid ? "" : undefined}
-			data-autoresize={autoResize ? "" : undefined}
-			// Controlled `value` (not `defaultValue`) — hono/jsx's SSR renderer
-			// serialises `defaultValue` as a dead attribute that never reaches the
-			// live DOM property, so the field would render empty on first paint.
-			value={context?.value ?? ""}
 			size={autoResize ? 1 : undefined}
-			onChange={(e) => {
-				context?.setValue((e.currentTarget as HTMLInputElement).value);
-			}}
-			onKeyDown={(e) => {
-				if (e.key === "Escape") {
-					context?.cancel({ restoreFocus: true });
-					e.preventDefault();
-				} else if (
-					e.key === "Enter" &&
-					submitOnEnter &&
-					!e.shiftKey &&
-					!(e as unknown as { metaKey?: boolean }).metaKey
-				) {
-					context?.submit({ restoreFocus: true });
-					e.preventDefault();
-				}
-				(onKeyDown as ((e: typeof e) => void) | undefined)?.(e);
-			}}
-			onBlur={(e) => {
-				if (!submitOnBlur) return;
-				const next = (e as FocusEvent).relatedTarget as HTMLElement | null;
-				if (
-					next?.closest('[data-part="submit-trigger"]') ||
-					next?.closest('[data-part="cancel-trigger"]')
-				) {
-					return;
-				}
-				context?.submit({ restoreFocus: false });
-			}}
 			style={
 				autoResize
 					? {
@@ -431,8 +544,116 @@ export function Input(props: InputProps) {
 						}
 					: undefined
 			}
-			{...rest}
 		/>
+	);
+}
+
+/**
+ * `tags` mode's editing widget: existing tags as removable chips plus a text
+ * field that turns Enter/comma keystrokes into new chips. Deliberately a
+ * self-contained mini implementation rather than reusing the standalone
+ * `TagsField` component — that component's interactive logic lives directly
+ * in its island file (unlike Combobox/Dropdown, whose logic already sits in
+ * their -primitive.tsx so it's reusable without a nested-island boundary),
+ * so pulling it in here would either duplicate it anyway or require first
+ * refactoring TagsField itself.
+ */
+function EditableTagsInput(props: { class?: string }) {
+	const context = useEditableContext();
+	const styles = context?.styles ?? editable();
+	const editing = context?.editing ?? false;
+	const tags = parseTags(context?.value ?? "");
+	const [draft, setDraft] = useState("");
+
+	const commitTags = (next: string[]) => {
+		context?.setValue(next.join(", "));
+	};
+
+	const addTag = (raw: string) => {
+		const tag = raw.trim();
+		setDraft("");
+		if (!tag || tags.includes(tag)) return;
+		commitTags([...tags, tag]);
+	};
+
+	const removeTag = (index: number) => {
+		commitTags(tags.filter((_, i) => i !== index));
+	};
+
+	const submitOnBlur =
+		context?.submitMode === "blur" || context?.submitMode === "both";
+
+	return (
+		<div
+			hidden={!editing}
+			class={cx(styles.input, styles.tagsInput, props.class)}
+			data-scope="editable"
+			data-part="tags-input"
+		>
+			{tags.map((tag, index) => (
+				<span key={tag} class={styles.tag} data-part="tag">
+					{tag}
+					<button
+						type="button"
+						class={styles.tagDeleteTrigger}
+						data-part="tag-delete-trigger"
+						aria-label={`Remove ${tag}`}
+						// Without this, the mousedown blurs the text input first
+						// (default browser focus-shift behavior), which fires the
+						// input's blur-submit handler — closing the editor and
+						// discarding this click's `removeTag` before it can run.
+						onMouseDown={(e) => e.preventDefault()}
+						onClick={() => removeTag(index)}
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="10"
+							height="10"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="3"
+							stroke-linecap="round"
+						>
+							<title>Remove</title>
+							<path d="M18 6 6 18M6 6l12 12" />
+						</svg>
+					</button>
+				</span>
+			))}
+			<input
+				id={context?.ids.input}
+				data-scope="editable"
+				data-part="input"
+				class={styles.tagsInputField}
+				value={draft}
+				placeholder={tags.length === 0 ? context?.placeholder?.edit : ""}
+				aria-label={context?.translations.input}
+				onInput={(e) => setDraft((e.currentTarget as HTMLInputElement).value)}
+				onKeyDown={(e) => {
+					if (e.key === "Enter" || e.key === ",") {
+						e.preventDefault();
+						addTag(draft);
+					} else if (e.key === "Backspace" && draft === "" && tags.length > 0) {
+						removeTag(tags.length - 1);
+					} else if (e.key === "Escape") {
+						context?.cancel({ restoreFocus: true });
+					}
+				}}
+				onBlur={(e) => {
+					if (draft.trim()) addTag(draft);
+					if (!submitOnBlur) return;
+					const next = (e as FocusEvent).relatedTarget as HTMLElement | null;
+					if (
+						next?.closest('[data-part="submit-trigger"]') ||
+						next?.closest('[data-part="cancel-trigger"]')
+					) {
+						return;
+					}
+					context?.submit({ restoreFocus: false });
+				}}
+			/>
+		</div>
 	);
 }
 
@@ -597,8 +818,43 @@ const DefaultCancelIcon = () => (
 	</svg>
 );
 
+export function HelperText(props: { children?: Child; class?: string }) {
+	const { children, class: classProp } = props;
+	const context = useEditableContext();
+	const styles = context?.styles ?? editable();
+	return (
+		<div
+			id={context?.ids.helperText}
+			class={cx(styles.helperText, classProp)}
+			data-scope="editable"
+			data-part="helper-text"
+		>
+			{children}
+		</div>
+	);
+}
+
+export function ErrorText(props: { children?: Child; class?: string }) {
+	const { children, class: classProp } = props;
+	const context = useEditableContext();
+	const styles = context?.styles ?? editable();
+	if (!children || !context?.invalid) return null;
+	return (
+		<div
+			id={context?.ids.errorText}
+			class={cx(styles.errorText, classProp)}
+			data-scope="editable"
+			data-part="error-text"
+		>
+			{children}
+		</div>
+	);
+}
+
 export interface ContentProps extends PropsWithChildren {
 	label?: JSX.Element | string;
+	helperText?: Child;
+	errorText?: Child;
 }
 
 /**
@@ -633,6 +889,8 @@ export function Content(props: ContentProps) {
 					<DefaultCancelIcon />
 				</CancelTrigger>
 			</Control>
+			{props.helperText && <HelperText>{props.helperText}</HelperText>}
+			<ErrorText>{props.errorText}</ErrorText>
 			{props.children}
 		</>
 	);

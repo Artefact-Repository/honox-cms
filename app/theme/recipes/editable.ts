@@ -12,6 +12,12 @@ export const editable = defineSlotRecipe({
 		"submitTrigger",
 		"cancelTrigger",
 		"control",
+		"helperText",
+		"errorText",
+		"tagsInput",
+		"tagsInputField",
+		"tag",
+		"tagDeleteTrigger",
 	],
 	base: {
 		root: {
@@ -51,10 +57,56 @@ export const editable = defineSlotRecipe({
 			display: "inline-flex",
 			gap: "1.5",
 		},
+		helperText: {
+			color: "fg.muted",
+			textStyle: "sm",
+		},
+		errorText: {
+			color: "error",
+			textStyle: "sm",
+		},
+		tagsInput: {
+			alignItems: "center",
+			display: "flex",
+			flexWrap: "wrap",
+			gap: "1.5",
+		},
+		tagsInputField: {
+			background: "transparent",
+			border: "none",
+			outline: "none",
+			flex: "1",
+			minWidth: "16",
+			textStyle: "sm",
+		},
+		tag: {
+			alignItems: "center",
+			bg: "gray.subtle.bg",
+			borderRadius: "l1",
+			display: "inline-flex",
+			gap: "1",
+			px: "2",
+			py: "0.5",
+			textStyle: "sm",
+		},
+		tagDeleteTrigger: {
+			alignItems: "center",
+			borderRadius: "full",
+			color: "fg.muted",
+			cursor: "pointer",
+			display: "inline-flex",
+			justifyContent: "center",
+			_hover: {
+				bg: "gray.subtle.bg.hover",
+				color: "fg",
+			},
+		},
 	},
 	defaultVariants: {
 		size: "md",
 		multiline: false,
+		combobox: false,
+		tags: false,
 	},
 	variants: {
 		multiline: {
@@ -72,6 +124,29 @@ export const editable = defineSlotRecipe({
 				input: {
 					whiteSpace: "pre-wrap",
 					resize: "vertical",
+				},
+				control: {
+					alignSelf: "flex-end",
+				},
+			},
+			false: {},
+		},
+		combobox: {
+			true: {
+				root: { width: "full" },
+			},
+			false: {},
+		},
+		tags: {
+			true: {
+				root: {
+					display: "flex",
+					flexDirection: "column",
+					alignItems: "stretch",
+				},
+				preview: {
+					display: "flex",
+					flexWrap: "wrap",
 				},
 				control: {
 					alignSelf: "flex-end",

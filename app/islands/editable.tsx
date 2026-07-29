@@ -25,6 +25,8 @@ export default function EditableIsland(props: EditableIslandProps) {
 		onValueRevert,
 		onEditChange,
 		label,
+		helperText,
+		errorText,
 		children,
 		activationMode = "focus",
 		...rest
@@ -182,8 +184,12 @@ export default function EditableIsland(props: EditableIslandProps) {
 			onSubmit={handleSubmit}
 			onSetValue={handleSetValue}
 			data-hydrated="true"
+			helperText={helperText}
+			errorText={errorText}
 		>
-			<Content label={label}>{children}</Content>
+			<Content label={label} helperText={helperText} errorText={errorText}>
+				{children}
+			</Content>
 		</Root>
 	);
 }
