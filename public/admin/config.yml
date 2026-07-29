@@ -131,6 +131,82 @@ collections:
         i18n: duplicate
       - { label: Body, name: body, widget: markdown, i18n: true }
 
+  # Git-backed project management: projects + tasks. Not i18n (operational
+  # data, not marketing content) — plain JSON, one file per entry, no
+  # locale subfolders. `tasks.project` is this config's first use of the
+  # `relation` widget, referencing `projects` by slug.
+  - name: projects
+    label: Projects
+    label_singular: Project
+    folder: /content/projects
+    extension: json
+    format: json
+    create: true
+    slug: "{{slug}}"
+    summary: "{{title}} — {{status}}"
+    sortable_fields: [title, status, dueDate]
+    view_groups:
+      - label: Status
+        field: status
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Summary, name: summary, widget: string, hint: "One-line summary shown on the project card" }
+      - { label: Description, name: description, widget: text, required: false }
+      - label: Status
+        name: status
+        widget: select
+        options: &project_statuses [Planning, Active, "On Hold", Completed, Archived]
+        default: Planning
+      - label: Color
+        name: colorPalette
+        widget: select
+        options: [gray, blue, green, red, orange, purple, cyan, amber]
+        default: blue
+        hint: "Accent color for the project's badges/cards"
+      - { label: Owner, name: owner, widget: string, required: false }
+      - { label: Start Date, name: startDate, widget: datetime, type: date, required: false, default: "" }
+      - { label: Due Date, name: dueDate, widget: datetime, type: date, required: false, default: "" }
+      - { label: Tags, name: tags, widget: list, required: false }
+
+  - name: tasks
+    label: Tasks
+    label_singular: Task
+    folder: /content/tasks
+    extension: md
+    format: frontmatter
+    create: true
+    slug: "{{slug}}"
+    summary: "{{title}} — {{status}}"
+    sortable_fields: [title, status, priority, dueDate]
+    view_groups:
+      - label: Status
+        field: status
+      - label: Priority
+        field: priority
+    fields:
+      - { label: Title, name: title, widget: string }
+      - label: Project
+        name: project
+        widget: relation
+        collection: projects
+        search_fields: [title]
+        value_field: "{{slug}}"
+        display_fields: [title]
+      - label: Status
+        name: status
+        widget: select
+        options: &task_statuses ["To Do", "In Progress", "In Review", Done]
+        default: "To Do"
+      - label: Priority
+        name: priority
+        widget: select
+        options: &task_priorities [Low, Medium, High, Urgent]
+        default: Medium
+      - { label: Assignee, name: assignee, widget: string, required: false }
+      - { label: Due Date, name: dueDate, widget: datetime, type: date, required: false, default: "" }
+      - { label: Tags, name: tags, widget: list, required: false }
+      - { label: Description, name: body, widget: markdown, required: false }
+
   - name: pages
     label: Pages
     label_singular: Page
