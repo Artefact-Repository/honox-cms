@@ -131,21 +131,26 @@ export async function createTask(input: NewTaskInput): Promise<string> {
 	return slug;
 }
 
-/** Duplicates `content/tasks/{slug}.md` as a new file titled "<title> (Copy)"
- * — reads the source file's raw content first (rather than reconstructing it
+/** Duplicates `content/tasks/{slug}.md` as a new file titled `newTitle` —
+ * reads the source file's raw content first (rather than reconstructing it
  * from the list page's `Task`, which only carries a truncated `excerpt`) so
  * the full body survives the clone intact. Retries with a numeric suffix on
- * a slug collision, since every clone starts from the same "(Copy)" title
- * and repeated clicks would otherwise all collide on the same slug. */
-export async function cloneTask(slug: string): Promise<string> {
+ * a slug collision (e.g. two clones typed to the same name). */
+export async function cloneTask(
+	slug: string,
+	newTitle: string,
+): Promise<string> {
 	const token = requireToken();
+	const title = newTitle.trim();
+	if (!title) {
+		throw new TaskSaveError("Enter a name for the copy.");
+	}
+
 	const source = await fetchFile(`content/tasks/${slug}.md`, token);
 	const { data, content } = parseFrontmatter(source.content);
-
 	const sourceTitle = (data.title as string) || slug;
-	const cloneTitle = `${sourceTitle} (Copy)`;
-	const baseSlug = slugifyTaskTitle(cloneTitle);
 
+	const baseSlug = slugifyTaskTitle(title);
 	let cloneSlug = baseSlug;
 	let attempt = 2;
 	while (await fileExists(`content/tasks/${cloneSlug}.md`, token)) {
@@ -153,14 +158,11 @@ export async function cloneTask(slug: string): Promise<string> {
 		attempt += 1;
 	}
 
-	const newContent = stringifyFrontmatter(
-		{ ...data, title: cloneTitle },
-		content,
-	);
+	const newContent = stringifyFrontmatter({ ...data, title }, content);
 	await createFile(
 		`content/tasks/${cloneSlug}.md`,
 		newContent,
-		`Clone task "${sourceTitle}" as "${cloneTitle}"`,
+		`Clone task "${sourceTitle}" as "${title}"`,
 		token,
 	);
 	return cloneSlug;
