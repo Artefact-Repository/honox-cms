@@ -55,6 +55,18 @@ export async function deleteTask(slug: string): Promise<void> {
 	await deleteFile(path, file.sha, `Delete task "${slug}"`, token);
 }
 
+/** Sets `parentTask` on an existing task — same direct-commit path as every
+ * other field edit (see `saveTaskField`), just named for the task detail
+ * page's "Convert to... Subtask" action. */
+export async function convertTaskToSubtask(
+	slug: string,
+	parentSlug: string,
+): Promise<void> {
+	await saveTaskField(slug, (data) => ({
+		data: { ...data, parentTask: parentSlug },
+	}));
+}
+
 /** Turns a task title into the same kind of slug the CMS's `{{slug}}`
  * pattern would produce, so hand-created and CMS-created task files stay
  * consistent (see public/admin/config.yml's tasks collection). */

@@ -187,6 +187,25 @@ export function buildTaskTree(tasks: Task[]): TaskTreeEntry[] {
 	return entries;
 }
 
+/** Every task nested (directly or transitively) under `slug`, via
+ * `buildTaskTree` — entries in a pre-order tree walk are contiguous, so
+ * everything after `slug`'s own entry with a greater depth is its subtree.
+ * Used to keep "convert to subtask" pickers from offering a task's own
+ * descendant as its new parent — `buildTaskTree`'s cycle guard would
+ * otherwise just silently flatten the result back to top-level instead of
+ * actually nesting it. */
+export function descendantsOf(tasks: Task[], slug: string): Task[] {
+	const tree = buildTaskTree(tasks);
+	const index = tree.findIndex((entry) => entry.task.slug === slug);
+	if (index === -1) return [];
+	const depth = tree[index].depth;
+	const descendants: Task[] = [];
+	for (let i = index + 1; i < tree.length && tree[i].depth > depth; i++) {
+		descendants.push(tree[i].task);
+	}
+	return descendants;
+}
+
 export async function loadTaskBySlug(
 	slug: string,
 ): Promise<TaskDetail | undefined> {
