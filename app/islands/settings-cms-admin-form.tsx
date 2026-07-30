@@ -22,6 +22,18 @@ const backendItems = [
 	{ label: "gitea", value: "gitea" },
 ];
 
+// The 5 structures Sveltia CMS supports for i18n content layout — see
+// sveltiacms.app/en/docs/i18n. Not freely renamable like other text fields:
+// picking the wrong one changes how the CMS reads/writes every translated
+// file, so it's a fixed select instead of a Field.
+const structureItems = [
+	{ label: "single_file", value: "single_file" },
+	{ label: "single_file_default_root", value: "single_file_default_root" },
+	{ label: "multiple_files", value: "multiple_files" },
+	{ label: "multiple_folders", value: "multiple_folders" },
+	{ label: "multiple_root_folders", value: "multiple_root_folders" },
+];
+
 const labelClass = css({ fontWeight: "medium", mb: "1.5" });
 
 export interface CmsAdminSettingsFormProps {
@@ -128,15 +140,23 @@ export default function CmsAdminSettingsForm({
 				disabled={readOnly}
 			/>
 
-			<Field
-				label="i18n structure"
-				helperText="e.g. multiple_folders — see sveltiacms.app/en/docs/config-i18n for valid values"
-				value={form.i18n.structure}
-				onValueChange={(value: string) =>
-					setForm((f) => ({ ...f, i18n: { ...f.i18n, structure: value } }))
-				}
-				disabled={readOnly}
-			/>
+			<div>
+				<Text size="sm" class={labelClass}>
+					i18n structure
+				</Text>
+				<InteractiveCombobox
+					items={structureItems}
+					value={form.i18n.structure}
+					onValueChange={(value: string) =>
+						setForm((f) => ({ ...f, i18n: { ...f.i18n, structure: value } }))
+					}
+					size="sm"
+					disabled={readOnly}
+				/>
+				<Text size="xs" class={css({ color: "fg.muted", mt: "1" })}>
+					See sveltiacms.app/en/docs/i18n for what each structure means.
+				</Text>
+			</div>
 
 			<TagsField
 				label="Locales"
