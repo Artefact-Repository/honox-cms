@@ -104,7 +104,9 @@ export default function TaskRowActionsMenu({ tasks }: TaskRowActionsMenuProps) {
 	const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
 	const [projectOpen, setProjectOpen] = useState(false);
 	const contextTriggerRef = useRef<HTMLDivElement | null>(null);
-	const pendingPointRef = useRef<{ x: number; y: number } | null>(null);
+	const pendingPointRef = useRef<{ x: number; y: number; yBottom: number } | null>(
+		null,
+	);
 	const forcedRowRef = useRef<HTMLElement | null>(null);
 
 	const selectedTask = tasks.find((t) => t.slug === selectedSlug) ?? null;
@@ -121,10 +123,11 @@ export default function TaskRowActionsMenu({ tasks }: TaskRowActionsMenuProps) {
 			const slug = trigger.getAttribute("data-task-slug");
 			if (!slug) return;
 			const rect = trigger.getBoundingClientRect();
-			// `y` is the *bottom* edge to grow up from — see `data-open-upward`
-			// below — not the top, so the menu opens above the row instead of
-			// covering the ones under it.
-			pendingPointRef.current = { x: rect.left, y: rect.top };
+			// `y` is the anchor's *top* edge — see `data-open-upward` below — so
+			// the menu prefers opening above the row instead of covering the
+			// ones under it; `yBottom` lets the primitive flip to opening below
+			// instead when there isn't enough room above (e.g. the first row).
+			pendingPointRef.current = { x: rect.left, y: rect.top, yBottom: rect.bottom };
 			setSelectedSlug(slug);
 		};
 		document.addEventListener("click", onClick);
@@ -136,6 +139,7 @@ export default function TaskRowActionsMenu({ tasks }: TaskRowActionsMenuProps) {
 		const target = contextTriggerRef.current;
 		if (!selectedSlug || !point || !target) return;
 		pendingPointRef.current = null;
+		target.setAttribute("data-anchor-bottom", String(point.yBottom));
 		target.dispatchEvent(
 			new MouseEvent("contextmenu", {
 				bubbles: true,
