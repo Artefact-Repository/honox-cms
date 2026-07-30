@@ -5,6 +5,7 @@ import { listPageSlugs } from "../lib/pages";
 import { extractLayoutStyle } from "./block-style";
 import { type BlockProps, type ComponentBlock, propsOf } from "./block-types";
 import { customTableRenderers } from "./custom-table-renderers";
+import { displayValueFormatters } from "./display-value-formatters";
 import {
 	AbsoluteCenter,
 	Alert,
@@ -396,11 +397,22 @@ const registry: Record<string, BlockRenderer> = {
 	// empty-state placeholder rather than rendering a blank string, so it's
 	// normalized to undefined here (same empty-string gotcha noted elsewhere
 	// in this file for other optional CMS fields).
+	//
+	// `formatValue` arrives as a string naming an entry in
+	// displayValueFormatters (CMS JSON can't store a function) — same
+	// string->function registry pattern as `customRenderer` in the `table`
+	// block below. An unrecognised name is dropped rather than passed through,
+	// since DisplayValue would otherwise try to call the raw string.
 	displayValue: (b) => {
-		const { value, ...rest } = propsOf(b);
+		const { value, formatValue, ...rest } = propsOf(b);
 		return (
 			<DisplayValue
 				value={typeof value === "string" && value !== "" ? value : undefined}
+				formatValue={
+					typeof formatValue === "string"
+						? displayValueFormatters[formatValue]
+						: undefined
+				}
 				{...rest}
 			/>
 		);

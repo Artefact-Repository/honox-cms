@@ -394,6 +394,12 @@ collections:
                             widget: object
                             fields: &displayValue_fields
                               - { label: Value, name: value, widget: string, required: false, hint: "Leave blank to render the accessible empty-state placeholder (—) instead of text." }
+                              - label: Format Value
+                                name: formatValue
+                                widget: select
+                                required: false
+                                options: [date, bytes]
+                                hint: "Optional named formatter applied to Value before display. Leave blank to display Value as-is."
                           - label: Icon
                             name: icon
                             widget: object
