@@ -6,6 +6,7 @@ import {
 	Anchor,
 	Avatar,
 	Badge,
+	DisplayValue,
 	Heading,
 	Progress,
 	Search,
@@ -19,8 +20,8 @@ import { Toaster } from "../../components/ui/toast";
 import PmsCreateMenu from "../../islands/pms-create-menu";
 import TaskBoard from "../../islands/task-board";
 import {
-	listProjects,
 	listProjectSlugs,
+	listProjects,
 	loadProjectBySlug,
 	PROJECT_STATUS_COLOR,
 } from "../../lib/projects";
@@ -372,7 +373,10 @@ export default createRoute(
 											sortable: true,
 											render: (task: Task) => (
 												<Text size="sm" class={css({ color: "fg.muted" })}>
-													{formatDate(task.dueDate) ?? "—"}
+													<DisplayValue
+														value={task.dueDate}
+														formatValue={formatDate}
+													/>
 												</Text>
 											),
 										},

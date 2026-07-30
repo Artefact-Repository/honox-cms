@@ -5,6 +5,7 @@ import {
 	Anchor,
 	Avatar,
 	Badge,
+	DisplayValue,
 	Heading,
 	Search,
 	Stack,
@@ -559,7 +560,10 @@ export default createRoute(async (c) => {
 										sortable: true,
 										render: (task: Task) => (
 											<Text size="sm" class={css({ color: "fg.muted" })}>
-												{formatDate(task.dueDate) ?? "—"}
+												<DisplayValue
+													value={task.dueDate}
+													formatValue={formatDate}
+												/>
 											</Text>
 										),
 									},
