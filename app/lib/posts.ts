@@ -13,9 +13,13 @@ import { TRANSLATED_LOCALES } from "./i18n";
 // Sveltia CMS actually writes for this collection (public/admin/config.yml's
 // `posts` collection sets `i18n: true` with no `structure` override, so it
 // inherits the global `i18n.structure: multiple_folders`).
-const postFiles = import.meta.glob(
-	["/content/posts/*.md", "/content/posts/*/*.md"],
-	{ query: "?raw", import: "default" },
+const postFiles = (
+	typeof import.meta.glob === "function"
+		? import.meta.glob(
+				["/content/posts/*.md", "/content/posts/*/*.md"],
+				{ query: "?raw", import: "default" },
+			)
+		: {}
 );
 
 /** Splits a glob-discovered post path into its base slug and locale. */

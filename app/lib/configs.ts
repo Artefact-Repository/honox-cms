@@ -219,9 +219,13 @@ export const DEFAULT_DOCS_UI: Required<DocsUiConfig> = {
 // that only applies to folder-based entry collections. Resolves to
 // content/configs.json (en, default) and content/configs.zh.json /
 // content/configs.es.json (translations).
-const docsConfigModule = import.meta.glob(
-	["/content/configs.json", "/content/configs.*.json"],
-	{ import: "default" },
+const docsConfigModule = (
+	typeof import.meta.glob === "function"
+		? import.meta.glob(
+				["/content/configs.json", "/content/configs.*.json"],
+				{ import: "default" },
+			)
+		: {}
 ) as Record<string, () => Promise<DocsConfig>>;
 
 /** Loads the DocsConfig singleton that drives the docs sidenav's grouping.

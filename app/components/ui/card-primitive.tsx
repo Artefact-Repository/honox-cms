@@ -142,7 +142,7 @@ export function CardBase(props: CardBaseProps) {
 		...rest
 	} = props;
 
-	const styles = card(rest);
+	const styles = card({ imagePosition, ...rest });
 
 	const headerContent = (avatar || title || description || headerAction) && (
 		<Header class={headerClass}>
@@ -173,7 +173,7 @@ export function CardBase(props: CardBaseProps) {
 	);
 
 	return (
-		<Root {...rest}>
+		<Root imagePosition={imagePosition} {...rest}>
 			{image && imagePosition === "top" && imageContent}
 			<div
 				style={{

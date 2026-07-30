@@ -3,9 +3,13 @@ import type { ColorPalette } from "../components/ui/color-palette";
 // Projects content lives under content/projects/*.json, one file per entry —
 // same glob-by-filename convention as app/lib/pages.ts, but flat (no i18n:
 // this is operational data, not translated marketing content).
-const projectModules = import.meta.glob("/content/projects/*.json", {
-	import: "default",
-}) as Record<string, () => Promise<unknown>>;
+const projectModules = (
+	typeof import.meta.glob === "function"
+		? import.meta.glob("/content/projects/*.json", {
+				import: "default",
+			})
+		: {}
+) as Record<string, () => Promise<unknown>>;
 
 export type ProjectStatus =
 	| "Planning"
