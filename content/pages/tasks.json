@@ -1,5 +1,45 @@
 {
   "title": "Tasks - Artefact",
+  "headerBrand": [
+    {
+      "blockType": "link",
+      "href": "/",
+      "variant": "plain",
+      "style": "flex-shrink:0;text-decoration:none",
+      "children": [
+        { "blockType": "text", "content": "Artefact UI", "size": "lg", "style": "font-weight:600" }
+      ]
+    }
+  ],
+  "headerNav": [
+    {
+      "blockType": "link",
+      "href": "/projects",
+      "variant": "plain",
+      "children": [
+        { "blockType": "text", "content": "Projects", "size": "sm", "style": "color:#71717a" }
+      ]
+    },
+    {
+      "blockType": "link",
+      "href": "/tasks",
+      "variant": "plain",
+      "children": [
+        { "blockType": "text", "content": "Tasks", "size": "sm", "style": "font-weight:600" }
+      ]
+    }
+  ],
+  "headerActions": [
+    {
+      "blockType": "link",
+      "href": "/admin",
+      "variant": "plain",
+      "class": "button button--variant_outline button--size_sm",
+      "children": [
+        { "blockType": "text", "content": "Admin" }
+      ]
+    }
+  ],
   "content": [
     { "blockType": "heading", "as": "h1", "text": "Tasks", "size": "3xl", "style": "margin-bottom:0.5rem" },
     { "blockType": "text", "content": "Every task across every project, soonest due date first.", "style": "color:#71717a;margin-bottom:1.5rem" }

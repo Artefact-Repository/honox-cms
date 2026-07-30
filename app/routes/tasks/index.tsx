@@ -7,7 +7,6 @@ import {
 	Avatar,
 	Badge,
 	DisplayValue,
-	Heading,
 	Search,
 	Stack,
 	Table,
@@ -138,22 +137,7 @@ export default createRoute(async (c) => {
 						gap: "4",
 					})}
 				>
-					<Anchor
-						href="/"
-						variant="plain"
-						class={css({ textDecoration: "none", flexShrink: "0" })}
-					>
-						<Heading
-							as="span"
-							class={css({
-								fontSize: "lg",
-								fontWeight: "bold",
-								tracking: "tight",
-							})}
-						>
-							Artefact UI
-						</Heading>
-					</Anchor>
+					<PageRenderer content={data.headerBrand ?? []} />
 
 					{tasks.length > 0 && (
 						<div class={css({ flex: "1", maxWidth: "sm", minWidth: "160px" })}>
@@ -173,41 +157,9 @@ export default createRoute(async (c) => {
 					)}
 
 					<nav class={css({ display: "flex", gap: "6", alignItems: "center" })}>
-						<Anchor
-							href="/projects"
-							variant="plain"
-							class={css({
-								textStyle: "sm",
-								fontWeight: "medium",
-								color: "fg.muted",
-								textDecoration: "none",
-								_hover: { color: "fg" },
-							})}
-						>
-							Projects
-						</Anchor>
-						<Anchor
-							href="/tasks"
-							variant="plain"
-							class={css({
-								textStyle: "sm",
-								fontWeight: "semibold",
-								color: "fg",
-								textDecoration: "none",
-							})}
-						>
-							Tasks
-						</Anchor>
+						<PageRenderer content={data.headerNav ?? []} />
 						<PmsCreateMenu projects={projectItems} tasks={taskItems} />
-						<Anchor
-							href="/admin"
-							class={cx(
-								button({ variant: "outline", size: "sm" }),
-								css({ textStyle: "sm", fontWeight: "medium" }),
-							)}
-						>
-							Admin
-						</Anchor>
+						<PageRenderer content={data.headerActions ?? []} />
 					</nav>
 				</div>
 			</header>

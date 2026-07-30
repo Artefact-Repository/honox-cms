@@ -13,6 +13,13 @@ const pageModules = (
 export interface PageData {
 	title?: string;
 	content?: ComponentBlock[];
+	/** Optional custom-header slots — a page whose route renders its own
+	 * header (rather than a shared one) can source it from here instead of
+	 * hardcoding it. See content/pages/index.json and app/routes/index.tsx
+	 * for the reference usage. */
+	headerBrand?: ComponentBlock[];
+	headerNav?: ComponentBlock[];
+	headerActions?: ComponentBlock[];
 	[key: string]: unknown;
 }
 
