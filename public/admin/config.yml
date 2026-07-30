@@ -19,7 +19,7 @@ i18n:
 # Update with your repository details
 backend:
   name: github
-  repo: yum-chen/honox-ts
+  repo: Chen-Software/honox-cms
   branch: main  # or master, depending on your default branch
   base_url: https://sveltia-cms-auth.yumchen.workers.dev
 
