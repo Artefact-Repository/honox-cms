@@ -17,12 +17,177 @@ import {
 	getArrowRotation,
 	getArrowStyle,
 	getPlacementStyle,
+	getTransformOrigin,
 	type OverlayPlacement,
+	type OverlayPlacementConfig,
 	positionOverlay,
 } from "./overlay-position";
 
 const ARROW_OFFSET = "16px";
 const VIEWPORT_GAP = 8;
+
+const DROPDOWN_PORTAL_CONTAINER_ID = "dropdown-portal-root";
+
+/**
+ * Shared body-level container every top-level (non-submenu) Dropdown's
+ * positioner gets relocated into once mounted (see `relocateForPortal`) —
+ * so it can escape an ancestor `overflow: hidden`/`auto` (e.g. the table
+ * wrapper in table-primitive.tsx) and any stacking context an ancestor might
+ * establish, instead of being clipped/buried the way a plain
+ * `position: absolute` sibling of the trigger would be.
+ *
+ * Deliberately a single flat sibling of `document.body`'s own children: the
+ * ancestor-walk in `applyInert` (overlay-a11y.ts) stops climbing once it
+ * reaches `document.body` and never inerts body's own direct children, so
+ * this container (and whichever Dropdown's content is currently inside it)
+ * is naturally exempt from being marked inert while some other overlay is
+ * open — no special-casing needed there.
+ */
+function getDropdownPortalContainer(): HTMLElement {
+	let el = document.getElementById(DROPDOWN_PORTAL_CONTAINER_ID);
+	if (!el) {
+		el = document.createElement("div");
+		el.id = DROPDOWN_PORTAL_CONTAINER_ID;
+		document.body.appendChild(el);
+	}
+	return el;
+}
+
+/** Moves `positioner` into the shared portal container, once, idempotently
+ * (a no-op if it's already been relocated — e.g. on a later re-run of the
+ * effect that calls this). Marks it with the owning root's id so ownership
+ * checks that used to rely on DOM containment under that root (ownsTarget,
+ * the keydown guard) can still recognize it after the move. */
+function relocateForPortal(positioner: HTMLElement, rootId: string) {
+	if (positioner.getAttribute("data-portal-owner") === rootId) return;
+	positioner.setAttribute("data-portal-owner", rootId);
+	getDropdownPortalContainer().appendChild(positioner);
+}
+
+/** Finds a `[data-part="..."]` element belonging to this Dropdown instance,
+ * whether it's still a DOM descendant of `rootEl` (the common case for
+ * submenus/context-menus, which never portal) or has been relocated into the
+ * shared portal container (see `relocateForPortal`) — once relocated, it and
+ * everything inside it (content, items, any nested submenu root) are no
+ * longer descendants of `rootEl` at all. */
+function findOwnedPart(
+	rootId: string,
+	rootEl: HTMLElement | null,
+	selector: string,
+): HTMLElement | null {
+	const inRoot = rootEl?.querySelector<HTMLElement>(selector) ?? null;
+	if (inRoot) return inRoot;
+	const portaled = document.querySelector<HTMLElement>(
+		`[data-portal-owner="${CSS.escape(rootId)}"]`,
+	);
+	if (!portaled) return null;
+	return portaled.matches(selector)
+		? portaled
+		: portaled.querySelector<HTMLElement>(selector);
+}
+
+/**
+ * Fixed-pixel equivalent of overlay-position.ts's `positionOverlay`, for a
+ * trigger-anchored positioner that's been relocated into the shared portal
+ * container (see `relocateForPortal`) and can therefore no longer rely on
+ * CSS relative-flow offsets (`position: absolute; top: 100%`, computed
+ * against a `position: relative` wrapper right next to the trigger) to
+ * follow it — once relocated, that wrapper is no longer its nearest
+ * positioned ancestor, so its position has to be computed in viewport
+ * pixels from the trigger's own `getBoundingClientRect()` instead, the same
+ * way the context-menu/submenu branches in `updatePosition` below already
+ * do it.
+ */
+function positionPortaledTrigger(
+	trigger: HTMLElement,
+	positioner: HTMLElement,
+	content: HTMLElement | null,
+	config: OverlayPlacementConfig & { side: OverlayPlacement },
+) {
+	const gap = config.viewportGap ?? VIEWPORT_GAP;
+	const triggerRect = trigger.getBoundingClientRect();
+	const box = content ?? positioner;
+	const menuWidth = box.offsetWidth || 200;
+	const menuHeight = box.offsetHeight || 200;
+
+	const spaceBelow = window.innerHeight - triggerRect.bottom;
+	const spaceAbove = triggerRect.top;
+	const spaceRight = window.innerWidth - triggerRect.right;
+	const spaceLeft = triggerRect.left;
+
+	let side = config.side;
+	if (side === "bottom" && menuHeight > spaceBelow - gap && spaceAbove > spaceBelow) {
+		side = "top";
+	} else if (side === "top" && menuHeight > spaceAbove - gap && spaceBelow > spaceAbove) {
+		side = "bottom";
+	} else if (side === "right" && menuWidth > spaceRight - gap && spaceLeft > spaceRight) {
+		side = "left";
+	} else if (side === "left" && menuWidth > spaceLeft - gap && spaceRight > spaceLeft) {
+		side = "right";
+	}
+
+	let x: number;
+	let y: number;
+	if (side === "top" || side === "bottom") {
+		y = side === "bottom" ? triggerRect.bottom : triggerRect.top - menuHeight;
+		x =
+			config.align === "center"
+				? triggerRect.left + triggerRect.width / 2 - menuWidth / 2
+				: config.align === "end"
+					? triggerRect.right - menuWidth
+					: triggerRect.left;
+	} else {
+		x = side === "right" ? triggerRect.right : triggerRect.left - menuWidth;
+		y =
+			config.align === "center"
+				? triggerRect.top + triggerRect.height / 2 - menuHeight / 2
+				: config.align === "end"
+					? triggerRect.bottom - menuHeight
+					: triggerRect.top;
+	}
+
+	x = Math.max(gap, Math.min(x, window.innerWidth - menuWidth - gap));
+	y = Math.max(gap, Math.min(y, window.innerHeight - menuHeight - gap));
+
+	positioner.style.position = "fixed";
+	positioner.style.top = `${y}px`;
+	positioner.style.left = `${x}px`;
+	positioner.style.right = "auto";
+	positioner.style.bottom = "auto";
+	positioner.style.margin = "0";
+	positioner.style.transform = "none";
+	positioner.style.zIndex = "var(--z-index-dropdown, 1000)";
+	positioner.setAttribute("data-effective-placement", side);
+	positioner.style.setProperty(
+		"--transform-origin",
+		getTransformOrigin(side, config.align),
+	);
+
+	const availableHeight =
+		side === "top"
+			? spaceAbove - gap
+			: side === "bottom"
+				? spaceBelow - gap
+				: window.innerHeight - 2 * gap;
+	positioner.style.setProperty(
+		"--available-height",
+		`${Math.max(0, availableHeight)}px`,
+	);
+
+	const arrow = positioner.querySelector<HTMLElement>('[data-part="arrow"]');
+	if (arrow) {
+		let arrowConfig = config;
+		if (config.pointAtCenter) {
+			const arrowSize = 12;
+			const dim =
+				side === "top" || side === "bottom" ? triggerRect.width : triggerRect.height;
+			arrowConfig = { ...config, arrowOffset: `${dim / 2 - arrowSize / 2}px` };
+		}
+		Object.assign(arrow.style, getArrowStyle(side, arrowConfig));
+		const tip = arrow.querySelector<HTMLElement>('[data-part="arrow-tip"]');
+		if (tip) tip.style.transform = `rotate(${getArrowRotation(side)}deg)`;
+	}
+}
 
 type DropdownStyles = ReturnType<typeof dropdown>;
 
@@ -830,12 +995,12 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 		} else {
 			const root = document.getElementById(rootId);
 			if (root && renderOpen) {
-				const contentEl = root.querySelector(
-					'[data-part="content"]',
-				) as HTMLElement | null;
-				const positionerEl = root.querySelector(
+				const contentEl = findOwnedPart(rootId, root, '[data-part="content"]');
+				const positionerEl = findOwnedPart(
+					rootId,
+					root,
 					'[data-part="positioner"]',
-				) as HTMLElement | null;
+				);
 				const animatedEl = contentEl || positionerEl;
 				if (animatedEl) {
 					const cleanup = whenAnimationEnds(animatedEl, () => {
@@ -893,8 +1058,15 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 		).filter((el) => el.closest('[data-part="content"]') === content);
 	};
 
-	const ownsTarget = (el: HTMLElement) =>
-		el.closest("[data-overlay-root]") === rootRef.current;
+	const ownsTarget = (el: HTMLElement) => {
+		if (el.closest("[data-overlay-root]") === rootRef.current) return true;
+		// The positioner (and everything inside it — content, items, any
+		// nested submenu root) may have been relocated into the shared portal
+		// container (see relocateForPortal), and is no longer a DOM
+		// descendant of rootRef.current once that's happened.
+		const portalOwner = el.closest("[data-portal-owner]");
+		return portalOwner?.getAttribute("data-portal-owner") === rootId;
+	};
 
 	const setItemChecked = (item: HTMLElement, checked: boolean) => {
 		item.setAttribute("aria-checked", String(checked));
@@ -989,14 +1161,26 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 		const part = trigger.getAttribute("data-part");
 
 		if (part === "trigger") {
-			positioner.style.position = "absolute";
-			positioner.style.removeProperty("top");
-			positioner.style.removeProperty("left");
-			const { align } = resolveDropdownPlacement(placement);
+			const { side, align } = resolveDropdownPlacement(placement);
 			const isPointAtCenter =
 				typeof arrow === "object" && arrow !== null && "pointAtCenter" in arrow
 					? !!arrow.pointAtCenter
 					: false;
+			if (positioner.getAttribute("data-portal-owner") === rootId) {
+				positionPortaledTrigger(trigger, positioner, content, {
+					side,
+					align,
+					arrowOffset: ARROW_OFFSET,
+					pointAtCenter: isPointAtCenter,
+				});
+				return;
+			}
+			// Safety net only: relocateForPortal runs synchronously in the
+			// mount effect before any interaction can reach this function, so
+			// this branch shouldn't normally execute.
+			positioner.style.position = "absolute";
+			positioner.style.removeProperty("top");
+			positioner.style.removeProperty("left");
 			positionOverlay(root, {
 				align,
 				arrowOffset: ARROW_OFFSET,
@@ -1167,13 +1351,15 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 			const root = document.getElementById(rootId);
 			if (root) {
 				rootRef.current = root;
-				triggerRef.current = root.querySelector<HTMLElement>(
+				triggerRef.current = findOwnedPart(
+					rootId,
+					root,
 					'[data-part="trigger"], [data-part="context-trigger"], [data-part="trigger-item"]',
 				);
-				contentRef.current = root.querySelector<HTMLElement>(
-					'[data-part="content"]',
-				);
-				positionerRef.current = root.querySelector<HTMLElement>(
+				contentRef.current = findOwnedPart(rootId, root, '[data-part="content"]');
+				positionerRef.current = findOwnedPart(
+					rootId,
+					root,
 					'[data-part="positioner"]',
 				);
 			}
@@ -1198,6 +1384,16 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 		positionerRef.current = root.querySelector<HTMLElement>(
 			'[data-part="positioner"]',
 		);
+		// Submenus stay put — they're already positioned relative to their own
+		// trigger-item via fixed/viewport math (see updatePosition) and moving
+		// them would separate them from the parent content they need to nest
+		// inside of. Everything else (plain trigger AND contextDropdown-only
+		// instances) relocates so it can't be clipped by an ancestor's
+		// `overflow: hidden`/`auto` the way a plain `position: absolute` or
+		// under-stacked `position: fixed` sibling of the trigger could be.
+		if (!submenu && positionerRef.current) {
+			relocateForPortal(positionerRef.current, rootId);
+		}
 		const triggerEl = triggerRef.current;
 		const contentEl = contentRef.current;
 
@@ -1317,7 +1513,7 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 
 		const handleKeyDown = (e: KeyboardEvent) => {
 			const eventTarget = e.target as HTMLElement;
-			if (eventTarget.closest("[data-overlay-root]") !== root) return;
+			if (!ownsTarget(eventTarget)) return;
 
 			if (
 				!isOpenRef.current &&
@@ -1444,15 +1640,20 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 		};
 
 		const handleScroll = (e: Event) => {
-			// The top-level trigger's menu is `position: absolute` and scrolls
-			// with the page for free (see updatePosition); only the pointer- and
-			// item-anchored `position: fixed` cases (context menu, submenu) can
-			// visually detach from their anchor on scroll, so only those close.
-			if (triggerRef.current?.getAttribute("data-part") === "trigger") return;
-			if (
-				isOpenRef.current &&
-				!contentRef.current?.contains(e.target as Node)
-			) {
+			if (!isOpenRef.current) return;
+			if (triggerRef.current?.getAttribute("data-part") === "trigger") {
+				// Now relocated into the shared portal container and positioned
+				// with fixed viewport pixels (see relocateForPortal /
+				// positionPortaledTrigger) rather than riding along for free via
+				// CSS relative-flow — has to be explicitly re-anchored on every
+				// scroll instead, the same way resize already does.
+				updatePosition();
+				return;
+			}
+			// Context menu / submenu: anchored to a pointer/item position that's
+			// meaningless once the page has scrolled past it; closing is simpler
+			// and more predictable than trying to re-anchor to a moving target.
+			if (!contentRef.current?.contains(e.target as Node)) {
 				handleClose("trigger");
 			}
 		};
@@ -1499,6 +1700,15 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 					contentEl.removeEventListener("mouseenter", onContentEnter);
 					contentEl.removeEventListener("mouseleave", onContentLeave);
 				}
+			}
+			// Only remove the relocated positioner when the wrapper itself has
+			// actually left the document (a real unmount, e.g. a table row
+			// being deleted) — not on every re-run of this effect (e.g. a
+			// `placement`/`mouseEnterDelay` prop change), which would otherwise
+			// detach it right before the effect re-establishes the very same
+			// relocation.
+			if (positionerRef.current && !root.isConnected) {
+				positionerRef.current.remove();
 			}
 		};
 		// Callback props (onOpenChange/onSelect/onClose/closeOnEscape) are read
