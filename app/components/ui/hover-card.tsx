@@ -6,6 +6,7 @@ import {
 	ArrowTip,
 	Content,
 	Context,
+	type HoverCardPlacement,
 	type HoverCardRootProps,
 	Positioner,
 	Root as RootPrimitive,
@@ -30,7 +31,8 @@ function Root(props: HoverCardProps) {
 }
 
 function HoverCard(props: HoverCardProps) {
-	const { interactive, trigger, title, description, content, ...rest } = props;
+	const { interactive, trigger, title, description, content, placement, ...rest } =
+		props;
 
 	const body = content ?? (
 		<>
@@ -44,11 +46,11 @@ function HoverCard(props: HoverCardProps) {
 	);
 
 	return (
-		<Root {...rest} interactive={interactive}>
+		<Root {...rest} placement={placement} interactive={interactive}>
 			{trigger && <Trigger asChild>{trigger}</Trigger>}
-			<Positioner>
-				<Content>
-					<Arrow />
+			<Positioner placement={placement}>
+				<Content placement={placement}>
+					<Arrow placement={placement} />
 					{body}
 				</Content>
 			</Positioner>
@@ -73,6 +75,7 @@ export {
 	Content,
 	Context,
 	HoverCardComponent as HoverCard,
+	type HoverCardPlacement,
 	type HoverCardProps,
 	Positioner,
 	Root,

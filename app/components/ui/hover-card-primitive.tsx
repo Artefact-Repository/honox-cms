@@ -10,18 +10,35 @@ import {
 	useRef,
 	useState,
 } from "hono/jsx";
-import { getArrowRotation, getArrowStyle } from "./overlay-position";
+import {
+	getArrowRotation,
+	getArrowStyle,
+	getPlacementStyle,
+	type OverlayPlacement,
+	positionOverlay,
+} from "./overlay-position";
+
+export type HoverCardPlacement = OverlayPlacement;
+
+// HoverCard content is typically richer/wider than its trigger (title +
+// description + actions), so — like Popover — it hangs its leading edge off
+// the trigger's leading edge rather than centering (Tooltip's convention,
+// reserved for narrow single-line content). `pointAtCenter` keeps the arrow
+// itself locked to the trigger's actual midpoint (measured from the real DOM
+// rect whenever the card opens or the viewport resizes — see
+// InteractiveHoverCardRoot) regardless of the trigger's width, and
+// `positionOverlay`'s own viewport clamping pulls the whole box back on
+// screen near a viewport edge. Together these replace the old hand-rolled
+// `align="start"|"end"` prop this component used to have — there's no longer
+// a manual escape hatch to reach for near a viewport edge.
+const ARROW_OFFSET = "16px";
+const PLACEMENT_CONFIG = {
+	align: "start",
+	arrowOffset: ARROW_OFFSET,
+	pointAtCenter: true,
+} as const;
 
 type HoverCardStyles = ReturnType<typeof hoverCard>;
-
-// Positioner always renders below the trigger (see Positioner below), so the
-// arrow is fixed to "bottom" placement — there's no dynamic flipping. Its
-// cross-axis alignment must still match the Positioner's own `align`
-// ("start" hangs the box off the trigger's left edge, "end" off its right),
-// or the arrow ends up offset from the wrong edge of the box entirely.
-const ARROW_OFFSET = "16px";
-const getPlacementConfig = (align: "start" | "end") =>
-	({ align, arrowOffset: ARROW_OFFSET }) as const;
 
 export interface HoverCardContextValue {
 	id: string;
@@ -30,11 +47,7 @@ export interface HoverCardContextValue {
 	lazyMount?: boolean;
 	unmountOnExit?: boolean;
 	hasOpenedRef?: { current: boolean };
-	/** Which edge of the trigger the positioner hangs off. Positioner always
-	 * renders below the trigger (no vertical flipping); "end" hangs it off
-	 * the trigger's right edge instead of its left, for triggers near the
-	 * right side of the viewport (e.g. a header's trailing avatar). */
-	align?: "start" | "end";
+	placement: HoverCardPlacement;
 }
 
 const HoverCardContext = createContext<HoverCardContextValue | null>(null);
@@ -53,8 +66,8 @@ export interface HoverCardRootProps extends PropsWithChildren {
 	closeDelay?: number;
 	lazyMount?: boolean;
 	unmountOnExit?: boolean;
-	/** @default "start" */
-	align?: "start" | "end";
+	/** Which side of the trigger the card opens on. Default: "bottom". */
+	placement?: HoverCardPlacement;
 }
 
 export function Root(props: HoverCardRootProps) {
@@ -64,7 +77,7 @@ export function Root(props: HoverCardRootProps) {
 		children,
 		lazyMount,
 		unmountOnExit,
-		align = "start",
+		placement = "bottom",
 	} = props;
 	const autoId = useId();
 	const id = idProp || autoId;
@@ -76,7 +89,7 @@ export function Root(props: HoverCardRootProps) {
 
 	return (
 		<HoverCardContext.Provider
-			value={{ id, open, styles, lazyMount, unmountOnExit, hasOpenedRef, align }}
+			value={{ id, open, styles, lazyMount, unmountOnExit, hasOpenedRef, placement }}
 		>
 			{children}
 		</HoverCardContext.Provider>
@@ -128,18 +141,30 @@ export function Trigger(props: HoverCardTriggerProps) {
 
 export interface HoverCardPositionerProps extends PropsWithChildren {
 	class?: string;
+	placement?: HoverCardPlacement;
 	[key: string]: unknown;
 }
 
 export function Positioner(props: HoverCardPositionerProps) {
-	const { children, class: classProp, ...restProps } = props;
+	const {
+		children,
+		class: classProp,
+		placement: placementProp,
+		...restProps
+	} = props;
 	const context = useHoverCardContext();
 	const open = context?.open;
 	const styles = context?.styles || hoverCard();
 	const lazyMount = context?.lazyMount;
 	const unmountOnExit = context?.unmountOnExit;
 	const hasOpenedRef = context?.hasOpenedRef;
-	const align = context?.align ?? "start";
+	// An explicit `placement` prop (threaded from the non-island composer)
+	// takes priority over context — HonoX reconstructs an island's `children`
+	// for hydration from a context-less snapshot, so context-derived values
+	// would silently reset to their fallback default once the client
+	// hydrates, while an explicit prop survives (see Popover's Positioner for
+	// the same note).
+	const placement = placementProp ?? context?.placement ?? "bottom";
 
 	if (open && hasOpenedRef) {
 		hasOpenedRef.current = true;
@@ -162,11 +187,10 @@ export function Positioner(props: HoverCardPositionerProps) {
 			data-state={open ? "open" : "closed"}
 			data-scope="hover-card"
 			data-part="positioner"
+			data-placement={placement}
 			style={{
 				position: "absolute",
-				top: "100%",
-				...(align === "end" ? { right: "0" } : { left: "0" }),
-				zIndex: 1000,
+				...getPlacementStyle(placement, PLACEMENT_CONFIG),
 			}}
 			{...restProps}
 		>
@@ -177,11 +201,17 @@ export function Positioner(props: HoverCardPositionerProps) {
 
 export interface HoverCardContentProps extends PropsWithChildren {
 	class?: string;
+	placement?: HoverCardPlacement;
 	[key: string]: unknown;
 }
 
 export function Content(props: HoverCardContentProps) {
-	const { children, class: classProp, ...restProps } = props;
+	const {
+		children,
+		class: classProp,
+		placement: placementProp,
+		...restProps
+	} = props;
 	const context = useHoverCardContext();
 	const id = context?.id;
 	const open = context?.open;
@@ -189,6 +219,7 @@ export function Content(props: HoverCardContentProps) {
 	const lazyMount = context?.lazyMount;
 	const unmountOnExit = context?.unmountOnExit;
 	const hasOpenedRef = context?.hasOpenedRef;
+	const placement = placementProp ?? context?.placement ?? "bottom";
 
 	if (open && hasOpenedRef) {
 		hasOpenedRef.current = true;
@@ -209,6 +240,7 @@ export function Content(props: HoverCardContentProps) {
 			data-state={open ? "open" : "closed"}
 			data-scope="hover-card"
 			data-part="content"
+			data-placement={placement}
 			{...restProps}
 		>
 			{children}
@@ -216,34 +248,45 @@ export function Content(props: HoverCardContentProps) {
 	);
 }
 
-export function Arrow(props: PropsWithChildren<{ class?: string }>) {
-	const { children, class: classProp, ...restProps } = props;
+export function Arrow(
+	props: PropsWithChildren<{ class?: string; placement?: HoverCardPlacement }>,
+) {
+	const {
+		children,
+		class: classProp,
+		placement: placementProp,
+		...restProps
+	} = props;
 	const context = useHoverCardContext();
 	const styles = context?.styles || hoverCard();
-	const align = context?.align ?? "start";
+	const placement = placementProp ?? context?.placement ?? "bottom";
 	return (
 		<div
 			class={cx(styles.arrow, classProp)}
 			data-scope="hover-card"
 			data-part="arrow"
-			style={getArrowStyle("bottom", getPlacementConfig(align))}
+			style={getArrowStyle(placement, PLACEMENT_CONFIG)}
 			{...restProps}
 		>
-			{children || <ArrowTip />}
+			{children || <ArrowTip placement={placement} />}
 		</div>
 	);
 }
 
-export function ArrowTip(props: { class?: string }) {
-	const { class: classProp, ...restProps } = props;
+export function ArrowTip(props: {
+	class?: string;
+	placement?: HoverCardPlacement;
+}) {
+	const { class: classProp, placement: placementProp, ...restProps } = props;
 	const context = useHoverCardContext();
 	const styles = context?.styles || hoverCard();
+	const placement = placementProp ?? context?.placement ?? "bottom";
 	return (
 		<div
 			class={cx(styles.arrowTip, classProp)}
 			data-scope="hover-card"
 			data-part="arrow-tip"
-			style={{ transform: `rotate(${getArrowRotation("bottom")}deg)` }}
+			style={{ transform: `rotate(${getArrowRotation(placement)}deg)` }}
 			{...restProps}
 		/>
 	);
@@ -332,6 +375,7 @@ export function InteractiveHoverCardRoot(props: HoverCardRootProps) {
 				p.style.setProperty("display", "block", "important");
 				p.setAttribute("data-state", "open");
 			});
+			positionOverlay(root, PLACEMENT_CONFIG);
 			const content = root.querySelector<HTMLElement>('[data-part="content"]');
 			if (content) {
 				content.setAttribute("data-state", "open");
@@ -366,6 +410,27 @@ export function InteractiveHoverCardRoot(props: HoverCardRootProps) {
 			closeHoverCard();
 		}
 	}, [rootId, open]);
+
+	// Keeps the open card correctly placed (and its arrow correctly centered
+	// — see `pointAtCenter` above) across viewport changes, mirroring
+	// Popover's resize/scroll handling.
+	useEffect(() => {
+		const root = rootRef.current;
+		if (!root) return;
+
+		const reposition = () => {
+			if (root.getAttribute("data-state") === "open") {
+				positionOverlay(root, PLACEMENT_CONFIG);
+			}
+		};
+
+		window.addEventListener("resize", reposition);
+		window.addEventListener("scroll", reposition, true);
+		return () => {
+			window.removeEventListener("resize", reposition);
+			window.removeEventListener("scroll", reposition, true);
+		};
+	}, []);
 
 	useEffect(() => {
 		const root = rootRef.current;
@@ -414,6 +479,8 @@ export function InteractiveHoverCardRoot(props: HoverCardRootProps) {
 		<div
 			id={rootId}
 			ref={rootRef}
+			data-hover-card-root
+			data-overlay-root
 			data-state={open ? "open" : "closed"}
 			style={{ position: "relative", display: "inline-block" }}
 		>

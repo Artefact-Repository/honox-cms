@@ -544,6 +544,11 @@ collections:
                               - { label: Trigger Text, name: triggerText, widget: string, default: "Hover me" }
                               - { label: Title, name: title, widget: string, required: false }
                               - { label: Description, name: description, widget: string, required: false }
+                              - label: Placement
+                                name: placement
+                                widget: select
+                                options: [top, bottom, left, right]
+                                default: bottom
                           - label: Menu
                             name: menu
                             widget: object
@@ -1216,6 +1221,11 @@ collections:
                       - { label: Trigger Text, name: triggerText, widget: string, default: "Hover me" }
                       - { label: Title, name: title, widget: string, required: false }
                       - { label: Description, name: description, widget: string, required: false }
+                      - label: Placement
+                        name: placement
+                        widget: select
+                        options: [top, bottom, left, right]
+                        default: bottom
                       - label: Children
                         name: children
                         widget: list
@@ -1794,6 +1804,11 @@ collections:
               - { label: Trigger Text, name: triggerText, widget: string, default: "Hover me" }
               - { label: Title, name: title, widget: string, required: false }
               - { label: Description, name: description, widget: string, required: false }
+              - label: Placement
+                name: placement
+                widget: select
+                options: [top, bottom, left, right]
+                default: bottom
               - label: Children
                 name: children
                 widget: list

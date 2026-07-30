@@ -26,6 +26,22 @@ describe("HoverCard Unit Tests", () => {
 		expect(html).toContain('data-part="arrow"');
 	});
 
+	test("should default to bottom placement", () => {
+		const html = <HoverCard interactive={false} />.toString();
+
+		expect(html).toContain('data-placement="bottom"');
+	});
+
+	test("should support top/left/right placement", () => {
+		for (const placement of ["top", "left", "right"] as const) {
+			const html = (
+				<HoverCard interactive={false} placement={placement} />
+			).toString();
+
+			expect(html).toContain(`data-placement="${placement}"`);
+		}
+	});
+
 	test("should render custom content when provided", () => {
 		const html = (
 			<HoverCard interactive={false} content={<div>Custom Content</div>} />

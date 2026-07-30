@@ -65,6 +65,29 @@ Decreases the open and close delays for immediate responsiveness when a user mov
 }
 ```
 
+## 3. Right-Side Placement
+
+Opens to the right of the trigger instead of the default bottom — useful for triggers that sit inline with text or near the bottom of the viewport.
+
+<DemoPreview>
+  <HoverCard
+    trigger={<span style={{ cursor: "pointer", textDecoration: "underline", textDecorationStyle: "dotted" }}>Right-Side Placement</span>}
+    title="Inline Reference"
+    description="Opens to the right so it doesn't cover the line of text below the trigger."
+    placement="right"
+  />
+</DemoPreview>
+
+```json
+{
+  "type": "hoverCard",
+  "triggerText": "Right-Side Placement",
+  "title": "Inline Reference",
+  "description": "Opens to the right so it doesn't cover the line of text below the trigger.",
+  "placement": "right"
+}
+```
+
 ---
 
 # Props
@@ -74,15 +97,16 @@ Decreases the open and close delays for immediate responsiveness when a user mov
 | **Trigger Text** (`triggerText`) | `string` | - | The visual text link or label that users hover over to activate the overlay. |
 | **Title** (`title`) | `string` | - | Bold header text displayed at the top of the popped visual container. |
 | **Description** (`description`) | `string` | - | Descriptive body text or secondary meta details inside the popped container. |
+| **Placement** (`placement`) | `select` | `bottom` | Which side of the trigger the card opens on. Options: `top`, `bottom`, `left`, `right`. Automatically flips to the opposite side (and clamps on the cross axis) if there isn't enough viewport room. |
 | **Open Delay** (`openDelay`) | `number` | `700` | Delay time in milliseconds before opening the overlay upon mouse enter. |
 | **Close Delay** (`closeDelay`) | `number` | `300` | Delay time in milliseconds before closing the overlay upon mouse leave. |
-| **Force Interactive** (`interactive`) | `boolean` | `true` | Hydrates the component as an interactive client-side island to compute alignments and handle hover listeners. |
+| **Force Interactive** (`interactive`) | `boolean` | `true` | Hydrates the component as an interactive client-side island to compute placement and handle hover listeners. |
 
 ---
 
 # Developer Notes & Accessibility
 
-- **Responsive Viewport Clamping:** The interactive island absolute-positions the popped card relative to its relative-positioned trigger wrapper. If the card would exceed screen boundaries, it automatically flips (e.g. from top to bottom) and clamps onto the cross axis to prevent layout overflow.
-- **Always-On Arrow:** Every hover card renders a small pointer arrow back to its trigger — there's no toggle to hide it. The arrow tracks whichever edge (`align="start"` or `align="end"`) the card is aligned to, so it stays anchored to the trigger even when the card is pinned to the opposite side of a narrow container.
+- **Responsive Viewport Clamping:** The interactive island absolute-positions the popped card relative to its relative-positioned trigger wrapper, using the same positioning system as Popover. If the requested `placement` would overflow the viewport, it automatically flips to the opposite side, and clamps onto the cross axis to prevent layout overflow — no manual alignment prop needed even for triggers pinned near a viewport edge (e.g. a header's trailing avatar).
+- **Always-On Arrow:** Every hover card renders a small pointer arrow back to its trigger — there's no toggle to hide it. The arrow tracks the trigger's actual measured center regardless of `placement` or trigger width, staying visually locked to the trigger even when viewport clamping shifts the card off its default position.
 - **WAI-ARIA Pattern:** Adheres to semantic aria layouts, using appropriate relative role associations. It ensures screen readers are updated correctly when absolute elements display or collapse.
-- **Scroll Synchronization:** Because the container uses absolute coordinate alignments nested directly under the trigger container context, scrolling the page keeps the popped card securely synchronized with the cursor's target.
+- **Scroll Synchronization:** Because the container uses absolute coordinate alignments nested directly under the trigger container context, scrolling or resizing the page keeps the popped card securely synchronized with the trigger.
