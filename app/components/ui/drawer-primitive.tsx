@@ -132,15 +132,19 @@ export interface PositionerProps extends PropsWithChildren {
 export function Positioner(props: PositionerProps) {
 	const { children, class: classProp, ...restProps } = props;
 	const context = useDrawerContext();
-	const styles = context?.styles || drawer();
 	const open = context?.open;
+	// `classProp` is the recipe class computed up front by the flattened
+	// `Drawer` wrapper (drawer.tsx) — see the comment there. Falling back to
+	// `context.styles` is only for the raw compound API used standalone
+	// without an explicit `class`, which is unaffected by the hydration bug
+	// only because nothing in this app relies on it for a non-default variant.
+	const styleClass = classProp ?? (context?.styles || drawer()).positioner;
 
 	return (
 		<div
 			class={cx(
-				styles.positioner,
+				styleClass,
 				"drawer__positioner",
-				classProp,
 				!open && css({ display: "none" }),
 			)}
 			data-state={open ? "open" : "closed"}
@@ -165,10 +169,13 @@ export function Content(props: ContentProps) {
 		...restProps
 	} = props;
 	const context = useDrawerContext();
-	const styles = context?.styles || drawer();
 	const open = context?.open;
 	const id = context?.id;
 	const role = context?.dialogRole ?? "dialog";
+	// See Positioner's comment: `classProp` is the authoritative recipe
+	// class from drawer.tsx; `context.styles` is only a fallback for
+	// standalone compound-API usage.
+	const styleClass = classProp ?? (context?.styles || drawer()).content;
 
 	const titleId = id ? `${id}-title` : undefined;
 	const descriptionId = id ? `${id}-description` : undefined;
@@ -208,12 +215,7 @@ export function Content(props: ContentProps) {
 			tabIndex={-1}
 			{...nameProps}
 			{...(describedBy ? { "aria-describedby": describedBy } : {})}
-			class={cx(
-				styles.content,
-				"drawer__content",
-				classProp,
-				!open && css({ display: "none" }),
-			)}
+			class={cx(styleClass, "drawer__content", !open && css({ display: "none" }))}
 			data-state={open ? "open" : "closed"}
 			{...restProps}
 		>
@@ -245,10 +247,11 @@ export interface BodyProps extends PropsWithChildren {
 export function Body(props: BodyProps) {
 	const { children, class: classProp, ...restProps } = props;
 	const context = useDrawerContext();
-	const styles = context?.styles || drawer();
+	// See Positioner's comment.
+	const styleClass = classProp ?? (context?.styles || drawer()).body;
 
 	return (
-		<div class={cx(styles.body, "drawer__body", classProp)} {...restProps}>
+		<div class={cx(styleClass, "drawer__body")} {...restProps}>
 			{children}
 		</div>
 	);
@@ -261,10 +264,11 @@ export interface FooterProps extends PropsWithChildren {
 export function Footer(props: FooterProps) {
 	const { children, class: classProp, ...restProps } = props;
 	const context = useDrawerContext();
-	const styles = context?.styles || drawer();
+	// See Positioner's comment.
+	const styleClass = classProp ?? (context?.styles || drawer()).footer;
 
 	return (
-		<div class={cx(styles.footer, "drawer__footer", classProp)} {...restProps}>
+		<div class={cx(styleClass, "drawer__footer")} {...restProps}>
 			{children}
 		</div>
 	);

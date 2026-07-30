@@ -1,3 +1,5 @@
+import { cx } from "design-system/css";
+import { drawer } from "design-system/recipes";
 import type { JSX } from "hono/jsx";
 import { CloseIcon } from "../../icons/close";
 import DrawerIsland from "../../islands/drawer";
@@ -40,6 +42,10 @@ export interface DrawerProps extends RootProps {
 	cancel?: JSX.Element;
 	confirm?: JSX.Element;
 	closable?: boolean;
+	/** Extra class merged onto the `content` part — e.g. to widen a drawer
+	 * beyond its `size` variant's max-width. See the note above `Drawer()`
+	 * on why this has to be a literal class rather than a bigger `size`. */
+	contentClass?: string;
 	/** Drawer variant: a standard panel or an alert dialog. Default: "dialog". */
 	role?: "dialog" | "alertdialog";
 	/** Accessible name for the drawer when no `title` is provided. */
@@ -68,15 +74,30 @@ function Drawer(props: DrawerProps) {
 		rootRef,
 		role,
 		"aria-label": ariaLabel,
+		contentClass,
 		...rest
 	} = props;
+
+	// Computed here, in the plain (non-island) wrapper, and threaded down as
+	// literal `class` props rather than left for Positioner/Content/Body/
+	// Footer to read off DrawerContext themselves. HonoX renders an island's
+	// `children` a second time — outside the DrawerContext.Provider that
+	// `Root` sets up inside the island — to capture the snapshot it uses for
+	// client hydration, so any non-default `size`/`placement` variant read
+	// via context there silently resets to the recipe's defaults the moment
+	// the client takes over (see honox-drawer-island-placement-hydration-bug
+	// in project memory). A literal prop baked into these elements before
+	// they ever cross the island boundary can't diverge between that pass
+	// and the real one, since both render the exact same vnode object.
+	const [variantProps] = drawer.splitVariantProps(props);
+	const styles = drawer(variantProps);
 
 	return (
 		<Root {...rest} rootRef={rootRef} dialogRole={role}>
 			{trigger && <Trigger asChild>{trigger}</Trigger>}
 			<Backdrop />
-			<Positioner>
-				<Content aria-label={ariaLabel}>
+			<Positioner class={styles.positioner}>
+				<Content aria-label={ariaLabel} class={cx(styles.content, contentClass)}>
 					{closable && (
 						<CloseTrigger asChild>
 							<IconButton variant="plain" size="sm" aria-label="Close">
@@ -88,10 +109,10 @@ function Drawer(props: DrawerProps) {
 						{title && <Title>{title}</Title>}
 						{description && <Description>{description}</Description>}
 					</Header>
-					{body && <Body>{body}</Body>}
+					{body && <Body class={styles.body}>{body}</Body>}
 					{children}
 					{(footer || cancel || confirm) && (
-						<Footer>
+						<Footer class={styles.footer}>
 							{cancel && (
 								<CloseTrigger asChild unstyled>
 									{cancel}
