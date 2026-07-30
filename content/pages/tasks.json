@@ -13,19 +13,27 @@
   ],
   "headerNav": [
     {
-      "blockType": "link",
-      "href": "/projects",
-      "variant": "plain",
+      "blockType": "stack",
+      "direction": "horizontal",
+      "align": "center",
+      "gap": "6",
       "children": [
-        { "blockType": "text", "content": "Projects", "size": "sm", "style": "color:#71717a" }
-      ]
-    },
-    {
-      "blockType": "link",
-      "href": "/tasks",
-      "variant": "plain",
-      "children": [
-        { "blockType": "text", "content": "Tasks", "size": "sm", "style": "font-weight:600" }
+        {
+          "blockType": "link",
+          "href": "/projects",
+          "variant": "plain",
+          "children": [
+            { "blockType": "text", "content": "Projects", "size": "sm", "style": "color:#71717a" }
+          ]
+        },
+        {
+          "blockType": "link",
+          "href": "/tasks",
+          "variant": "plain",
+          "children": [
+            { "blockType": "text", "content": "Tasks", "size": "sm", "style": "font-weight:600" }
+          ]
+        }
       ]
     }
   ],
@@ -42,6 +50,111 @@
   ],
   "content": [
     { "blockType": "heading", "as": "h1", "text": "Tasks", "size": "3xl", "style": "margin-bottom:0.5rem" },
-    { "blockType": "text", "content": "Every task across every project, soonest due date first.", "style": "color:#71717a;margin-bottom:1.5rem" }
+    { "blockType": "text", "content": "Every task across every project, soonest due date first.", "style": "color:#71717a;margin-bottom:1.5rem" },
+    {
+      "blockType": "stack",
+      "direction": "horizontal",
+      "align": "center",
+      "wrap": true,
+      "gap": "2",
+      "style": "margin-bottom:0.75rem",
+      "children": [
+        { "blockType": "text", "content": "Project", "size": "xs", "style": "font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#71717a" },
+        {
+          "blockType": "each",
+          "dataSource": "projects",
+          "template": [
+            {
+              "blockType": "link",
+              "href": "{{item.href}}",
+              "variant": "plain",
+              "style": "text-decoration:none",
+              "children": [
+                { "blockType": "badge", "text": "{{item.label}}", "variant": "subtle", "colorPalette": "{{item.colorPalette}}", "style": "padding:0.25rem 0.75rem;border-radius:9999px;font-size:0.75rem" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "blockType": "stack",
+      "direction": "horizontal",
+      "align": "center",
+      "wrap": true,
+      "gap": "2",
+      "style": "margin-bottom:0.75rem",
+      "children": [
+        { "blockType": "text", "content": "Assignee", "size": "xs", "style": "font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#71717a" },
+        {
+          "blockType": "each",
+          "dataSource": "taskAssignees",
+          "template": [
+            {
+              "blockType": "link",
+              "href": "{{item.href}}",
+              "variant": "plain",
+              "style": "text-decoration:none",
+              "children": [
+                { "blockType": "badge", "text": "{{item.label}}", "variant": "subtle", "colorPalette": "{{item.colorPalette}}", "style": "padding:0.25rem 0.75rem;border-radius:9999px;font-size:0.75rem" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "blockType": "stack",
+      "direction": "horizontal",
+      "align": "center",
+      "wrap": true,
+      "gap": "2",
+      "style": "margin-bottom:0.75rem",
+      "children": [
+        { "blockType": "text", "content": "Status", "size": "xs", "style": "font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#71717a" },
+        {
+          "blockType": "each",
+          "dataSource": "taskStatuses",
+          "template": [
+            {
+              "blockType": "link",
+              "href": "{{item.href}}",
+              "variant": "plain",
+              "style": "text-decoration:none",
+              "children": [
+                { "blockType": "badge", "text": "{{item.label}}", "variant": "subtle", "colorPalette": "{{item.colorPalette}}", "style": "padding:0.25rem 0.75rem;border-radius:9999px;font-size:0.75rem" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "blockType": "stack",
+      "direction": "horizontal",
+      "align": "center",
+      "wrap": true,
+      "gap": "2",
+      "style": "margin-bottom:2rem",
+      "children": [
+        { "blockType": "text", "content": "Priority", "size": "xs", "style": "font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#71717a" },
+        {
+          "blockType": "each",
+          "dataSource": "taskPriorities",
+          "template": [
+            {
+              "blockType": "link",
+              "href": "{{item.href}}",
+              "variant": "plain",
+              "style": "text-decoration:none",
+              "children": [
+                { "blockType": "badge", "text": "{{item.label}}", "variant": "subtle", "colorPalette": "{{item.colorPalette}}", "style": "padding:0.25rem 0.75rem;border-radius:9999px;font-size:0.75rem" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    { "blockType": "table", "customRenderer": "tasks" }
   ]
 }

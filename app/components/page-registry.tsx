@@ -4,6 +4,7 @@ import { localeToggleUrl, localiseHref } from "../lib/i18n";
 import { listPageSlugs } from "../lib/pages";
 import { extractLayoutStyle } from "./block-style";
 import { type BlockProps, type ComponentBlock, propsOf } from "./block-types";
+import { customTableRenderers } from "./custom-table-renderers";
 import {
 	AbsoluteCenter,
 	Alert,
@@ -351,6 +352,18 @@ const registry: Record<string, BlockRenderer> = {
 	badge: (b) => {
 		const { text, ...rest } = propsOf(b);
 		return <Badge {...rest}>{text}</Badge>;
+	},
+
+	// The generic repeater — no rendering opinion of its own. `children` has
+	// already been expanded (one copy of the block's `template` per resolved
+	// item, placeholders filled in) by `loadPage`'s `resolveBlockDataSources`
+	// (app/lib/pages.ts) before this ever runs, so — like every other block
+	// here — this stays a synchronous pass-through. Composing e.g. a labeled
+	// filter row out of this is just ordinary CMS content: a `stack`
+	// containing a `text` label and an `each` (see content/pages/tasks.json).
+	each: (b) => {
+		const { children } = b;
+		return <>{renderChildren(children as ComponentBlock[])}</>;
 	},
 
 	alert: (b) => {
@@ -1123,7 +1136,21 @@ const registry: Record<string, BlockRenderer> = {
 	tagsField: (b) => <TagsField interactive {...propsOf(b)} />,
 
 	table: (b) => {
-		const { columns, rows, ...rest } = propsOf(b);
+		// Escape hatch for a table whose row rendering (drag-and-drop reorder,
+		// collapsible tree nesting, hover actions opening islands/a drawer) is
+		// too bespoke for the generic columns/rows path below — `data` is
+		// attached server-side by `loadPage` from the matching resolver in
+		// app/lib/data-sources.ts. See app/components/custom-table-renderers.tsx.
+		const { customRenderer, data, columns, rows, ...rest } = propsOf(b);
+		if (typeof customRenderer === "string") {
+			const renderer = customTableRenderers[customRenderer];
+			return renderer ? (
+				renderer((data as Record<string, unknown>) ?? {})
+			) : (
+				<></>
+			);
+		}
+
 		let parsedRows: unknown[] = [];
 		if (typeof rows === "string" && rows.trim()) {
 			try {
