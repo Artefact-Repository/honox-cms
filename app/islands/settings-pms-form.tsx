@@ -2,11 +2,14 @@ import { css, cx } from "design-system/css";
 import { button } from "design-system/recipes";
 import { useState } from "hono/jsx";
 import { Badge } from "../components/ui/badge";
+import { Collapsible } from "../components/ui/collapsible";
 import { InteractiveCombobox } from "../components/ui/combobox-primitive";
+import { Grid } from "../components/ui/grid";
 import { Stack } from "../components/ui/stack";
 import { Switch } from "../components/ui/switch";
 import { Text } from "../components/ui/text";
 import { toaster } from "../components/ui/toast";
+import { ChevronDownIcon } from "../icons/chevron-down";
 import { PROJECT_COLOR_PALETTES } from "../lib/projects";
 import { saveConfigsFields, SettingsSaveError } from "../utils/settings-save";
 
@@ -110,53 +113,91 @@ export default function PmsSettingsForm({ initial }: PmsSettingsFormProps) {
 				/>
 			</Stack>
 
-			<div>
-				<Text size="sm" class={labelClass}>
-					Task status colors
-				</Text>
-				<ColorMapEditor
-					entries={form.statusColors}
-					onChange={(key, colorPalette) =>
-						setForm((f) => ({
-							...f,
-							statusColors: { ...f.statusColors, [key]: colorPalette },
-						}))
-					}
-				/>
-			</div>
+			<Collapsible
+				interactive
+				defaultOpen={false}
+				trigger={
+					<button
+						type="button"
+						class={css({
+							display: "flex",
+							alignItems: "center",
+							justifyContent: "space-between",
+							width: "full",
+						})}
+					>
+						<Text size="sm" class={css({ fontWeight: "medium" })}>
+							Advanced theming settings
+						</Text>
+					</button>
+				}
+				indicator={
+					<ChevronDownIcon
+						width="14"
+						height="14"
+						class={css({
+							color: "fg.muted",
+							transition: "transform 0.2s",
+							"[data-state=open] &": { transform: "rotate(180deg)" },
+						})}
+					/>
+				}
+				contentClass={css({ pt: "4" })}
+				content={
+					<Grid columns={{ base: 1, md: 3 }} gap="5">
+						<div>
+							<Text size="sm" class={labelClass}>
+								Task status colors
+							</Text>
+							<ColorMapEditor
+								entries={form.statusColors}
+								onChange={(key, colorPalette) =>
+									setForm((f) => ({
+										...f,
+										statusColors: { ...f.statusColors, [key]: colorPalette },
+									}))
+								}
+							/>
+						</div>
 
-			<div>
-				<Text size="sm" class={labelClass}>
-					Task priority colors
-				</Text>
-				<ColorMapEditor
-					entries={form.priorityColors}
-					onChange={(key, colorPalette) =>
-						setForm((f) => ({
-							...f,
-							priorityColors: { ...f.priorityColors, [key]: colorPalette },
-						}))
-					}
-				/>
-			</div>
+						<div>
+							<Text size="sm" class={labelClass}>
+								Task priority colors
+							</Text>
+							<ColorMapEditor
+								entries={form.priorityColors}
+								onChange={(key, colorPalette) =>
+									setForm((f) => ({
+										...f,
+										priorityColors: {
+											...f.priorityColors,
+											[key]: colorPalette,
+										},
+									}))
+								}
+							/>
+						</div>
 
-			<div>
-				<Text size="sm" class={labelClass}>
-					Project status colors
-				</Text>
-				<ColorMapEditor
-					entries={form.projectStatusColors}
-					onChange={(key, colorPalette) =>
-						setForm((f) => ({
-							...f,
-							projectStatusColors: {
-								...f.projectStatusColors,
-								[key]: colorPalette,
-							},
-						}))
-					}
-				/>
-			</div>
+						<div>
+							<Text size="sm" class={labelClass}>
+								Project status colors
+							</Text>
+							<ColorMapEditor
+								entries={form.projectStatusColors}
+								onChange={(key, colorPalette) =>
+									setForm((f) => ({
+										...f,
+										projectStatusColors: {
+											...f.projectStatusColors,
+											[key]: colorPalette,
+										},
+									}))
+								}
+							/>
+						</div>
+					</Grid>
+				}
+			/>
 
 			{error && (
 				<Text size="sm" class={css({ color: "fg.error" })}>
