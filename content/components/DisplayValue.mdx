@@ -1,0 +1,102 @@
+---
+title: DisplayValue
+category: Data Display
+hydration: 3
+---
+
+import { DisplayValue, Stack } from "../../app/components/ui";
+import { DemoPreview } from "../../app/components/demo-preview";
+
+# Introduction
+
+A tiny formatting helper for rendering a piece of dynamic application data — not
+static page content. It renders the value (optionally passed through a
+`formatValue` transform), or a subtle, accessible "—" placeholder when the
+value is `null`, `undefined`, an empty string, or an empty array.
+
+Unlike most components in this kit, **DisplayValue is not a Page Builder
+block**. Its whole purpose is to wrap a runtime value (a table cell, a detail
+panel field, a formatted date) that only exists in application code — there is
+nothing for a content author to configure through the CMS, and its
+`formatValue` callback is a function, which can't be expressed as serializable
+page-builder content anyway. Reach for `Text`/`Anchor` for CMS-authored copy;
+reach for `DisplayValue` when you're rendering a value your own code computed.
+
+---
+
+# Usage
+
+## 1. Plain values
+
+Strings, numbers, and other non-empty values render as-is (coerced to a
+string when no `formatValue` is given).
+
+<DemoPreview>
+  <Stack gap="4">
+    <DisplayValue value="Park UI" />
+    <DisplayValue value={42} />
+  </Stack>
+</DemoPreview>
+
+```tsx
+<DisplayValue value="Park UI" />
+<DisplayValue value={42} />
+```
+
+## 2. Formatting a value
+
+`formatValue` runs only when the value is non-empty, so it never has to
+handle `null`/`undefined` itself.
+
+<DemoPreview>
+  <DisplayValue
+    value={new Date(2026, 0, 15)}
+    formatValue={(date) => date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+  />
+</DemoPreview>
+
+```tsx
+<DisplayValue
+  value={someDate}
+  formatValue={(date) =>
+    date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+  }
+/>
+```
+
+## 3. Empty values
+
+`null`, `undefined`, `""`, and `[]` all render the same accessible fallback —
+a decorative dash for sighted users, plus visually-hidden text for screen
+readers.
+
+<DemoPreview>
+  <Stack gap="4">
+    <DisplayValue value={null} />
+    <DisplayValue value={undefined} />
+    <DisplayValue value="" />
+  </Stack>
+</DemoPreview>
+
+```tsx
+<DisplayValue value={null} />
+<DisplayValue value={undefined} />
+<DisplayValue value="" />
+```
+
+---
+
+# Props
+
+| Property | Type | Default | Description |
+| --- | --- | --- | --- |
+| **Value** (`value`) | `T \| null \| undefined` | - | The data to display. |
+| **Format Value** (`formatValue`) | `(value: NonNullable<T>) => string \| null \| undefined` | - | Runs only against non-empty values. Returning `null`/`undefined` falls back to `String(value)`, not to the empty-state dash. |
+
+---
+
+# Developer Notes & Accessibility
+
+- **Zero JS, always.** DisplayValue has no interactive behavior of any kind — it computes its output synchronously during server render and never ships a client island (Tier-3, Presentational).
+- **Emptiness check:** a value counts as empty only if it is `null`, `undefined`, an empty string, or an empty array — `0` and `false` are treated as real values and render normally.
+- **Accessible fallback:** the empty state renders a decorative `—` (`aria-hidden="true"`) alongside visually-hidden text reading "No value available", so screen reader users get an explicit announcement instead of silence or a bare dash.

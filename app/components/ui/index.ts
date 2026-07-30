@@ -31,6 +31,7 @@ export { ColorPicker, type ColorPickerProps } from "./color-picker";
 export { Combobox, type ComboboxProps } from "./combobox";
 export { DatePicker, type DatePickerProps } from "./date-picker";
 export { Dialog, type DialogProps } from "./dialog";
+export { DisplayValue, type DisplayValueProps } from "./display-value";
 export { Drawer, type DrawerProps } from "./drawer";
 export { Dropdown, type DropdownItem, type DropdownProps } from "./dropdown";
 export * as DropdownPrimitive from "./dropdown-primitive";
