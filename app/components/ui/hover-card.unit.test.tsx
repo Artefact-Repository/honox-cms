@@ -51,6 +51,60 @@ describe("HoverCard Unit Tests", () => {
 		expect(html).not.toContain("HoverCard Title");
 	});
 
+	test("should make a non-native trigger keyboard-focusable", () => {
+		const html = (
+			<HoverCard interactive={false} trigger={<span>Hover me</span>} />
+		).toString();
+
+		expect(html).toContain('tabIndex="0"');
+		expect(html).toContain('role="button"');
+	});
+
+	test("should not override a native button/anchor trigger's semantics", () => {
+		const buttonHtml = (
+			<HoverCard
+				interactive={false}
+				trigger={
+					<button type="button" class="my-btn">
+						Hover me
+					</button>
+				}
+			/>
+		).toString();
+		expect(buttonHtml).not.toContain('role="button"');
+
+		const anchorHtml = (
+			<HoverCard interactive={false} trigger={<a href="/profile">Jules</a>} />
+		).toString();
+		expect(anchorHtml).not.toContain('role="button"');
+		expect(anchorHtml).toContain('href="/profile"');
+	});
+
+	test("should default the plain (non-asChild) trigger to focusable", () => {
+		const html = (
+			<HoverCard.Root>
+				<HoverCard.Trigger>
+					<span>Hover me</span>
+				</HoverCard.Trigger>
+			</HoverCard.Root>
+		).toString();
+
+		expect(html).toContain('tabIndex="0"');
+		expect(html).toContain('role="button"');
+	});
+
+	test("should reflect disabled via aria-disabled on the trigger", () => {
+		const html = (
+			<HoverCard.Root disabled>
+				<HoverCard.Trigger>
+					<span>Hover me</span>
+				</HoverCard.Trigger>
+			</HoverCard.Root>
+		).toString();
+
+		expect(html).toContain('aria-disabled="true"');
+	});
+
 	test("should render compound/composable API correctly", () => {
 		const html = (
 			<HoverCard.Root>
