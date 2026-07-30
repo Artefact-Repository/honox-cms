@@ -21,13 +21,13 @@ describe("HoverCard Unit Tests", () => {
 	});
 
 	test("should always render an arrow", () => {
-		const html = <HoverCard interactive={false} />.toString();
+		const html = (<HoverCard interactive={false} />).toString();
 
 		expect(html).toContain('data-part="arrow"');
 	});
 
 	test("should default to bottom placement", () => {
-		const html = <HoverCard interactive={false} />.toString();
+		const html = (<HoverCard interactive={false} />).toString();
 
 		expect(html).toContain('data-placement="bottom"');
 	});

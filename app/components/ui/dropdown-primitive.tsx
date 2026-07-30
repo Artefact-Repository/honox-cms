@@ -116,13 +116,29 @@ function positionPortaledTrigger(
 	const spaceLeft = triggerRect.left;
 
 	let side = config.side;
-	if (side === "bottom" && menuHeight > spaceBelow - gap && spaceAbove > spaceBelow) {
+	if (
+		side === "bottom" &&
+		menuHeight > spaceBelow - gap &&
+		spaceAbove > spaceBelow
+	) {
 		side = "top";
-	} else if (side === "top" && menuHeight > spaceAbove - gap && spaceBelow > spaceAbove) {
+	} else if (
+		side === "top" &&
+		menuHeight > spaceAbove - gap &&
+		spaceBelow > spaceAbove
+	) {
 		side = "bottom";
-	} else if (side === "right" && menuWidth > spaceRight - gap && spaceLeft > spaceRight) {
+	} else if (
+		side === "right" &&
+		menuWidth > spaceRight - gap &&
+		spaceLeft > spaceRight
+	) {
 		side = "left";
-	} else if (side === "left" && menuWidth > spaceLeft - gap && spaceRight > spaceLeft) {
+	} else if (
+		side === "left" &&
+		menuWidth > spaceLeft - gap &&
+		spaceRight > spaceLeft
+	) {
 		side = "right";
 	}
 
@@ -180,7 +196,9 @@ function positionPortaledTrigger(
 		if (config.pointAtCenter) {
 			const arrowSize = 12;
 			const dim =
-				side === "top" || side === "bottom" ? triggerRect.width : triggerRect.height;
+				side === "top" || side === "bottom"
+					? triggerRect.width
+					: triggerRect.height;
 			arrowConfig = { ...config, arrowOffset: `${dim / 2 - arrowSize / 2}px` };
 		}
 		Object.assign(arrow.style, getArrowStyle(side, arrowConfig));
@@ -821,8 +839,12 @@ export interface DropdownItemIndicatorProps extends PropsWithChildren {
 }
 
 export function DropdownItemIndicator(props: DropdownItemIndicatorProps) {
-	const { children, checked: checkedProp, class: classProp, ...restProps } =
-		props;
+	const {
+		children,
+		checked: checkedProp,
+		class: classProp,
+		...restProps
+	} = props;
 	const context = useDropdownContext();
 	const itemState = useContext(DropdownItemStateContext);
 	const checked = checkedProp ?? itemState?.checked;
@@ -1356,7 +1378,11 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 					root,
 					'[data-part="trigger"], [data-part="context-trigger"], [data-part="trigger-item"]',
 				);
-				contentRef.current = findOwnedPart(rootId, root, '[data-part="content"]');
+				contentRef.current = findOwnedPart(
+					rootId,
+					root,
+					'[data-part="content"]',
+				);
 				positionerRef.current = findOwnedPart(
 					rootId,
 					root,
@@ -1668,7 +1694,9 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 		root.addEventListener("contextmenu", handleContextMenu);
 		root.addEventListener("mouseover", handleMouseOver);
 		root.addEventListener("keydown", handleKeyDown);
-		document.addEventListener("pointerdown", handleClickOutside, { capture: true });
+		document.addEventListener("pointerdown", handleClickOutside, {
+			capture: true,
+		});
 		window.addEventListener("scroll", handleScroll, true);
 		window.addEventListener("resize", handleReposition);
 
@@ -1684,13 +1712,16 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 
 		return () => {
 			clearTimers();
-			if (typeaheadTimeoutRef.current) clearTimeout(typeaheadTimeoutRef.current);
+			if (typeaheadTimeoutRef.current)
+				clearTimeout(typeaheadTimeoutRef.current);
 			cancelPendingHideRef.current();
 			root.removeEventListener("click", handleClick);
 			root.removeEventListener("contextmenu", handleContextMenu);
 			root.removeEventListener("mouseover", handleMouseOver);
 			root.removeEventListener("keydown", handleKeyDown);
-			document.removeEventListener("pointerdown", handleClickOutside, { capture: true });
+			document.removeEventListener("pointerdown", handleClickOutside, {
+				capture: true,
+			});
 			window.removeEventListener("scroll", handleScroll, true);
 			window.removeEventListener("resize", handleReposition);
 			if (hoverEnabled) {

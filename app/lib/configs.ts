@@ -221,10 +221,9 @@ export const DEFAULT_DOCS_UI: Required<DocsUiConfig> = {
 // content/configs.es.json (translations).
 const docsConfigModule = (
 	typeof import.meta.glob === "function"
-		? import.meta.glob(
-				["/content/configs.json", "/content/configs.*.json"],
-				{ import: "default" },
-			)
+		? import.meta.glob(["/content/configs.json", "/content/configs.*.json"], {
+				import: "default",
+			})
 		: {}
 ) as Record<string, () => Promise<DocsConfig>>;
 

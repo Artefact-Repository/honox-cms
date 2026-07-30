@@ -8,8 +8,6 @@
 // page-registry's synchronous render pipeline without needing its own fetch.
 import { css, cx } from "design-system/css";
 import { button } from "design-system/recipes";
-import { Anchor, Avatar, Badge, DisplayValue, Stack, Table, Text } from "./ui";
-import { colorPaletteClass } from "./ui/color-palette";
 import { ChevronUpIcon } from "../icons/chevron-up";
 import { EllipsisIcon } from "../icons/ellipsis";
 import TaskCloneAction from "../islands/task-clone-action";
@@ -19,7 +17,6 @@ import TaskEditAction from "../islands/task-edit-action";
 import TaskRowActionsMenu from "../islands/task-row-actions-menu";
 import TaskTreeDnd from "../islands/task-tree-dnd";
 import TaskTreeToggle from "../islands/task-tree-toggle";
-import type { ColorPalette } from "./ui/color-palette";
 import type { Project } from "../lib/projects";
 import {
 	TASK_PRIORITIES,
@@ -27,14 +24,18 @@ import {
 	TASK_STATUS_COLOR,
 	TASK_STATUSES,
 	type Task,
-	type TaskStatus,
 	type TaskPriority,
+	type TaskStatus,
 	type TaskTreeEntry,
 } from "../lib/tasks";
 import { formatDate } from "../utils/date";
+import { Anchor, Avatar, Badge, DisplayValue, Stack, Table, Text } from "./ui";
+import type { ColorPalette } from "./ui/color-palette";
+import { colorPaletteClass } from "./ui/color-palette";
 
 const treeRowClass = css({
 	'&[data-tree-hidden="true"]': { display: "none" },
+	'&[data-status-hidden="true"]': { display: "none" },
 });
 
 const treeToggleClass = css({
@@ -120,12 +121,12 @@ function TasksTable(data: Partial<TasksTableData>) {
 						// TaskTreeToggle's recomputeVisibility would produce after
 						// closing every toggle, just computed once for SSR instead of
 						// walking the (not-yet-interactive) DOM.
-						const initiallyHidden =
-							!subtasksExpandedByDefault && depth > 0;
+						const initiallyHidden = !subtasksExpandedByDefault && depth > 0;
 						return {
 							id: `task-${task.slug}`,
 							"data-task-slug": task.slug,
 							"data-task-title": task.title,
+							"data-task-status": task.status,
 							"data-order-key": entry?.orderKey ?? 0,
 							"data-depth": depth,
 							...(entry && depth > 0
@@ -171,7 +172,11 @@ function TasksTable(data: Partial<TasksTableData>) {
 												aria-label={`Toggle subtasks of "${task.title}"`}
 												class={treeToggleClass}
 											>
-												<ChevronUpIcon width="12" height="12" data-part="chevron" />
+												<ChevronUpIcon
+													width="12"
+													height="12"
+													data-part="chevron"
+												/>
 											</button>
 										) : (
 											depth > 0 && (

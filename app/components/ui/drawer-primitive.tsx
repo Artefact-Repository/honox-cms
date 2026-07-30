@@ -215,7 +215,11 @@ export function Content(props: ContentProps) {
 			tabIndex={-1}
 			{...nameProps}
 			{...(describedBy ? { "aria-describedby": describedBy } : {})}
-			class={cx(styleClass, "drawer__content", !open && css({ display: "none" }))}
+			class={cx(
+				styleClass,
+				"drawer__content",
+				!open && css({ display: "none" }),
+			)}
 			data-state={open ? "open" : "closed"}
 			{...restProps}
 		>

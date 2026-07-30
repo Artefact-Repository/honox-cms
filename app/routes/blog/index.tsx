@@ -276,36 +276,37 @@ export default createRoute(async (c) => {
 														align="center"
 														class={css({ pointerEvents: "auto" })}
 													>
-														{config.blog?.showAuthor !== false && post.author && (
-															<Anchor
-																href={localiseLink(
-																	`/blog/by-author/${post.author}`,
-																)}
-																class={css({
-																	display: "inline-flex",
-																	alignItems: "center",
-																	gap: "2.5",
-																	textDecoration: "none",
-																	color: "white.a12",
-																	_hover: { color: "blue.4" },
-																})}
-															>
-																<Avatar
-																	size="sm"
-																	variant="solid"
-																	name={post.author}
-																/>
-																<Text
-																	size="sm"
+														{config.blog?.showAuthor !== false &&
+															post.author && (
+																<Anchor
+																	href={localiseLink(
+																		`/blog/by-author/${post.author}`,
+																	)}
 																	class={css({
-																		color: "inherit",
-																		fontWeight: "medium",
+																		display: "inline-flex",
+																		alignItems: "center",
+																		gap: "2.5",
+																		textDecoration: "none",
+																		color: "white.a12",
+																		_hover: { color: "blue.4" },
 																	})}
 																>
-																	{post.author}
-																</Text>
-															</Anchor>
-														)}
+																	<Avatar
+																		size="sm"
+																		variant="solid"
+																		name={post.author}
+																	/>
+																	<Text
+																		size="sm"
+																		class={css({
+																			color: "inherit",
+																			fontWeight: "medium",
+																		})}
+																	>
+																		{post.author}
+																	</Text>
+																</Anchor>
+															)}
 														<Text size="sm" class={css({ color: "white.a10" })}>
 															{config.blog?.showAuthor !== false && post.author
 																? "· "
@@ -318,7 +319,8 @@ export default createRoute(async (c) => {
 																	year: "numeric",
 																},
 															)}
-															{config.blog?.showReadTime !== false && post.readTime
+															{config.blog?.showReadTime !== false &&
+															post.readTime
 																? ` · ${post.readTime}`
 																: ""}
 														</Text>
@@ -640,18 +642,26 @@ export default createRoute(async (c) => {
 											{config.blog?.showAuthor !== false && post.author && (
 												<>
 													<Anchor
-														href={localiseLink(`/blog/by-author/${post.author}`)}
+														href={localiseLink(
+															`/blog/by-author/${post.author}`,
+														)}
 														class={css({
 															display: "inline-flex",
 															alignItems: "center",
 															textDecoration: "none",
 														})}
 													>
-														<Avatar size="sm" variant="solid" name={post.author} />
+														<Avatar
+															size="sm"
+															variant="solid"
+															name={post.author}
+														/>
 													</Anchor>
 													<div>
 														<Anchor
-															href={localiseLink(`/blog/by-author/${post.author}`)}
+															href={localiseLink(
+																`/blog/by-author/${post.author}`,
+															)}
 															class={css({
 																textDecoration: "none",
 																color: "fg",
@@ -689,11 +699,15 @@ export default createRoute(async (c) => {
 															},
 														)}
 													</Text>
-													{config.blog?.showReadTime !== false && post.readTime && (
-														<Text size="xs" class={css({ color: "fg.muted" })}>
-															· {post.readTime}
-														</Text>
-													)}
+													{config.blog?.showReadTime !== false &&
+														post.readTime && (
+															<Text
+																size="xs"
+																class={css({ color: "fg.muted" })}
+															>
+																· {post.readTime}
+															</Text>
+														)}
 												</Stack>
 											</div>
 										</Stack>

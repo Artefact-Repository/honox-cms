@@ -13,6 +13,7 @@ import {
 } from "../../../components/ui";
 import AuthStatus from "../../../islands/auth-status";
 import { loadDocsConfig } from "../../../lib/configs";
+import { mergeColorOverrides } from "../../../lib/pms-config";
 import { listProjects, type Project } from "../../../lib/projects";
 import {
 	buildTaskSearchEntries,
@@ -24,7 +25,6 @@ import {
 	type Task,
 	type TaskStatus,
 } from "../../../lib/tasks";
-import { mergeColorOverrides } from "../../../lib/pms-config";
 import { formatDate } from "../../../utils/date";
 import { filterEntries } from "../../../utils/search";
 
@@ -188,10 +188,7 @@ export default createRoute(
 						<Heading as="h1" size="3xl">
 							{statusParam} Status
 						</Heading>
-						<Badge
-							variant="subtle"
-							colorPalette={statusColor[statusParam]}
-						>
+						<Badge variant="subtle" colorPalette={statusColor[statusParam]}>
 							{tasks.length}
 						</Badge>
 					</Stack>

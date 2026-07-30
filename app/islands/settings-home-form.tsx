@@ -8,7 +8,7 @@ import { Stack } from "../components/ui/stack";
 import { Text } from "../components/ui/text";
 import { toaster } from "../components/ui/toast";
 import { PROJECT_COLOR_PALETTES } from "../lib/projects";
-import { saveConfigsFields, SettingsSaveError } from "../utils/settings-save";
+import { SettingsSaveError, saveConfigsFields } from "../utils/settings-save";
 import { useGitToken } from "./git-token-banner";
 
 const colorItems = PROJECT_COLOR_PALETTES.map((c) => ({ label: c, value: c }));
@@ -60,7 +60,10 @@ export default function HomeSettingsForm({
 	const addLink = () => {
 		setForm((f) => ({
 			...f,
-			footerLinks: [...f.footerLinks, { label: "", href: "", colorPalette: "gray" }],
+			footerLinks: [
+				...f.footerLinks,
+				{ label: "", href: "", colorPalette: "gray" },
+			],
 		}));
 	};
 
@@ -141,7 +144,11 @@ export default function HomeSettingsForm({
 				<Text size="sm" class={labelClass}>
 					Footer links <FieldInfo description={descriptions.footerLinks} />
 				</Text>
-				<Stack direction="column" gap="3" class={css({ alignItems: "stretch" })}>
+				<Stack
+					direction="column"
+					gap="3"
+					class={css({ alignItems: "stretch" })}
+				>
 					{form.footerLinks.map((link, index) => (
 						<Stack
 							key={index}

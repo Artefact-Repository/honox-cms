@@ -104,9 +104,11 @@ export default function TaskRowActionsMenu({ tasks }: TaskRowActionsMenuProps) {
 	const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
 	const [projectOpen, setProjectOpen] = useState(false);
 	const contextTriggerRef = useRef<HTMLDivElement | null>(null);
-	const pendingPointRef = useRef<{ x: number; y: number; yBottom: number } | null>(
-		null,
-	);
+	const pendingPointRef = useRef<{
+		x: number;
+		y: number;
+		yBottom: number;
+	} | null>(null);
 	const forcedRowRef = useRef<HTMLElement | null>(null);
 
 	const selectedTask = tasks.find((t) => t.slug === selectedSlug) ?? null;
@@ -127,7 +129,11 @@ export default function TaskRowActionsMenu({ tasks }: TaskRowActionsMenuProps) {
 			// the menu prefers opening above the row instead of covering the
 			// ones under it; `yBottom` lets the primitive flip to opening below
 			// instead when there isn't enough room above (e.g. the first row).
-			pendingPointRef.current = { x: rect.left, y: rect.top, yBottom: rect.bottom };
+			pendingPointRef.current = {
+				x: rect.left,
+				y: rect.top,
+				yBottom: rect.bottom,
+			};
 			setSelectedSlug(slug);
 		};
 		document.addEventListener("click", onClick);

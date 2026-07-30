@@ -5,6 +5,7 @@ import { Search } from "../../components/ui";
 import { Toaster } from "../../components/ui/toast";
 import AuthStatus from "../../islands/auth-status";
 import PmsCreateMenu from "../../islands/pms-create-menu";
+import TaskStatusFilter from "../../islands/task-status-filter";
 import { loadPage } from "../../lib/pages";
 import { listProjects } from "../../lib/projects";
 import { listTasks } from "../../lib/tasks";
@@ -60,19 +61,32 @@ export default createRoute(async (c) => {
 					<PageRenderer content={data.headerBrand ?? []} />
 
 					{tasks.length > 0 && (
-						<div class={css({ flex: "1", maxWidth: "sm", minWidth: "160px" })}>
-							<Search
-								size="sm"
-								src="/api/tasks/search.json"
-								action="/tasks"
-								initialQuery={searchQuery}
-								placeholder="Search tasks..."
-								itemLabel="tasks"
-								total={tasks.length}
-								filterAttribute="data-task-slug"
-								emptyStateId="tasks-search-empty"
-								showCount={false}
-							/>
+						<div
+							class={css({
+								flex: "1",
+								maxWidth: "sm",
+								minWidth: "160px",
+								display: "flex",
+								gap: "2",
+							})}
+						>
+							<div class={css({ flex: "1" })}>
+								<Search
+									size="sm"
+									src="/api/tasks/search.json"
+									action="/tasks"
+									initialQuery={searchQuery}
+									placeholder="Search tasks..."
+									itemLabel="tasks"
+									total={tasks.length}
+									filterAttribute="data-task-slug"
+									emptyStateId="tasks-search-empty"
+									showCount={false}
+								/>
+							</div>
+							<div class={css({ flexShrink: 0 })}>
+								<TaskStatusFilter />
+							</div>
 						</div>
 					)}
 

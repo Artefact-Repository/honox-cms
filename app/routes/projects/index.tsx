@@ -15,12 +15,12 @@ import { Toaster } from "../../components/ui/toast";
 import AuthStatus from "../../islands/auth-status";
 import PmsCreateMenu from "../../islands/pms-create-menu";
 import { loadDocsConfig } from "../../lib/configs";
+import { mergeColorOverrides } from "../../lib/pms-config";
 import {
 	listProjects,
 	PROJECT_STATUS_COLOR,
 	type Project,
 } from "../../lib/projects";
-import { mergeColorOverrides } from "../../lib/pms-config";
 import { listTasks, type Task } from "../../lib/tasks";
 
 function projectProgress(project: Project, tasks: Task[]) {

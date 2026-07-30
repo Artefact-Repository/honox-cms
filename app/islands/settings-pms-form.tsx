@@ -12,7 +12,7 @@ import { Text } from "../components/ui/text";
 import { toaster } from "../components/ui/toast";
 import { ChevronDownIcon } from "../icons/chevron-down";
 import { PROJECT_COLOR_PALETTES } from "../lib/projects";
-import { saveConfigsFields, SettingsSaveError } from "../utils/settings-save";
+import { SettingsSaveError, saveConfigsFields } from "../utils/settings-save";
 import { useGitToken } from "./git-token-banner";
 
 const colorItems = PROJECT_COLOR_PALETTES.map((c) => ({ label: c, value: c }));
@@ -108,9 +108,7 @@ export default function PmsSettingsForm({
 			<Stack align="center" justify="space-between">
 				<Text size="sm">
 					Subtasks expanded by default{" "}
-					<FieldInfo
-						description={descriptions.subtasksExpandedByDefault}
-					/>
+					<FieldInfo description={descriptions.subtasksExpandedByDefault} />
 				</Text>
 				<Switch
 					checked={form.subtasksExpandedByDefault}
@@ -196,9 +194,7 @@ export default function PmsSettingsForm({
 						<div>
 							<Text size="sm" class={labelClass}>
 								Project status colors{" "}
-								<FieldInfo
-									description={descriptions.projectStatusColors}
-								/>
+								<FieldInfo description={descriptions.projectStatusColors} />
 							</Text>
 							<ColorMapEditor
 								entries={form.projectStatusColors}

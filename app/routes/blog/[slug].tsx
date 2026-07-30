@@ -148,7 +148,9 @@ export default createRoute(
 									locale: currentLocale,
 									currentPath,
 								})}
-								<AuthStatus href={`/admin/#/collections/posts/entries/${slug}`} />
+								<AuthStatus
+									href={`/admin/#/collections/posts/entries/${slug}`}
+								/>
 							</nav>
 						</div>
 					</header>

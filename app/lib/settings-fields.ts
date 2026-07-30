@@ -104,7 +104,7 @@ export const DEFAULT_SETTINGS_FIELDS: SettingsFieldMeta[] = [
 		section: "docs",
 		label: "Fallback group label",
 		description:
-			"Sidenav group label used for any doc that doesn't match one of the configured groups (by section or category). Defaults to \"Other\".",
+			'Sidenav group label used for any doc that doesn\'t match one of the configured groups (by section or category). Defaults to "Other".',
 	},
 	{
 		id: "docOrder",
@@ -277,7 +277,8 @@ export async function buildSettingsSearchIndex(): Promise<SearchIndexEntry[]> {
 	const entries: SearchIndexEntry[] = [];
 	for (const section of sections) {
 		const fields = mergeFieldOverrides(section.slug, section.fields);
-		const href = section.slug === "home" ? "/settings" : `/settings/${section.slug}`;
+		const href =
+			section.slug === "home" ? "/settings" : `/settings/${section.slug}`;
 		for (const field of fields) {
 			entries.push({
 				key: `${section.slug}-${field.id}`,
@@ -285,7 +286,11 @@ export async function buildSettingsSearchIndex(): Promise<SearchIndexEntry[]> {
 				title: field.label,
 				description: field.description,
 				tags: [section.title],
-				haystack: buildHaystack([field.label, field.description, section.title]),
+				haystack: buildHaystack([
+					field.label,
+					field.description,
+					section.title,
+				]),
 			});
 		}
 	}

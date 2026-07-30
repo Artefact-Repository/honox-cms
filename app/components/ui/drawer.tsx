@@ -97,7 +97,10 @@ function Drawer(props: DrawerProps) {
 			{trigger && <Trigger asChild>{trigger}</Trigger>}
 			<Backdrop />
 			<Positioner class={styles.positioner}>
-				<Content aria-label={ariaLabel} class={cx(styles.content, contentClass)}>
+				<Content
+					aria-label={ariaLabel}
+					class={cx(styles.content, contentClass)}
+				>
 					{closable && (
 						<CloseTrigger asChild>
 							<IconButton variant="plain" size="sm" aria-label="Close">

@@ -116,7 +116,8 @@ export default function ProjectCreateDrawer(props: ProjectCreateDrawerProps) {
 		}
 	};
 
-	const canCreate = form.title.trim().length > 0 && form.summary.trim().length > 0;
+	const canCreate =
+		form.title.trim().length > 0 && form.summary.trim().length > 0;
 
 	return (
 		<Drawer

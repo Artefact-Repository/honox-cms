@@ -4,10 +4,10 @@ import { useEffect, useState } from "hono/jsx";
 import { Anchor } from "../components/ui/anchor";
 import { Avatar } from "../components/ui/avatar";
 import { Badge } from "../components/ui/badge";
+import type { ColorPalette } from "../components/ui/color-palette";
 import { Drawer } from "../components/ui/drawer";
 import { Stack } from "../components/ui/stack";
 import { Text } from "../components/ui/text";
-import type { ColorPalette } from "../components/ui/color-palette";
 import {
 	TASK_PRIORITY_COLOR,
 	TASK_STATUS_COLOR,
@@ -107,10 +107,7 @@ export default function TaskDetailsDrawer({
 						class={css({ alignItems: "stretch", width: "full" })}
 					>
 						<Stack gap="2" wrap="wrap">
-							<Badge
-								variant="subtle"
-								colorPalette={statusColors[task.status]}
-							>
+							<Badge variant="subtle" colorPalette={statusColors[task.status]}>
 								{task.status}
 							</Badge>
 							<Badge

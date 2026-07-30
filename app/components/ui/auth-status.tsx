@@ -1,5 +1,8 @@
 import AuthStatusIsland from "../../islands/auth-status";
-import { AuthStatusBase, type AuthStatusBaseProps } from "./auth-status-primitive";
+import {
+	AuthStatusBase,
+	type AuthStatusBaseProps,
+} from "./auth-status-primitive";
 import { shouldHydrate } from "./island-utils";
 
 export interface AuthStatusProps extends Pick<AuthStatusBaseProps, "href"> {

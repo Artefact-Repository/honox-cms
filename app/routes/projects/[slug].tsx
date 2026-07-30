@@ -20,13 +20,13 @@ import AuthStatus from "../../islands/auth-status";
 import PmsCreateMenu from "../../islands/pms-create-menu";
 import TaskBoard from "../../islands/task-board";
 import { loadDocsConfig } from "../../lib/configs";
+import { mergeColorOverrides } from "../../lib/pms-config";
 import {
 	listProjectSlugs,
 	listProjects,
 	loadProjectBySlug,
 	PROJECT_STATUS_COLOR,
 } from "../../lib/projects";
-import { mergeColorOverrides } from "../../lib/pms-config";
 import {
 	buildTaskSearchEntries,
 	listTasksByProject,
@@ -282,10 +282,10 @@ export default createRoute(
 								<Text class={css({ color: "fg.muted" })}>No tasks yet.</Text>
 							) : (
 								<TaskBoard
-								tasks={tasks}
-								statusColors={statusColor}
-								priorityColors={priorityColor}
-							/>
+									tasks={tasks}
+									statusColors={statusColor}
+									priorityColors={priorityColor}
+								/>
 							)}
 						</Tabs.Content>
 

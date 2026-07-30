@@ -20,7 +20,9 @@
 		"baseUrl": ".",
 		"paths": {
 			"@/*": ["app/*", "src/*"],
-			"hono/jsx/jsx-dev-runtime": ["node_modules/hono/dist/jsx/jsx-dev-runtime.js"],
+			"hono/jsx/jsx-dev-runtime": [
+				"node_modules/hono/dist/jsx/jsx-dev-runtime.js"
+			],
 			"hono/jsx/jsx-runtime": ["node_modules/hono/dist/jsx/jsx-runtime.js"]
 		},
 

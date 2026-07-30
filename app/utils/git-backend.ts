@@ -295,7 +295,10 @@ export async function fetchFile(path: string, token: string): Promise<GitFile> {
  * still propagates. Used by every direct-commit "create" path to check the
  * target filename is free before writing (create/update use different API
  * calls, so there's no single conflict-status check across every backend). */
-export async function fileExists(path: string, token: string): Promise<boolean> {
+export async function fileExists(
+	path: string,
+	token: string,
+): Promise<boolean> {
 	try {
 		await fetchFile(path, token);
 		return true;

@@ -5,6 +5,8 @@
 // one app-specific data shape (projects, task statuses, ...) into the same
 // uniform item shape a generic block (e.g. `badge-list`) can render without
 // knowing where the data actually came from.
+
+import { filterEntries } from "../utils/search";
 import { loadDocsConfig } from "./configs";
 import { mergeColorOverrides } from "./pms-config";
 import { listProjects } from "./projects";
@@ -17,7 +19,6 @@ import {
 	TASK_STATUS_COLOR,
 	TASK_STATUSES,
 } from "./tasks";
-import { filterEntries } from "../utils/search";
 
 export interface DataSourceContext {
 	/** Full request URL (path + query) — needed by any source whose contents
@@ -119,9 +120,7 @@ const customTableDataResolvers: Record<string, CustomTableDataResolver> = {
 			loadDocsConfig("en"),
 		]);
 		const projectBySlug = new Map(projects.map((p) => [p.slug, p]));
-		const projectTitleBySlug = new Map(
-			projects.map((p) => [p.slug, p.title]),
-		);
+		const projectTitleBySlug = new Map(projects.map((p) => [p.slug, p.title]));
 		const taskTree = buildTaskTree(tasks);
 		const statusColors = mergeColorOverrides(
 			TASK_STATUS_COLOR,

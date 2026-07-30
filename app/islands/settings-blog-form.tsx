@@ -8,7 +8,7 @@ import { Switch } from "../components/ui/switch";
 import { Text } from "../components/ui/text";
 import { Textarea } from "../components/ui/textarea";
 import { toaster } from "../components/ui/toast";
-import { saveConfigsFields, SettingsSaveError } from "../utils/settings-save";
+import { SettingsSaveError, saveConfigsFields } from "../utils/settings-save";
 import { useGitToken } from "./git-token-banner";
 
 export interface BlogSettingsFormProps {
@@ -67,8 +67,7 @@ export default function BlogSettingsForm({
 		<Stack direction="column" gap="4" class={css({ alignItems: "stretch" })}>
 			<Stack align="center" justify="space-between">
 				<Text size="sm">
-					Show author byline{" "}
-					<FieldInfo description={descriptions.showAuthor} />
+					Show author byline <FieldInfo description={descriptions.showAuthor} />
 				</Text>
 				<Switch
 					checked={form.showAuthor}
@@ -80,8 +79,7 @@ export default function BlogSettingsForm({
 			</Stack>
 			<Stack align="center" justify="space-between">
 				<Text size="sm">
-					Show read time{" "}
-					<FieldInfo description={descriptions.showReadTime} />
+					Show read time <FieldInfo description={descriptions.showReadTime} />
 				</Text>
 				<Switch
 					checked={form.showReadTime}
@@ -94,9 +92,7 @@ export default function BlogSettingsForm({
 			<Stack align="center" justify="space-between">
 				<Text size="sm">
 					Exclude untranslated posts from search{" "}
-					<FieldInfo
-						description={descriptions.excludeUntranslatedFromSearch}
-					/>
+					<FieldInfo description={descriptions.excludeUntranslatedFromSearch} />
 				</Text>
 				<Switch
 					checked={form.excludeUntranslatedFromSearch}
@@ -114,9 +110,7 @@ export default function BlogSettingsForm({
 				label={
 					<>
 						Newsletter heading{" "}
-						<FieldInfo
-							description={descriptions.newsletterHeading}
-						/>
+						<FieldInfo description={descriptions.newsletterHeading} />
 					</>
 				}
 				value={form.newsletterHeading}
@@ -128,9 +122,7 @@ export default function BlogSettingsForm({
 			<div>
 				<Text size="sm" class={css({ fontWeight: "medium", mb: "1.5" })}>
 					Newsletter description{" "}
-					<FieldInfo
-						description={descriptions.newsletterDescription}
-					/>
+					<FieldInfo description={descriptions.newsletterDescription} />
 				</Text>
 				<Textarea
 					rows={3}

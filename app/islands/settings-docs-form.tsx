@@ -8,7 +8,7 @@ import { Switch } from "../components/ui/switch";
 import { TagsField } from "../components/ui/tags-field";
 import { Text } from "../components/ui/text";
 import { toaster } from "../components/ui/toast";
-import { saveConfigsFields, SettingsSaveError } from "../utils/settings-save";
+import { SettingsSaveError, saveConfigsFields } from "../utils/settings-save";
 import { useGitToken } from "./git-token-banner";
 
 export interface DocsSettingsFormProps {
@@ -86,9 +86,7 @@ export default function DocsSettingsForm({
 			<Stack align="center" justify="space-between">
 				<Text size="sm">
 					Show hydration tier badge{" "}
-					<FieldInfo
-						description={descriptions.showHydrationTierBadge}
-					/>
+					<FieldInfo description={descriptions.showHydrationTierBadge} />
 				</Text>
 				<Switch
 					checked={form.showHydrationTierBadge}
@@ -119,8 +117,7 @@ export default function DocsSettingsForm({
 			<TagsField
 				label={
 					<>
-						Explicit doc order{" "}
-						<FieldInfo description={descriptions.docOrder} />
+						Explicit doc order <FieldInfo description={descriptions.docOrder} />
 					</>
 				}
 				helperText="Doc slugs, in sidenav order — press Enter to add one. Docs not listed keep alphabetical order, appended after these."

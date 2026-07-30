@@ -14,6 +14,7 @@ import {
 } from "../../../components/ui";
 import AuthStatus from "../../../islands/auth-status";
 import { loadDocsConfig } from "../../../lib/configs";
+import { mergeColorOverrides } from "../../../lib/pms-config";
 import { listProjects, type Project } from "../../../lib/projects";
 import {
 	buildTaskSearchEntries,
@@ -24,7 +25,6 @@ import {
 	TASK_STATUSES,
 	type Task,
 } from "../../../lib/tasks";
-import { mergeColorOverrides } from "../../../lib/pms-config";
 import { formatDate } from "../../../utils/date";
 import { filterEntries } from "../../../utils/search";
 

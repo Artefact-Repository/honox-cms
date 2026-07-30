@@ -212,10 +212,7 @@ export default createRoute(
 						<Badge variant="subtle" colorPalette={statusColor[task.status]}>
 							{task.status}
 						</Badge>
-						<Badge
-							variant="subtle"
-							colorPalette={priorityColor[task.priority]}
-						>
+						<Badge variant="subtle" colorPalette={priorityColor[task.priority]}>
 							{task.priority}
 						</Badge>
 					</Stack>

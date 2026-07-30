@@ -619,8 +619,7 @@ export default createRoute(
 						</Heading>
 
 						{(() => {
-							const showTier =
-								config.docs?.showHydrationTierBadge !== false;
+							const showTier = config.docs?.showHydrationTierBadge !== false;
 							return (
 								(doc.category || (showTier && doc.hydration)) && (
 									<Stack

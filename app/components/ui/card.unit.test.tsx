@@ -20,11 +20,15 @@ test("Card renders image", () => {
 });
 
 test("Card renders image with different positions", () => {
-	const htmlLeft = (<Card image="test-image.jpg" title="Image Card" imagePosition="left" />).toString();
+	const htmlLeft = (
+		<Card image="test-image.jpg" title="Image Card" imagePosition="left" />
+	).toString();
 	expect(htmlLeft).toContain('<img src="test-image.jpg"');
 	expect(htmlLeft).toContain("card__image");
 
-	const htmlRight = (<Card image="test-image.jpg" title="Image Card" imagePosition="right" />).toString();
+	const htmlRight = (
+		<Card image="test-image.jpg" title="Image Card" imagePosition="right" />
+	).toString();
 	expect(htmlRight).toContain('<img src="test-image.jpg"');
 });
 

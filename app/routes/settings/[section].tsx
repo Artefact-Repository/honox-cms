@@ -150,7 +150,9 @@ export default createRoute(
 				content={
 					<>
 						<title>
-							{active ? `${active.title} Settings - Artefact` : "Settings - Artefact"}
+							{active
+								? `${active.title} Settings - Artefact`
+								: "Settings - Artefact"}
 						</title>
 						<Toaster />
 

@@ -32,7 +32,11 @@ export function AuthStatusBase({ user, href = "/admin" }: AuthStatusBaseProps) {
 		return (
 			<HoverCard
 				trigger={
-					<Avatar size="xs" name={displayName} src={user.avatarURL ?? undefined} />
+					<Avatar
+						size="xs"
+						name={displayName}
+						src={user.avatarURL ?? undefined}
+					/>
 				}
 				content={
 					<div class={stack({ gap: "3", minWidth: "44" })}>

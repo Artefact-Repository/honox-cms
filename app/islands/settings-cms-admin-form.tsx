@@ -102,8 +102,7 @@ export default function CmsAdminSettingsForm({
 
 			<div>
 				<Text size="sm" class={labelClass}>
-					Backend type{" "}
-					<FieldInfo description={descriptions.backendName} />
+					Backend type <FieldInfo description={descriptions.backendName} />
 				</Text>
 				<InteractiveCombobox
 					items={backendItems}
@@ -132,8 +131,7 @@ export default function CmsAdminSettingsForm({
 			<Field
 				label={
 					<>
-						Branch{" "}
-						<FieldInfo description={descriptions.backendBranch} />
+						Branch <FieldInfo description={descriptions.backendBranch} />
 					</>
 				}
 				value={form.backend.branch}
@@ -145,8 +143,7 @@ export default function CmsAdminSettingsForm({
 			<Field
 				label={
 					<>
-						Base URL{" "}
-						<FieldInfo description={descriptions.backendBaseUrl} />
+						Base URL <FieldInfo description={descriptions.backendBaseUrl} />
 					</>
 				}
 				value={form.backend.baseUrl}
@@ -161,8 +158,7 @@ export default function CmsAdminSettingsForm({
 
 			<div>
 				<Text size="sm" class={labelClass}>
-					i18n structure{" "}
-					<FieldInfo description={descriptions.i18nStructure} />
+					i18n structure <FieldInfo description={descriptions.i18nStructure} />
 				</Text>
 				<InteractiveCombobox
 					items={structureItems}
@@ -181,8 +177,7 @@ export default function CmsAdminSettingsForm({
 			<TagsField
 				label={
 					<>
-						Locales{" "}
-						<FieldInfo description={descriptions.i18nLocales} />
+						Locales <FieldInfo description={descriptions.i18nLocales} />
 					</>
 				}
 				helperText="Locale codes, e.g. en, zh — press Enter to add one"
@@ -240,8 +235,7 @@ export default function CmsAdminSettingsForm({
 			<Field
 				label={
 					<>
-						Media folder{" "}
-						<FieldInfo description={descriptions.mediaFolder} />
+						Media folder <FieldInfo description={descriptions.mediaFolder} />
 					</>
 				}
 				value={form.media.mediaFolder}
@@ -256,8 +250,7 @@ export default function CmsAdminSettingsForm({
 			<Field
 				label={
 					<>
-						Public folder{" "}
-						<FieldInfo description={descriptions.publicFolder} />
+						Public folder <FieldInfo description={descriptions.publicFolder} />
 					</>
 				}
 				value={form.media.publicFolder}

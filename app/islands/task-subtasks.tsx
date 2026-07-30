@@ -4,9 +4,9 @@ import { useState } from "hono/jsx";
 import { Anchor } from "../components/ui/anchor";
 import { Avatar } from "../components/ui/avatar";
 import { Badge } from "../components/ui/badge";
+import type { ColorPalette } from "../components/ui/color-palette";
 import { Stack } from "../components/ui/stack";
 import { Text } from "../components/ui/text";
-import type { ColorPalette } from "../components/ui/color-palette";
 import { TASK_STATUS_COLOR, type Task, type TaskStatus } from "../lib/tasks";
 import TaskCreateDrawer from "./task-create-drawer";
 

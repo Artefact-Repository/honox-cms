@@ -48,11 +48,7 @@ export default function PmsCreateMenu(props: PmsCreateMenuProps) {
 					if (value === "project") setProjectOpen(true);
 				}}
 			/>
-			<TaskCreateDrawer
-				{...props}
-				open={taskOpen}
-				onOpenChange={setTaskOpen}
-			/>
+			<TaskCreateDrawer {...props} open={taskOpen} onOpenChange={setTaskOpen} />
 			<ProjectCreateDrawer open={projectOpen} onOpenChange={setProjectOpen} />
 		</>
 	);

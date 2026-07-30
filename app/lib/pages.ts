@@ -95,11 +95,12 @@ async function resolveBlockDataSources(
 		blocks.map(async (block) => {
 			const next: ComponentBlock = { ...block };
 			if (block.blockType === "each") {
-				const items = typeof block.dataSource === "string"
-					? await resolveDataSource(block.dataSource, ctx)
-					: Array.isArray(block.items)
-						? block.items
-						: [];
+				const items =
+					typeof block.dataSource === "string"
+						? await resolveDataSource(block.dataSource, ctx)
+						: Array.isArray(block.items)
+							? block.items
+							: [];
 				const template = Array.isArray(block.template)
 					? (block.template as ComponentBlock[])
 					: [];

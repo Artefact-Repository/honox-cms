@@ -48,9 +48,7 @@ export async function saveCmsAdminSettings(
 	try {
 		doc = parseDocument(file.content, { maxAliasCount: -1 });
 	} catch {
-		throw new CmsConfigSaveError(
-			"public/admin/config.yml is not valid YAML.",
-		);
+		throw new CmsConfigSaveError("public/admin/config.yml is not valid YAML.");
 	}
 
 	doc.setIn(["backend", "name"], next.backend.name);

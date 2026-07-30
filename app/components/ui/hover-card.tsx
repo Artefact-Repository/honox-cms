@@ -31,8 +31,15 @@ function Root(props: HoverCardProps) {
 }
 
 function HoverCard(props: HoverCardProps) {
-	const { interactive, trigger, title, description, content, placement, ...rest } =
-		props;
+	const {
+		interactive,
+		trigger,
+		title,
+		description,
+		content,
+		placement,
+		...rest
+	} = props;
 
 	const body = content ?? (
 		<>

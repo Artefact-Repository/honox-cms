@@ -4,10 +4,10 @@ import { Anchor } from "../components/ui/anchor";
 import { Avatar } from "../components/ui/avatar";
 import { Badge } from "../components/ui/badge";
 import { Card } from "../components/ui/card";
+import type { ColorPalette } from "../components/ui/color-palette";
 import { Stack } from "../components/ui/stack";
 import { Text } from "../components/ui/text";
 import { toaster } from "../components/ui/toast";
-import type { ColorPalette } from "../components/ui/color-palette";
 import {
 	TASK_PRIORITY_COLOR,
 	TASK_STATUS_COLOR,
