@@ -9,7 +9,7 @@ import { css } from "design-system/css";
 import { createRoute } from "honox/factory";
 import { PageRenderer } from "../../components/page-renderer";
 import { renderSettingsSectionForm } from "../../components/settings-section-form";
-import { Card, Layout, type LayoutProps } from "../../components/ui";
+import { Card, Layout, type LayoutProps, Search } from "../../components/ui";
 import { Toaster } from "../../components/ui/toast";
 import AuthStatus from "../../islands/auth-status";
 import SettingsAuthBanner from "../../islands/settings-auth-banner";
@@ -122,7 +122,20 @@ export default createRoute(async (c) => {
 					</nav>
 				</div>
 			}
-			sider={<SettingsSidenav sections={sections} activeSlug="home" />}
+			sider={
+				<>
+					<Search
+						size="sm"
+						src="/api/settings/search.json"
+						placeholder="Search settings..."
+						itemLabel="settings"
+						showCount={false}
+						syncUrl={false}
+						class={css({ mb: "4" })}
+					/>
+					<SettingsSidenav sections={sections} activeSlug="home" />
+				</>
+			}
 			mobileNavActions={<AuthStatus />}
 			content={
 				<>

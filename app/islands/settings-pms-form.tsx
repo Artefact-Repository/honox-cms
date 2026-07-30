@@ -1,6 +1,7 @@
 import { css, cx } from "design-system/css";
 import { button } from "design-system/recipes";
 import { useState } from "hono/jsx";
+import { FieldInfo } from "../components/settings-field-info";
 import { Badge } from "../components/ui/badge";
 import { Collapsible } from "../components/ui/collapsible";
 import { InteractiveCombobox } from "../components/ui/combobox-primitive";
@@ -26,6 +27,7 @@ export interface PmsSettingsFormProps {
 		priorityColors: Record<string, string>;
 		projectStatusColors: Record<string, string>;
 	};
+	descriptions: Record<string, string>;
 }
 
 const labelClass = css({ fontWeight: "medium", mb: "1.5" });
@@ -61,7 +63,10 @@ function ColorMapEditor({
 	);
 }
 
-export default function PmsSettingsForm({ initial }: PmsSettingsFormProps) {
+export default function PmsSettingsForm({
+	initial,
+	descriptions,
+}: PmsSettingsFormProps) {
 	const [form, setForm] = useState(initial);
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -101,7 +106,12 @@ export default function PmsSettingsForm({ initial }: PmsSettingsFormProps) {
 	return (
 		<Stack direction="column" gap="5" class={css({ alignItems: "stretch" })}>
 			<Stack align="center" justify="space-between">
-				<Text size="sm">Subtasks expanded by default</Text>
+				<Text size="sm">
+					Subtasks expanded by default{" "}
+					<FieldInfo
+						description={descriptions.subtasksExpandedByDefault}
+					/>
+				</Text>
 				<Switch
 					checked={form.subtasksExpandedByDefault}
 					onCheckedChange={(details: { checked: boolean }) =>
@@ -148,7 +158,8 @@ export default function PmsSettingsForm({ initial }: PmsSettingsFormProps) {
 					<Grid columns={{ base: 1, md: 3 }} gap="5">
 						<div>
 							<Text size="sm" class={labelClass}>
-								Task status colors
+								Task status colors{" "}
+								<FieldInfo description={descriptions.statusColors} />
 							</Text>
 							<ColorMapEditor
 								entries={form.statusColors}
@@ -164,7 +175,8 @@ export default function PmsSettingsForm({ initial }: PmsSettingsFormProps) {
 
 						<div>
 							<Text size="sm" class={labelClass}>
-								Task priority colors
+								Task priority colors{" "}
+								<FieldInfo description={descriptions.priorityColors} />
 							</Text>
 							<ColorMapEditor
 								entries={form.priorityColors}
@@ -183,7 +195,10 @@ export default function PmsSettingsForm({ initial }: PmsSettingsFormProps) {
 
 						<div>
 							<Text size="sm" class={labelClass}>
-								Project status colors
+								Project status colors{" "}
+								<FieldInfo
+									description={descriptions.projectStatusColors}
+								/>
 							</Text>
 							<ColorMapEditor
 								entries={form.projectStatusColors}

@@ -1,4 +1,31 @@
 {
   "title": "Blog",
-  "description": "Post byline display and the /blog newsletter widget's copy."
+  "description": "Post byline display and the /blog newsletter widget's copy.",
+  "fields": [
+    {
+      "id": "showAuthor",
+      "label": "Show author byline",
+      "description": "Shows the post author's name and avatar on blog post cards (/blog listing) and the article page. Turn off for a byline-free blog."
+    },
+    {
+      "id": "showReadTime",
+      "label": "Show read time",
+      "description": "Shows the \"X min read\" estimate on post cards and the article page, computed from each post's word count."
+    },
+    {
+      "id": "excludeUntranslatedFromSearch",
+      "label": "Exclude untranslated posts from search",
+      "description": "When on, this locale's blog search only returns posts that actually have a translation into it, instead of silently falling back to the English post. Turn on per-locale only once that locale's translation coverage is complete — otherwise search just returns fewer results than it should."
+    },
+    {
+      "id": "newsletterHeading",
+      "label": "Newsletter heading",
+      "description": "Heading text for the newsletter signup widget on /blog."
+    },
+    {
+      "id": "newsletterDescription",
+      "label": "Newsletter description",
+      "description": "Supporting copy shown under the newsletter heading."
+    }
+  ]
 }

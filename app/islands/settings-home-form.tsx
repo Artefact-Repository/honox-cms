@@ -1,6 +1,7 @@
 import { css, cx } from "design-system/css";
 import { button } from "design-system/recipes";
 import { useState } from "hono/jsx";
+import { FieldInfo } from "../components/settings-field-info";
 import { InteractiveCombobox } from "../components/ui/combobox-primitive";
 import { Field } from "../components/ui/field";
 import { Stack } from "../components/ui/stack";
@@ -25,11 +26,15 @@ export interface HomeSettingsFormProps {
 		footerCopyright: string;
 		footerLinks: FooterLink[];
 	};
+	descriptions: Record<string, string>;
 }
 
 const labelClass = css({ fontWeight: "medium", mb: "1.5" });
 
-export default function HomeSettingsForm({ initial }: HomeSettingsFormProps) {
+export default function HomeSettingsForm({
+	initial,
+	descriptions,
+}: HomeSettingsFormProps) {
 	const [form, setForm] = useState(initial);
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -94,7 +99,11 @@ export default function HomeSettingsForm({ initial }: HomeSettingsFormProps) {
 	return (
 		<Stack direction="column" gap="4" class={css({ alignItems: "stretch" })}>
 			<Field
-				label="Brand name"
+				label={
+					<>
+						Brand name <FieldInfo description={descriptions.brandName} />
+					</>
+				}
 				value={form.brandName}
 				onValueChange={(value: string) =>
 					setForm((f) => ({ ...f, brandName: value }))
@@ -102,7 +111,12 @@ export default function HomeSettingsForm({ initial }: HomeSettingsFormProps) {
 				disabled={readOnly}
 			/>
 			<Field
-				label="<title> fallback"
+				label={
+					<>
+						{"<title> fallback "}
+						<FieldInfo description={descriptions.titleFallback} />
+					</>
+				}
 				value={form.titleFallback}
 				onValueChange={(value: string) =>
 					setForm((f) => ({ ...f, titleFallback: value }))
@@ -110,7 +124,12 @@ export default function HomeSettingsForm({ initial }: HomeSettingsFormProps) {
 				disabled={readOnly}
 			/>
 			<Field
-				label="Footer copyright"
+				label={
+					<>
+						Footer copyright{" "}
+						<FieldInfo description={descriptions.footerCopyright} />
+					</>
+				}
 				value={form.footerCopyright}
 				onValueChange={(value: string) =>
 					setForm((f) => ({ ...f, footerCopyright: value }))
@@ -120,7 +139,7 @@ export default function HomeSettingsForm({ initial }: HomeSettingsFormProps) {
 
 			<div>
 				<Text size="sm" class={labelClass}>
-					Footer links
+					Footer links <FieldInfo description={descriptions.footerLinks} />
 				</Text>
 				<Stack direction="column" gap="3" class={css({ alignItems: "stretch" })}>
 					{form.footerLinks.map((link, index) => (

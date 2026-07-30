@@ -1,4 +1,26 @@
 {
   "title": "Docs",
-  "description": "Sidenav grouping and doc-page chrome for the /docs section."
+  "description": "Sidenav grouping and doc-page chrome for the /docs section.",
+  "fields": [
+    {
+      "id": "showHydrationTierBadge",
+      "label": "Show hydration tier badge",
+      "description": "Shows a doc's Tier 1/2/3 hydration badge next to its category badge on the doc page. This is an implementation detail (see the Hydration guide) — turn it off if your readers don't need to know it."
+    },
+    {
+      "id": "fallbackLabel",
+      "label": "Fallback group label",
+      "description": "Sidenav group label used for any doc that doesn't match one of the configured groups (by section or category). Defaults to \"Other\"."
+    },
+    {
+      "id": "docOrder",
+      "label": "Explicit doc order",
+      "description": "Doc slugs, in the exact order they should appear within their sidenav group. Any doc not listed here keeps alphabetical order, appended after these."
+    },
+    {
+      "id": "docsUiLabels",
+      "label": "Header / pager labels",
+      "description": "Button and pager copy on doc pages: the Edit/Admin buttons (deep-link into the CMS), the mobile menu disclosure toggle, and the Previous/Next doc pager at the bottom of each doc."
+    }
+  ]
 }

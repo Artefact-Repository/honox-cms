@@ -1,4 +1,56 @@
 {
   "title": "CMS Admin",
-  "description": "Sveltia CMS's own bootstrap config (public/admin/config.yml) — backend connection, i18n locales, and media storage paths."
+  "description": "Sveltia CMS's own bootstrap config (public/admin/config.yml) — backend connection, i18n locales, and media storage paths.",
+  "fields": [
+    {
+      "id": "backendName",
+      "label": "Backend type",
+      "description": "Which git host the CMS admin and every direct-commit editor on this site (including these Settings forms) talk to: github, gitlab, or gitea."
+    },
+    {
+      "id": "backendRepo",
+      "label": "Repository",
+      "description": "The owner/repo every content change is committed to — the CMS admin, the task/project board, and this Settings page all write here."
+    },
+    {
+      "id": "backendBranch",
+      "label": "Branch",
+      "description": "The branch every direct commit is made against."
+    },
+    {
+      "id": "backendBaseUrl",
+      "label": "Base URL",
+      "description": "The OAuth proxy Worker URL used to authenticate into the CMS. Required for a self-hosted gitea/forgejo instance (no public default); optional for github/gitlab."
+    },
+    {
+      "id": "i18nStructure",
+      "label": "i18n structure",
+      "description": "How translated content files are laid out on disk — e.g. multiple_folders means each locale's files live in their own subfolder alongside the default-locale files. Changing this doesn't move any existing files, so pick this before translating content, not after."
+    },
+    {
+      "id": "i18nLocales",
+      "label": "Locales",
+      "description": "Every locale the CMS and site support, as language codes (en, zh, es, ...). Adding one here doesn't create its content — it just makes the CMS offer it as a translation target."
+    },
+    {
+      "id": "i18nDefaultLocale",
+      "label": "Default locale",
+      "description": "The locale whose content lives at the un-prefixed path (e.g. /docs, not /docs/zh) and that every other locale falls back to when a translation is missing."
+    },
+    {
+      "id": "i18nOmitDefaultLocaleFromFilePath",
+      "label": "Omit default locale from file path",
+      "description": "When on, the default locale's files skip the locale subfolder (content/docs/Intro.md instead of content/docs/en/Intro.md) while every other locale still gets one. Matches this site's actual content layout — turning it off without moving files would break the default locale's content lookup."
+    },
+    {
+      "id": "mediaFolder",
+      "label": "Media folder",
+      "description": "Where the CMS uploads media files to in the repo."
+    },
+    {
+      "id": "publicFolder",
+      "label": "Public folder",
+      "description": "The public URL path media files are served from once uploaded (e.g. /media)."
+    }
+  ]
 }

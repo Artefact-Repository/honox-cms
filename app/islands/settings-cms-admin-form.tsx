@@ -1,6 +1,7 @@
 import { css, cx } from "design-system/css";
 import { button } from "design-system/recipes";
 import { useState } from "hono/jsx";
+import { FieldInfo } from "../components/settings-field-info";
 import { Alert } from "../components/ui/alert";
 import { InteractiveCombobox } from "../components/ui/combobox-primitive";
 import { Field } from "../components/ui/field";
@@ -38,10 +39,12 @@ const labelClass = css({ fontWeight: "medium", mb: "1.5" });
 
 export interface CmsAdminSettingsFormProps {
 	initial: CmsAdminSettings;
+	descriptions: Record<string, string>;
 }
 
 export default function CmsAdminSettingsForm({
 	initial,
+	descriptions,
 }: CmsAdminSettingsFormProps) {
 	const [form, setForm] = useState(initial);
 	const [saving, setSaving] = useState(false);
@@ -99,7 +102,8 @@ export default function CmsAdminSettingsForm({
 
 			<div>
 				<Text size="sm" class={labelClass}>
-					Backend type
+					Backend type{" "}
+					<FieldInfo description={descriptions.backendName} />
 				</Text>
 				<InteractiveCombobox
 					items={backendItems}
@@ -113,7 +117,12 @@ export default function CmsAdminSettingsForm({
 			</div>
 
 			<Field
-				label="Repository (owner/repo)"
+				label={
+					<>
+						Repository (owner/repo){" "}
+						<FieldInfo description={descriptions.backendRepo} />
+					</>
+				}
 				value={form.backend.repo}
 				onValueChange={(value: string) =>
 					setForm((f) => ({ ...f, backend: { ...f.backend, repo: value } }))
@@ -121,7 +130,12 @@ export default function CmsAdminSettingsForm({
 				disabled={readOnly}
 			/>
 			<Field
-				label="Branch"
+				label={
+					<>
+						Branch{" "}
+						<FieldInfo description={descriptions.backendBranch} />
+					</>
+				}
 				value={form.backend.branch}
 				onValueChange={(value: string) =>
 					setForm((f) => ({ ...f, backend: { ...f.backend, branch: value } }))
@@ -129,7 +143,12 @@ export default function CmsAdminSettingsForm({
 				disabled={readOnly}
 			/>
 			<Field
-				label="Base URL (OAuth proxy — required for gitea/forgejo, optional otherwise)"
+				label={
+					<>
+						Base URL{" "}
+						<FieldInfo description={descriptions.backendBaseUrl} />
+					</>
+				}
 				value={form.backend.baseUrl}
 				onValueChange={(value: string) =>
 					setForm((f) => ({
@@ -142,7 +161,8 @@ export default function CmsAdminSettingsForm({
 
 			<div>
 				<Text size="sm" class={labelClass}>
-					i18n structure
+					i18n structure{" "}
+					<FieldInfo description={descriptions.i18nStructure} />
 				</Text>
 				<InteractiveCombobox
 					items={structureItems}
@@ -159,7 +179,12 @@ export default function CmsAdminSettingsForm({
 			</div>
 
 			<TagsField
-				label="Locales"
+				label={
+					<>
+						Locales{" "}
+						<FieldInfo description={descriptions.i18nLocales} />
+					</>
+				}
 				helperText="Locale codes, e.g. en, zh — press Enter to add one"
 				value={form.i18n.locales}
 				onValueChange={(details: { value: string[] }) =>
@@ -173,7 +198,8 @@ export default function CmsAdminSettingsForm({
 
 			<div>
 				<Text size="sm" class={labelClass}>
-					Default locale
+					Default locale{" "}
+					<FieldInfo description={descriptions.i18nDefaultLocale} />
 				</Text>
 				<InteractiveCombobox
 					items={localeItems}
@@ -190,7 +216,12 @@ export default function CmsAdminSettingsForm({
 			</div>
 
 			<Stack align="center" justify="space-between">
-				<Text size="sm">Omit default locale from file path</Text>
+				<Text size="sm">
+					Omit default locale from file path{" "}
+					<FieldInfo
+						description={descriptions.i18nOmitDefaultLocaleFromFilePath}
+					/>
+				</Text>
 				<Switch
 					checked={form.i18n.omitDefaultLocaleFromFilePath}
 					onCheckedChange={(details: { checked: boolean }) =>
@@ -207,7 +238,12 @@ export default function CmsAdminSettingsForm({
 			</Stack>
 
 			<Field
-				label="Media folder"
+				label={
+					<>
+						Media folder{" "}
+						<FieldInfo description={descriptions.mediaFolder} />
+					</>
+				}
 				value={form.media.mediaFolder}
 				onValueChange={(value: string) =>
 					setForm((f) => ({
@@ -218,7 +254,12 @@ export default function CmsAdminSettingsForm({
 				disabled={readOnly}
 			/>
 			<Field
-				label="Public folder"
+				label={
+					<>
+						Public folder{" "}
+						<FieldInfo description={descriptions.publicFolder} />
+					</>
+				}
 				value={form.media.publicFolder}
 				onValueChange={(value: string) =>
 					setForm((f) => ({

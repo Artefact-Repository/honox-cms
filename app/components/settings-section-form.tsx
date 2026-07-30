@@ -15,6 +15,7 @@ import PmsSettingsForm from "../islands/settings-pms-form";
 import { loadDocsConfig } from "../lib/configs";
 import { mergeColorOverrides } from "../lib/pms-config";
 import { PROJECT_STATUS_COLOR } from "../lib/projects";
+import { loadSectionFieldDescriptions } from "../lib/settings-fields";
 import type { SettingsSectionSlug } from "../lib/settings-sections";
 import { TASK_PRIORITY_COLOR, TASK_STATUS_COLOR } from "../lib/tasks";
 
@@ -74,7 +75,10 @@ function loadCmsAdminSettingsFromDisk() {
 }
 
 export async function renderSettingsSectionForm(slug: SettingsSectionSlug) {
-	const config = await loadDocsConfig("en");
+	const [config, descriptions] = await Promise.all([
+		loadDocsConfig("en"),
+		loadSectionFieldDescriptions(slug),
+	]);
 
 	switch (slug) {
 		case "home": {
@@ -91,6 +95,7 @@ export async function renderSettingsSectionForm(slug: SettingsSectionSlug) {
 							colorPalette: link.colorPalette || "gray",
 						})),
 					}}
+					descriptions={descriptions}
 				/>
 			);
 		}
@@ -106,6 +111,7 @@ export async function renderSettingsSectionForm(slug: SettingsSectionSlug) {
 						newsletterHeading: blog.newsletterHeading ?? "",
 						newsletterDescription: blog.newsletterDescription ?? "",
 					}}
+					descriptions={descriptions}
 				/>
 			);
 		}
@@ -131,6 +137,7 @@ export async function renderSettingsSectionForm(slug: SettingsSectionSlug) {
 						},
 					}}
 					groupsSummary={groupsSummary}
+					descriptions={descriptions}
 				/>
 			);
 		}
@@ -143,24 +150,27 @@ export async function renderSettingsSectionForm(slug: SettingsSectionSlug) {
 						statusColors: mergeColorOverrides(
 							TASK_STATUS_COLOR,
 							pms.statusColors,
-							"status",
 						),
 						priorityColors: mergeColorOverrides(
 							TASK_PRIORITY_COLOR,
 							pms.priorityColors,
-							"priority",
 						),
 						projectStatusColors: mergeColorOverrides(
 							PROJECT_STATUS_COLOR,
 							pms.projectStatusColors,
-							"status",
 						),
 					}}
+					descriptions={descriptions}
 				/>
 			);
 		}
 		case "cms-admin": {
-			return <CmsAdminSettingsForm initial={loadCmsAdminSettingsFromDisk()} />;
+			return (
+				<CmsAdminSettingsForm
+					initial={loadCmsAdminSettingsFromDisk()}
+					descriptions={descriptions}
+				/>
+			);
 		}
 	}
 }

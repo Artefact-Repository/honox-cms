@@ -1,4 +1,26 @@
 {
   "title": "PMS (Projects & Tasks)",
-  "description": "Accent colors for status/priority badges across /tasks and /projects, and the subtask tree's default state."
+  "description": "Accent colors for status/priority badges across /tasks and /projects, and the subtask tree's default state.",
+  "fields": [
+    {
+      "id": "subtasksExpandedByDefault",
+      "label": "Subtasks expanded by default",
+      "description": "Whether a task with subtasks starts expanded (showing its children) or collapsed when the /tasks table and a project's board first load."
+    },
+    {
+      "id": "statusColors",
+      "label": "Task status colors",
+      "description": "Accent color for each task Status badge, wherever it renders: the /tasks table, a project's board, and task detail pages. Any status left unset keeps its built-in default color."
+    },
+    {
+      "id": "priorityColors",
+      "label": "Task priority colors",
+      "description": "Accent color for each task Priority badge. Any priority left unset keeps its built-in default color."
+    },
+    {
+      "id": "projectStatusColors",
+      "label": "Project status colors",
+      "description": "Accent color for each project Status badge on /projects and a project's own page. Any status left unset keeps its built-in default color."
+    }
+  ]
 }

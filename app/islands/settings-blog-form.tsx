@@ -1,6 +1,7 @@
 import { css, cx } from "design-system/css";
 import { button } from "design-system/recipes";
 import { useState } from "hono/jsx";
+import { FieldInfo } from "../components/settings-field-info";
 import { Field } from "../components/ui/field";
 import { Stack } from "../components/ui/stack";
 import { Switch } from "../components/ui/switch";
@@ -18,9 +19,13 @@ export interface BlogSettingsFormProps {
 		newsletterHeading: string;
 		newsletterDescription: string;
 	};
+	descriptions: Record<string, string>;
 }
 
-export default function BlogSettingsForm({ initial }: BlogSettingsFormProps) {
+export default function BlogSettingsForm({
+	initial,
+	descriptions,
+}: BlogSettingsFormProps) {
 	const [form, setForm] = useState(initial);
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -61,7 +66,10 @@ export default function BlogSettingsForm({ initial }: BlogSettingsFormProps) {
 	return (
 		<Stack direction="column" gap="4" class={css({ alignItems: "stretch" })}>
 			<Stack align="center" justify="space-between">
-				<Text size="sm">Show author byline</Text>
+				<Text size="sm">
+					Show author byline{" "}
+					<FieldInfo description={descriptions.showAuthor} />
+				</Text>
 				<Switch
 					checked={form.showAuthor}
 					onCheckedChange={(details: { checked: boolean }) =>
@@ -71,7 +79,10 @@ export default function BlogSettingsForm({ initial }: BlogSettingsFormProps) {
 				/>
 			</Stack>
 			<Stack align="center" justify="space-between">
-				<Text size="sm">Show read time</Text>
+				<Text size="sm">
+					Show read time{" "}
+					<FieldInfo description={descriptions.showReadTime} />
+				</Text>
 				<Switch
 					checked={form.showReadTime}
 					onCheckedChange={(details: { checked: boolean }) =>
@@ -81,7 +92,12 @@ export default function BlogSettingsForm({ initial }: BlogSettingsFormProps) {
 				/>
 			</Stack>
 			<Stack align="center" justify="space-between">
-				<Text size="sm">Exclude untranslated posts from search</Text>
+				<Text size="sm">
+					Exclude untranslated posts from search{" "}
+					<FieldInfo
+						description={descriptions.excludeUntranslatedFromSearch}
+					/>
+				</Text>
 				<Switch
 					checked={form.excludeUntranslatedFromSearch}
 					onCheckedChange={(details: { checked: boolean }) =>
@@ -95,22 +111,36 @@ export default function BlogSettingsForm({ initial }: BlogSettingsFormProps) {
 			</Stack>
 
 			<Field
-				label="Newsletter heading"
+				label={
+					<>
+						Newsletter heading{" "}
+						<FieldInfo
+							description={descriptions.newsletterHeading}
+						/>
+					</>
+				}
 				value={form.newsletterHeading}
 				onValueChange={(value: string) =>
 					setForm((f) => ({ ...f, newsletterHeading: value }))
 				}
 				disabled={readOnly}
 			/>
-			<Textarea
-				label="Newsletter description"
-				rows={3}
-				value={form.newsletterDescription}
-				onValueChange={(value: string) =>
-					setForm((f) => ({ ...f, newsletterDescription: value }))
-				}
-				disabled={readOnly}
-			/>
+			<div>
+				<Text size="sm" class={css({ fontWeight: "medium", mb: "1.5" })}>
+					Newsletter description{" "}
+					<FieldInfo
+						description={descriptions.newsletterDescription}
+					/>
+				</Text>
+				<Textarea
+					rows={3}
+					value={form.newsletterDescription}
+					onValueChange={(value: string) =>
+						setForm((f) => ({ ...f, newsletterDescription: value }))
+					}
+					disabled={readOnly}
+				/>
+			</div>
 
 			{error && (
 				<Text size="sm" class={css({ color: "fg.error" })}>

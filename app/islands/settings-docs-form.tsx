@@ -1,6 +1,7 @@
 import { css, cx } from "design-system/css";
 import { button } from "design-system/recipes";
 import { useState } from "hono/jsx";
+import { FieldInfo } from "../components/settings-field-info";
 import { Field } from "../components/ui/field";
 import { Stack } from "../components/ui/stack";
 import { Switch } from "../components/ui/switch";
@@ -27,6 +28,7 @@ export interface DocsSettingsFormProps {
 	 * content change, not a simple setting, so it's shown but not editable
 	 * here (manage it in the CMS's Configs entry instead). */
 	groupsSummary: string;
+	descriptions: Record<string, string>;
 }
 
 const labelClass = css({ fontWeight: "medium", mb: "1.5" });
@@ -34,6 +36,7 @@ const labelClass = css({ fontWeight: "medium", mb: "1.5" });
 export default function DocsSettingsForm({
 	initial,
 	groupsSummary,
+	descriptions,
 }: DocsSettingsFormProps) {
 	const [form, setForm] = useState(initial);
 	const [saving, setSaving] = useState(false);
@@ -81,7 +84,12 @@ export default function DocsSettingsForm({
 	return (
 		<Stack direction="column" gap="4" class={css({ alignItems: "stretch" })}>
 			<Stack align="center" justify="space-between">
-				<Text size="sm">Show hydration tier badge</Text>
+				<Text size="sm">
+					Show hydration tier badge{" "}
+					<FieldInfo
+						description={descriptions.showHydrationTierBadge}
+					/>
+				</Text>
 				<Switch
 					checked={form.showHydrationTierBadge}
 					onCheckedChange={(details: { checked: boolean }) =>
@@ -95,7 +103,12 @@ export default function DocsSettingsForm({
 			</Stack>
 
 			<Field
-				label="Fallback group label"
+				label={
+					<>
+						Fallback group label{" "}
+						<FieldInfo description={descriptions.fallbackLabel} />
+					</>
+				}
 				value={form.fallbackLabel}
 				onValueChange={(value: string) =>
 					setForm((f) => ({ ...f, fallbackLabel: value }))
@@ -104,7 +117,12 @@ export default function DocsSettingsForm({
 			/>
 
 			<TagsField
-				label="Explicit doc order"
+				label={
+					<>
+						Explicit doc order{" "}
+						<FieldInfo description={descriptions.docOrder} />
+					</>
+				}
 				helperText="Doc slugs, in sidenav order — press Enter to add one. Docs not listed keep alphabetical order, appended after these."
 				value={form.docOrder}
 				onValueChange={(details: { value: string[] }) =>
@@ -115,7 +133,8 @@ export default function DocsSettingsForm({
 
 			<div>
 				<Text size="sm" class={labelClass}>
-					Header / pager labels
+					Header / pager labels{" "}
+					<FieldInfo description={descriptions.docsUiLabels} />
 				</Text>
 				<Stack gap="3" wrap="wrap">
 					<div class={css({ flex: "1", minWidth: "24" })}>

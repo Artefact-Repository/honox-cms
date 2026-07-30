@@ -1,4 +1,26 @@
 {
   "title": "Homepage & Branding",
-  "description": "Header brand name, <title> fallback, and footer content shown across the site."
+  "description": "Header brand name, <title> fallback, and footer content shown across the site.",
+  "fields": [
+    {
+      "id": "brandName",
+      "label": "Brand name",
+      "description": "Shown next to the logo in the site header, on every page that renders a header."
+    },
+    {
+      "id": "titleFallback",
+      "label": "<title> fallback",
+      "description": "Used for the browser tab's <title> only when the homepage's own CMS content has no title set for the current locale."
+    },
+    {
+      "id": "footerCopyright",
+      "label": "Footer copyright",
+      "description": "The copyright line shown in the site footer."
+    },
+    {
+      "id": "footerLinks",
+      "label": "Footer links",
+      "description": "External links shown at the bottom of the footer (e.g. HonoX Docs, PandaCSS Docs) — each has a label, a URL, and an accent color."
+    }
+  ]
 }

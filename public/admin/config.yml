@@ -2137,6 +2137,16 @@ collections:
     fields:
       - { label: Title, name: title, widget: string }
       - { label: Description, name: description, widget: string }
+      - label: Fields
+        name: fields
+        widget: list
+        required: false
+        summary: "{{fields.label}}"
+        hint: "Per-field tooltip text shown via the ⓘ icon next to each setting's label on /settings, and indexed by its search box. Field ID must exactly match that field's key in app/lib/settings-fields.ts — a mismatched ID is silently ignored and that field just keeps its built-in default text."
+        fields:
+          - { label: Field ID, name: id, widget: string }
+          - { label: Label, name: label, widget: string, required: false }
+          - { label: Description, name: description, widget: text, required: false }
 
 # Singletons - Single-instance config files, edited as one entry (not a list)
 # Docs: https://sveltiacms.app/en/docs/collections/singletons
