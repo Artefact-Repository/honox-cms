@@ -7,12 +7,16 @@
 // CMS itself (public/admin/config.yml's `singletons: configs`); this page
 // exists so these specific, frequently-tweaked values don't require opening
 // the full CMS entry.
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { css } from "design-system/css";
 import { createRoute } from "honox/factory";
+import { parseDocument } from "yaml";
 import { Anchor, Card, Heading, Text } from "../../components/ui";
 import { Toaster } from "../../components/ui/toast";
 import AuthStatus from "../../islands/auth-status";
 import BlogSettingsForm from "../../islands/settings-blog-form";
+import CmsAdminSettingsForm from "../../islands/settings-cms-admin-form";
 import DocsSettingsForm from "../../islands/settings-docs-form";
 import HomeSettingsForm from "../../islands/settings-home-form";
 import PmsSettingsForm from "../../islands/settings-pms-form";
@@ -23,8 +27,59 @@ import { TASK_PRIORITY_COLOR, TASK_STATUS_COLOR } from "../../lib/tasks";
 
 const CMS_ADMIN_HREF = "/admin/";
 
+/** Reads public/admin/config.yml straight off disk — this only ever runs at
+ * build time (every route handler here executes once per static page during
+ * `vite build`, see app/lib/configs.ts's module comment on the SSG model),
+ * never in the deployed static site, so plain Node fs access is safe. Vite's
+ * `import.meta.glob` can't reach this file since it lives under `public/`,
+ * which Vite deliberately excludes from its module graph (that's the whole
+ * reason this file has to be read as YAML off disk instead of imported like
+ * content/configs.json). `maxAliasCount: -1` disables the parser's default
+ * anti-DoS alias limit (100) — this file's page-builder component schema
+ * reuses far more anchors than that (same reason git-backend.ts's
+ * getRepoConfig needs the same option to read this file client-side). */
+function loadCmsAdminSettingsFromDisk() {
+	const filePath = path.join(process.cwd(), "public/admin/config.yml");
+	const raw = readFileSync(filePath, "utf-8");
+	const doc = parseDocument(raw, { maxAliasCount: -1 });
+	// `maxAliasCount` on parseDocument only bounds the parse step — toJS()
+	// re-checks it independently when resolving aliases into plain values,
+	// so it has to be passed here too or this throws on this exact file.
+	const data = doc.toJS({ maxAliasCount: -1 }) as {
+		backend?: { name?: string; repo?: string; branch?: string; base_url?: string };
+		i18n?: {
+			structure?: string;
+			locales?: string[];
+			default_locale?: string;
+			omit_default_locale_from_file_path?: boolean;
+		};
+		media_folder?: string;
+		public_folder?: string;
+	};
+	return {
+		backend: {
+			name: data.backend?.name ?? "github",
+			repo: data.backend?.repo ?? "",
+			branch: data.backend?.branch ?? "main",
+			baseUrl: data.backend?.base_url ?? "",
+		},
+		i18n: {
+			structure: data.i18n?.structure ?? "multiple_folders",
+			locales: data.i18n?.locales ?? ["en"],
+			defaultLocale: data.i18n?.default_locale ?? "en",
+			omitDefaultLocaleFromFilePath:
+				data.i18n?.omit_default_locale_from_file_path ?? true,
+		},
+		media: {
+			mediaFolder: data.media_folder ?? "/public/media",
+			publicFolder: data.public_folder ?? "/media",
+		},
+	};
+}
+
 export default createRoute(async (c) => {
 	const config = await loadDocsConfig("en");
+	const cmsAdmin = loadCmsAdminSettingsFromDisk();
 	const home = config.home ?? {};
 	const blog = config.blog ?? {};
 	const docsUi = config.docsUi ?? {};
@@ -250,6 +305,16 @@ export default createRoute(async (c) => {
 							projectStatusColors: projectStatusColor,
 						}}
 					/>
+				</Card>
+
+				<Card
+					variant="outline"
+					title="CMS Admin"
+					description="Sveltia CMS's own bootstrap config (public/admin/config.yml) — backend connection, i18n locales, and media storage paths."
+					headerClass={css({ p: "5", pb: "3" })}
+					bodyClass={css({ p: "5", pt: "0" })}
+				>
+					<CmsAdminSettingsForm initial={cmsAdmin} />
 				</Card>
 			</div>
 		</>,
