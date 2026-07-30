@@ -153,4 +153,4 @@ function SkeletonText(props: SkeletonTextProps) {
 	);
 }
 
-export { Skeleton, type SkeletonProps };
+export { Skeleton, SkeletonCircle, type SkeletonProps };

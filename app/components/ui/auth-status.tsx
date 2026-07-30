@@ -11,9 +11,13 @@ export interface AuthStatusProps extends Pick<AuthStatusBaseProps, "href"> {
 // anything but the logged-out state — hydrates unless explicitly opted out.
 export function AuthStatus({ interactive, href }: AuthStatusProps = {}) {
 	if (shouldHydrate(interactive, true)) {
+		// The island resolves this after mount; user=undefined here is the
+		// SSR/pre-hydration skeleton state, not a claim that no one's logged in.
 		return <AuthStatusIsland href={href} />;
 	}
-	return <AuthStatusBase href={href} />;
+	// No island means no JS is ever coming to resolve the identity, so this
+	// definitively renders the logged-out state rather than an eternal skeleton.
+	return <AuthStatusBase user={null} href={href} />;
 }
 
 export default AuthStatus;
