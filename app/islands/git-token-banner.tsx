@@ -9,11 +9,21 @@ import {
 	setStoredToken,
 } from "../utils/git-backend";
 
+// Fired on `window` whenever connect/disconnect changes the stored token, so
+// every island on the page using `useGitToken()` stays in sync with a single
+// connect action — e.g. /settings' five separate form islands all unlocking
+// together after one connect, instead of only the island whose own banner was
+// used. Plain localStorage writes don't do this on their own: the browser's
+// `storage` event only fires in *other* tabs/windows, never the one that made
+// the change, so same-page cross-island updates need this explicit signal.
+const TOKEN_CHANGED_EVENT = "git-token-changed";
+
 /** Resolves/stores the git host token every direct-commit editor needs
  * (personal access token, or the Sveltia CMS session if one's already
- * logged in) — shared by TaskBoard's drag-and-drop and TaskTreeDnd's
- * reparent/reorder drags, the two places that need a connect/disconnect
- * banner rather than just calling `requireToken()` and showing an error. */
+ * logged in) — shared by TaskBoard's drag-and-drop, TaskTreeDnd's
+ * reparent/reorder drags, and the /settings forms, for whichever needs a
+ * connect/disconnect banner (or just a live disabled/enabled signal) rather
+ * than only calling `requireToken()` and showing an error on save. */
 export function useGitToken() {
 	const [token, setToken] = useState<string | null>(null);
 	const [tokenSource, setTokenSource] = useState<"sveltia" | "manual" | null>(
@@ -21,11 +31,18 @@ export function useGitToken() {
 	);
 
 	// localStorage only exists client-side, so the connect state can't be
-	// known during SSR — read it once after hydration.
+	// known during SSR — read it once after hydration, then keep listening so
+	// a connect/disconnect made via a *different* island's banner (or a
+	// different call to this same hook) still updates this instance.
 	useEffect(() => {
-		const resolved = resolveToken();
-		setToken(resolved.token);
-		setTokenSource(resolved.source);
+		const resolve = () => {
+			const resolved = resolveToken();
+			setToken(resolved.token);
+			setTokenSource(resolved.source);
+		};
+		resolve();
+		window.addEventListener(TOKEN_CHANGED_EVENT, resolve);
+		return () => window.removeEventListener(TOKEN_CHANGED_EVENT, resolve);
 	}, []);
 
 	const connect = (value: string) => {
@@ -34,6 +51,7 @@ export function useGitToken() {
 		setStoredToken(trimmed);
 		setToken(trimmed);
 		setTokenSource("manual");
+		window.dispatchEvent(new Event(TOKEN_CHANGED_EVENT));
 		return true;
 	};
 
@@ -41,6 +59,7 @@ export function useGitToken() {
 		clearStoredToken();
 		setToken(null);
 		setTokenSource(null);
+		window.dispatchEvent(new Event(TOKEN_CHANGED_EVENT));
 	};
 
 	return { token, tokenSource, connect, disconnect };

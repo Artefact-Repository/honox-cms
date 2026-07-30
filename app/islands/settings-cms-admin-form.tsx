@@ -14,6 +14,7 @@ import {
 	CmsConfigSaveError,
 	saveCmsAdminSettings,
 } from "../utils/cms-config-save";
+import { useGitToken } from "./git-token-banner";
 
 const backendItems = [
 	{ label: "github", value: "github" },
@@ -33,6 +34,8 @@ export default function CmsAdminSettingsForm({
 	const [form, setForm] = useState(initial);
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const { token } = useGitToken();
+	const readOnly = !token;
 
 	const localeItems = form.i18n.locales.map((l) => ({ label: l, value: l }));
 
@@ -93,6 +96,7 @@ export default function CmsAdminSettingsForm({
 						setForm((f) => ({ ...f, backend: { ...f.backend, name: value } }))
 					}
 					size="sm"
+					disabled={readOnly}
 				/>
 			</div>
 
@@ -102,6 +106,7 @@ export default function CmsAdminSettingsForm({
 				onValueChange={(value: string) =>
 					setForm((f) => ({ ...f, backend: { ...f.backend, repo: value } }))
 				}
+				disabled={readOnly}
 			/>
 			<Field
 				label="Branch"
@@ -109,6 +114,7 @@ export default function CmsAdminSettingsForm({
 				onValueChange={(value: string) =>
 					setForm((f) => ({ ...f, backend: { ...f.backend, branch: value } }))
 				}
+				disabled={readOnly}
 			/>
 			<Field
 				label="Base URL (OAuth proxy — required for gitea/forgejo, optional otherwise)"
@@ -119,6 +125,7 @@ export default function CmsAdminSettingsForm({
 						backend: { ...f.backend, baseUrl: value },
 					}))
 				}
+				disabled={readOnly}
 			/>
 
 			<Field
@@ -128,6 +135,7 @@ export default function CmsAdminSettingsForm({
 				onValueChange={(value: string) =>
 					setForm((f) => ({ ...f, i18n: { ...f.i18n, structure: value } }))
 				}
+				disabled={readOnly}
 			/>
 
 			<TagsField
@@ -140,6 +148,7 @@ export default function CmsAdminSettingsForm({
 						i18n: { ...f.i18n, locales: details.value },
 					}))
 				}
+				disabled={readOnly}
 			/>
 
 			<div>
@@ -156,6 +165,7 @@ export default function CmsAdminSettingsForm({
 						}))
 					}
 					size="sm"
+					disabled={readOnly}
 				/>
 			</div>
 
@@ -172,6 +182,7 @@ export default function CmsAdminSettingsForm({
 							},
 						}))
 					}
+					disabled={readOnly}
 				/>
 			</Stack>
 
@@ -184,6 +195,7 @@ export default function CmsAdminSettingsForm({
 						media: { ...f.media, mediaFolder: value },
 					}))
 				}
+				disabled={readOnly}
 			/>
 			<Field
 				label="Public folder"
@@ -194,6 +206,7 @@ export default function CmsAdminSettingsForm({
 						media: { ...f.media, publicFolder: value },
 					}))
 				}
+				disabled={readOnly}
 			/>
 
 			{error && (
@@ -202,11 +215,16 @@ export default function CmsAdminSettingsForm({
 				</Text>
 			)}
 
-			<Stack justify="end">
+			<Stack align="center" justify="end" gap="3">
+				{readOnly && (
+					<Text size="xs" class={css({ color: "fg.muted" })}>
+						Connect a git host token above to edit.
+					</Text>
+				)}
 				<button
 					type="button"
 					onClick={() => void handleSave()}
-					disabled={saving}
+					disabled={saving || readOnly}
 					class={cx(button({ variant: "solid", size: "sm" }))}
 				>
 					{saving ? "Saving..." : "Save changes"}

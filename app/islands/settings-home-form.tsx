@@ -8,6 +8,7 @@ import { Text } from "../components/ui/text";
 import { toaster } from "../components/ui/toast";
 import { PROJECT_COLOR_PALETTES } from "../lib/projects";
 import { saveConfigsFields, SettingsSaveError } from "../utils/settings-save";
+import { useGitToken } from "./git-token-banner";
 
 const colorItems = PROJECT_COLOR_PALETTES.map((c) => ({ label: c, value: c }));
 
@@ -32,6 +33,8 @@ export default function HomeSettingsForm({ initial }: HomeSettingsFormProps) {
 	const [form, setForm] = useState(initial);
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const { token } = useGitToken();
+	const readOnly = !token;
 
 	const updateLink = (index: number, patch: Partial<FooterLink>) => {
 		setForm((f) => ({
@@ -96,6 +99,7 @@ export default function HomeSettingsForm({ initial }: HomeSettingsFormProps) {
 				onValueChange={(value: string) =>
 					setForm((f) => ({ ...f, brandName: value }))
 				}
+				disabled={readOnly}
 			/>
 			<Field
 				label="<title> fallback"
@@ -103,6 +107,7 @@ export default function HomeSettingsForm({ initial }: HomeSettingsFormProps) {
 				onValueChange={(value: string) =>
 					setForm((f) => ({ ...f, titleFallback: value }))
 				}
+				disabled={readOnly}
 			/>
 			<Field
 				label="Footer copyright"
@@ -110,6 +115,7 @@ export default function HomeSettingsForm({ initial }: HomeSettingsFormProps) {
 				onValueChange={(value: string) =>
 					setForm((f) => ({ ...f, footerCopyright: value }))
 				}
+				disabled={readOnly}
 			/>
 
 			<div>
@@ -137,6 +143,7 @@ export default function HomeSettingsForm({ initial }: HomeSettingsFormProps) {
 									onValueChange={(value: string) =>
 										updateLink(index, { label: value })
 									}
+									disabled={readOnly}
 								/>
 							</div>
 							<div class={css({ flex: "2", minWidth: "36" })}>
@@ -146,6 +153,7 @@ export default function HomeSettingsForm({ initial }: HomeSettingsFormProps) {
 									onValueChange={(value: string) =>
 										updateLink(index, { href: value })
 									}
+									disabled={readOnly}
 								/>
 							</div>
 							<div class={css({ flex: "1", minWidth: "28" })}>
@@ -159,11 +167,13 @@ export default function HomeSettingsForm({ initial }: HomeSettingsFormProps) {
 										updateLink(index, { colorPalette: value })
 									}
 									size="sm"
+									disabled={readOnly}
 								/>
 							</div>
 							<button
 								type="button"
 								onClick={() => removeLink(index)}
+								disabled={readOnly}
 								class={cx(button({ variant: "outline", size: "sm" }))}
 							>
 								Remove
@@ -174,6 +184,7 @@ export default function HomeSettingsForm({ initial }: HomeSettingsFormProps) {
 				<button
 					type="button"
 					onClick={addLink}
+					disabled={readOnly}
 					class={cx(
 						button({ variant: "outline", size: "sm" }),
 						css({ mt: "2" }),
@@ -189,11 +200,16 @@ export default function HomeSettingsForm({ initial }: HomeSettingsFormProps) {
 				</Text>
 			)}
 
-			<Stack justify="end">
+			<Stack align="center" justify="end" gap="3">
+				{readOnly && (
+					<Text size="xs" class={css({ color: "fg.muted" })}>
+						Connect a git host token above to edit.
+					</Text>
+				)}
 				<button
 					type="button"
 					onClick={() => void handleSave()}
-					disabled={saving}
+					disabled={saving || readOnly}
 					class={cx(button({ variant: "solid", size: "sm" }))}
 				>
 					{saving ? "Saving..." : "Save changes"}

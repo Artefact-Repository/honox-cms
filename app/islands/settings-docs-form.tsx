@@ -8,6 +8,7 @@ import { TagsField } from "../components/ui/tags-field";
 import { Text } from "../components/ui/text";
 import { toaster } from "../components/ui/toast";
 import { saveConfigsFields, SettingsSaveError } from "../utils/settings-save";
+import { useGitToken } from "./git-token-banner";
 
 export interface DocsSettingsFormProps {
 	initial: {
@@ -37,6 +38,8 @@ export default function DocsSettingsForm({
 	const [form, setForm] = useState(initial);
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const { token } = useGitToken();
+	const readOnly = !token;
 
 	const setDocsUi = (patch: Partial<typeof initial.docsUi>) =>
 		setForm((f) => ({ ...f, docsUi: { ...f.docsUi, ...patch } }));
@@ -87,6 +90,7 @@ export default function DocsSettingsForm({
 							showHydrationTierBadge: details.checked,
 						}))
 					}
+					disabled={readOnly}
 				/>
 			</Stack>
 
@@ -96,6 +100,7 @@ export default function DocsSettingsForm({
 				onValueChange={(value: string) =>
 					setForm((f) => ({ ...f, fallbackLabel: value }))
 				}
+				disabled={readOnly}
 			/>
 
 			<TagsField
@@ -105,6 +110,7 @@ export default function DocsSettingsForm({
 				onValueChange={(details: { value: string[] }) =>
 					setForm((f) => ({ ...f, docOrder: details.value }))
 				}
+				disabled={readOnly}
 			/>
 
 			<div>
@@ -117,6 +123,7 @@ export default function DocsSettingsForm({
 							label="Edit button"
 							value={form.docsUi.edit}
 							onValueChange={(value: string) => setDocsUi({ edit: value })}
+							disabled={readOnly}
 						/>
 					</div>
 					<div class={css({ flex: "1", minWidth: "24" })}>
@@ -124,6 +131,7 @@ export default function DocsSettingsForm({
 							label="Admin button"
 							value={form.docsUi.admin}
 							onValueChange={(value: string) => setDocsUi({ admin: value })}
+							disabled={readOnly}
 						/>
 					</div>
 					<div class={css({ flex: "1", minWidth: "24" })}>
@@ -131,6 +139,7 @@ export default function DocsSettingsForm({
 							label="Mobile menu toggle"
 							value={form.docsUi.menu}
 							onValueChange={(value: string) => setDocsUi({ menu: value })}
+							disabled={readOnly}
 						/>
 					</div>
 					<div class={css({ flex: "1", minWidth: "24" })}>
@@ -138,6 +147,7 @@ export default function DocsSettingsForm({
 							label="Previous doc label"
 							value={form.docsUi.previous}
 							onValueChange={(value: string) => setDocsUi({ previous: value })}
+							disabled={readOnly}
 						/>
 					</div>
 					<div class={css({ flex: "1", minWidth: "24" })}>
@@ -145,6 +155,7 @@ export default function DocsSettingsForm({
 							label="Next doc label"
 							value={form.docsUi.next}
 							onValueChange={(value: string) => setDocsUi({ next: value })}
+							disabled={readOnly}
 						/>
 					</div>
 				</Stack>
@@ -165,11 +176,16 @@ export default function DocsSettingsForm({
 				</Text>
 			)}
 
-			<Stack justify="end">
+			<Stack align="center" justify="end" gap="3">
+				{readOnly && (
+					<Text size="xs" class={css({ color: "fg.muted" })}>
+						Connect a git host token above to edit.
+					</Text>
+				)}
 				<button
 					type="button"
 					onClick={() => void handleSave()}
-					disabled={saving}
+					disabled={saving || readOnly}
 					class={cx(button({ variant: "solid", size: "sm" }))}
 				>
 					{saving ? "Saving..." : "Save changes"}

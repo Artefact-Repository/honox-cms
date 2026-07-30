@@ -15,6 +15,7 @@ import { parseDocument } from "yaml";
 import { Anchor, Card, Heading, Text } from "../../components/ui";
 import { Toaster } from "../../components/ui/toast";
 import AuthStatus from "../../islands/auth-status";
+import SettingsAuthBanner from "../../islands/settings-auth-banner";
 import BlogSettingsForm from "../../islands/settings-blog-form";
 import CmsAdminSettingsForm from "../../islands/settings-cms-admin-form";
 import DocsSettingsForm from "../../islands/settings-docs-form";
@@ -225,6 +226,8 @@ export default createRoute(async (c) => {
 						.
 					</Text>
 				</div>
+
+				<SettingsAuthBanner />
 
 				<Card
 					variant="outline"

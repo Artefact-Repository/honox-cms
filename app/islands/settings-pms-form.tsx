@@ -12,6 +12,7 @@ import { toaster } from "../components/ui/toast";
 import { ChevronDownIcon } from "../icons/chevron-down";
 import { PROJECT_COLOR_PALETTES } from "../lib/projects";
 import { saveConfigsFields, SettingsSaveError } from "../utils/settings-save";
+import { useGitToken } from "./git-token-banner";
 
 const colorItems = PROJECT_COLOR_PALETTES.map((c) => ({ label: c, value: c }));
 
@@ -32,9 +33,11 @@ const labelClass = css({ fontWeight: "medium", mb: "1.5" });
 function ColorMapEditor({
 	entries,
 	onChange,
+	disabled,
 }: {
 	entries: Record<string, string>;
 	onChange: (key: string, colorPalette: string) => void;
+	disabled?: boolean;
 }) {
 	return (
 		<Stack direction="column" gap="2" class={css({ alignItems: "stretch" })}>
@@ -49,6 +52,7 @@ function ColorMapEditor({
 							value={colorPalette}
 							onValueChange={(value: string) => onChange(key, value)}
 							size="sm"
+							disabled={disabled}
 						/>
 					</div>
 				</Stack>
@@ -61,6 +65,8 @@ export default function PmsSettingsForm({ initial }: PmsSettingsFormProps) {
 	const [form, setForm] = useState(initial);
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const { token } = useGitToken();
+	const readOnly = !token;
 
 	const handleSave = async () => {
 		setSaving(true);
@@ -110,6 +116,7 @@ export default function PmsSettingsForm({ initial }: PmsSettingsFormProps) {
 							subtasksExpandedByDefault: details.checked,
 						}))
 					}
+					disabled={readOnly}
 				/>
 			</Stack>
 
@@ -157,6 +164,7 @@ export default function PmsSettingsForm({ initial }: PmsSettingsFormProps) {
 										statusColors: { ...f.statusColors, [key]: colorPalette },
 									}))
 								}
+								disabled={readOnly}
 							/>
 						</div>
 
@@ -175,6 +183,7 @@ export default function PmsSettingsForm({ initial }: PmsSettingsFormProps) {
 										},
 									}))
 								}
+								disabled={readOnly}
 							/>
 						</div>
 
@@ -193,6 +202,7 @@ export default function PmsSettingsForm({ initial }: PmsSettingsFormProps) {
 										},
 									}))
 								}
+								disabled={readOnly}
 							/>
 						</div>
 					</Grid>
@@ -205,11 +215,16 @@ export default function PmsSettingsForm({ initial }: PmsSettingsFormProps) {
 				</Text>
 			)}
 
-			<Stack justify="end">
+			<Stack align="center" justify="end" gap="3">
+				{readOnly && (
+					<Text size="xs" class={css({ color: "fg.muted" })}>
+						Connect a git host token above to edit.
+					</Text>
+				)}
 				<button
 					type="button"
 					onClick={() => void handleSave()}
-					disabled={saving}
+					disabled={saving || readOnly}
 					class={cx(button({ variant: "solid", size: "sm" }))}
 				>
 					{saving ? "Saving..." : "Save changes"}
