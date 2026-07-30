@@ -299,47 +299,49 @@ export default createRoute(
 									})}
 								>
 									{/* Author */}
-									<Stack gap="3" align="center">
-										<Anchor
-											href={localiseLink(
-												`/blog/by-author/${post.author || "Artefact Team"}`,
-											)}
-											class={css({
-												display: "inline-flex",
-												alignItems: "center",
-												textDecoration: "none",
-											})}
-										>
-											<Avatar
-												size="md"
-												variant="solid"
-												name={post.author || "Artefact Team"}
-											/>
-										</Anchor>
-										<div>
+									{config.blog?.showAuthor !== false && (
+										<Stack gap="3" align="center">
 											<Anchor
 												href={localiseLink(
 													`/blog/by-author/${post.author || "Artefact Team"}`,
 												)}
 												class={css({
+													display: "inline-flex",
+													alignItems: "center",
 													textDecoration: "none",
-													color: "fg",
-													_hover: { color: "blue.10" },
 												})}
 											>
-												<Text
-													size="sm"
+												<Avatar
+													size="md"
+													variant="solid"
+													name={post.author || "Artefact Team"}
+												/>
+											</Anchor>
+											<div>
+												<Anchor
+													href={localiseLink(
+														`/blog/by-author/${post.author || "Artefact Team"}`,
+													)}
 													class={css({
-														color: "inherit",
-														fontWeight: "semibold",
-														display: "block",
+														textDecoration: "none",
+														color: "fg",
+														_hover: { color: "blue.10" },
 													})}
 												>
-													{post.author || "Artefact Team"}
-												</Text>
-											</Anchor>
-										</div>
-									</Stack>
+													<Text
+														size="sm"
+														class={css({
+															color: "inherit",
+															fontWeight: "semibold",
+															display: "block",
+														})}
+													>
+														{post.author || "Artefact Team"}
+													</Text>
+												</Anchor>
+											</div>
+										</Stack>
+									)}
 
 									{/* Date */}
 									{post.date && (
@@ -364,7 +366,7 @@ export default createRoute(
 									)}
 
 									{/* Read Time */}
-									{post.readTime ? (
+									{config.blog?.showReadTime !== false && post.readTime ? (
 										<Stack gap="2" align="center">
 											<ClockIcon width="18" height="18" />
 											<Text

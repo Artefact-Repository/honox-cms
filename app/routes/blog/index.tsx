@@ -276,7 +276,7 @@ export default createRoute(async (c) => {
 														align="center"
 														class={css({ pointerEvents: "auto" })}
 													>
-														{post.author && (
+														{config.blog?.showAuthor !== false && post.author && (
 															<Anchor
 																href={localiseLink(
 																	`/blog/by-author/${post.author}`,
@@ -307,7 +307,9 @@ export default createRoute(async (c) => {
 															</Anchor>
 														)}
 														<Text size="sm" class={css({ color: "white.a10" })}>
-															{post.author ? "· " : ""}
+															{config.blog?.showAuthor !== false && post.author
+																? "· "
+																: ""}
 															{new Date(post.date).toLocaleDateString(
 																currentLocale === "zh" ? "zh-CN" : "en-US",
 																{
@@ -316,7 +318,9 @@ export default createRoute(async (c) => {
 																	year: "numeric",
 																},
 															)}
-															{post.readTime ? ` · ${post.readTime}` : ""}
+															{config.blog?.showReadTime !== false && post.readTime
+																? ` · ${post.readTime}`
+																: ""}
 														</Text>
 													</Stack>
 												</div>
@@ -633,37 +637,43 @@ export default createRoute(async (c) => {
 									>
 										<Stack gap="2.5" align="center">
 											{/* Author Avatar */}
-											<Anchor
-												href={localiseLink(`/blog/by-author/${post.author}`)}
-												class={css({
-													display: "inline-flex",
-													alignItems: "center",
-													textDecoration: "none",
-												})}
-											>
-												<Avatar size="sm" variant="solid" name={post.author} />
-											</Anchor>
-											<div>
-												<Anchor
-													href={localiseLink(`/blog/by-author/${post.author}`)}
-													class={css({
-														textDecoration: "none",
-														color: "fg",
-														_hover: { color: "blue.10" },
-													})}
-												>
-													<Text
-														size="sm"
+											{config.blog?.showAuthor !== false && post.author && (
+												<>
+													<Anchor
+														href={localiseLink(`/blog/by-author/${post.author}`)}
 														class={css({
-															fontWeight: "medium",
-															lineHeight: "tight",
-															display: "block",
-															color: "inherit",
+															display: "inline-flex",
+															alignItems: "center",
+															textDecoration: "none",
 														})}
 													>
-														{post.author}
-													</Text>
-												</Anchor>
+														<Avatar size="sm" variant="solid" name={post.author} />
+													</Anchor>
+													<div>
+														<Anchor
+															href={localiseLink(`/blog/by-author/${post.author}`)}
+															class={css({
+																textDecoration: "none",
+																color: "fg",
+																_hover: { color: "blue.10" },
+															})}
+														>
+															<Text
+																size="sm"
+																class={css({
+																	fontWeight: "medium",
+																	lineHeight: "tight",
+																	display: "block",
+																	color: "inherit",
+																})}
+															>
+																{post.author}
+															</Text>
+														</Anchor>
+													</div>
+												</>
+											)}
+											<div>
 												<Stack
 													gap="2"
 													align="center"
@@ -679,9 +689,11 @@ export default createRoute(async (c) => {
 															},
 														)}
 													</Text>
-													<Text size="xs" class={css({ color: "fg.muted" })}>
-														· {post.readTime}
-													</Text>
+													{config.blog?.showReadTime !== false && post.readTime && (
+														<Text size="xs" class={css({ color: "fg.muted" })}>
+															· {post.readTime}
+														</Text>
+													)}
 												</Stack>
 											</div>
 										</Stack>

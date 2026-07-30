@@ -618,29 +618,35 @@ export default createRoute(
 							{doc.title}
 						</Heading>
 
-						{(doc.category || doc.hydration) && (
-							<Stack
-								direction="horizontal"
-								gap="2"
-								align="center"
-								class={css({ mb: "6" })}
-							>
-								{doc.category && (
-									<Badge variant="subtle" colorPalette="cyan" size="sm">
-										{doc.category}
-									</Badge>
-								)}
-								{doc.hydration && (
-									<Badge
-										variant="subtle"
-										colorPalette={TIER_COLOR[doc.hydration] ?? "gray"}
-										size="sm"
+						{(() => {
+							const showTier =
+								config.docs?.showHydrationTierBadge !== false;
+							return (
+								(doc.category || (showTier && doc.hydration)) && (
+									<Stack
+										direction="horizontal"
+										gap="2"
+										align="center"
+										class={css({ mb: "6" })}
 									>
-										{tierLabel(config.hydrationTiers, doc.hydration)}
-									</Badge>
-								)}
-							</Stack>
-						)}
+										{doc.category && (
+											<Badge variant="subtle" colorPalette="cyan" size="sm">
+												{doc.category}
+											</Badge>
+										)}
+										{showTier && doc.hydration && (
+											<Badge
+												variant="subtle"
+												colorPalette={TIER_COLOR[doc.hydration] ?? "gray"}
+												size="sm"
+											>
+												{tierLabel(config.hydrationTiers, doc.hydration)}
+											</Badge>
+										)}
+									</Stack>
+								)
+							);
+						})()}
 
 						{DocContent ? (
 							<div class={markdownContentClass}>
