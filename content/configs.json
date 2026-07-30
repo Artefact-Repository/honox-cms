@@ -580,11 +580,11 @@
   "home": {
     "brandName": "Artefact UI",
     "titleFallback": "Artefact — Modern UI Suite",
-    "footerCopyright": "© 2025 Artefact UI Suite. All rights reserved.",
+    "footerCopyright": "© 2026 Artefact UI Suite. All rights reserved.",
     "footerLinks": [
       {
         "label": "HonoX Docs",
-        "href": "https://honox.dev",
+        "href": "https://hono.dev",
         "colorPalette": "gray"
       },
       {
