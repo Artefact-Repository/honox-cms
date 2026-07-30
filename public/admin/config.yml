@@ -2399,3 +2399,67 @@ singletons:
             default: false
             i18n: true
             hint: "When on, this locale's blog search only returns posts that actually have a translation into it, instead of falling back to the English post. Set per-locale (each locale's own value) — turn on only once that specific locale's translation coverage is complete, or its search just returns fewer results."
+          - label: Show Author
+            name: showAuthor
+            widget: boolean
+            default: true
+            required: false
+            i18n: duplicate
+            hint: "Shows the author byline on post cards and the article page."
+          - label: Show Read Time
+            name: showReadTime
+            widget: boolean
+            default: true
+            required: false
+            i18n: duplicate
+            hint: "Shows the \"X min read\" byline on post cards and the article page."
+      - label: Docs
+        name: docs
+        widget: object
+        required: false
+        i18n: duplicate
+        hint: "/docs section rendering toggles (not page-chrome copy — see Docs UI above)."
+        fields:
+          - label: Show Hydration Tier Badge
+            name: showHydrationTierBadge
+            widget: boolean
+            default: true
+            required: false
+            hint: "Shows a doc's Tier 1/2/3 hydration badge next to its category badge. Turn off to hide this implementation detail from readers who don't need it."
+      - label: PMS (Projects & Tasks)
+        name: pms
+        widget: object
+        required: false
+        i18n: duplicate
+        hint: "Project/task board behavior — not translated content, so every field here is a matching key shared across all locale files."
+        fields:
+          - label: Task Status Colors
+            name: statusColors
+            widget: list
+            required: false
+            hint: "Overrides the accent color used for each task Status badge (table, board, and detail pages). Any status left out keeps its built-in default color."
+            fields:
+              - { label: Status, name: status, widget: select, options: *task_statuses }
+              - { label: Color Palette, name: colorPalette, widget: select, options: [gray, blue, green, red, orange, purple, cyan, amber] }
+          - label: Task Priority Colors
+            name: priorityColors
+            widget: list
+            required: false
+            hint: "Overrides the accent color used for each task Priority badge. Any priority left out keeps its built-in default color."
+            fields:
+              - { label: Priority, name: priority, widget: select, options: *task_priorities }
+              - { label: Color Palette, name: colorPalette, widget: select, options: [gray, blue, green, red, orange, purple, cyan, amber] }
+          - label: Project Status Colors
+            name: projectStatusColors
+            widget: list
+            required: false
+            hint: "Overrides the accent color used for each project Status badge. Any status left out keeps its built-in default color."
+            fields:
+              - { label: Status, name: status, widget: select, options: *project_statuses }
+              - { label: Color Palette, name: colorPalette, widget: select, options: [gray, blue, green, red, orange, purple, cyan, amber] }
+          - label: Subtasks Expanded By Default
+            name: subtasksExpandedByDefault
+            widget: boolean
+            default: true
+            required: false
+            hint: "Whether a task with subtasks starts expanded (showing its children) on the /tasks table and project board."

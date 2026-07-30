@@ -46,6 +46,46 @@ export interface BlogSiteConfig {
 	 * across locales) only once that locale's translation coverage is
 	 * actually complete, or search will just return fewer results. */
 	excludeUntranslatedFromSearch?: boolean;
+	/** Shows the author byline on post cards (/blog listing) and the article
+	 * page. Defaults to true when omitted. */
+	showAuthor?: boolean;
+	/** Shows the "X min read" byline on post cards and the article page.
+	 * Defaults to true when omitted. */
+	showReadTime?: boolean;
+}
+
+/** /docs section behavior (configs singleton's `docs` field) — not page
+ * chrome copy (see `docsUi` below), just rendering toggles. */
+export interface DocsSiteConfig {
+	/** Shows a doc's hydration-tier badge (Tier 1/2/3) next to its category
+	 * badge on the doc page. Defaults to true when omitted — turn off to hide
+	 * this implementation detail from readers who don't need it. */
+	showHydrationTierBadge?: boolean;
+}
+
+/** One status/priority → accent color override (configs singleton's `pms`
+ * field). `status`/`priority` are matching keys — one of the fixed values
+ * from the tasks/projects collections' own `select` options in
+ * public/admin/config.yml (task_statuses/task_priorities/project_statuses),
+ * not freely renamable, since task/project frontmatter still stores the
+ * English string. Any status/priority not listed here keeps its built-in
+ * default color (see app/lib/tasks.ts, app/lib/projects.ts). */
+export interface PmsColorOverride {
+	status?: string;
+	priority?: string;
+	colorPalette: string;
+}
+
+/** Project/task board behavior (configs singleton's `pms` field) — not
+ * translated content, so every field is a matching key duplicated across all
+ * locale files (i18n: duplicate in config.yml), same as `docOrder` above. */
+export interface PmsSiteConfig {
+	statusColors?: PmsColorOverride[];
+	priorityColors?: PmsColorOverride[];
+	projectStatusColors?: PmsColorOverride[];
+	/** Whether a task with subtasks starts expanded on the /tasks table and
+	 * the project board. Defaults to true when omitted. */
+	subtasksExpandedByDefault?: boolean;
 }
 
 /** One entry in the `hydrationTiers` list: the numeric `tier` is a matching
@@ -157,8 +197,13 @@ export interface DocsConfig {
 	hydrationTiers?: HydrationTierConfig[];
 	/** Docs search box + header Edit/Admin button copy. */
 	docsUi?: DocsUiConfig;
+	/** /docs section rendering toggles (not page-chrome copy — see `docsUi`). */
+	docs?: DocsSiteConfig;
 	/** Home page brand/chrome copy and footer links. */
 	home?: HomeSiteConfig;
+	/** Project/task board behavior — status/priority accent color overrides
+	 * and default subtask expansion. */
+	pms?: PmsSiteConfig;
 }
 
 const EMPTY_DOCS_CONFIG: DocsConfig = { groups: [] };

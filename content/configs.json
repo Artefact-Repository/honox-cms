@@ -488,7 +488,34 @@
   "blog": {
     "excludeUntranslatedFromSearch": false,
     "newsletterHeading": "Stay Updated",
-    "newsletterDescription": "Get the latest articles and insights delivered straight to your inbox. No spam, just good content."
+    "newsletterDescription": "Get the latest articles and insights delivered straight to your inbox. No spam, just good content.",
+    "showAuthor": true,
+    "showReadTime": true
+  },
+  "docs": {
+    "showHydrationTierBadge": true
+  },
+  "pms": {
+    "statusColors": [
+      { "status": "To Do", "colorPalette": "gray" },
+      { "status": "In Progress", "colorPalette": "blue" },
+      { "status": "In Review", "colorPalette": "purple" },
+      { "status": "Done", "colorPalette": "green" }
+    ],
+    "priorityColors": [
+      { "priority": "Low", "colorPalette": "gray" },
+      { "priority": "Medium", "colorPalette": "blue" },
+      { "priority": "High", "colorPalette": "orange" },
+      { "priority": "Urgent", "colorPalette": "red" }
+    ],
+    "projectStatusColors": [
+      { "status": "Planning", "colorPalette": "gray" },
+      { "status": "Active", "colorPalette": "blue" },
+      { "status": "On Hold", "colorPalette": "amber" },
+      { "status": "Completed", "colorPalette": "green" },
+      { "status": "Archived", "colorPalette": "gray" }
+    ],
+    "subtasksExpandedByDefault": true
   },
   "hydrationTiers": [
     {

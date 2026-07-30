@@ -5,6 +5,8 @@
 // one app-specific data shape (projects, task statuses, ...) into the same
 // uniform item shape a generic block (e.g. `badge-list`) can render without
 // knowing where the data actually came from.
+import { loadDocsConfig } from "./configs";
+import { mergeColorOverrides } from "./pms-config";
 import { listProjects } from "./projects";
 import {
 	buildTaskSearchEntries,
@@ -55,21 +57,35 @@ const dataSources: Record<string, DataSourceResolver> = {
 		}));
 	},
 
-	taskStatuses: async () =>
-		TASK_STATUSES.map((status) => ({
+	taskStatuses: async () => {
+		const config = await loadDocsConfig("en");
+		const statusColor = mergeColorOverrides(
+			TASK_STATUS_COLOR,
+			config.pms?.statusColors,
+			"status",
+		);
+		return TASK_STATUSES.map((status) => ({
 			label: status,
 			value: status,
 			href: `/tasks/by-status/${encodeURIComponent(status)}`,
-			colorPalette: TASK_STATUS_COLOR[status],
-		})),
+			colorPalette: statusColor[status],
+		}));
+	},
 
-	taskPriorities: async () =>
-		TASK_PRIORITIES.map((priority) => ({
+	taskPriorities: async () => {
+		const config = await loadDocsConfig("en");
+		const priorityColor = mergeColorOverrides(
+			TASK_PRIORITY_COLOR,
+			config.pms?.priorityColors,
+			"priority",
+		);
+		return TASK_PRIORITIES.map((priority) => ({
 			label: priority,
 			value: priority,
 			href: `/tasks/by-priority/${priority}`,
-			colorPalette: TASK_PRIORITY_COLOR[priority],
-		})),
+			colorPalette: priorityColor[priority],
+		}));
+	},
 };
 
 /** Resolves a named data source into a flat list of uniform items. Returns
@@ -99,15 +115,28 @@ type CustomTableDataResolver = (
 
 const customTableDataResolvers: Record<string, CustomTableDataResolver> = {
 	tasks: async (ctx) => {
-		const [tasks, projects] = await Promise.all([
+		const [tasks, projects, config] = await Promise.all([
 			listTasks(),
 			listProjects(),
+			loadDocsConfig("en"),
 		]);
 		const projectBySlug = new Map(projects.map((p) => [p.slug, p]));
 		const projectTitleBySlug = new Map(
 			projects.map((p) => [p.slug, p.title]),
 		);
 		const taskTree = buildTaskTree(tasks);
+		const statusColors = mergeColorOverrides(
+			TASK_STATUS_COLOR,
+			config.pms?.statusColors,
+			"status",
+		);
+		const priorityColors = mergeColorOverrides(
+			TASK_PRIORITY_COLOR,
+			config.pms?.priorityColors,
+			"priority",
+		);
+		const subtasksExpandedByDefault =
+			config.pms?.subtasksExpandedByDefault ?? true;
 
 		// Server-side filtering for the no-JS ?q= fallback, mirroring the blog
 		// listing page: all rows still render (non-matches hidden) so the Search
@@ -131,6 +160,9 @@ const customTableDataResolvers: Record<string, CustomTableDataResolver> = {
 			// TaskCreateDrawer for its Project/Parent task fields.
 			projectItems: projects.map((p) => ({ label: p.title, value: p.slug })),
 			taskItems: tasks.map((t) => ({ label: t.title, value: t.slug })),
+			statusColors,
+			priorityColors,
+			subtasksExpandedByDefault,
 		};
 	},
 };
