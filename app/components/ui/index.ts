@@ -4,6 +4,7 @@ export {
 } from "./absolute-center";
 export { Alert, AlertIcon, type AlertProps } from "./alert";
 export { Anchor, type AnchorProps } from "./anchor";
+export { AuthStatus, type AuthStatusProps } from "./auth-status";
 export { Avatar, type AvatarProps } from "./avatar";
 export { Badge, type BadgeProps } from "./badge";
 export {

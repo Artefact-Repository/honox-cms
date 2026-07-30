@@ -5,6 +5,7 @@ import { renderBlocks } from "../../components/page-registry";
 import { PageRenderer } from "../../components/page-renderer";
 import {
 	Anchor,
+	AuthStatus,
 	Card,
 	Collapsible,
 	Layout,
@@ -258,11 +259,6 @@ function DocsSidenav({
 
 interface HeaderActionsProps {
 	headerItems?: ComponentBlock[];
-	/** The Admin link block, pulled from `config.header`'s tree (see
-	 * `findBlock`) so the mobile disclosure shows the exact same
-	 * (already-localised) block as the desktop header, instead of a second,
-	 * separately-hardcoded one. */
-	adminBlock?: ComponentBlock;
 	currentPath: string;
 	currentLocale: string;
 	/** Smaller text/controls for the mobile disclosure panel vs. the desktop
@@ -272,12 +268,12 @@ interface HeaderActionsProps {
 
 // The actions shared between the desktop header row (`nav`, hidden below
 // `md`) and Layout's built-in mobile disclosure (`mobileNav`, which takes
-// over below `md` via `siderHideBelow`) — headerItems (incl. the GitHub
-// icon link, CMS-authored via `config.headerItems`) plus the Admin link.
-// Rendered from a single function so both stay in sync.
+// over below `md` via `siderHideBelow`) — headerItems (incl. the GitHub icon
+// link, CMS-authored via `config.headerItems`). Rendered from a single
+// function so both stay in sync. AuthStatus (the Login/username link) isn't
+// CMS content, so it's mounted directly alongside this in JSX instead.
 function HeaderActions({
 	headerItems,
-	adminBlock,
 	currentPath,
 	currentLocale,
 	compact,
@@ -291,31 +287,8 @@ function HeaderActions({
 				currentPath,
 				class: css({ textStyle, fontWeight: "medium" }),
 			})}
-			{adminBlock &&
-				renderBlocks([adminBlock], {
-					locale: currentLocale,
-					currentPath,
-					class: css({ textStyle, fontWeight: "medium" }),
-				})}
 		</>
 	);
-}
-
-/** Finds the first block matching `predicate`, recursing into `children`.
- * Used to pull the Admin link back out of `config.header`'s tree so the
- * mobile disclosure (`HeaderActions`) can render the exact same block
- * instead of a second hardcoded one. */
-function findBlock(
-	blocks: ComponentBlock[] | undefined,
-	predicate: (block: ComponentBlock) => boolean,
-): ComponentBlock | undefined {
-	if (!blocks) return undefined;
-	for (const block of blocks) {
-		if (predicate(block)) return block;
-		const found = findBlock(block["children"], predicate);
-		if (found) return found;
-	}
-	return undefined;
 }
 
 /** Shared `<Layout>` props for the docs shell, so every docs route renders
@@ -368,10 +341,6 @@ export default createRoute(async (c) => {
 	]);
 	const groups = buildDocGroups(docs, config);
 	const ui = { ...DEFAULT_DOCS_UI, ...config.docsUi };
-	const adminBlock = findBlock(
-		config.header,
-		(block) => block.blockType === "link" && block["href"] === "/admin",
-	);
 
 	const localiseLink = (href: string) => localiseHref(href, currentLocale);
 
@@ -399,13 +368,15 @@ export default createRoute(async (c) => {
 			}
 			mobileNavLabel={ui.menu}
 			mobileNavActions={
-				<HeaderActions
-					adminBlock={adminBlock}
-					headerItems={config.headerItems}
-					currentPath={currentPath}
-					currentLocale={currentLocale}
-					compact
-				/>
+				<>
+					<HeaderActions
+						headerItems={config.headerItems}
+						currentPath={currentPath}
+						currentLocale={currentLocale}
+						compact
+					/>
+					<AuthStatus />
+				</>
 			}
 			content={
 				<>

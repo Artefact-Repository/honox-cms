@@ -827,6 +827,11 @@ collections:
                                 widget: select
                                 options: [blue, green, red, purple, orange, amber, cyan, slate]
                                 required: false
+                          - label: Auth Status
+                            name: authStatus
+                            widget: object
+                            hint: "Fixed system widget — shows the logged-in CMS username, or a Login button, when the site renders. Not editable here; keep exactly one in the header's nav cluster."
+                            fields: []
                           - label: Rating Group
                             name: ratingGroup
                             widget: object
@@ -2193,7 +2198,7 @@ singletons:
         widget: list
         required: false
         i18n: true
-        hint: "The full docs desktop header row — one Stack (brand lockup, search box, and a nav-links Stack as its three children). A fully self-contained tree, hand-duplicated from Header Items below rather than sharing it. Any Link with URL /admin is swapped for an Edit deep-link on an individual doc page (app/routes/docs/[doc].tsx), so keep exactly one such Link. Uses the same component types as Page Builder content (see Stack's own Style fields for margin/padding/etc; flex-shrink/flex-basis/media-query sizing beyond those isn't exposed here — edit the JSON directly for that)."
+        hint: "The full docs desktop header row — one Stack (brand lockup, search box, and a nav-links Stack as its three children). A fully self-contained tree, hand-duplicated from Header Items below rather than sharing it. The Auth Status block's link is swapped for an Edit deep-link on an individual doc page (app/routes/docs/[doc].tsx), so keep exactly one such block. Uses the same component types as Page Builder content (see Stack's own Style fields for margin/padding/etc; flex-shrink/flex-basis/media-query sizing beyond those isn't exposed here — edit the JSON directly for that)."
         typeKey: blockType
         types: *root_components
       - label: Header Items

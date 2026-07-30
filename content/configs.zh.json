@@ -294,16 +294,7 @@
               ]
             },
             {
-              "blockType": "link",
-              "href": "/admin",
-              "variant": "plain",
-              "class": "button button--variant_outline button--size_sm",
-              "children": [
-                {
-                  "blockType": "text",
-                  "content": "内容管理"
-                }
-              ]
+              "blockType": "authStatus"
             }
           ]
         }

@@ -10,6 +10,7 @@ import {
 	Alert,
 	AlertIcon,
 	Anchor,
+	AuthStatus,
 	Avatar,
 	Badge,
 	Breadcrumb,
@@ -1078,6 +1079,7 @@ const registry: Record<string, BlockRenderer> = {
 	colorPicker: (b) => <ColorPicker interactive {...propsOf(b)} />,
 	pinField: (b) => <PinField interactive {...propsOf(b)} />,
 	avatar: (b) => <Avatar {...propsOf(b)} />,
+	authStatus: (b) => <AuthStatus href={b["href"] as string | undefined} />,
 	ratingGroup: (b) => <RatingGroup interactive {...propsOf(b)} />,
 	clipboard: (b) => <Clipboard interactive {...propsOf(b)} />,
 	// Renders the global toast host. Pair with a Button whose `onclick` raw

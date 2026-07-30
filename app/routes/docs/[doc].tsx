@@ -5,6 +5,7 @@ import type { ComponentBlock } from "../../components/block-types";
 import { renderBlocks } from "../../components/page-registry";
 import {
 	Anchor,
+	AuthStatus,
 	Badge,
 	Collapsible,
 	Heading,
@@ -280,11 +281,6 @@ function DocsSidenav({
 
 interface HeaderActionsProps {
 	headerItems?: ComponentBlock[];
-	/** The (already per-doc-patched, for the desktop header — see
-	 * `withDocEditLink`) Edit/Admin link block, reused here verbatim so the
-	 * mobile disclosure shows the exact same block rather than a second,
-	 * separately-hardcoded one. */
-	adminBlock?: ComponentBlock;
 	currentPath: string;
 	currentLocale: string;
 	/** Smaller text/controls for the mobile disclosure panel vs. the desktop
@@ -294,12 +290,12 @@ interface HeaderActionsProps {
 
 // The actions shared between the desktop header row (`nav`, hidden below
 // `md`) and Layout's built-in mobile disclosure (`mobileNav`, which takes
-// over below `md` via `siderHideBelow`) — headerItems (incl. the GitHub
-// icon link, CMS-authored via `config.headerItems`) plus the Edit/Admin
-// link. Rendered from a single function so both stay in sync.
+// over below `md` via `siderHideBelow`) — headerItems (incl. the GitHub icon
+// link, CMS-authored via `config.headerItems`). Rendered from a single
+// function so both stay in sync. AuthStatus (the Login/username link) isn't
+// CMS content, so it's mounted directly alongside this in JSX instead.
 function HeaderActions({
 	headerItems,
-	adminBlock,
 	currentPath,
 	currentLocale,
 	compact,
@@ -313,63 +309,35 @@ function HeaderActions({
 				currentPath,
 				class: css({ textStyle, fontWeight: "medium" }),
 			})}
-			{adminBlock &&
-				renderBlocks([adminBlock], {
-					locale: currentLocale,
-					currentPath,
-					class: css({ textStyle, fontWeight: "medium" }),
-				})}
 		</>
 	);
 }
 
 /** `config.header` (see `DocsConfig.header`) is a fully static, self-
- * contained content tree — except its nav cluster's hand-authored Admin
- * link (`href: "/admin"`), which on an individual doc page should instead
- * be an Edit deep-link for *this* doc. The CMS can't know which doc a
- * reader is on, so this patches that one block at render time rather than
- * threading per-request state into page-registry.tsx. Matches on `href` (a
- * stable, already-meaningful field), not array position, and recurses into
- * `children` since the link sits inside a nested nav `stack`. */
-function withDocEditLink(
+ * contained content tree — except its nav cluster's `authStatus` block,
+ * whose link should point at an Edit deep-link for *this* doc rather than
+ * the plain CMS admin root. The CMS can't know which doc a reader is on, so
+ * this patches that one block's `href` at render time rather than threading
+ * per-request state into page-registry.tsx (see the "Do NOT re-add
+ * extraProps-threading" project note). Recurses into `children` since the
+ * block sits inside a nested nav `stack`. */
+function withDocEditHref(
 	blocks: ComponentBlock[] | undefined,
 	editUrl: string,
-	editLabel: string,
 ): ComponentBlock[] | undefined {
 	if (!blocks) return blocks;
 	return blocks.map((block) => {
-		if (block.blockType === "link" && block["href"] === "/admin") {
-			return {
-				...block,
-				href: editUrl,
-				children: [{ blockType: "text", content: editLabel }],
-			};
+		if (block.blockType === "authStatus") {
+			return { ...block, href: editUrl };
 		}
 		if (Array.isArray(block["children"])) {
 			return {
 				...block,
-				children: withDocEditLink(block["children"], editUrl, editLabel),
+				children: withDocEditHref(block["children"], editUrl),
 			};
 		}
 		return block;
 	});
-}
-
-/** Finds the first block matching `predicate`, recursing into `children`.
- * Used to pull the (already per-doc-patched) Edit/Admin link back out of
- * `config.header`'s tree so the mobile disclosure (`HeaderActions`) can
- * render the exact same block instead of a second hardcoded one. */
-function findBlock(
-	blocks: ComponentBlock[] | undefined,
-	predicate: (block: ComponentBlock) => boolean,
-): ComponentBlock | undefined {
-	if (!blocks) return undefined;
-	for (const block of blocks) {
-		if (predicate(block)) return block;
-		const found = findBlock(block["children"], predicate);
-		if (found) return found;
-	}
-	return undefined;
 }
 
 /** CMS Edit deep-link for a doc, honoring the Collections mapping from the
@@ -575,17 +543,13 @@ export default createRoute(
 		const DocContent = doc.Component;
 		const ui = { ...DEFAULT_DOCS_UI, ...config.docsUi };
 		const editUrl = docEditUrl(doc, config);
-		const headerBlocks = withDocEditLink(config.header, editUrl, ui.edit);
-		const adminBlock = findBlock(
-			headerBlocks,
-			(block) => block.blockType === "link" && block["href"] === editUrl,
-		);
+		const headerBlocks = withDocEditHref(config.header, editUrl);
 
 		return c.render(
 			<Layout
 				{...docsShellProps}
 				// Fully CMS content (`config.header` — see `DocsConfig.header`),
-				// aside from `withDocEditLink`'s one per-doc patch above. No
+				// aside from `withDocEditHref`'s one per-doc patch above. No
 				// hardcoded shell left. `renderBlocks` (not `<PageRenderer>`,
 				// which doesn't take a second argument) so `locale`/`currentPath`
 				// reach the search box and language dropdown nested inside it.
@@ -607,13 +571,15 @@ export default createRoute(
 				}
 				mobileNavLabel={ui.menu}
 				mobileNavActions={
-					<HeaderActions
-						adminBlock={adminBlock}
-						headerItems={config.headerItems}
-						currentPath={currentPath}
-						currentLocale={currentLocale}
-						compact
-					/>
+					<>
+						<HeaderActions
+							headerItems={config.headerItems}
+							currentPath={currentPath}
+							currentLocale={currentLocale}
+							compact
+						/>
+						<AuthStatus href={editUrl} />
+					</>
 				}
 				content={
 					<>
