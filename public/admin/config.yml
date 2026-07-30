@@ -21,6 +21,7 @@ backend:
   name: github
   repo: yum-chen/honox-ts
   branch: main  # or master, depending on your default branch
+  base_url: https://sveltia-cms-auth.yumchen.workers.dev
 
 # Media Storage
 # Media files will be stored in /public/media and accessible at /media
