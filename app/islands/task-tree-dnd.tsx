@@ -20,6 +20,17 @@ const containerClass = css({
 	'& tr[data-drop-zone="after"]': {
 		boxShadow: "inset 0 -2px 0 0 var(--colors-blue-8)",
 	},
+	// Fail closed: hides row hover actions (Edit/Clone/Delete/"...") and
+	// drops the drag cursor whenever `data-can-write` (set pre-hydration in
+	// routes/_renderer.tsx's boot script from the same token this island's
+	// own `useGitToken()` reads) isn't "true" — these all need the write
+	// access `onDragStart` below also gates on.
+	':where(html:not([data-can-write="true"])) & tr[draggable]': {
+		cursor: "default",
+	},
+	':where(html:not([data-can-write="true"])) & [data-hover-actions]': {
+		display: "none",
+	},
 });
 
 interface RowInfo {
@@ -111,6 +122,14 @@ export default function TaskTreeDnd({ children }: PropsWithChildren) {
 		};
 
 		const onDragStart = (e: DragEvent) => {
+			// Gate reordering/reparenting on write access up front — cancels the
+			// browser's native drag entirely (rather than letting the user drag
+			// through drop-zone indicators and only failing at drop, which is
+			// what the `onDrop` check below used to be the sole guard against).
+			if (!tokenRef.current) {
+				e.preventDefault();
+				return;
+			}
 			const row = (e.target as HTMLElement)?.closest?.(
 				"tr[data-task-slug]",
 			) as HTMLTableRowElement | null;

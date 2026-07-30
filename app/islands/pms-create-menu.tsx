@@ -2,6 +2,7 @@ import { cx } from "design-system/css";
 import { button } from "design-system/recipes";
 import { useState } from "hono/jsx";
 import { Dropdown } from "../components/ui/dropdown";
+import { useGitToken } from "./git-token-banner";
 import ProjectCreateDrawer from "./project-create-drawer";
 import TaskCreateDrawer, {
 	type TaskCreateDrawerProps,
@@ -14,9 +15,17 @@ export interface PmsCreateMenuProps
 // of a single action since there are now two things it can create. Both
 // drawers stay mounted and controlled here so the menu just toggles which one
 // is open (same pattern as TaskActionsMenu's clone/delete/convert dialogs).
+//
+// Creating either one is a direct-commit write (see task-save.ts), so it's
+// gated behind the same `useGitToken()` write-access check every other
+// direct-commit editor uses (TaskTreeDnd, TaskBoard) — no token means no
+// button, not just a disabled one, since there's nothing for it to open.
 export default function PmsCreateMenu(props: PmsCreateMenuProps) {
+	const { token } = useGitToken();
 	const [taskOpen, setTaskOpen] = useState(false);
 	const [projectOpen, setProjectOpen] = useState(false);
+
+	if (!token) return null;
 
 	return (
 		<>
