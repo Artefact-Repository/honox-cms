@@ -10,6 +10,7 @@ import {
 	useRef,
 	useState,
 } from "hono/jsx";
+import { CheckIcon } from "../../icons/check";
 import { ChevronRightIcon } from "../../icons/chevron-right";
 import { useOverlayStackEntry, whenAnimationEnds } from "./overlay-a11y";
 import {
@@ -120,6 +121,17 @@ const DropdownRadioGroupContext =
 
 export const useDropdownRadioGroupContext = () =>
 	useContext(DropdownRadioGroupContext);
+
+/** Lets a `DropdownItemIndicator` nested inside a `DropdownCheckboxItem`/
+ * `DropdownRadioItem` know that item's checked state automatically, instead
+ * of requiring the caller to pass a redundant `checked` prop by hand — and
+ * to know it's inside a checkable item at all, so it can fall back to a
+ * default checkmark icon (only checkbox/radio items imply "indicator ==
+ * check icon"; a plain item's leading-icon `ItemIndicator` has no such
+ * default, since there's nothing to indicate). */
+const DropdownItemStateContext = createContext<{ checked: boolean } | null>(
+	null,
+);
 
 export function DropdownRoot(props: DropdownRootProps) {
 	const [variantProps, localProps] = dropdown.splitVariantProps(props);
@@ -576,7 +588,9 @@ export function DropdownCheckboxItem(props: DropdownCheckboxItemProps) {
 			tabIndex={-1}
 			{...restProps}
 		>
-			{children}
+			<DropdownItemStateContext.Provider value={{ checked: !!checked }}>
+				{children}
+			</DropdownItemStateContext.Provider>
 		</div>
 	);
 }
@@ -628,7 +642,9 @@ export function DropdownRadioItem(props: DropdownRadioItemProps) {
 			tabIndex={-1}
 			{...restProps}
 		>
-			{children}
+			<DropdownItemStateContext.Provider value={{ checked: isChecked }}>
+				{children}
+			</DropdownItemStateContext.Provider>
 		</div>
 	);
 }
@@ -640,8 +656,11 @@ export interface DropdownItemIndicatorProps extends PropsWithChildren {
 }
 
 export function DropdownItemIndicator(props: DropdownItemIndicatorProps) {
-	const { children, checked, class: classProp, ...restProps } = props;
+	const { children, checked: checkedProp, class: classProp, ...restProps } =
+		props;
 	const context = useDropdownContext();
+	const itemState = useContext(DropdownItemStateContext);
+	const checked = checkedProp ?? itemState?.checked;
 
 	return (
 		<div
@@ -651,9 +670,13 @@ export function DropdownItemIndicator(props: DropdownItemIndicatorProps) {
 				checked === undefined ? undefined : checked ? "checked" : "unchecked"
 			}
 			class={cx(context.styles.itemIndicator, classProp)}
+			style={{ display: checked === false ? "none" : "flex" }}
 			{...restProps}
 		>
-			{children}
+			{children ??
+				(itemState ? (
+					<CheckIcon width="16" height="16" aria-hidden="true" />
+				) : undefined)}
 		</div>
 	);
 }
@@ -876,9 +899,17 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 	const setItemChecked = (item: HTMLElement, checked: boolean) => {
 		item.setAttribute("aria-checked", String(checked));
 		item.setAttribute("data-state", checked ? "checked" : "unchecked");
-		item
-			.querySelector('[data-part="item-indicator"]')
-			?.setAttribute("data-state", checked ? "checked" : "unchecked");
+		const indicator = item.querySelector<HTMLElement>(
+			'[data-part="item-indicator"]',
+		);
+		if (indicator) {
+			indicator.setAttribute("data-state", checked ? "checked" : "unchecked");
+			// The indicator's initial visibility is an SSR-rendered inline
+			// style (see DropdownItemIndicator), not a re-render — toggling
+			// only the data-state attribute here would leave it stuck at
+			// whatever it looked like on page load.
+			indicator.style.display = checked ? "flex" : "none";
+		}
 		const value = item.getAttribute("data-value");
 		if (value) checkedOverridesRef.current.set(value, checked);
 	};
@@ -909,9 +940,16 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 			if (item?.getAttribute("role")?.startsWith("menuitem")) {
 				item.setAttribute("aria-checked", String(checked));
 				item.setAttribute("data-state", checked ? "checked" : "unchecked");
-				item
-					.querySelector('[data-part="item-indicator"]')
-					?.setAttribute("data-state", checked ? "checked" : "unchecked");
+				const indicator = item.querySelector<HTMLElement>(
+					'[data-part="item-indicator"]',
+				);
+				if (indicator) {
+					indicator.setAttribute(
+						"data-state",
+						checked ? "checked" : "unchecked",
+					);
+					indicator.style.display = checked ? "flex" : "none";
+				}
 			}
 		});
 	};
