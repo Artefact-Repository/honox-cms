@@ -1,5 +1,4 @@
-import { css, cx } from "design-system/css";
-import { button } from "design-system/recipes";
+import { css } from "design-system/css";
 import { ssgParams } from "hono/ssg";
 import { createRoute } from "honox/factory";
 import { renderBlocks } from "../../components/page-registry";
@@ -17,7 +16,8 @@ import { CalendarIcon } from "../../icons/calendar";
 import { ChevronRightIcon } from "../../icons/chevron-right";
 import { ClockIcon } from "../../icons/clock";
 import { ShareIcon } from "../../icons/share";
-import { DEFAULT_DOCS_UI, loadDocsConfig } from "../../lib/configs";
+import AuthStatus from "../../islands/auth-status";
+import { loadDocsConfig } from "../../lib/configs";
 import { detectLocale, isLocale, localiseHref } from "../../lib/i18n";
 import { loadPostBySlug, loadPosts } from "../../lib/posts";
 import { markdownContentClass } from "../../utils/markdown-content-style";
@@ -59,7 +59,6 @@ export default createRoute(
 			const postUrl = `${c.req.url}`;
 
 			const localiseLink = (href: string) => localiseHref(href, currentLocale);
-			const docsUi = { ...DEFAULT_DOCS_UI, ...config.docsUi };
 
 			return c.render(
 				<div
@@ -149,15 +148,7 @@ export default createRoute(
 									locale: currentLocale,
 									currentPath,
 								})}
-								<Anchor
-									href={`/admin/#/collections/posts/entries/${slug}`}
-									class={cx(
-										button({ variant: "outline", size: "sm" }),
-										css({ textStyle: "sm", fontWeight: "medium" }),
-									)}
-								>
-									{docsUi.edit}
-								</Anchor>
+								<AuthStatus href={`/admin/#/collections/posts/entries/${slug}`} />
 							</nav>
 						</div>
 					</header>

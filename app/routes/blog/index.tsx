@@ -1,5 +1,4 @@
-import { css, cx } from "design-system/css";
-import { button } from "design-system/recipes";
+import { css } from "design-system/css";
 import { createRoute } from "honox/factory";
 import { renderBlocks } from "../../components/page-registry";
 import { PageRenderer } from "../../components/page-renderer";
@@ -20,7 +19,8 @@ import { ArrowRightIcon } from "../../icons/arrow-right";
 import { FilterIcon } from "../../icons/filter";
 import { MailIcon } from "../../icons/mail";
 import { SearchIcon } from "../../icons/search";
-import { DEFAULT_DOCS_UI, loadDocsConfig } from "../../lib/configs";
+import AuthStatus from "../../islands/auth-status";
+import { loadDocsConfig } from "../../lib/configs";
 import {
 	BLOG_SEARCH_STRINGS,
 	detectLocale,
@@ -41,7 +41,6 @@ export default createRoute(async (c) => {
 		]);
 
 	const localiseLink = (href: string) => localiseHref(href, currentLocale);
-	const docsUi = { ...DEFAULT_DOCS_UI, ...config.docsUi };
 	const searchStrings =
 		BLOG_SEARCH_STRINGS[currentLocale] ?? BLOG_SEARCH_STRINGS.en;
 
@@ -139,15 +138,7 @@ export default createRoute(async (c) => {
 							locale: currentLocale,
 							currentPath,
 						})}
-						<Anchor
-							href="/admin"
-							class={cx(
-								button({ variant: "outline", size: "sm" }),
-								css({ textStyle: "sm", fontWeight: "medium" }),
-							)}
-						>
-							{docsUi.admin}
-						</Anchor>
+						<AuthStatus />
 					</nav>
 				</div>
 			</header>

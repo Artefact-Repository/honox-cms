@@ -1,5 +1,4 @@
-import { css, cx } from "design-system/css";
-import { button } from "design-system/recipes";
+import { css } from "design-system/css";
 import { ssgParams } from "hono/ssg";
 import { createRoute } from "honox/factory";
 import { renderBlocks } from "../../../components/page-registry";
@@ -19,7 +18,8 @@ import { ArrowLeftIcon } from "../../../icons/arrow-left";
 import { ArrowRightIcon } from "../../../icons/arrow-right";
 import { CheckIcon } from "../../../icons/check";
 import { TagIcon } from "../../../icons/tag";
-import { DEFAULT_DOCS_UI, loadDocsConfig } from "../../../lib/configs";
+import AuthStatus from "../../../islands/auth-status";
+import { loadDocsConfig } from "../../../lib/configs";
 import {
 	BLOG_SEARCH_STRINGS,
 	detectLocale,
@@ -47,7 +47,6 @@ export default createRoute(
 			loadDocsConfig(currentLocale),
 		]);
 		const blogPosts = posts.filter((post) => post.tags.includes(tagFilter));
-		const docsUi = { ...DEFAULT_DOCS_UI, ...config.docsUi };
 
 		return c.render(
 			<>
@@ -102,15 +101,7 @@ export default createRoute(
 								locale: currentLocale,
 								currentPath: c.req.path,
 							})}
-							<Anchor
-								href="/admin"
-								class={cx(
-									button({ variant: "outline", size: "sm" }),
-									css({ textStyle: "sm", fontWeight: "medium" }),
-								)}
-							>
-								{docsUi.admin}
-							</Anchor>
+							<AuthStatus />
 						</nav>
 					</div>
 				</header>
