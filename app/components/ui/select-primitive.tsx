@@ -14,6 +14,7 @@ import {
 import { CheckIcon } from "../../icons/check";
 import { ChevronsUpDownIcon } from "../../icons/chevrons-up-down";
 import { CloseIcon } from "../../icons/close";
+import { useOverlayStackEntry } from "./overlay-a11y";
 
 type SelectStyles = ReturnType<typeof select>;
 
@@ -695,6 +696,10 @@ function InteractiveSelect(props: InteractiveSelectProps) {
 
 	const fallbackId = useId();
 	const rootId = idProp || `select-${fallbackId}`;
+
+	// Lets an ancestor Dialog/Drawer's Escape/Tab handling know this Select
+	// is the topmost open overlay while it's open (see useOverlayStackEntry).
+	useOverlayStackEntry(rootId, open);
 
 	// Sync controlled props
 	useEffect(() => {

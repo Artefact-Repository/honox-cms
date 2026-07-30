@@ -168,6 +168,41 @@ export function whenAnimationEnds(
 	};
 }
 
+/**
+ * Registers the element with id `rootId` on the shared `openOverlayRoots`
+ * stack for as long as `open` is true.
+ *
+ * `useOverlay` below only lets a Dialog/Drawer react to Escape/Tab when its
+ * own root is the *topmost* entry on that stack — but Select, Dropdown,
+ * Combobox, and Popover manage their own open/close state and never call
+ * `useOverlay`, so they're otherwise invisible to that check. Left
+ * unregistered, opening one of them nested inside a Dialog/Drawer still
+ * leaves the Dialog "topmost" (the only entry), so its window-level
+ * *capture*-phase Escape handler fires first and closes the whole Dialog —
+ * before the nested overlay's own bubble-phase Escape handler ever runs.
+ *
+ * Deliberately lighter than `useOverlay`'s activate/deactivate: it only
+ * affects stack membership (and the `inert` math, via `applyInert`), not
+ * focus trapping, scroll locking, or focus management — the primitive keeps
+ * handling those itself.
+ */
+export function useOverlayStackEntry(rootId: string, open: boolean) {
+	useEffect(() => {
+		if (!open) return;
+		const root = document.getElementById(rootId);
+		if (!root) return;
+		openOverlayRoots.push(root);
+		applyInert();
+		return () => {
+			const idx = openOverlayRoots.indexOf(root);
+			if (idx !== -1) {
+				openOverlayRoots.splice(idx, 1);
+			}
+			applyInert();
+		};
+	}, [open, rootId]);
+}
+
 export interface OverlayOptions {
 	/** Ref holding the overlay root element (the wrapping `<div id=...>`). */
 	rootRef: { current: HTMLElement | null };

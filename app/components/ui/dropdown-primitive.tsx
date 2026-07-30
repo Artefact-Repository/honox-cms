@@ -11,7 +11,7 @@ import {
 	useState,
 } from "hono/jsx";
 import { ChevronRightIcon } from "../../icons/chevron-right";
-import { whenAnimationEnds } from "./overlay-a11y";
+import { useOverlayStackEntry, whenAnimationEnds } from "./overlay-a11y";
 import {
 	getArrowRotation,
 	getArrowStyle,
@@ -781,6 +781,12 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 		rootIdRef.current = idProp || `dropdown-${fallbackId}`;
 	}
 	const rootId = rootIdRef.current;
+
+	// Lets an ancestor Dialog/Drawer's Escape/Tab handling know this Dropdown
+	// is the topmost open overlay while it's open (see useOverlayStackEntry).
+	// Submenus register too — the check just needs a nested one to be seen as
+	// topmost, and a submenu's own root is a valid, more-specific entry.
+	useOverlayStackEntry(rootId, open);
 
 	const [renderOpen, setRenderOpen] = useState(open);
 

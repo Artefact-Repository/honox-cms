@@ -10,7 +10,12 @@ import {
 	useRef,
 	useState,
 } from "hono/jsx";
-import { getFocusable, hasPart, whenAnimationEnds } from "./overlay-a11y";
+import {
+	getFocusable,
+	hasPart,
+	useOverlayStackEntry,
+	whenAnimationEnds,
+} from "./overlay-a11y";
 import {
 	getArrowRotation,
 	getArrowStyle,
@@ -508,6 +513,11 @@ function InteractivePopoverRoot(props: InteractivePopoverProps) {
 
 	const fallbackId = useId();
 	const rootId = idProp || `popover-${fallbackId}`;
+
+	// Lets an ancestor Dialog/Drawer's Escape/Tab handling know this Popover
+	// is the topmost open overlay while it's open (see useOverlayStackEntry).
+	useOverlayStackEntry(rootId, open);
+
 	const handleOpenChangeRef = useRef<(nextOpen: boolean) => void>(() => {});
 	const closeOnEscapeRef = useRef(closeOnEscape);
 	closeOnEscapeRef.current = closeOnEscape;

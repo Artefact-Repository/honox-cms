@@ -14,6 +14,7 @@ import {
 import { CheckIcon } from "../../icons/check";
 import { ChevronsUpDownIcon } from "../../icons/chevrons-up-down";
 import { CloseIcon } from "../../icons/close";
+import { useOverlayStackEntry } from "./overlay-a11y";
 
 type ComboboxStyles = ReturnType<typeof combobox>;
 
@@ -734,6 +735,10 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 
 	const fallbackId = useId();
 	const rootId = idProp || `combobox-${fallbackId}`;
+
+	// Lets an ancestor Dialog/Drawer's Escape/Tab handling know this Combobox
+	// is the topmost open overlay while it's open (see useOverlayStackEntry).
+	useOverlayStackEntry(rootId, open);
 
 	const handleToggleRef = useRef<() => void>(() => {});
 	const handleCloseRef = useRef<() => void>(() => {});
