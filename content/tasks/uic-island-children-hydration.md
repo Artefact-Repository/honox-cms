@@ -1,5 +1,5 @@
 ---
-title: Generalize slot-lifting for nested components in islands
+title: Generalise slot-lifting for nested components in islands
 project: ui-components
 status: To Do
 priority: High
