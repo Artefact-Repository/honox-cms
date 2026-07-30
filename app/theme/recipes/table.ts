@@ -43,6 +43,14 @@ export const table = defineSlotRecipe({
 		row: {
 			_last: { "& td": { boxShadow: "none" } },
 			"&:hover [data-hover-actions]": { opacity: 1, pointerEvents: "auto" },
+			// Set by JS while a hover-action opens something anchored to it (e.g.
+			// TaskRowActionsMenu's dropdown) — the mouse may no longer be over the
+			// row and the open menu lives outside it in the DOM, so neither
+			// `:hover` above nor `_focusWithin` on the actions bar itself fires.
+			"&[data-force-visible] [data-hover-actions]": {
+				opacity: 1,
+				pointerEvents: "auto",
+			},
 		},
 		header: {
 			textAlign: "left",
