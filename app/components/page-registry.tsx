@@ -190,6 +190,24 @@ function footerFromBlocks(footer: unknown): JSX.Element | undefined {
 	return <>{renderBlocks(footer as ComponentBlock[])}</>;
 }
 
+// Dialog/Drawer content: nested `children` blocks are the only way current
+// config.yml content can put anything beyond plain text inside one, and a
+// few older entries still carry a plain-string `body` field from before
+// `children` existed. Rendered into the `body` *prop* (not JSX `children`,
+// which the Dialog/Drawer wrappers render as an unpadded, non-scrolling
+// sibling of Header/Footer) so it lands in the recipe's actual `<Body>`
+// slot and gets that slot's padding and scroll containment — see
+// app/theme/recipes/drawer.ts's `body` slot vs. bare `content`.
+function bodyFromBlocksOrString(
+	children: unknown,
+	legacyBody: unknown,
+): JSX.Element | string | undefined {
+	if (Array.isArray(children) && children.length > 0) {
+		return <>{renderChildren(children as ComponentBlock[])}</>;
+	}
+	return typeof legacyBody === "string" ? legacyBody : undefined;
+}
+
 function tryParseJSON(val: unknown): unknown {
 	if (typeof val === "string") {
 		// An untouched optional CMS field (e.g. Grid's Rows/Min Child Width)
@@ -564,6 +582,7 @@ const registry: Record<string, BlockRenderer> = {
 			role,
 			trigger: cmsTrigger,
 			footer: cmsFooter,
+			body: cmsBody,
 			...rest
 		} = propsOf(b);
 
@@ -584,6 +603,7 @@ const registry: Record<string, BlockRenderer> = {
 		// footer, alongside (or instead of) the dedicated Confirm/Cancel text
 		// shortcuts — e.g. a "Refresh" button that dispatches a custom event.
 		const footer = footerFromBlocks(cmsFooter);
+		const body = bodyFromBlocksOrString(children, cmsBody);
 
 		const confirm = confirmText ? <Button>{confirmText}</Button> : undefined;
 		const cancel = cancelText ? (
@@ -599,11 +619,10 @@ const registry: Record<string, BlockRenderer> = {
 				confirm={confirm}
 				cancel={cancel}
 				footer={footer}
+				body={body}
 				role={role}
 				{...rest}
-			>
-				{renderChildren(children as ComponentBlock[])}
-			</Dialog>
+			/>
 		);
 	},
 
@@ -616,6 +635,7 @@ const registry: Record<string, BlockRenderer> = {
 			cancelText,
 			trigger: cmsTrigger,
 			footer: cmsFooter,
+			body: cmsBody,
 			...rest
 		} = propsOf(b);
 
@@ -633,6 +653,7 @@ const registry: Record<string, BlockRenderer> = {
 		}
 
 		const footer = footerFromBlocks(cmsFooter);
+		const body = bodyFromBlocksOrString(children, cmsBody);
 
 		const confirm = confirmText ? <Button>{confirmText}</Button> : undefined;
 		const cancel = cancelText ? (
@@ -648,10 +669,9 @@ const registry: Record<string, BlockRenderer> = {
 				confirm={confirm}
 				cancel={cancel}
 				footer={footer}
+				body={body}
 				{...rest}
-			>
-				{renderChildren(children as ComponentBlock[])}
-			</Drawer>
+			/>
 		);
 	},
 
