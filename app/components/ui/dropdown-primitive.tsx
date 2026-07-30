@@ -336,6 +336,9 @@ export interface DropdownItemProps extends PropsWithChildren {
 	class?: string;
 	value?: string;
 	asChild?: boolean;
+	/** Whether selecting this item closes the menu. Default `true` (falls
+	 * back to the root's own `closeOnSelect`, see `InteractiveDropdownRootProps`). */
+	closeOnSelect?: boolean;
 	[key: string]: unknown;
 }
 
@@ -347,6 +350,7 @@ export function DropdownItem(props: DropdownItemProps) {
 		class: classProp,
 		value,
 		asChild,
+		closeOnSelect,
 		...restProps
 	} = props;
 	const context = useDropdownContext();
@@ -358,6 +362,8 @@ export function DropdownItem(props: DropdownItemProps) {
 		"data-part": "item",
 		"data-disabled": disabled ? "" : undefined,
 		"data-value": value,
+		"data-close-on-select":
+			closeOnSelect === undefined ? undefined : String(closeOnSelect),
 		"aria-disabled": disabled ? "true" : undefined,
 		tabIndex: -1,
 		...restProps,
@@ -724,6 +730,10 @@ export interface InteractiveDropdownRootProps extends DropdownRootProps {
 	arrow?: boolean | { pointAtCenter?: boolean };
 	/** Close when Escape is pressed. Default `true`. */
 	closeOnEscape?: boolean;
+	/** Whether selecting a regular item closes the menu, unless that item sets
+	 * its own `closeOnSelect`. Default `true` (matches Ark UI's Menu.Root). Has
+	 * no effect on checkbox/radio items, which always stay open. */
+	closeOnSelect?: boolean;
 	/**
 	 * Marks this instance as a cascading submenu, nested inside a parent
 	 * menu's content. Changes the root wrapper from a positioned box (for the
@@ -761,6 +771,7 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 		mouseEnterDelay = 150,
 		mouseLeaveDelay = 100,
 		closeOnEscape = true,
+		closeOnSelect = true,
 		submenu = false,
 		arrow,
 		destroyOnHidden,
@@ -837,6 +848,8 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 
 	const closeOnEscapeRef = useRef(closeOnEscape);
 	closeOnEscapeRef.current = closeOnEscape;
+	const closeOnSelectRef = useRef(closeOnSelect);
+	closeOnSelectRef.current = closeOnSelect;
 
 	const triggerActions = disabled ? [] : normaliseTriggerModes(triggerMode);
 	// Structural inputs to the mount effect below (which trigger modes are
@@ -912,6 +925,17 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 	// re-anchors a context menu to its own zero-size trigger element instead
 	// of the pointer position it actually opened at.
 	const lastOpenEventRef = useRef<MouseEvent | undefined>(undefined);
+
+	// Typeahead search buffer (APG menu pattern): consecutive character
+	// keypresses within the timeout accumulate into one query (e.g. "s", "a"
+	// -> "sa"), so quickly typing a longer prefix narrows the match instead of
+	// each keystroke re-searching from scratch. Repeated presses of the exact
+	// same character are a special case (see handleKeyDown) that cycles
+	// through every match instead of narrowing to a one-letter prefix.
+	const typeaheadBufferRef = useRef("");
+	const typeaheadTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+		null,
+	);
 
 	// Positions the top-level (trigger-anchored) menu using the shared
 	// overlay math, or a context menu / submenu using pointer / item-relative
@@ -989,13 +1013,25 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 			}
 			if (x + menuWidth > window.innerWidth) x -= menuWidth;
 		} else {
-			// Submenu: open beside its trigger item, flipping to the left
-			// when there isn't room on the right.
+			// Submenu: open beside its trigger item, on the side its own
+			// ArrowLeft/ArrowRight keybinding already opens it from (see
+			// isRtl/openSubmenuKey in handleKeyDown below) — the right in LTR,
+			// the left in RTL — flipping to the opposite side when there isn't
+			// room.
+			const isRtl =
+				document.documentElement.dir === "rtl" ||
+				document.body.dir === "rtl" ||
+				root.closest('[dir="rtl"]') !== null;
 			const rect = trigger.getBoundingClientRect();
-			x = rect.right;
 			y = rect.top;
-			if (x + menuWidth > window.innerWidth)
-				x = Math.max(0, rect.left - menuWidth);
+			if (isRtl) {
+				x = rect.left - menuWidth;
+				if (x < 0) x = rect.right;
+			} else {
+				x = rect.right;
+				if (x + menuWidth > window.innerWidth)
+					x = Math.max(0, rect.left - menuWidth);
+			}
 			if (y + menuHeight > window.innerHeight) {
 				y = Math.max(0, window.innerHeight - menuHeight);
 			}
@@ -1201,11 +1237,17 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 					return;
 				}
 
-				// A regular item closes every menu level it bubbles through.
+				// A regular item closes every menu level it bubbles through,
+				// unless the item (or the root, as its default) opts out.
 				if (ownsTarget(target)) onSelectRef.current?.(value);
-				handleClose("menu");
-				if (triggerRef.current?.getAttribute("data-part") === "trigger") {
-					triggerRef.current.focus();
+				const itemCloseOnSelect = target.hasAttribute("data-close-on-select")
+					? target.getAttribute("data-close-on-select") !== "false"
+					: closeOnSelectRef.current;
+				if (itemCloseOnSelect) {
+					handleClose("menu");
+					if (triggerRef.current?.getAttribute("data-part") === "trigger") {
+						triggerRef.current.focus();
+					}
 				}
 			}
 		};
@@ -1315,14 +1357,29 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 				!e.metaKey &&
 				!e.altKey
 			) {
-				const char = e.key.toLowerCase();
+				if (typeaheadTimeoutRef.current) {
+					clearTimeout(typeaheadTimeoutRef.current);
+				}
+				typeaheadBufferRef.current += e.key.toLowerCase();
+				const buffer = typeaheadBufferRef.current;
+				typeaheadTimeoutRef.current = setTimeout(() => {
+					typeaheadBufferRef.current = "";
+				}, 500);
+
+				// Repeated presses of one character (e.g. "s", "s", "s") cycle
+				// through every match one at a time instead of narrowing to a
+				// one-letter prefix and getting stuck on the first hit.
+				const isRepeatedChar =
+					buffer.length > 1 && buffer.split("").every((c) => c === buffer[0]);
+				const query = isRepeatedChar ? buffer[0] : buffer;
+				const searchStart = isRepeatedChar ? currentIndex + 1 : currentIndex;
 				const searchItems = [
-					...items.slice(currentIndex + 1),
-					...items.slice(0, currentIndex + 1),
+					...items.slice(searchStart),
+					...items.slice(0, searchStart),
 				];
 				const match = searchItems.find((item) => {
 					const text = item.textContent?.trim().toLowerCase() || "";
-					return text.startsWith(char);
+					return text.startsWith(query);
 				});
 				if (match) {
 					match.focus();
@@ -1388,6 +1445,7 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 
 		return () => {
 			clearTimers();
+			if (typeaheadTimeoutRef.current) clearTimeout(typeaheadTimeoutRef.current);
 			cancelPendingHideRef.current();
 			root.removeEventListener("click", handleClick);
 			root.removeEventListener("contextmenu", handleContextMenu);

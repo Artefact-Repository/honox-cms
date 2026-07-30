@@ -56,6 +56,8 @@ interface DropdownItemItem extends BaseDropdownItem {
 	 * `button` block's `onclick` — runs without depending on `onSelect`,
 	 * which can't be expressed in CMS JSON. */
 	onclick?: string;
+	/** Whether selecting this item closes the menu. Default `true`. */
+	closeOnSelect?: boolean;
 }
 
 interface DropdownSeparatorItem extends BaseDropdownItem {
@@ -137,6 +139,9 @@ interface DropdownProps extends DropdownVariantProps {
 	mouseLeaveDelay?: number;
 	/** Close when Escape is pressed. Default `true`. */
 	closeOnEscape?: boolean;
+	/** Whether selecting a regular item closes the menu by default; an
+	 * individual item's own `closeOnSelect` overrides this. Default `true`. */
+	closeOnSelect?: boolean;
 	/** Called when the menu opens or closes. */
 	onOpenChange?: (open: boolean, info?: { source: "trigger" | "menu" }) => void;
 	/** Called with an item's `value` when it is activated. */
@@ -269,6 +274,7 @@ function renderDropdownItem(
 						value={menuItem.value}
 						disabled={menuItem.disabled}
 						class={menuItem.class}
+						closeOnSelect={menuItem.closeOnSelect}
 						asChild
 					>
 						<a href={menuItem.href}>{content}</a>
@@ -282,6 +288,7 @@ function renderDropdownItem(
 					disabled={menuItem.disabled}
 					class={menuItem.class}
 					onclick={menuItem.onclick}
+					closeOnSelect={menuItem.closeOnSelect}
 				>
 					{content}
 				</Item>
@@ -369,6 +376,7 @@ function DropdownRoot(props: DropdownProps) {
 		mouseEnterDelay,
 		mouseLeaveDelay,
 		closeOnEscape,
+		closeOnSelect,
 		onOpenChange,
 		onSelect,
 		destroyOnHidden,
@@ -431,6 +439,7 @@ function DropdownRoot(props: DropdownProps) {
 				mouseEnterDelay={mouseEnterDelay}
 				mouseLeaveDelay={mouseLeaveDelay}
 				closeOnEscape={closeOnEscape}
+				closeOnSelect={closeOnSelect}
 				onOpenChange={onOpenChange}
 				onSelect={onSelect}
 				arrow={arrow}
