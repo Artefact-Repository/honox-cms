@@ -31,6 +31,7 @@ export function AuthStatusBase({ user, href = "/admin" }: AuthStatusBaseProps) {
 		const displayName = user.name ?? user.login ?? "";
 		return (
 			<HoverCard
+				align="end"
 				trigger={
 					<Avatar size="xs" name={displayName} src={user.avatarURL ?? undefined} />
 				}
