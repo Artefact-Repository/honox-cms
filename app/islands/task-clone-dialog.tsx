@@ -58,11 +58,15 @@ export default function TaskCloneDialog({
 			});
 			onOpenChange(false);
 		} catch (err) {
-			setError(
+			const message =
 				err instanceof TaskSaveError || err instanceof Error
 					? err.message
-					: "Failed to clone the task.",
-			);
+					: "Failed to clone the task.";
+			// Toasted (not just shown inline) so a failure — e.g. a 404 from a
+			// git host permission gap — is never missed (see task-create-drawer's
+			// same fix).
+			toaster.error(message);
+			setError(message);
 		} finally {
 			setCloning(false);
 		}

@@ -56,11 +56,15 @@ export default function TaskToSubtaskDialog({
 			onOpenChange(false);
 			window.location.reload();
 		} catch (err) {
-			setError(
+			const message =
 				err instanceof TaskSaveError || err instanceof Error
 					? err.message
-					: "Failed to convert task to subtask.",
-			);
+					: "Failed to convert task to subtask.";
+			// Toasted (not just shown inline) so a failure — e.g. a 404 from a
+			// git host permission gap — is never missed (see task-create-drawer's
+			// same fix).
+			toaster.error(message);
+			setError(message);
 		} finally {
 			setConverting(false);
 		}

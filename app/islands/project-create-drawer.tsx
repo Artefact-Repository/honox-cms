@@ -102,11 +102,15 @@ export default function ProjectCreateDrawer(props: ProjectCreateDrawerProps) {
 			resetAndClose();
 			void slug;
 		} catch (err) {
-			setError(
+			const message =
 				err instanceof ProjectSaveError || err instanceof Error
 					? err.message
-					: "Failed to create the project.",
-			);
+					: "Failed to create the project.";
+			// Toasted (not just shown inline) so a failure — e.g. a 404 from a
+			// git host permission gap — is never missed (see task-create-drawer's
+			// same fix).
+			toaster.error(message);
+			setError(message);
 		} finally {
 			setSaving(false);
 		}
