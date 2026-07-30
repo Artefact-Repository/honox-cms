@@ -13,9 +13,11 @@ import {
 	SubmitTrigger,
 } from "../components/ui/editable-primitive";
 import { Text } from "../components/ui/text";
+import { toaster } from "../components/ui/toast";
 import { CheckIcon } from "../icons/check";
 import { CloseIcon } from "../icons/close";
 import { EditIcon } from "../icons/edit";
+import { saveTaskField } from "../utils/task-save";
 
 export interface TaskEditableTextProps {
 	value: string;
@@ -28,6 +30,13 @@ export interface TaskEditableTextProps {
 	/** Renders a resizable textarea instead of a single-line input. */
 	multiline?: boolean;
 	rows?: number;
+	/** Task slug + which field this editor commits to via `saveTaskField` on
+	 * submit (same direct-commit path as task-project-editor.tsx) — a plain
+	 * string/enum pair rather than a save callback, since island props are
+	 * serialized across the hydration boundary and can't carry a closure from
+	 * the server-rendered parent. */
+	slug: string;
+	field: "title" | "body";
 }
 
 const controlsClass = css({
@@ -44,18 +53,49 @@ const controlsClass = css({
 // (the outer island's server snapshot already contains the inner island's
 // rendered markup, then the inner island hydrates a second copy on top).
 //
-// There's also no live backend here — content only ever changes through the
-// CMS's git commits (see the "Convert to Project" dialog for the same
-// constraint). Editing inline is a real, working local preview, but it
-// can't persist on its own, so a commit surfaces a link back to the CMS
-// instead of pretending to have saved anything.
+// Submitting commits straight to the git host via saveTaskField, same
+// direct-commit path as every other task field editor (see
+// task-project-editor.tsx) — a failed commit (no token connected, a stale
+// sha, a rejected token) falls back to a link into the CMS instead of
+// silently losing the edit.
 export default function TaskEditableText(props: TaskEditableTextProps) {
 	const [value, setValue] = useState(props.value);
 	const [editing, setEditing] = useState(false);
 	const [dirty, setDirty] = useState(false);
+	const [saving, setSaving] = useState(false);
 	const previousValue = useRef(props.value);
+	// The baseline "already saved" value — starts at props.value, and moves
+	// forward on every successful onSave so a second edit's dirty-check (and
+	// the no-op guard below) compares against what's actually persisted, not
+	// the page's stale initial server-rendered value.
+	const savedValue = useRef(props.value);
 	const rootRef = useRef<HTMLDivElement>(null);
 	const Wrapper = props.as ?? "div";
+
+	const handleSubmit = () => {
+		setEditing(false);
+		if (value === savedValue.current) return;
+		setSaving(true);
+		saveTaskField(props.slug, (data) =>
+			props.field === "title"
+				? { data: { ...data, title: value } }
+				: { content: value },
+		)
+			.then(() => {
+				savedValue.current = value;
+				setDirty(false);
+				toaster.success("Saved.", {
+					description: "Committed to main — live once the site rebuilds.",
+				});
+			})
+			.catch((error: unknown) => {
+				setDirty(true);
+				toaster.error(
+					error instanceof Error ? error.message : "Failed to save.",
+				);
+			})
+			.finally(() => setSaving(false));
+	};
 
 	return (
 		<Wrapper class={cx(css({ margin: "0" }), props.class)}>
@@ -77,10 +117,7 @@ export default function TaskEditableText(props: TaskEditableTextProps) {
 					setValue(previousValue.current);
 					setEditing(false);
 				}}
-				onSubmit={() => {
-					setEditing(false);
-					if (value !== props.value) setDirty(true);
-				}}
+				onSubmit={handleSubmit}
 				onSetValue={setValue}
 			>
 				<Area>
@@ -100,13 +137,19 @@ export default function TaskEditableText(props: TaskEditableTextProps) {
 				</Control>
 			</EditableRoot>
 
-			{dirty && (
+			{saving && (
 				<Text size="sm" class={css({ color: "fg.muted", mt: "1" })}>
-					Edited locally — not saved.{" "}
+					Saving…
+				</Text>
+			)}
+
+			{!saving && dirty && (
+				<Text size="sm" class={css({ color: "fg.muted", mt: "1" })}>
+					Failed to save.{" "}
 					<Anchor href={props.editHref} target="_blank" variant="plain">
 						Edit in the CMS
 					</Anchor>{" "}
-					to make it permanent.
+					instead.
 				</Text>
 			)}
 		</Wrapper>

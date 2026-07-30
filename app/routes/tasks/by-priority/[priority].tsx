@@ -22,16 +22,8 @@ import {
 	type Task,
 	type TaskPriority,
 } from "../../../lib/tasks";
+import { formatDate } from "../../../utils/date";
 import { filterEntries } from "../../../utils/search";
-
-function formatDate(value?: string) {
-	if (!value) return undefined;
-	return new Date(value).toLocaleDateString("en-US", {
-		month: "short",
-		day: "numeric",
-		year: "numeric",
-	});
-}
 
 export default createRoute(
 	ssgParams(() => TASK_PRIORITIES.map((priority) => ({ priority }))),

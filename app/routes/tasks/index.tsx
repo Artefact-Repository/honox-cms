@@ -33,6 +33,7 @@ import {
 	TASK_STATUSES,
 	type Task,
 } from "../../lib/tasks";
+import { formatDate } from "../../utils/date";
 import { filterEntries } from "../../utils/search";
 
 const treeRowClass = css({
@@ -65,15 +66,6 @@ const dragHandleClass = css({
 	lineHeight: "1",
 	cursor: "grab",
 });
-
-function formatDate(value?: string) {
-	if (!value) return undefined;
-	return new Date(value).toLocaleDateString("en-US", {
-		month: "short",
-		day: "numeric",
-		year: "numeric",
-	});
-}
 
 export default createRoute(async (c) => {
 	const [tasks, projects] = await Promise.all([listTasks(), listProjects()]);

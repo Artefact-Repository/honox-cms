@@ -25,15 +25,7 @@ import {
 	TASK_PRIORITY_COLOR,
 	TASK_STATUS_COLOR,
 } from "../../lib/tasks";
-
-function formatDate(value?: string) {
-	if (!value) return undefined;
-	return new Date(value).toLocaleDateString("en-US", {
-		month: "short",
-		day: "numeric",
-		year: "numeric",
-	});
-}
+import { formatDate } from "../../utils/date";
 
 export default createRoute(
 	ssgParams(() => {
@@ -201,6 +193,8 @@ export default createRoute(
 							editHref={`/admin/#/collections/tasks/entries/${task.slug}`}
 							textClass={heading({ size: "3xl" })}
 							placeholder="Task title"
+							slug={task.slug}
+							field="title"
 						/>
 						<Badge
 							variant="subtle"
@@ -255,6 +249,8 @@ export default createRoute(
 							class={css({ mb: "6" })}
 							multiline
 							rows={8}
+							slug={task.slug}
+							field="body"
 						/>
 					)}
 

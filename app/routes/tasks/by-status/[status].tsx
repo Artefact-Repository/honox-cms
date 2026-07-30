@@ -22,16 +22,8 @@ import {
 	type Task,
 	type TaskStatus,
 } from "../../../lib/tasks";
+import { formatDate } from "../../../utils/date";
 import { filterEntries } from "../../../utils/search";
-
-function formatDate(value?: string) {
-	if (!value) return undefined;
-	return new Date(value).toLocaleDateString("en-US", {
-		month: "short",
-		day: "numeric",
-		year: "numeric",
-	});
-}
 
 export default createRoute(
 	ssgParams(() => TASK_STATUSES.map((status) => ({ status }))),
@@ -275,6 +267,7 @@ export default createRoute(
 									{
 										header: "Task",
 										key: "title",
+										class: css({ maxWidth: "sm" }),
 										render: (task: Task) => (
 											<Anchor
 												href={`/tasks/${task.slug}`}
