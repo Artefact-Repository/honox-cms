@@ -6,6 +6,7 @@ import { InteractiveCombobox } from "../components/ui/combobox-primitive";
 import { Drawer } from "../components/ui/drawer";
 import { Field } from "../components/ui/field";
 import { Stack } from "../components/ui/stack";
+import { TagsField } from "../components/ui/tags-field";
 import { Text } from "../components/ui/text";
 import { Textarea } from "../components/ui/textarea";
 import { toaster } from "../components/ui/toast";
@@ -50,7 +51,7 @@ const emptyForm = (
 	priority: "Medium",
 	assignee: "",
 	dueDate: "",
-	tags: "",
+	tags: [] as string[],
 	body: "",
 });
 
@@ -62,7 +63,7 @@ const formFromTask = (task: Task, body: string) => ({
 	priority: task.priority,
 	assignee: task.assignee ?? "",
 	dueDate: task.dueDate ?? "",
-	tags: task.tags.join(", "),
+	tags: task.tags,
 	body,
 });
 
@@ -110,10 +111,7 @@ export default function TaskCreateDrawer(props: TaskCreateDrawerProps) {
 			priority: form.priority,
 			assignee: form.assignee.trim() || undefined,
 			dueDate: form.dueDate || undefined,
-			tags: form.tags
-				.split(",")
-				.map((tag) => tag.trim())
-				.filter(Boolean),
+			tags: form.tags,
 			body: form.body.trim() || undefined,
 		};
 		try {
@@ -317,12 +315,12 @@ export default function TaskCreateDrawer(props: TaskCreateDrawerProps) {
 						</div>
 					</Stack>
 
-					<Field
+					<TagsField
 						label="Tags"
-						helperText="Comma-separated"
+						helperText="Press Enter to add a tag"
 						value={form.tags}
-						onValueChange={(value: string) =>
-							setForm((f) => ({ ...f, tags: value }))
+						onValueChange={(details: { value: string[] }) =>
+							setForm((f) => ({ ...f, tags: details.value }))
 						}
 					/>
 
