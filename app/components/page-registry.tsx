@@ -807,7 +807,7 @@ const registry: Record<string, BlockRenderer> = {
 
 	hoverCard: (b) => {
 		const { children } = b;
-		const { triggerText, showArrow, title, description, ...rest } = propsOf(b);
+		const { triggerText, title, description, ...rest } = propsOf(b);
 		const trigger = triggerText ? (
 			<Button variant="outline">{triggerText}</Button>
 		) : undefined;
@@ -824,13 +824,7 @@ const registry: Record<string, BlockRenderer> = {
 				</>
 			) : undefined;
 		return (
-			<HoverCard
-				interactive
-				trigger={trigger}
-				showArrow={showArrow}
-				content={content}
-				{...rest}
-			/>
+			<HoverCard interactive trigger={trigger} content={content} {...rest} />
 		);
 	},
 

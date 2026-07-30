@@ -1135,7 +1135,6 @@
             {
               "blockType": "hoverCard",
               "triggerText": "Survolez pour voir les détails de l'auteur",
-              "showArrow": true,
               "title": "À propos de Jules",
               "description": "Designer UI senior et architecte front-end spécialisé dans les suites HonoX."
             }

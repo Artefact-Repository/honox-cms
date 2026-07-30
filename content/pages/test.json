@@ -183,8 +183,7 @@
       ],
       "title": "ttl",
       "description": "desc",
-      "triggerText": "Hover me",
-      "showArrow": true
+      "triggerText": "Hover me"
     },
     {
       "blockType": "field",

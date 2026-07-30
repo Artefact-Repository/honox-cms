@@ -542,7 +542,6 @@ collections:
                             widget: object
                             fields: &hovercard_fields
                               - { label: Trigger Text, name: triggerText, widget: string, default: "Hover me" }
-                              - { label: Show Arrow, name: showArrow, widget: boolean, default: false }
                               - { label: Title, name: title, widget: string, required: false }
                               - { label: Description, name: description, widget: string, required: false }
                           - label: Menu
@@ -1215,7 +1214,6 @@ collections:
                     widget: object
                     fields:
                       - { label: Trigger Text, name: triggerText, widget: string, default: "Hover me" }
-                      - { label: Show Arrow, name: showArrow, widget: boolean, default: false }
                       - { label: Title, name: title, widget: string, required: false }
                       - { label: Description, name: description, widget: string, required: false }
                       - label: Children
@@ -1794,7 +1792,6 @@ collections:
             widget: object
             fields:
               - { label: Trigger Text, name: triggerText, widget: string, default: "Hover me" }
-              - { label: Show Arrow, name: showArrow, widget: boolean, default: false }
               - { label: Title, name: title, widget: string, required: false }
               - { label: Description, name: description, widget: string, required: false }
               - label: Children

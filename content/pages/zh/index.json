@@ -1135,7 +1135,6 @@
             {
               "blockType": "hoverCard",
               "triggerText": "悬停查看作者详情",
-              "showArrow": true,
               "title": "关于 Jules",
               "description": "资深 UI 设计师与前端架构师，专注于 HonoX 套件。"
             }

@@ -20,20 +20,10 @@ describe("HoverCard Unit Tests", () => {
 		expect(html).toContain("This is the description.");
 	});
 
-	test("should render arrow when showArrow is true", () => {
-		const html = (
-			<HoverCard interactive={false} showArrow={true} />
-		).toString();
+	test("should always render an arrow", () => {
+		const html = <HoverCard interactive={false} />.toString();
 
 		expect(html).toContain('data-part="arrow"');
-	});
-
-	test("should not render arrow when showArrow is false", () => {
-		const html = (
-			<HoverCard interactive={false} showArrow={false} />
-		).toString();
-
-		expect(html).not.toContain('data-part="arrow"');
 	});
 
 	test("should render custom content when provided", () => {

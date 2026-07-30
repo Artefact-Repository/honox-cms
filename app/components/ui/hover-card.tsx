@@ -18,7 +18,6 @@ import { Text } from "./text";
 interface HoverCardProps extends HoverCardRootProps {
 	interactive?: boolean; // keep — forces island hydration (default true)
 	trigger?: JSX.Element; // rendered asChild inside HoverCardTrigger
-	showArrow?: boolean; // default false (matches the home-page "Basic" demo)
 	title?: string | JSX.Element; // convenience — rendered as bold Text
 	description?: string | JSX.Element; // convenience — rendered as muted Text
 	content?: JSX.Element; // full custom body; overrides title/description
@@ -31,15 +30,7 @@ function Root(props: HoverCardProps) {
 }
 
 function HoverCard(props: HoverCardProps) {
-	const {
-		interactive,
-		trigger,
-		showArrow = false,
-		title,
-		description,
-		content,
-		...rest
-	} = props;
+	const { interactive, trigger, title, description, content, ...rest } = props;
 
 	const body = content ?? (
 		<>
@@ -57,7 +48,7 @@ function HoverCard(props: HoverCardProps) {
 			{trigger && <Trigger asChild>{trigger}</Trigger>}
 			<Positioner>
 				<Content>
-					{showArrow && <Arrow />}
+					<Arrow />
 					{body}
 				</Content>
 			</Positioner>
