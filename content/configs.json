@@ -497,23 +497,62 @@
   },
   "pms": {
     "statusColors": [
-      { "status": "To Do", "colorPalette": "gray" },
-      { "status": "In Progress", "colorPalette": "blue" },
-      { "status": "In Review", "colorPalette": "purple" },
-      { "status": "Done", "colorPalette": "green" }
+      {
+        "status": "To Do",
+        "colorPalette": "gray"
+      },
+      {
+        "status": "In Progress",
+        "colorPalette": "blue"
+      },
+      {
+        "status": "In Review",
+        "colorPalette": "purple"
+      },
+      {
+        "status": "Done",
+        "colorPalette": "green"
+      }
     ],
     "priorityColors": [
-      { "priority": "Low", "colorPalette": "gray" },
-      { "priority": "Medium", "colorPalette": "blue" },
-      { "priority": "High", "colorPalette": "orange" },
-      { "priority": "Urgent", "colorPalette": "red" }
+      {
+        "priority": "Low",
+        "colorPalette": "gray"
+      },
+      {
+        "priority": "Medium",
+        "colorPalette": "blue"
+      },
+      {
+        "priority": "High",
+        "colorPalette": "orange"
+      },
+      {
+        "priority": "Urgent",
+        "colorPalette": "red"
+      }
     ],
     "projectStatusColors": [
-      { "status": "Planning", "colorPalette": "gray" },
-      { "status": "Active", "colorPalette": "blue" },
-      { "status": "On Hold", "colorPalette": "amber" },
-      { "status": "Completed", "colorPalette": "green" },
-      { "status": "Archived", "colorPalette": "gray" }
+      {
+        "status": "Planning",
+        "colorPalette": "gray"
+      },
+      {
+        "status": "Active",
+        "colorPalette": "blue"
+      },
+      {
+        "status": "On Hold",
+        "colorPalette": "amber"
+      },
+      {
+        "status": "Completed",
+        "colorPalette": "green"
+      },
+      {
+        "status": "Archived",
+        "colorPalette": "gray"
+      }
     ],
     "subtasksExpandedByDefault": true
   },
@@ -545,17 +584,13 @@
     "footerLinks": [
       {
         "label": "HonoX Docs",
-        "href": "https://honox.dev"
+        "href": "https://honox.dev",
+        "colorPalette": "gray"
       },
       {
         "label": "PandaCSS Docs",
         "href": "https://panda-css.com",
         "colorPalette": "purple"
-      },
-      {
-        "label": "Park UI",
-        "href": "https://park-ui.com",
-        "colorPalette": "green"
       }
     ]
   }
