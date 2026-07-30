@@ -1728,6 +1728,7 @@ export function InteractiveColorPicker(props: InteractiveColorPickerProps) {
 			disabled={disabled}
 			readOnly={readOnly}
 			class={classProp}
+			data-state={open ? "open" : "closed"}
 		>
 			{trigger ? (
 				<>

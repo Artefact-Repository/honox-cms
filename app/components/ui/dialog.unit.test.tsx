@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { Dialog } from "./dialog";
+import { hasOpenNested } from "./overlay-a11y";
 
 describe("Dialog Unit Tests", () => {
 	test("should render flattened API correctly", () => {
@@ -80,7 +81,12 @@ describe("Dialog Unit Tests", () => {
 			<Dialog.Root open={true}>
 				<Dialog.Trigger>Open Dialog</Dialog.Trigger>
 				<Dialog.Content>
-					<div id="nested-select" data-scope="select" data-part="root" data-overlay-root>
+					<div
+						id="nested-select"
+						data-scope="select"
+						data-part="root"
+						data-overlay-root
+					>
 						<button data-part="trigger">Open Select</button>
 					</div>
 				</Dialog.Content>
@@ -89,5 +95,43 @@ describe("Dialog Unit Tests", () => {
 
 		expect(html).toContain('data-overlay-root="true"');
 		expect(html).toContain('data-scope="select"');
+	});
+
+	test("should identify open nested overlays with hasOpenNested", () => {
+		if (typeof document !== "undefined") {
+			const div = document.createElement("div");
+			document.body.appendChild(div);
+
+			// Render a Dialog with a nested open Select
+			div.innerHTML = (
+				<Dialog.Root open={true} id="parent-dialog">
+					<Dialog.Content>
+						<div id="nested-select" data-overlay-root data-state="open">
+							<button>Select Button</button>
+						</div>
+					</Dialog.Content>
+				</Dialog.Root>
+			).toString();
+
+			const root = div.querySelector("#parent-dialog") as HTMLElement;
+			expect(root).not.toBeNull();
+			expect(hasOpenNested(root)).toBe(true);
+
+			// Now check with closed nested overlay
+			div.innerHTML = (
+				<Dialog.Root open={true} id="parent-dialog">
+					<Dialog.Content>
+						<div id="nested-select" data-overlay-root data-state="closed">
+							<button>Select Button</button>
+						</div>
+					</Dialog.Content>
+				</Dialog.Root>
+			).toString();
+
+			const rootClosed = div.querySelector("#parent-dialog") as HTMLElement;
+			expect(hasOpenNested(rootClosed)).toBe(false);
+
+			document.body.removeChild(div);
+		}
 	});
 });

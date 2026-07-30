@@ -1383,6 +1383,7 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 			data-scope="dropdown"
 			data-part="root"
 			data-overlay-root
+			data-state={open ? "open" : "closed"}
 			style={
 				submenu
 					? { display: "contents" }

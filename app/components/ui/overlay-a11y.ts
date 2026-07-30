@@ -36,6 +36,13 @@ const FOCUSABLE_SELECTOR =
  */
 export const openOverlayRoots: HTMLElement[] = [];
 
+/** Check if there are any open nested overlay elements inside the container. */
+export function hasOpenNested(root: HTMLElement): boolean {
+	return (
+		root.querySelectorAll('[data-overlay-root][data-state="open"]').length > 0
+	);
+}
+
 /** Query focusable descendants of `container`, excluding hidden/disabled ones. */
 export function getFocusable(container: HTMLElement): HTMLElement[] {
 	return Array.from(
@@ -423,6 +430,9 @@ export function useOverlay(opts: OverlayOptions) {
 			if (dataPart === "backdrop" || dataPart === "positioner") {
 				// Only close if we clicked EXACTLY on the backdrop/positioner, not its children (Content)
 				if (closeOnInteractOutsideRef.current && e.target === target) {
+					if (hasOpenNested(root)) {
+						return;
+					}
 					hide();
 					onChangeRef.current(false);
 				}
@@ -452,6 +462,9 @@ export function useOverlay(opts: OverlayOptions) {
 			if (openOverlayRoots[openOverlayRoots.length - 1] !== root) return;
 
 			if (e.key === "Escape") {
+				if (hasOpenNested(root)) {
+					return;
+				}
 				if (closeOnEscapeRef.current) {
 					e.preventDefault();
 					hide();
