@@ -28,10 +28,36 @@ export default createRoute(async (c) => {
 	}));
 	const searchQuery = new URL(c.req.url).searchParams.get("q") || "";
 
+	const originalContent = data.content ?? [];
+	const statusBlockIndex = originalContent.findIndex(
+		(block) =>
+			block.blockType === "stack" &&
+			block.children?.some(
+				(child) => child.blockType === "text" && child.content === "Status",
+			),
+	);
+
+	let contentBefore = originalContent;
+	let contentAfter: typeof originalContent = [];
+
+	if (statusBlockIndex !== -1) {
+		contentBefore = originalContent.slice(0, statusBlockIndex);
+		contentAfter = originalContent.slice(statusBlockIndex + 1);
+	}
+
 	return c.render(
 		<>
 			<title>{data.title ?? "Tasks - Artefact"}</title>
 			<Toaster />
+			<style
+				dangerouslySetInnerHTML={{
+					__html: `
+						tr[data-status-hidden="true"] {
+							display: none !important;
+						}
+					`,
+				}}
+			/>
 
 			<header
 				class={css({
@@ -107,7 +133,34 @@ export default createRoute(async (c) => {
 					mx: "auto",
 				})}
 			>
-				<PageRenderer content={data.content ?? []} />
+				<PageRenderer content={contentBefore} />
+
+				{statusBlockIndex !== -1 && (
+					<div
+						class={css({
+							display: "flex",
+							alignItems: "center",
+							gap: "2",
+							marginBottom: "0.75rem",
+						})}
+					>
+						<span
+							class={css({
+								fontSize: "xs",
+								fontWeight: "600",
+								textTransform: "uppercase",
+								letterSpacing: "0.05em",
+								color: "#71717a",
+								minWidth: "64px",
+							})}
+						>
+							Status
+						</span>
+						<TaskStatusFilter />
+					</div>
+				)}
+
+				<PageRenderer content={contentAfter} />
 			</div>
 		</>,
 	);
