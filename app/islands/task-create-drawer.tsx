@@ -1,6 +1,6 @@
 import { css, cx } from "design-system/css";
 import { button } from "design-system/recipes";
-import { useState } from "hono/jsx";
+import { useEffect, useState } from "hono/jsx";
 import { Anchor } from "../components/ui/anchor";
 import { InteractiveCombobox } from "../components/ui/combobox-primitive";
 import { Drawer } from "../components/ui/drawer";
@@ -9,8 +9,8 @@ import { Stack } from "../components/ui/stack";
 import { Text } from "../components/ui/text";
 import { Textarea } from "../components/ui/textarea";
 import { toaster } from "../components/ui/toast";
-import { TASK_PRIORITIES, TASK_STATUSES } from "../lib/tasks";
-import { createTask, TaskSaveError } from "../utils/task-save";
+import { TASK_PRIORITIES, TASK_STATUSES, type Task } from "../lib/tasks";
+import { createTask, TaskSaveError, updateTask } from "../utils/task-save";
 
 const statusItems = TASK_STATUSES.map((status) => ({
 	label: status,
@@ -31,6 +31,12 @@ export interface TaskCreateDrawerProps {
 	defaultParentTaskSlug?: string;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
+	/** Edits this task in place instead of creating a new one — the tasks
+	 * table's row-level Edit action (see task-edit-action.tsx) reuses this
+	 * same drawer, just prefilled with the task's current fields. `body` is
+	 * fetched separately by the caller since the table's row data only
+	 * carries a truncated `excerpt`, not the raw markdown body. */
+	editTask?: { task: Task; body: string };
 }
 
 const emptyForm = (
@@ -48,60 +54,102 @@ const emptyForm = (
 	body: "",
 });
 
+const formFromTask = (task: Task, body: string) => ({
+	title: task.title,
+	project: task.project,
+	parentTask: task.parentTask ?? "",
+	status: task.status,
+	priority: task.priority,
+	assignee: task.assignee ?? "",
+	dueDate: task.dueDate ?? "",
+	tags: task.tags.join(", "),
+	body,
+});
+
 // Same "no live backend" constraint as every other task editor (see
 // TaskEditableText) — this commits straight to the git host via
 // createTask/task-save.ts (Sveltia's session token, or our manually-connected
 // one) when one is available, and otherwise falls back to a link into the
 // CMS's own "new entry" screen rather than pretending to have saved anything.
 export default function TaskCreateDrawer(props: TaskCreateDrawerProps) {
-	const [form, setForm] = useState(
-		emptyForm(props.defaultProjectSlug, props.defaultParentTaskSlug),
+	const [form, setForm] = useState(() =>
+		props.editTask
+			? formFromTask(props.editTask.task, props.editTask.body)
+			: emptyForm(props.defaultProjectSlug, props.defaultParentTaskSlug),
 	);
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
+	// Rebuild the form fresh each time the drawer opens — same subject
+	// (create vs. this particular task) can otherwise show stale state from
+	// a previous open, e.g. if `editTask` changed while the drawer was closed.
+	useEffect(() => {
+		if (!props.open) return;
+		setForm(
+			props.editTask
+				? formFromTask(props.editTask.task, props.editTask.body)
+				: emptyForm(props.defaultProjectSlug, props.defaultParentTaskSlug),
+		);
+		setError(null);
+	}, [props.open]);
+
 	const resetAndClose = () => {
-		setForm(emptyForm(props.defaultProjectSlug, props.defaultParentTaskSlug));
 		setError(null);
 		props.onOpenChange(false);
 	};
 
-	const handleCreate = async () => {
+	const handleSave = async () => {
 		if (!form.title.trim() || !form.project) return;
 		setSaving(true);
 		setError(null);
+		const input = {
+			title: form.title.trim(),
+			project: form.project,
+			parentTask: form.parentTask || undefined,
+			status: form.status,
+			priority: form.priority,
+			assignee: form.assignee.trim() || undefined,
+			dueDate: form.dueDate || undefined,
+			tags: form.tags
+				.split(",")
+				.map((tag) => tag.trim())
+				.filter(Boolean),
+			body: form.body.trim() || undefined,
+		};
 		try {
-			const slug = await createTask({
-				title: form.title.trim(),
-				project: form.project,
-				parentTask: form.parentTask || undefined,
-				status: form.status,
-				priority: form.priority,
-				assignee: form.assignee.trim() || undefined,
-				dueDate: form.dueDate || undefined,
-				tags: form.tags
-					.split(",")
-					.map((tag) => tag.trim())
-					.filter(Boolean),
-				body: form.body.trim() || undefined,
-			});
-			toaster.success(`Created "${form.title.trim()}".`, {
-				description: "Committed to main — live once the site rebuilds.",
-			});
+			if (props.editTask) {
+				await updateTask(props.editTask.task.slug, input);
+				toaster.success(`Updated "${input.title}".`, {
+					description: "Committed to main — live once the site rebuilds.",
+				});
+			} else {
+				const slug = await createTask(input);
+				toaster.success(`Created "${input.title}".`, {
+					description: "Committed to main — live once the site rebuilds.",
+				});
+				void slug;
+			}
 			resetAndClose();
-			void slug;
 		} catch (err) {
-			setError(
+			const message =
 				err instanceof TaskSaveError || err instanceof Error
 					? err.message
-					: "Failed to create the task.",
-			);
+					: props.editTask
+						? "Failed to save the task."
+						: "Failed to create the task.";
+			// Toasted (not just shown inline) so a failure is never missed even
+			// if the drawer's form is tall enough to scroll the inline banner
+			// below the fold — see the "it doesn't save" 404 report this was
+			// added for (an unrelated GitHub Contents API permission error that
+			// was only ever surfacing as easy-to-miss inline text).
+			toaster.error(message);
+			setError(message);
 		} finally {
 			setSaving(false);
 		}
 	};
 
-	const canCreate = form.title.trim().length > 0 && form.project.length > 0;
+	const canSave = form.title.trim().length > 0 && form.project.length > 0;
 
 	return (
 		<Drawer
@@ -115,8 +163,12 @@ export default function TaskCreateDrawer(props: TaskCreateDrawerProps) {
 			}}
 			closeOnEscape={false}
 			closeOnInteractOutside={false}
-			title="New Task"
-			description="Creates a task file and commits it to main — same as the CMS."
+			title={props.editTask ? "Edit Task" : "New Task"}
+			description={
+				props.editTask
+					? "Edits this task file and commits the change to main — same as the CMS."
+					: "Creates a task file and commits it to main — same as the CMS."
+			}
 			footer={
 				<Stack gap="3" justify="end" class={css({ width: "full" })}>
 					<button
@@ -128,11 +180,17 @@ export default function TaskCreateDrawer(props: TaskCreateDrawerProps) {
 					</button>
 					<button
 						type="button"
-						onClick={() => void handleCreate()}
-						disabled={!canCreate || saving}
+						onClick={() => void handleSave()}
+						disabled={!canSave || saving}
 						class={cx(button({ variant: "solid", size: "sm" }))}
 					>
-						{saving ? "Creating..." : "Create task"}
+						{props.editTask
+							? saving
+								? "Saving..."
+								: "Save changes"
+							: saving
+								? "Creating..."
+								: "Create task"}
 					</button>
 				</Stack>
 			}
@@ -280,11 +338,15 @@ export default function TaskCreateDrawer(props: TaskCreateDrawerProps) {
 						<Text size="sm" class={css({ color: "fg.error" })}>
 							{error}{" "}
 							<Anchor
-								href="/admin/#/collections/tasks/entries/new"
+								href={
+									props.editTask
+										? `/admin/#/collections/tasks/entries/${props.editTask.task.slug}`
+										: "/admin/#/collections/tasks/entries/new"
+								}
 								target="_blank"
 								variant="plain"
 							>
-								Create it in the CMS
+								{props.editTask ? "Edit it" : "Create it"} in the CMS
 							</Anchor>{" "}
 							instead.
 						</Text>

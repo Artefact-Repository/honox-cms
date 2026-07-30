@@ -15,6 +15,7 @@ import { EllipsisIcon } from "../icons/ellipsis";
 import TaskCloneAction from "../islands/task-clone-action";
 import TaskDeleteConfirm from "../islands/task-delete-confirm";
 import TaskDetailsDrawer from "../islands/task-details-drawer";
+import TaskEditAction from "../islands/task-edit-action";
 import TaskRowActionsMenu from "../islands/task-row-actions-menu";
 import TaskTreeDnd from "../islands/task-tree-dnd";
 import TaskTreeToggle from "../islands/task-tree-toggle";
@@ -66,6 +67,8 @@ interface TasksTableData {
 	projectBySlug: Record<string, Project>;
 	projectTitleBySlug: Record<string, string>;
 	matchedSlugs: string[];
+	projectItems: { label: string; value: string }[];
+	taskItems: { label: string; value: string }[];
 }
 
 function TasksTable(data: Partial<TasksTableData>) {
@@ -74,6 +77,8 @@ function TasksTable(data: Partial<TasksTableData>) {
 	const projectBySlug = data.projectBySlug ?? {};
 	const projectTitleBySlug = data.projectTitleBySlug ?? {};
 	const matchedSlugs = new Set(data.matchedSlugs ?? []);
+	const projectItems = data.projectItems ?? [];
+	const taskItems = data.taskItems ?? [];
 
 	if (tasks.length === 0) {
 		return <Text class={css({ color: "fg.muted" })}>No tasks yet.</Text>;
@@ -273,6 +278,18 @@ function TasksTable(data: Partial<TasksTableData>) {
 						<>
 							<button
 								type="button"
+								data-task-edit-trigger
+								data-task-slug={task.slug}
+								aria-label={`Edit "${task.title}"`}
+								class={cx(
+									button({ variant: "outline", size: "sm" }),
+									css({ textStyle: "sm", fontWeight: "medium" }),
+								)}
+							>
+								Edit
+							</button>
+							<button
+								type="button"
 								data-task-clone-trigger
 								data-task-slug={task.slug}
 								aria-label={`Clone "${task.title}"`}
@@ -315,6 +332,11 @@ function TasksTable(data: Partial<TasksTableData>) {
 			<TaskDetailsDrawer tasks={tasks} projectTitleBySlug={projectTitleBySlug} />
 			<TaskDeleteConfirm tasks={tasks} />
 			<TaskCloneAction tasks={tasks} />
+			<TaskEditAction
+				tasks={tasks}
+				projects={projectItems}
+				taskItems={taskItems}
+			/>
 			<TaskRowActionsMenu tasks={tasks} />
 			<TaskTreeToggle />
 		</>

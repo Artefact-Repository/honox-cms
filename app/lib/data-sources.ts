@@ -126,6 +126,11 @@ const customTableDataResolvers: Record<string, CustomTableDataResolver> = {
 			projectBySlug: Object.fromEntries(projectBySlug),
 			projectTitleBySlug: Object.fromEntries(projectTitleBySlug),
 			matchedSlugs,
+			// Combobox items for the row-level Edit drawer (see TaskEditAction) —
+			// same {label, value} shape PmsCreateMenu already passes into
+			// TaskCreateDrawer for its Project/Parent task fields.
+			projectItems: projects.map((p) => ({ label: p.title, value: p.slug })),
+			taskItems: tasks.map((t) => ({ label: t.title, value: t.slug })),
 		};
 	},
 };

@@ -67,6 +67,18 @@ export async function convertTaskToTopLevel(slug: string): Promise<void> {
 	}));
 }
 
+/** Reads back `content/tasks/{slug}.md`'s parsed frontmatter and raw body —
+ * used by the tasks table's Edit drawer to prefill its form, since the list
+ * page's `Task` type only carries a truncated `excerpt`, not the full body. */
+export async function fetchTaskContent(
+	slug: string,
+): Promise<{ data: Record<string, unknown>; body: string }> {
+	const token = requireToken();
+	const file = await fetchFile(`content/tasks/${slug}.md`, token);
+	const { data, content } = parseFrontmatter(file.content);
+	return { data, body: content };
+}
+
 /** Turns a task title into the same kind of slug the CMS's `{{slug}}`
  * pattern would produce, so hand-created and CMS-created task files stay
  * consistent (see public/admin/config.yml's tasks collection). */
@@ -117,6 +129,31 @@ export async function createTask(input: NewTaskInput): Promise<string> {
 	const content = stringifyFrontmatter(data, input.body ?? "");
 	await createFile(path, content, `Create task "${input.title}"`, token);
 	return slug;
+}
+
+/** Overwrites every editable field of an existing `content/tasks/{slug}.md`
+ * in place — the tasks table's Edit drawer's save, vs. `saveTaskField`'s
+ * single-field patch used by each inline editor. `body` is optional so a
+ * save made without touching the description (e.g. the prefill fetch failed)
+ * leaves the existing body untouched instead of blanking it out. */
+export async function updateTask(
+	slug: string,
+	input: NewTaskInput,
+): Promise<void> {
+	await saveTaskField(slug, (data, content) => ({
+		data: {
+			...data,
+			title: input.title,
+			project: input.project,
+			parentTask: input.parentTask || undefined,
+			status: input.status,
+			priority: input.priority,
+			assignee: input.assignee || undefined,
+			dueDate: input.dueDate || undefined,
+			tags: input.tags.length > 0 ? input.tags : undefined,
+		},
+		content: input.body ?? content,
+	}));
 }
 
 /** Duplicates `content/tasks/{slug}.md` as a new file titled `newTitle` —
