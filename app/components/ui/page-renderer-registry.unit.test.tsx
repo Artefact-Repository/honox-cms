@@ -264,10 +264,29 @@ test("registry exposes a renderer for every canonical block type", () => {
 		"switch",
 		"pinField",
 		"fileUpload",
+		"displayValue",
 	];
 	for (const type of types) {
 		expect(typeof registry[type], `registry missing entry for "${type}"`).toBe(
 			"function",
 		);
 	}
+});
+
+test("displayValue block renders the configured value", () => {
+	const html = (
+		<PageRenderer content={[{ blockType: "displayValue", value: "Park UI" }]} />
+	).toString();
+	expect(html).toContain("Park UI");
+	expect(html).not.toContain("No value available");
+});
+
+test("displayValue block renders the empty-state placeholder when value is untouched (empty string)", () => {
+	// Sveltia serializes an untouched optional string field as "", not
+	// omitted — same gotcha as other optional CMS fields in this registry.
+	const html = (
+		<PageRenderer content={[{ blockType: "displayValue", value: "" }]} />
+	).toString();
+	expect(html).toContain("No value available");
+	expect(html).toContain('aria-hidden="true"');
 });

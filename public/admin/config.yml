@@ -388,6 +388,11 @@ collections:
                                 widget: select
                                 options: [xs, sm, md, lg, xl, 2xl, 3xl, 4xl, 5xl, 6xl, 7xl]
                                 default: md
+                          - label: Display Value
+                            name: displayValue
+                            widget: object
+                            fields: &displayValue_fields
+                              - { label: Value, name: value, widget: string, required: false, hint: "Leave blank to render the accessible empty-state placeholder (—) instead of text." }
                           - label: Icon
                             name: icon
                             widget: object
@@ -1347,6 +1352,10 @@ collections:
                     name: text
                     widget: object
                     fields: *text_fields
+                  - label: Display Value
+                    name: displayValue
+                    widget: object
+                    fields: *displayValue_fields
                   - label: Link
                     name: link
                     widget: object
@@ -1934,6 +1943,10 @@ collections:
             name: text
             widget: object
             fields: *text_fields
+          - label: Display Value
+            name: displayValue
+            widget: object
+            fields: *displayValue_fields
           - label: Icon
             name: icon
             widget: object

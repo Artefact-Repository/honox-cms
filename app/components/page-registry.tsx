@@ -22,6 +22,7 @@ import {
 	Combobox,
 	DatePicker,
 	Dialog,
+	DisplayValue,
 	Drawer,
 	Dropdown,
 	Editable,
@@ -374,6 +375,21 @@ const registry: Record<string, BlockRenderer> = {
 	text: (b) => {
 		const { content, ...rest } = propsOf(b);
 		return <Text {...rest}>{content}</Text>;
+	},
+
+	// `value` arrives as "" (not omitted) when a content author leaves the
+	// CMS field untouched — that must fall through to DisplayValue's own
+	// empty-state placeholder rather than rendering a blank string, so it's
+	// normalized to undefined here (same empty-string gotcha noted elsewhere
+	// in this file for other optional CMS fields).
+	displayValue: (b) => {
+		const { value, ...rest } = propsOf(b);
+		return (
+			<DisplayValue
+				value={typeof value === "string" && value !== "" ? value : undefined}
+				{...rest}
+			/>
+		);
 	},
 
 	anchor: (b) => {

@@ -14,13 +14,14 @@ static page content. It renders the value (optionally passed through a
 `formatValue` transform), or a subtle, accessible "—" placeholder when the
 value is `null`, `undefined`, an empty string, or an empty array.
 
-Unlike most components in this kit, **DisplayValue is not a Page Builder
-block**. Its whole purpose is to wrap a runtime value (a table cell, a detail
-panel field, a formatted date) that only exists in application code — there is
-nothing for a content author to configure through the CMS, and its
-`formatValue` callback is a function, which can't be expressed as serializable
-page-builder content anyway. Reach for `Text`/`Anchor` for CMS-authored copy;
-reach for `DisplayValue` when you're rendering a value your own code computed.
+The **Display Value** component is integrated as a `displayValue` block in the
+**Page Builder**, letting content authors place a piece of text that should
+render as an explicit, accessible "no value" placeholder when intentionally
+left blank — rather than an empty gap or a hand-typed "N/A". Its `formatValue`
+transform is a plain code-level prop (a function can't be expressed as
+serializable page-builder content), so from app code — a table cell, a detail
+panel field, a formatted date — reach for `DisplayValue` directly instead of
+going through a CMS block.
 
 ---
 
@@ -64,7 +65,25 @@ handle `null`/`undefined` itself.
 />
 ```
 
-## 3. Empty values
+## 3. Page Builder block
+
+The CMS block only exposes `value` (a plain string) — there's no way to author
+a `formatValue` function through content — so leaving the field blank is how
+an editor deliberately requests the empty-state placeholder rather than
+typing a filler value themselves.
+
+<DemoPreview>
+  <DisplayValue value="Q4 shipping estimate: 3 business days" />
+</DemoPreview>
+
+```json
+{
+  "type": "displayValue",
+  "value": "Q4 shipping estimate: 3 business days"
+}
+```
+
+## 4. Empty values
 
 `null`, `undefined`, `""`, and `[]` all render the same accessible fallback —
 a decorative dash for sighted users, plus visually-hidden text for screen
@@ -88,10 +107,10 @@ readers.
 
 # Props
 
-| Property | Type | Default | Description |
+| Property | CMS Field Type | Default | Description |
 | --- | --- | --- | --- |
-| **Value** (`value`) | `T \| null \| undefined` | - | The data to display. |
-| **Format Value** (`formatValue`) | `(value: NonNullable<T>) => string \| null \| undefined` | - | Runs only against non-empty values. Returning `null`/`undefined` falls back to `String(value)`, not to the empty-state dash. |
+| **Value** (`value`) | `string` | - | The data to display. Leave blank in the CMS to render the empty-state placeholder. |
+| **Format Value** (`formatValue`) | *(code-only, not a CMS field)* | - | `(value: NonNullable<T>) => string \| null \| undefined`. Runs only against non-empty values. Returning `null`/`undefined` falls back to `String(value)`, not to the empty-state dash. |
 
 ---
 
