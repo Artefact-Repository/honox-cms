@@ -163,6 +163,7 @@ export default function TaskCreateDrawer(props: TaskCreateDrawerProps) {
 			}}
 			closeOnEscape={false}
 			closeOnInteractOutside={false}
+			size="lg"
 			title={props.editTask ? "Edit Task" : "New Task"}
 			description={
 				props.editTask
