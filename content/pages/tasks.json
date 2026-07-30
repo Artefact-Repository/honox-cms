@@ -33,6 +33,14 @@
           "children": [
             { "blockType": "text", "content": "Tasks", "size": "sm", "style": "font-weight:600" }
           ]
+        },
+        {
+          "blockType": "link",
+          "href": "/settings",
+          "variant": "plain",
+          "children": [
+            { "blockType": "text", "content": "Settings", "size": "sm", "style": "color:#71717a" }
+          ]
         }
       ]
     }

@@ -118,6 +118,19 @@ export default createRoute(async (c) => {
 						>
 							Tasks
 						</Anchor>
+						<Anchor
+							href="/settings"
+							variant="plain"
+							class={css({
+								textStyle: "sm",
+								fontWeight: "medium",
+								color: "fg.muted",
+								textDecoration: "none",
+								_hover: { color: "fg" },
+							})}
+						>
+							Settings
+						</Anchor>
 						<PmsCreateMenu projects={projectItems} />
 						<AuthStatus />
 					</nav>
