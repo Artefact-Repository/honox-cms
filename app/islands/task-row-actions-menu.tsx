@@ -195,7 +195,7 @@ export default function TaskRowActionsMenu({ tasks }: TaskRowActionsMenuProps) {
 						? [
 								{
 									type: "item",
-									label: "Edit",
+									label: "Edit in CMS",
 									value: "edit",
 									href: `/admin/#/collections/tasks/entries/${selectedTask.slug}`,
 								},
