@@ -11,6 +11,7 @@ import {
 	Table,
 	Text,
 } from "../../components/ui";
+import { ArrowRightIcon } from "../../icons/arrow-right";
 import TaskCreateDrawer from "../../islands/task-create-drawer";
 import { listProjects, type Project } from "../../lib/projects";
 import {
@@ -457,6 +458,19 @@ export default createRoute(async (c) => {
 								},
 							]}
 							rows={tasks}
+							hoverActions={(task: Task) => (
+								<Anchor
+									href={`/tasks/${task.slug}`}
+									variant="plain"
+									class={cx(
+										button({ variant: "outline", size: "sm" }),
+										css({ textStyle: "sm", fontWeight: "medium" }),
+									)}
+								>
+									View Details
+									<ArrowRightIcon width="14" height="14" />
+								</Anchor>
+							)}
 						/>
 					</>
 				)}
