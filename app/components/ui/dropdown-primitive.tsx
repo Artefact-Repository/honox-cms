@@ -966,14 +966,28 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 			x = event.clientX;
 			// A caller that dispatches its own synthetic `contextmenu` (rather
 			// than a real right-click at the pointer) can mark its trigger
-			// `data-open-upward` to mean "this y is the anchor's *bottom* edge,
-			// grow the menu up from it" — e.g. a per-row "..." button, so the
-			// menu opens above the row instead of covering the ones below it.
-			y = trigger.hasAttribute("data-open-upward")
-				? event.clientY - menuHeight
-				: event.clientY;
+			// `data-open-upward` to mean "prefer growing the menu up from this
+			// anchor" — e.g. a per-row "..." button, so the menu opens above the
+			// row instead of covering the ones below it. `event.clientY` is the
+			// anchor's *top* edge and `data-anchor-bottom` (if present) its
+			// *bottom* edge; when there isn't enough room above, flip to
+			// growing down from the bottom edge instead of clamping the menu
+			// into the anchor itself.
+			if (trigger.hasAttribute("data-open-upward")) {
+				const anchorBottom = Number(
+					trigger.getAttribute("data-anchor-bottom") ?? event.clientY,
+				);
+				const spaceAbove = event.clientY;
+				const spaceBelow = window.innerHeight - anchorBottom;
+				y =
+					spaceAbove >= menuHeight || spaceAbove >= spaceBelow
+						? event.clientY - menuHeight
+						: anchorBottom;
+			} else {
+				y = event.clientY;
+				if (y + menuHeight > window.innerHeight) y -= menuHeight;
+			}
 			if (x + menuWidth > window.innerWidth) x -= menuWidth;
-			if (y + menuHeight > window.innerHeight) y -= menuHeight;
 		} else {
 			// Submenu: open beside its trigger item, flipping to the left
 			// when there isn't room on the right.
