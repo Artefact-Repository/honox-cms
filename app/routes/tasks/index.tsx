@@ -1,6 +1,7 @@
 import { css, cx } from "design-system/css";
 import { button } from "design-system/recipes";
 import { createRoute } from "honox/factory";
+import { PageRenderer } from "../../components/page-renderer";
 import {
 	Anchor,
 	Avatar,
@@ -23,6 +24,7 @@ import TaskDetailsDrawer from "../../islands/task-details-drawer";
 import TaskRowActionsMenu from "../../islands/task-row-actions-menu";
 import TaskTreeDnd from "../../islands/task-tree-dnd";
 import TaskTreeToggle from "../../islands/task-tree-toggle";
+import { loadPage } from "../../lib/pages";
 import { listProjects, type Project } from "../../lib/projects";
 import {
 	buildTaskSearchEntries,
@@ -69,7 +71,11 @@ const dragHandleClass = css({
 });
 
 export default createRoute(async (c) => {
-	const [tasks, projects] = await Promise.all([listTasks(), listProjects()]);
+	const [tasks, projects, data] = await Promise.all([
+		listTasks(),
+		listProjects(),
+		loadPage("tasks").then((page) => page ?? { content: [] }),
+	]);
 	const projectBySlug = new Map<string, Project>(
 		projects.map((project) => [project.slug, project]),
 	);
@@ -104,7 +110,7 @@ export default createRoute(async (c) => {
 
 	return c.render(
 		<>
-			<title>Tasks - Artefact</title>
+			<title>{data.title ?? "Tasks - Artefact"}</title>
 			<Toaster />
 
 			<header
@@ -214,12 +220,7 @@ export default createRoute(async (c) => {
 					mx: "auto",
 				})}
 			>
-				<Heading as="h1" size="3xl" class={css({ mb: "2" })}>
-					Tasks
-				</Heading>
-				<Text class={css({ color: "fg.muted", mb: "6" })}>
-					Every task across every project, soonest due date first.
-				</Text>
+				<PageRenderer content={data.content ?? []} />
 
 				{projects.length > 0 && (
 					<Stack gap="2" align="center" wrap="wrap" class={css({ mb: "3" })}>
