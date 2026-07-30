@@ -97,6 +97,40 @@ describe("Dialog Unit Tests", () => {
 		expect(html).toContain('data-scope="select"');
 	});
 
+	test('should render data-scope="dialog" and trigger data-state on every part', () => {
+		const closedHtml = (
+			<Dialog.Root open={false}>
+				<Dialog.Trigger>Open</Dialog.Trigger>
+				<Dialog.Backdrop />
+				<Dialog.Positioner>
+					<Dialog.Content>
+						<Dialog.CloseTrigger>Close</Dialog.CloseTrigger>
+						<Dialog.ActionTrigger>Go</Dialog.ActionTrigger>
+					</Dialog.Content>
+				</Dialog.Positioner>
+			</Dialog.Root>
+		).toString();
+
+		for (const part of [
+			"trigger",
+			"backdrop",
+			"positioner",
+			"content",
+			"close-trigger",
+			"action-trigger",
+		]) {
+			expect(closedHtml).toContain(`data-scope="dialog" data-part="${part}"`);
+		}
+		expect(closedHtml).toContain('data-part="trigger" data-state="closed"');
+
+		const openHtml = (
+			<Dialog.Root open={true}>
+				<Dialog.Trigger>Open</Dialog.Trigger>
+			</Dialog.Root>
+		).toString();
+		expect(openHtml).toContain('data-part="trigger" data-state="open"');
+	});
+
 	test("should identify open nested overlays with hasOpenNested", () => {
 		if (typeof document !== "undefined") {
 			const div = document.createElement("div");

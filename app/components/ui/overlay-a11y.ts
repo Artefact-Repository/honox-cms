@@ -219,12 +219,22 @@ export interface OverlayOptions {
 	closeOnEscape: boolean;
 	/** Close when the backdrop is clicked / interaction occurs outside. Default: true. */
 	closeOnInteractOutside: boolean;
+	/** Lock body scroll while open. Default: true. */
+	preventScroll?: boolean;
+	/** Trap Tab/Shift+Tab focus cycling within the content. Default: true. */
+	trapFocus?: boolean;
 	/** Notifies the owner of an open/close request originating from behavior (Escape / outside click). */
 	onChange: (open: boolean) => void;
 	/** Element to focus when the overlay opens. Defaults to the first focusable. */
 	initialFocusEl?: () => HTMLElement | null;
 	/** Element to focus when the overlay closes. Defaults to the trigger. */
 	finalFocusEl?: () => HTMLElement | null;
+	/** Fired on Escape keydown while open, before the close-on-escape default runs. Call `event.preventDefault()` to suppress the default close. */
+	onEscapeKeyDown?: (event: KeyboardEvent) => void;
+	/** Fired on an outside backdrop/positioner interaction, before the close-on-interact-outside default runs. Call `event.preventDefault()` to suppress the default close. */
+	onInteractOutside?: (event: Event) => void;
+	/** Fired once the close (exit) animation has fully finished, after focus has been returned. */
+	onExitComplete?: () => void;
 }
 
 /**
@@ -238,9 +248,14 @@ export function useOverlay(opts: OverlayOptions) {
 		open,
 		closeOnEscape,
 		closeOnInteractOutside,
+		preventScroll = true,
+		trapFocus = true,
 		onChange,
 		initialFocusEl,
 		finalFocusEl,
+		onEscapeKeyDown,
+		onInteractOutside,
+		onExitComplete,
 	} = opts;
 
 	// Keep the latest options in refs to prevent event listener thrashing.
@@ -253,11 +268,26 @@ export function useOverlay(opts: OverlayOptions) {
 	const closeOnInteractOutsideRef = useRef(closeOnInteractOutside);
 	closeOnInteractOutsideRef.current = closeOnInteractOutside;
 
+	const preventScrollRef = useRef(preventScroll);
+	preventScrollRef.current = preventScroll;
+
+	const trapFocusRef = useRef(trapFocus);
+	trapFocusRef.current = trapFocus;
+
 	const initialFocusElRef = useRef(initialFocusEl);
 	initialFocusElRef.current = initialFocusEl;
 
 	const finalFocusElRef = useRef(finalFocusEl);
 	finalFocusElRef.current = finalFocusEl;
+
+	const onEscapeKeyDownRef = useRef(onEscapeKeyDown);
+	onEscapeKeyDownRef.current = onEscapeKeyDown;
+
+	const onInteractOutsideRef = useRef(onInteractOutside);
+	onInteractOutsideRef.current = onInteractOutside;
+
+	const onExitCompleteRef = useRef(onExitComplete);
+	onExitCompleteRef.current = onExitComplete;
 
 	const showRef = useRef<() => void>(() => {});
 	const hideRef = useRef<() => void>(() => {});
@@ -278,6 +308,7 @@ export function useOverlay(opts: OverlayOptions) {
 
 		let prevFocus: HTMLElement | null = null;
 		let prevOverflow = "";
+		let scrollLocked = false;
 
 		const getElements = () => ({
 			positioners: Array.from(
@@ -299,8 +330,11 @@ export function useOverlay(opts: OverlayOptions) {
 			prevFocus = document.activeElement as HTMLElement | null;
 			openOverlayRoots.push(root);
 			applyInert();
-			prevOverflow = document.body.style.overflow;
-			document.body.style.overflow = "hidden";
+			if (preventScrollRef.current) {
+				prevOverflow = document.body.style.overflow;
+				document.body.style.overflow = "hidden";
+				scrollLocked = true;
+			}
 
 			// Move focus into the overlay (initialFocusEl > first focusable > content)
 			const focusables = getFocusable(content);
@@ -319,7 +353,7 @@ export function useOverlay(opts: OverlayOptions) {
 				openOverlayRoots.splice(idx, 1);
 			}
 			applyInert();
-			if (openOverlayRoots.length === 0) {
+			if (scrollLocked && openOverlayRoots.length === 0) {
 				document.body.style.overflow = prevOverflow || "";
 			}
 			// Return focus to the trigger (or finalFocusEl) on close
@@ -362,6 +396,7 @@ export function useOverlay(opts: OverlayOptions) {
 							c.style.cssText =
 								"display: none !important; visibility: hidden !important;";
 						}
+						onExitCompleteRef.current?.();
 					}
 				});
 			} else {
@@ -378,6 +413,7 @@ export function useOverlay(opts: OverlayOptions) {
 					c.style.cssText =
 						"display: none !important; visibility: hidden !important;";
 				}
+				onExitCompleteRef.current?.();
 			}
 		};
 
@@ -429,12 +465,15 @@ export function useOverlay(opts: OverlayOptions) {
 
 			if (dataPart === "backdrop" || dataPart === "positioner") {
 				// Only close if we clicked EXACTLY on the backdrop/positioner, not its children (Content)
-				if (closeOnInteractOutsideRef.current && e.target === target) {
+				if (e.target === target) {
 					if (hasOpenNested(root)) {
 						return;
 					}
-					hide();
-					onChangeRef.current(false);
+					onInteractOutsideRef.current?.(e);
+					if (closeOnInteractOutsideRef.current && !e.defaultPrevented) {
+						hide();
+						onChangeRef.current(false);
+					}
 				}
 			} else if (dataPart === "trigger") {
 				const currentOpen = root.getAttribute("data-state") === "open";
@@ -465,7 +504,8 @@ export function useOverlay(opts: OverlayOptions) {
 				if (hasOpenNested(root)) {
 					return;
 				}
-				if (closeOnEscapeRef.current) {
+				onEscapeKeyDownRef.current?.(e);
+				if (closeOnEscapeRef.current && !e.defaultPrevented) {
 					e.preventDefault();
 					hide();
 					onChangeRef.current(false);
@@ -473,6 +513,7 @@ export function useOverlay(opts: OverlayOptions) {
 				return;
 			}
 			if (e.key === "Tab") {
+				if (!trapFocusRef.current) return;
 				const { contents } = getElements();
 				const content = contents[0];
 				if (!content) return;

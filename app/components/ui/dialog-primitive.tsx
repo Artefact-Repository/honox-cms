@@ -80,7 +80,9 @@ export function Trigger(props: TriggerProps) {
 	const triggerProps = {
 		"aria-haspopup": "dialog",
 		"aria-expanded": open,
+		"data-scope": "dialog",
 		"data-part": "trigger",
+		"data-state": open ? "open" : "closed",
 		...restProps,
 	};
 
@@ -117,6 +119,7 @@ export function Backdrop(props: BackdropProps) {
 				!open && css({ display: "none" }),
 			)}
 			data-state={open ? "open" : "closed"}
+			data-scope="dialog"
 			data-part="backdrop"
 			{...restProps}
 		>
@@ -144,6 +147,7 @@ export function Positioner(props: PositionerProps) {
 				!open && css({ display: "none" }),
 			)}
 			data-state={open ? "open" : "closed"}
+			data-scope="dialog"
 			data-part="positioner"
 			{...restProps}
 		>
@@ -203,6 +207,7 @@ export function Content(props: ContentProps) {
 	return (
 		<div
 			role={role}
+			data-scope="dialog"
 			data-part="content"
 			aria-modal="true"
 			tabIndex={-1}
@@ -326,6 +331,7 @@ export function CloseTrigger(props: CloseTriggerProps) {
 	const styles = context?.styles || dialog();
 
 	const triggerProps = {
+		"data-scope": "dialog",
 		"data-part": "close-trigger",
 		...restProps,
 	};
@@ -368,6 +374,7 @@ export function ActionTrigger(props: ActionTriggerProps) {
 	const { children, class: classProp, asChild, ...restProps } = props;
 
 	const triggerProps = {
+		"data-scope": "dialog",
 		"data-part": "action-trigger",
 		...restProps,
 	};
@@ -398,10 +405,20 @@ export interface InteractiveDialogProps extends RootProps {
 	closeOnEscape?: boolean;
 	/** Close when the backdrop is clicked / interaction occurs outside. Default: true. */
 	closeOnInteractOutside?: boolean;
+	/** Lock body scroll while open. Default: true. */
+	preventScroll?: boolean;
+	/** Trap Tab/Shift+Tab focus cycling within the content. Default: true. */
+	trapFocus?: boolean;
 	/** Element to focus when the dialog opens. Defaults to the first focusable. */
 	initialFocusEl?: () => HTMLElement | null;
 	/** Element to focus when the dialog closes. Defaults to the trigger. */
 	finalFocusEl?: () => HTMLElement | null;
+	/** Fired on Escape keydown, before the close-on-escape default runs. Call `event.preventDefault()` to suppress the default close. */
+	onEscapeKeyDown?: (event: KeyboardEvent) => void;
+	/** Fired on an outside backdrop interaction, before the close-on-interact-outside default runs. Call `event.preventDefault()` to suppress the default close. */
+	onInteractOutside?: (event: Event) => void;
+	/** Fired once the close (exit) animation has fully finished. */
+	onExitComplete?: () => void;
 }
 
 export function InteractiveDialog(props: InteractiveDialogProps) {
@@ -413,8 +430,13 @@ export function InteractiveDialog(props: InteractiveDialogProps) {
 		dialogRole,
 		closeOnEscape = true,
 		closeOnInteractOutside = true,
+		preventScroll = true,
+		trapFocus = true,
 		initialFocusEl,
 		finalFocusEl,
+		onEscapeKeyDown,
+		onInteractOutside,
+		onExitComplete,
 		...rest
 	} = props;
 	const [isOpen, setIsOpen] = useState(openProp ?? defaultOpen ?? false);
@@ -465,9 +487,14 @@ export function InteractiveDialog(props: InteractiveDialogProps) {
 		open,
 		closeOnEscape,
 		closeOnInteractOutside,
+		preventScroll,
+		trapFocus,
 		onChange: handleOpenChange,
 		initialFocusEl,
 		finalFocusEl,
+		onEscapeKeyDown,
+		onInteractOutside,
+		onExitComplete,
 	});
 
 	return (

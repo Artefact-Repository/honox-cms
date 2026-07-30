@@ -21,6 +21,24 @@ import { shouldHydrate } from "./island-utils";
 
 interface RootProps extends DialogPrimitiveRootProps {
 	interactive?: boolean;
+	/** Close when Escape is pressed. Default: true. */
+	closeOnEscape?: boolean;
+	/** Close when the backdrop is clicked / interaction occurs outside. Default: true. */
+	closeOnInteractOutside?: boolean;
+	/** Lock body scroll while open. Default: true. */
+	preventScroll?: boolean;
+	/** Trap Tab/Shift+Tab focus cycling within the content. Default: true. */
+	trapFocus?: boolean;
+	/** Element to focus when the dialog opens. Defaults to the first focusable. */
+	initialFocusEl?: () => HTMLElement | null;
+	/** Element to focus when the dialog closes. Defaults to the trigger. */
+	finalFocusEl?: () => HTMLElement | null;
+	/** Fired on Escape keydown, before the close-on-escape default runs. Call `event.preventDefault()` to suppress the default close. */
+	onEscapeKeyDown?: (event: KeyboardEvent) => void;
+	/** Fired on an outside backdrop interaction, before the close-on-interact-outside default runs. Call `event.preventDefault()` to suppress the default close. */
+	onInteractOutside?: (event: Event) => void;
+	/** Fired once the close (exit) animation has fully finished. */
+	onExitComplete?: () => void;
 }
 
 function Root(props: RootProps) {
