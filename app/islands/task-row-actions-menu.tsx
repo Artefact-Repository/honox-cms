@@ -105,6 +105,7 @@ export default function TaskRowActionsMenu({ tasks }: TaskRowActionsMenuProps) {
 	const [projectOpen, setProjectOpen] = useState(false);
 	const contextTriggerRef = useRef<HTMLDivElement | null>(null);
 	const pendingPointRef = useRef<{ x: number; y: number } | null>(null);
+	const forcedRowRef = useRef<HTMLElement | null>(null);
 
 	const selectedTask = tasks.find((t) => t.slug === selectedSlug) ?? null;
 	const entries = buildTaskTree(tasks);
@@ -168,6 +169,24 @@ export default function TaskRowActionsMenu({ tasks }: TaskRowActionsMenuProps) {
 		}
 	};
 
+	// Keeps the row's hover-actions bar visible for as long as its dropdown is
+	// open — see the `data-force-visible` rule in table.ts for why `:hover` /
+	// `:focus-within` alone aren't enough here.
+	const handleOpenChange = (open: boolean) => {
+		if (!open) {
+			forcedRowRef.current?.removeAttribute("data-force-visible");
+			forcedRowRef.current = null;
+			return;
+		}
+		const trigger = document.querySelector<HTMLElement>(
+			`[data-task-row-actions-trigger][data-task-slug="${CSS.escape(selectedSlug ?? "")}"]`,
+		);
+		const row = trigger?.closest<HTMLElement>("tr");
+		if (!row) return;
+		row.setAttribute("data-force-visible", "");
+		forcedRowRef.current = row;
+	};
+
 	const handleSelect = (value: string) => {
 		if (value === "convert-to-project") setProjectOpen(true);
 		if (value === "convert-to-parent" && outdent) void applyMove(outdent);
@@ -178,6 +197,7 @@ export default function TaskRowActionsMenu({ tasks }: TaskRowActionsMenuProps) {
 		<>
 			<Dropdown
 				triggerMode="contextDropdown"
+				onOpenChange={handleOpenChange}
 				trigger={
 					// Never clicked directly — a fixed point the click delegation
 					// above fires a synthetic `contextmenu` at, so this can just sit
