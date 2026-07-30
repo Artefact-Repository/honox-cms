@@ -146,4 +146,25 @@ describe("Dropdown Unit Tests", () => {
 
 		expect(html).toContain('data-state="open"');
 	});
+
+	test("should render items with hierarchical structures and verify no regression on custom options", () => {
+		const html = (
+			<Dropdown.Root
+				interactive={true}
+				items={[
+					{ type: "item", label: "Apple", value: "apple" },
+					{ type: "item", label: "Banana", value: "banana" },
+					{
+						type: "submenu",
+						label: "Citrus",
+						items: [{ type: "item", label: "Lemon", value: "lemon" }],
+					},
+				]}
+			/>
+		).toString();
+
+		expect(html).toContain("Apple");
+		expect(html).toContain("Banana");
+		expect(html).toContain("Citrus");
+	});
 });

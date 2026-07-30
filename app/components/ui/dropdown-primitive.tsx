@@ -1248,6 +1248,13 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 			const items = getItems();
 			const currentIndex = items.indexOf(document.activeElement as HTMLElement);
 
+			const isRtl =
+				document.documentElement.dir === "rtl" ||
+				document.body.dir === "rtl" ||
+				root.closest('[dir="rtl"]') !== null;
+			const openSubmenuKey = isRtl ? "ArrowLeft" : "ArrowRight";
+			const closeSubmenuKey = isRtl ? "ArrowRight" : "ArrowLeft";
+
 			if (e.key === "Escape") {
 				if (!closeOnEscapeRef.current) return;
 				handleClose("trigger");
@@ -1262,13 +1269,13 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 			} else if (e.key === "ArrowUp") {
 				items[(currentIndex - 1 + items.length) % items.length]?.focus();
 				e.preventDefault();
-			} else if (e.key === "ArrowRight") {
+			} else if (e.key === openSubmenuKey) {
 				const currentItem = document.activeElement as HTMLElement;
 				if (currentItem?.getAttribute("data-part") === "trigger-item") {
 					currentItem.click();
 					e.preventDefault();
 				}
-			} else if (e.key === "ArrowLeft") {
+			} else if (e.key === closeSubmenuKey) {
 				if (triggerRef.current?.getAttribute("data-part") === "trigger-item") {
 					handleClose("trigger");
 					triggerRef.current?.focus();
@@ -1287,10 +1294,30 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 					currentItem.click();
 					e.preventDefault();
 				}
+			} else if (
+				e.key.length === 1 &&
+				e.key !== " " &&
+				!e.ctrlKey &&
+				!e.metaKey &&
+				!e.altKey
+			) {
+				const char = e.key.toLowerCase();
+				const searchItems = [
+					...items.slice(currentIndex + 1),
+					...items.slice(0, currentIndex + 1),
+				];
+				const match = searchItems.find((item) => {
+					const text = item.textContent?.trim().toLowerCase() || "";
+					return text.startsWith(char);
+				});
+				if (match) {
+					match.focus();
+					e.preventDefault();
+				}
 			}
 		};
 
-		const handleClickOutside = (e: MouseEvent) => {
+		const handleClickOutside = (e: PointerEvent) => {
 			if (isOpenRef.current && root && !root.contains(e.target as Node)) {
 				handleClose("trigger");
 			}
@@ -1331,7 +1358,7 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 		root.addEventListener("contextmenu", handleContextMenu);
 		root.addEventListener("mouseover", handleMouseOver);
 		root.addEventListener("keydown", handleKeyDown);
-		window.addEventListener("mousedown", handleClickOutside);
+		document.addEventListener("pointerdown", handleClickOutside, { capture: true });
 		window.addEventListener("scroll", handleScroll, true);
 		window.addEventListener("resize", handleReposition);
 
@@ -1352,7 +1379,7 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 			root.removeEventListener("contextmenu", handleContextMenu);
 			root.removeEventListener("mouseover", handleMouseOver);
 			root.removeEventListener("keydown", handleKeyDown);
-			window.removeEventListener("mousedown", handleClickOutside);
+			document.removeEventListener("pointerdown", handleClickOutside, { capture: true });
 			window.removeEventListener("scroll", handleScroll, true);
 			window.removeEventListener("resize", handleReposition);
 			if (hoverEnabled) {
