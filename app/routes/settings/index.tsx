@@ -12,7 +12,8 @@ import path from "node:path";
 import { css } from "design-system/css";
 import { createRoute } from "honox/factory";
 import { parseDocument } from "yaml";
-import { Anchor, Card, Heading, Text } from "../../components/ui";
+import { PageRenderer } from "../../components/page-renderer";
+import { Card } from "../../components/ui";
 import { Toaster } from "../../components/ui/toast";
 import AuthStatus from "../../islands/auth-status";
 import SettingsAuthBanner from "../../islands/settings-auth-banner";
@@ -22,11 +23,10 @@ import DocsSettingsForm from "../../islands/settings-docs-form";
 import HomeSettingsForm from "../../islands/settings-home-form";
 import PmsSettingsForm from "../../islands/settings-pms-form";
 import { loadDocsConfig } from "../../lib/configs";
+import { loadPage } from "../../lib/pages";
 import { mergeColorOverrides } from "../../lib/pms-config";
 import { PROJECT_STATUS_COLOR } from "../../lib/projects";
 import { TASK_PRIORITY_COLOR, TASK_STATUS_COLOR } from "../../lib/tasks";
-
-const CMS_ADMIN_HREF = "/admin/";
 
 /** Reads public/admin/config.yml straight off disk — this only ever runs at
  * build time (every route handler here executes once per static page during
@@ -79,7 +79,12 @@ function loadCmsAdminSettingsFromDisk() {
 }
 
 export default createRoute(async (c) => {
-	const config = await loadDocsConfig("en");
+	const [config, data] = await Promise.all([
+		loadDocsConfig("en"),
+		loadPage("settings", "en", { currentUrl: c.req.url }).then(
+			(page) => page ?? { content: [] },
+		),
+	]);
 	const cmsAdmin = loadCmsAdminSettingsFromDisk();
 	const home = config.home ?? {};
 	const blog = config.blog ?? {};
@@ -109,7 +114,7 @@ export default createRoute(async (c) => {
 
 	return c.render(
 		<>
-			<title>Settings - Artefact</title>
+			<title>{data.title ?? "Settings - Artefact"}</title>
 			<Toaster />
 
 			<header
@@ -137,58 +142,11 @@ export default createRoute(async (c) => {
 						gap: "4",
 					})}
 				>
-					<Anchor
-						href="/"
-						variant="plain"
-						class={css({ textDecoration: "none", flexShrink: "0" })}
-					>
-						<Heading
-							as="span"
-							class={css({ fontSize: "lg", fontWeight: "bold", tracking: "tight" })}
-						>
-							Artefact UI
-						</Heading>
-					</Anchor>
+					<PageRenderer content={data.headerBrand ?? []} />
 
 					<nav class={css({ display: "flex", gap: "6", alignItems: "center" })}>
-						<Anchor
-							href="/projects"
-							variant="plain"
-							class={css({
-								textStyle: "sm",
-								fontWeight: "medium",
-								color: "fg.muted",
-								textDecoration: "none",
-								_hover: { color: "fg" },
-							})}
-						>
-							Projects
-						</Anchor>
-						<Anchor
-							href="/tasks"
-							variant="plain"
-							class={css({
-								textStyle: "sm",
-								fontWeight: "medium",
-								color: "fg.muted",
-								textDecoration: "none",
-								_hover: { color: "fg" },
-							})}
-						>
-							Tasks
-						</Anchor>
-						<Anchor
-							href="/settings"
-							variant="plain"
-							class={css({
-								textStyle: "sm",
-								fontWeight: "semibold",
-								color: "fg",
-								textDecoration: "none",
-							})}
-						>
-							Settings
-						</Anchor>
+						<PageRenderer content={data.headerNav ?? []} />
+						<PageRenderer content={data.headerActions ?? []} />
 						<AuthStatus />
 					</nav>
 				</div>
@@ -206,25 +164,7 @@ export default createRoute(async (c) => {
 				})}
 			>
 				<div>
-					<Heading as="h1" size="3xl" class={css({ mb: "2" })}>
-						Settings
-					</Heading>
-					<Text class={css({ color: "fg.muted" })}>
-						Every site-wide setting, read from the{" "}
-						<Text as="span" class={css({ fontWeight: "medium", color: "fg" })}>
-							Configs
-						</Text>{" "}
-						singleton (
-						<Text as="span" class={css({ fontFamily: "mono", fontSize: "xs" })}>
-							content/configs.json
-						</Text>
-						). "Save changes" below commits straight to the repo — same as
-						editing it in{" "}
-						<Anchor href={CMS_ADMIN_HREF} variant="plain">
-							/admin
-						</Anchor>
-						.
-					</Text>
+					<PageRenderer content={data.content ?? []} />
 				</div>
 
 				<SettingsAuthBanner />

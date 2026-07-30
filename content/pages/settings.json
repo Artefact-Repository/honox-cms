@@ -1,0 +1,65 @@
+{
+  "title": "Settings - Artefact",
+  "headerBrand": [
+    {
+      "blockType": "link",
+      "href": "/",
+      "variant": "plain",
+      "style": "flex-shrink:0;text-decoration:none",
+      "children": [
+        { "blockType": "text", "content": "Artefact UI", "size": "lg", "style": "font-weight:600" }
+      ]
+    }
+  ],
+  "headerNav": [
+    {
+      "blockType": "stack",
+      "direction": "horizontal",
+      "align": "center",
+      "gap": "6",
+      "children": [
+        {
+          "blockType": "link",
+          "href": "/projects",
+          "variant": "plain",
+          "children": [
+            { "blockType": "text", "content": "Projects", "size": "sm", "style": "color:#71717a" }
+          ]
+        },
+        {
+          "blockType": "link",
+          "href": "/tasks",
+          "variant": "plain",
+          "children": [
+            { "blockType": "text", "content": "Tasks", "size": "sm", "style": "color:#71717a" }
+          ]
+        },
+        {
+          "blockType": "link",
+          "href": "/settings",
+          "variant": "plain",
+          "children": [
+            { "blockType": "text", "content": "Settings", "size": "sm", "style": "font-weight:600" }
+          ]
+        }
+      ]
+    }
+  ],
+  "headerActions": [],
+  "content": [
+    { "blockType": "heading", "as": "h1", "text": "Settings", "size": "3xl", "style": "margin-bottom:0.5rem" },
+    {
+      "blockType": "text",
+      "content": "Every site-wide setting, read from the Configs singleton (content/configs.json). \"Save changes\" below commits straight to the repo — same as editing it in /admin.",
+      "style": "color:#71717a;margin-bottom:0.5rem"
+    },
+    {
+      "blockType": "link",
+      "href": "/admin/",
+      "variant": "underline",
+      "children": [
+        { "blockType": "text", "content": "Open the Configs entry in /admin →" }
+      ]
+    }
+  ]
+}
