@@ -4,6 +4,9 @@ export const tooltip = defineSlotRecipe({
 	className: "tooltip",
 	slots: ["trigger", "content", "arrow", "arrowTip", "positioner"],
 	base: {
+		positioner: {
+			zIndex: "tooltip",
+		},
 		content: {
 			"--tooltip-bg": "colors.gray.solid.bg",
 			bg: "var(--tooltip-bg)",
@@ -16,6 +19,7 @@ export const tooltip = defineSlotRecipe({
 			py: "1.5",
 			textStyle: "xs",
 			maxWidth: "xs",
+			zIndex: "tooltip",
 			_open: {
 				animationStyle: "scale-fade-in",
 				animationDuration: "fast",

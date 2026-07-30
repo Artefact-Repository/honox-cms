@@ -19,7 +19,7 @@ export const card = defineSlotRecipe({
 			borderRadius: "l3",
 			display: "flex",
 			flexDirection: "column",
-			overflow: "hidden",
+			overflow: "visible",
 			position: "relative",
 			// Subtle default lift so cards read as raised above the page
 			// background even in the (most common) `outline`/`subtle` variants —
@@ -69,6 +69,13 @@ export const card = defineSlotRecipe({
 		image: {
 			width: "full",
 			objectFit: "cover",
+			overflow: "hidden",
+			"&:first-child": {
+				borderTopRadius: "l3",
+			},
+			"&:last-child": {
+				borderBottomRadius: "l3",
+			},
 		},
 		avatar: {
 			flexShrink: 0,

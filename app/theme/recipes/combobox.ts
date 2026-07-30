@@ -60,6 +60,9 @@ export const combobox = defineSlotRecipe({
 		control: {
 			position: "relative",
 		},
+		positioner: {
+			zIndex: "dropdown",
+		},
 		content: {
 			background: "gray.surface.bg",
 			borderRadius: "l2",

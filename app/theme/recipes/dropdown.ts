@@ -19,6 +19,10 @@ export const dropdown = defineSlotRecipe({
 		"triggerItem",
 	],
 	base: {
+		positioner: {
+			"--dropdown-z-index": "zIndex.dropdown",
+			zIndex: "calc(var(--dropdown-z-index) + var(--layer-index, 0))",
+		},
 		content: {
 			"--dropdown-z-index": "zIndex.dropdown",
 			"--dropdown-bg": "colors.gray.surface.bg",

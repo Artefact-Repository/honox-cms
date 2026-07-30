@@ -19,6 +19,14 @@ test("Card renders image", () => {
 	expect(html).toContain('<img src="test-image.jpg"');
 });
 
+test("Card supports imagePosition bottom", () => {
+	const html = (
+		<Card image="test-image.jpg" imagePosition="bottom" title="Image Card" />
+	).toString();
+
+	expect(html).toContain('<img src="test-image.jpg"');
+});
+
 test("Card renders footer", () => {
 	const html = (
 		<Card title="Footer Card" footer={<button type="button">Action</button>} />

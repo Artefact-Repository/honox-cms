@@ -4,6 +4,9 @@ export const hoverCard = defineSlotRecipe({
 	className: "hover-card",
 	slots: ["trigger", "positioner", "content", "arrow", "arrowTip"],
 	base: {
+		positioner: {
+			zIndex: "popover",
+		},
 		content: {
 			"--hovercard-bg": "colors.gray.surface.bg",
 

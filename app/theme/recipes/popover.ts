@@ -18,9 +18,14 @@ export const popover = defineSlotRecipe({
 		"footer",
 	],
 	base: {
+		positioner: {
+			"--z-index-popover": "zIndex.popover",
+			zIndex: "calc(var(--z-index-popover) + var(--layer-index, 0))",
+		},
 		content: {
 			"--popover-bg": "colors.gray.surface.bg",
 			"--popover-padding": "spacing.4",
+			"--z-index-popover": "zIndex.popover",
 
 			background: "var(--popover-bg)",
 			borderRadius: "l3",
