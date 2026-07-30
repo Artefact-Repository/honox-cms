@@ -14,11 +14,13 @@ import { colorPaletteClass } from "../../components/ui/color-palette";
 import { Toaster } from "../../components/ui/toast";
 import AuthStatus from "../../islands/auth-status";
 import PmsCreateMenu from "../../islands/pms-create-menu";
+import { loadDocsConfig } from "../../lib/configs";
 import {
 	listProjects,
 	PROJECT_STATUS_COLOR,
 	type Project,
 } from "../../lib/projects";
+import { mergeColorOverrides } from "../../lib/pms-config";
 import { listTasks, type Task } from "../../lib/tasks";
 
 function projectProgress(project: Project, tasks: Task[]) {
@@ -28,7 +30,16 @@ function projectProgress(project: Project, tasks: Task[]) {
 }
 
 export default createRoute(async (c) => {
-	const [projects, tasks] = await Promise.all([listProjects(), listTasks()]);
+	const [projects, tasks, config] = await Promise.all([
+		listProjects(),
+		listTasks(),
+		loadDocsConfig("en"),
+	]);
+	const projectStatusColor = mergeColorOverrides(
+		PROJECT_STATUS_COLOR,
+		config.pms?.projectStatusColors,
+		"status",
+	);
 	const projectItems = projects.map((project) => ({
 		label: project.title,
 		value: project.slug,
@@ -154,7 +165,7 @@ export default createRoute(async (c) => {
 							>
 								<Card
 									variant="outline"
-									colorPalette={PROJECT_STATUS_COLOR[project.status]}
+									colorPalette={projectStatusColor[project.status]}
 									class={css({
 										height: "full",
 										transition: "all 0.2s",
@@ -173,7 +184,7 @@ export default createRoute(async (c) => {
 										<Badge
 											variant="subtle"
 											size="sm"
-											colorPalette={PROJECT_STATUS_COLOR[project.status]}
+											colorPalette={projectStatusColor[project.status]}
 										>
 											{project.status}
 										</Badge>
@@ -192,7 +203,7 @@ export default createRoute(async (c) => {
 											showValueText
 											valueText={`${done}/${total} tasks`}
 											class={cx(
-												colorPaletteClass(PROJECT_STATUS_COLOR[project.status]),
+												colorPaletteClass(projectStatusColor[project.status]),
 												css({ mb: "4" }),
 											)}
 										/>

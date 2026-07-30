@@ -19,6 +19,7 @@ import TaskEditAction from "../islands/task-edit-action";
 import TaskRowActionsMenu from "../islands/task-row-actions-menu";
 import TaskTreeDnd from "../islands/task-tree-dnd";
 import TaskTreeToggle from "../islands/task-tree-toggle";
+import type { ColorPalette } from "./ui/color-palette";
 import type { Project } from "../lib/projects";
 import {
 	TASK_PRIORITIES,
@@ -26,6 +27,8 @@ import {
 	TASK_STATUS_COLOR,
 	TASK_STATUSES,
 	type Task,
+	type TaskStatus,
+	type TaskPriority,
 	type TaskTreeEntry,
 } from "../lib/tasks";
 import { formatDate } from "../utils/date";
@@ -69,6 +72,12 @@ interface TasksTableData {
 	matchedSlugs: string[];
 	projectItems: { label: string; value: string }[];
 	taskItems: { label: string; value: string }[];
+	/** Merged configs.json `pms.statusColors`/`priorityColors` overrides on
+	 * top of TASK_STATUS_COLOR/TASK_PRIORITY_COLOR — see data-sources.ts's
+	 * `tasks` resolver. */
+	statusColors: Record<TaskStatus, ColorPalette>;
+	priorityColors: Record<TaskPriority, ColorPalette>;
+	subtasksExpandedByDefault: boolean;
 }
 
 function TasksTable(data: Partial<TasksTableData>) {
@@ -79,6 +88,10 @@ function TasksTable(data: Partial<TasksTableData>) {
 	const matchedSlugs = new Set(data.matchedSlugs ?? []);
 	const projectItems = data.projectItems ?? [];
 	const taskItems = data.taskItems ?? [];
+	const statusColor = data.statusColors ?? TASK_STATUS_COLOR;
+	const priorityColor = data.priorityColors ?? TASK_PRIORITY_COLOR;
+	const subtasksExpandedByDefault = data.subtasksExpandedByDefault ?? true;
+	const initialExpanded = subtasksExpandedByDefault ? "true" : "false";
 
 	if (tasks.length === 0) {
 		return <Text class={css({ color: "fg.muted" })}>No tasks yet.</Text>;
@@ -100,17 +113,27 @@ function TasksTable(data: Partial<TasksTableData>) {
 				<Table
 					getRowProps={(task: Task, rowIndex: number) => {
 						const entry = taskTree[rowIndex];
+						const depth = entry?.depth ?? 0;
+						// Every ancestor toggle starts at `initialExpanded`, so when
+						// subtasks are collapsed by default every descendant row is
+						// transitively hidden on first render — same end state
+						// TaskTreeToggle's recomputeVisibility would produce after
+						// closing every toggle, just computed once for SSR instead of
+						// walking the (not-yet-interactive) DOM.
+						const initiallyHidden =
+							!subtasksExpandedByDefault && depth > 0;
 						return {
 							id: `task-${task.slug}`,
 							"data-task-slug": task.slug,
 							"data-task-title": task.title,
 							"data-order-key": entry?.orderKey ?? 0,
-							"data-depth": entry?.depth ?? 0,
-							...(entry && entry.depth > 0
+							"data-depth": depth,
+							...(entry && depth > 0
 								? { "data-parent-slug": task.parentTask }
 								: {}),
+							...(initiallyHidden ? { "data-tree-hidden": "true" } : {}),
 							draggable: true,
-							hidden: !matchedSlugs.has(task.slug),
+							hidden: !matchedSlugs.has(task.slug) || initiallyHidden,
 							class: treeRowClass,
 						};
 					}}
@@ -143,8 +166,8 @@ function TasksTable(data: Partial<TasksTableData>) {
 												type="button"
 												data-subtask-toggle
 												data-task-slug={task.slug}
-												data-expanded="true"
-												aria-expanded="true"
+												data-expanded={initialExpanded}
+												aria-expanded={initialExpanded}
 												aria-label={`Toggle subtasks of "${task.title}"`}
 												class={treeToggleClass}
 											>
@@ -213,7 +236,7 @@ function TasksTable(data: Partial<TasksTableData>) {
 									<Badge
 										variant="subtle"
 										size="sm"
-										colorPalette={TASK_STATUS_COLOR[task.status]}
+										colorPalette={statusColor[task.status]}
 									>
 										{task.status}
 									</Badge>
@@ -234,7 +257,7 @@ function TasksTable(data: Partial<TasksTableData>) {
 									<Badge
 										variant="subtle"
 										size="sm"
-										colorPalette={TASK_PRIORITY_COLOR[task.priority]}
+										colorPalette={priorityColor[task.priority]}
 									>
 										{task.priority}
 									</Badge>
@@ -329,7 +352,12 @@ function TasksTable(data: Partial<TasksTableData>) {
 					)}
 				/>
 			</TaskTreeDnd>
-			<TaskDetailsDrawer tasks={tasks} projectTitleBySlug={projectTitleBySlug} />
+			<TaskDetailsDrawer
+				tasks={tasks}
+				projectTitleBySlug={projectTitleBySlug}
+				statusColors={statusColor}
+				priorityColors={priorityColor}
+			/>
 			<TaskDeleteConfirm tasks={tasks} />
 			<TaskCloneAction tasks={tasks} />
 			<TaskEditAction

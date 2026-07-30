@@ -7,11 +7,13 @@ import { Card } from "../components/ui/card";
 import { Stack } from "../components/ui/stack";
 import { Text } from "../components/ui/text";
 import { toaster } from "../components/ui/toast";
+import type { ColorPalette } from "../components/ui/color-palette";
 import {
 	TASK_PRIORITY_COLOR,
 	TASK_STATUS_COLOR,
 	TASK_STATUSES,
 	type Task,
+	type TaskPriority,
 	type TaskStatus,
 } from "../lib/tasks";
 import { formatDate } from "../utils/date";
@@ -21,9 +23,17 @@ import GitTokenBanner, { useGitToken } from "./git-token-banner";
 
 export interface TaskBoardProps {
 	tasks: Task[];
+	/** Merged configs.json `pms.statusColors`/`priorityColors` overrides —
+	 * falls back to the built-in defaults when omitted. */
+	statusColors?: Record<TaskStatus, ColorPalette>;
+	priorityColors?: Record<TaskPriority, ColorPalette>;
 }
 
-export default function TaskBoard({ tasks: initialTasks }: TaskBoardProps) {
+export default function TaskBoard({
+	tasks: initialTasks,
+	statusColors = TASK_STATUS_COLOR,
+	priorityColors = TASK_PRIORITY_COLOR,
+}: TaskBoardProps) {
 	const [tasks, setTasks] = useState<Task[]>(initialTasks);
 	const { token, tokenSource, connect, disconnect } = useGitToken();
 	const [draggingSlug, setDraggingSlug] = useState<string | null>(null);
@@ -148,7 +158,7 @@ export default function TaskBoard({ tasks: initialTasks }: TaskBoardProps) {
 								<Badge
 									variant="subtle"
 									size="sm"
-									colorPalette={TASK_STATUS_COLOR[status]}
+									colorPalette={statusColors[status]}
 								>
 									{columnTasks.length}
 								</Badge>
@@ -169,7 +179,7 @@ export default function TaskBoard({ tasks: initialTasks }: TaskBoardProps) {
 									>
 										<Card
 											variant="outline"
-											colorPalette={TASK_PRIORITY_COLOR[task.priority]}
+											colorPalette={priorityColors[task.priority]}
 											bodyClass={css({ p: "3" })}
 										>
 											<Anchor
@@ -207,7 +217,7 @@ export default function TaskBoard({ tasks: initialTasks }: TaskBoardProps) {
 												<Badge
 													variant="subtle"
 													size="sm"
-													colorPalette={TASK_PRIORITY_COLOR[task.priority]}
+													colorPalette={priorityColors[task.priority]}
 												>
 													{task.priority}
 												</Badge>

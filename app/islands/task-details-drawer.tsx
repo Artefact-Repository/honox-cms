@@ -7,16 +7,23 @@ import { Badge } from "../components/ui/badge";
 import { Drawer } from "../components/ui/drawer";
 import { Stack } from "../components/ui/stack";
 import { Text } from "../components/ui/text";
+import type { ColorPalette } from "../components/ui/color-palette";
 import {
 	TASK_PRIORITY_COLOR,
 	TASK_STATUS_COLOR,
 	type Task,
+	type TaskPriority,
+	type TaskStatus,
 } from "../lib/tasks";
 import { formatDate } from "../utils/date";
 
 export interface TaskDetailsDrawerProps {
 	tasks: Task[];
 	projectTitleBySlug?: Record<string, string>;
+	/** Merged configs.json `pms.statusColors`/`priorityColors` overrides —
+	 * falls back to the built-in defaults when omitted. */
+	statusColors?: Record<TaskStatus, ColorPalette>;
+	priorityColors?: Record<TaskPriority, ColorPalette>;
 }
 
 // Mounted once for the whole tasks table (see hoverActions in
@@ -33,6 +40,8 @@ export interface TaskDetailsDrawerProps {
 export default function TaskDetailsDrawer({
 	tasks,
 	projectTitleBySlug = {},
+	statusColors = TASK_STATUS_COLOR,
+	priorityColors = TASK_PRIORITY_COLOR,
 }: TaskDetailsDrawerProps) {
 	const [task, setTask] = useState<Task | null>(null);
 
@@ -100,13 +109,13 @@ export default function TaskDetailsDrawer({
 						<Stack gap="2" wrap="wrap">
 							<Badge
 								variant="subtle"
-								colorPalette={TASK_STATUS_COLOR[task.status]}
+								colorPalette={statusColors[task.status]}
 							>
 								{task.status}
 							</Badge>
 							<Badge
 								variant="subtle"
-								colorPalette={TASK_PRIORITY_COLOR[task.priority]}
+								colorPalette={priorityColors[task.priority]}
 							>
 								{task.priority}
 							</Badge>

@@ -19,12 +19,14 @@ import { Toaster } from "../../components/ui/toast";
 import AuthStatus from "../../islands/auth-status";
 import PmsCreateMenu from "../../islands/pms-create-menu";
 import TaskBoard from "../../islands/task-board";
+import { loadDocsConfig } from "../../lib/configs";
 import {
 	listProjectSlugs,
 	listProjects,
 	loadProjectBySlug,
 	PROJECT_STATUS_COLOR,
 } from "../../lib/projects";
+import { mergeColorOverrides } from "../../lib/pms-config";
 import {
 	buildTaskSearchEntries,
 	listTasksByProject,
@@ -47,10 +49,26 @@ export default createRoute(
 		const project = await loadProjectBySlug(slug);
 		if (!project) return c.notFound();
 
-		const [tasks, allProjects] = await Promise.all([
+		const [tasks, allProjects, config] = await Promise.all([
 			listTasksByProject(slug),
 			listProjects(),
+			loadDocsConfig("en"),
 		]);
+		const projectStatusColor = mergeColorOverrides(
+			PROJECT_STATUS_COLOR,
+			config.pms?.projectStatusColors,
+			"status",
+		);
+		const statusColor = mergeColorOverrides(
+			TASK_STATUS_COLOR,
+			config.pms?.statusColors,
+			"status",
+		);
+		const priorityColor = mergeColorOverrides(
+			TASK_PRIORITY_COLOR,
+			config.pms?.priorityColors,
+			"priority",
+		);
 		const done = tasks.filter((task) => task.status === "Done").length;
 		const projectItems = allProjects.map((p) => ({
 			label: p.title,
@@ -198,7 +216,7 @@ export default createRoute(
 						</Heading>
 						<Badge
 							variant="subtle"
-							colorPalette={PROJECT_STATUS_COLOR[project.status]}
+							colorPalette={projectStatusColor[project.status]}
 						>
 							{project.status}
 						</Badge>
@@ -239,7 +257,7 @@ export default createRoute(
 							showValueText
 							valueText={`${done}/${tasks.length} tasks done`}
 							class={cx(
-								colorPaletteClass(PROJECT_STATUS_COLOR[project.status]),
+								colorPaletteClass(projectStatusColor[project.status]),
 								css({ mb: "8", maxWidth: "sm" }),
 							)}
 						/>
@@ -266,7 +284,11 @@ export default createRoute(
 							{tasks.length === 0 ? (
 								<Text class={css({ color: "fg.muted" })}>No tasks yet.</Text>
 							) : (
-								<TaskBoard tasks={tasks} />
+								<TaskBoard
+								tasks={tasks}
+								statusColors={statusColor}
+								priorityColors={priorityColor}
+							/>
 							)}
 						</Tabs.Content>
 
@@ -315,7 +337,7 @@ export default createRoute(
 													<Badge
 														variant="subtle"
 														size="sm"
-														colorPalette={TASK_STATUS_COLOR[task.status]}
+														colorPalette={statusColor[task.status]}
 													>
 														{task.status}
 													</Badge>
@@ -337,7 +359,7 @@ export default createRoute(
 													<Badge
 														variant="subtle"
 														size="sm"
-														colorPalette={TASK_PRIORITY_COLOR[task.priority]}
+														colorPalette={priorityColor[task.priority]}
 													>
 														{task.priority}
 													</Badge>

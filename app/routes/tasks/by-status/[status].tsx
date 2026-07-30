@@ -12,6 +12,7 @@ import {
 	Text,
 } from "../../../components/ui";
 import AuthStatus from "../../../islands/auth-status";
+import { loadDocsConfig } from "../../../lib/configs";
 import { listProjects, type Project } from "../../../lib/projects";
 import {
 	buildTaskSearchEntries,
@@ -23,6 +24,7 @@ import {
 	type Task,
 	type TaskStatus,
 } from "../../../lib/tasks";
+import { mergeColorOverrides } from "../../../lib/pms-config";
 import { formatDate } from "../../../utils/date";
 import { filterEntries } from "../../../utils/search";
 
@@ -35,12 +37,23 @@ export default createRoute(
 		) as TaskStatus;
 		if (!TASK_STATUSES.includes(statusParam)) return c.notFound();
 
-		const [allTasks, projects] = await Promise.all([
+		const [allTasks, projects, config] = await Promise.all([
 			listTasks(),
 			listProjects(),
+			loadDocsConfig("en"),
 		]);
 		const projectBySlug = new Map<string, Project>(
 			projects.map((project) => [project.slug, project]),
+		);
+		const statusColor = mergeColorOverrides(
+			TASK_STATUS_COLOR,
+			config.pms?.statusColors,
+			"status",
+		);
+		const priorityColor = mergeColorOverrides(
+			TASK_PRIORITY_COLOR,
+			config.pms?.priorityColors,
+			"priority",
 		);
 
 		const tasks = allTasks.filter((task) => task.status === statusParam);
@@ -179,7 +192,7 @@ export default createRoute(
 						</Heading>
 						<Badge
 							variant="subtle"
-							colorPalette={TASK_STATUS_COLOR[statusParam]}
+							colorPalette={statusColor[statusParam]}
 						>
 							{tasks.length}
 						</Badge>
@@ -218,7 +231,7 @@ export default createRoute(
 							>
 								<Badge
 									variant={status === statusParam ? "solid" : "subtle"}
-									colorPalette={TASK_STATUS_COLOR[status]}
+									colorPalette={statusColor[status]}
 									class={css({
 										px: "4",
 										py: "2",
@@ -310,7 +323,7 @@ export default createRoute(
 												<Badge
 													variant="subtle"
 													size="sm"
-													colorPalette={TASK_PRIORITY_COLOR[task.priority]}
+													colorPalette={priorityColor[task.priority]}
 												>
 													{task.priority}
 												</Badge>

@@ -6,7 +6,8 @@ import { Avatar } from "../components/ui/avatar";
 import { Badge } from "../components/ui/badge";
 import { Stack } from "../components/ui/stack";
 import { Text } from "../components/ui/text";
-import { TASK_STATUS_COLOR, type Task } from "../lib/tasks";
+import type { ColorPalette } from "../components/ui/color-palette";
+import { TASK_STATUS_COLOR, type Task, type TaskStatus } from "../lib/tasks";
 import TaskCreateDrawer from "./task-create-drawer";
 
 export interface TaskSubtasksProps {
@@ -18,6 +19,9 @@ export interface TaskSubtasksProps {
 	/** Candidate parent tasks for the create drawer's picker — every other
 	 * task, so a subtask's parent can be changed away from the default. */
 	tasks: { label: string; value: string }[];
+	/** Merged configs.json `pms.statusColors` overrides — falls back to the
+	 * built-in default when omitted. */
+	statusColors?: Record<TaskStatus, ColorPalette>;
 }
 
 // Rendered directly on the task detail page (routes/tasks/[slug].tsx), not
@@ -29,6 +33,7 @@ export default function TaskSubtasks({
 	subtasks,
 	projects,
 	tasks,
+	statusColors = TASK_STATUS_COLOR,
 }: TaskSubtasksProps) {
 	const [open, setOpen] = useState(false);
 	const done = subtasks.filter((subtask) => subtask.status === "Done").length;
@@ -83,7 +88,7 @@ export default function TaskSubtasks({
 								<Badge
 									variant="subtle"
 									size="sm"
-									colorPalette={TASK_STATUS_COLOR[subtask.status]}
+									colorPalette={statusColors[subtask.status]}
 								>
 									{subtask.status}
 								</Badge>

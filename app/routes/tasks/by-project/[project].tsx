@@ -12,6 +12,7 @@ import {
 	Text,
 } from "../../../components/ui";
 import AuthStatus from "../../../islands/auth-status";
+import { loadDocsConfig } from "../../../lib/configs";
 import { listProjects, loadProjectBySlug } from "../../../lib/projects";
 import {
 	buildTaskSearchEntries,
@@ -22,6 +23,7 @@ import {
 	TASK_STATUSES,
 	type Task,
 } from "../../../lib/tasks";
+import { mergeColorOverrides } from "../../../lib/pms-config";
 import { formatDate } from "../../../utils/date";
 import { filterEntries } from "../../../utils/search";
 
@@ -33,11 +35,23 @@ export default createRoute(
 
 	async (c) => {
 		const projectSlug = c.req.param("project");
-		const [project, allProjects] = await Promise.all([
+		const [project, allProjects, config] = await Promise.all([
 			loadProjectBySlug(projectSlug),
 			listProjects(),
+			loadDocsConfig("en"),
 		]);
 		if (!project) return c.notFound();
+
+		const statusColor = mergeColorOverrides(
+			TASK_STATUS_COLOR,
+			config.pms?.statusColors,
+			"status",
+		);
+		const priorityColor = mergeColorOverrides(
+			TASK_PRIORITY_COLOR,
+			config.pms?.priorityColors,
+			"priority",
+		);
 
 		const tasks = await listTasksByProject(projectSlug);
 
@@ -282,7 +296,7 @@ export default createRoute(
 												<Badge
 													variant="subtle"
 													size="sm"
-													colorPalette={TASK_STATUS_COLOR[task.status]}
+													colorPalette={statusColor[task.status]}
 												>
 													{task.status}
 												</Badge>
@@ -304,7 +318,7 @@ export default createRoute(
 												<Badge
 													variant="subtle"
 													size="sm"
-													colorPalette={TASK_PRIORITY_COLOR[task.priority]}
+													colorPalette={priorityColor[task.priority]}
 												>
 													{task.priority}
 												</Badge>

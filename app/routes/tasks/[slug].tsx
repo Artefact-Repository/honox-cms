@@ -16,6 +16,8 @@ import TaskActionsMenu from "../../islands/task-actions-menu";
 import TaskEditableText from "../../islands/task-editable-text";
 import TaskProjectEditor from "../../islands/task-project-editor";
 import TaskSubtasks from "../../islands/task-subtasks";
+import { loadDocsConfig } from "../../lib/configs";
+import { mergeColorOverrides } from "../../lib/pms-config";
 import { listProjects, loadProjectBySlug } from "../../lib/projects";
 import {
 	descendantsOf,
@@ -38,11 +40,22 @@ export default createRoute(
 		const task = await loadTaskBySlug(slug);
 		if (!task) return c.notFound();
 
-		const [project, projects, allTasks] = await Promise.all([
+		const [project, projects, allTasks, config] = await Promise.all([
 			loadProjectBySlug(task.project),
 			listProjects(),
 			listTasks(),
+			loadDocsConfig("en"),
 		]);
+		const statusColor = mergeColorOverrides(
+			TASK_STATUS_COLOR,
+			config.pms?.statusColors,
+			"status",
+		);
+		const priorityColor = mergeColorOverrides(
+			TASK_PRIORITY_COLOR,
+			config.pms?.priorityColors,
+			"priority",
+		);
 		const projectItems = projects.map((p) => ({
 			label: p.title,
 			value: p.slug,
@@ -198,15 +211,12 @@ export default createRoute(
 							slug={task.slug}
 							field="title"
 						/>
-						<Badge
-							variant="subtle"
-							colorPalette={TASK_STATUS_COLOR[task.status]}
-						>
+						<Badge variant="subtle" colorPalette={statusColor[task.status]}>
 							{task.status}
 						</Badge>
 						<Badge
 							variant="subtle"
-							colorPalette={TASK_PRIORITY_COLOR[task.priority]}
+							colorPalette={priorityColor[task.priority]}
 						>
 							{task.priority}
 						</Badge>
@@ -271,6 +281,7 @@ export default createRoute(
 						subtasks={subtasks}
 						projects={projectItems}
 						tasks={taskItems}
+						statusColors={statusColor}
 					/>
 				</div>
 			</>,
