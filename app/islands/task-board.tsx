@@ -14,18 +14,10 @@ import {
 	type Task,
 	type TaskStatus,
 } from "../lib/tasks";
+import { formatDate } from "../utils/date";
 import { fetchFile, updateFile } from "../utils/git-backend";
 import { parseFrontmatter, stringifyFrontmatter } from "../utils/markdown";
 import GitTokenBanner, { useGitToken } from "./git-token-banner";
-
-function formatDate(value?: string) {
-	if (!value) return undefined;
-	return new Date(value).toLocaleDateString("en-US", {
-		month: "short",
-		day: "numeric",
-		year: "numeric",
-	});
-}
 
 export interface TaskBoardProps {
 	tasks: Task[];

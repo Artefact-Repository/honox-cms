@@ -12,15 +12,7 @@ import {
 	TASK_STATUS_COLOR,
 	type Task,
 } from "../lib/tasks";
-
-function formatDate(value?: string) {
-	if (!value) return undefined;
-	return new Date(value).toLocaleDateString("en-US", {
-		month: "short",
-		day: "numeric",
-		year: "numeric",
-	});
-}
+import { formatDate } from "../utils/date";
 
 export interface TaskDetailsDrawerProps {
 	tasks: Task[];
