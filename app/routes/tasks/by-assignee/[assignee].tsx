@@ -1,5 +1,4 @@
-import { css, cx } from "design-system/css";
-import { button } from "design-system/recipes";
+import { css } from "design-system/css";
 import { ssgParams } from "hono/ssg";
 import { createRoute } from "honox/factory";
 import {
@@ -13,6 +12,7 @@ import {
 	Table,
 	Text,
 } from "../../../components/ui";
+import AuthStatus from "../../../islands/auth-status";
 import { listProjects, type Project } from "../../../lib/projects";
 import {
 	buildTaskSearchEntries,
@@ -168,15 +168,7 @@ export default createRoute(
 							>
 								Tasks
 							</Anchor>
-							<Anchor
-								href="/admin"
-								class={cx(
-									button({ variant: "outline", size: "sm" }),
-									css({ textStyle: "sm", fontWeight: "medium" }),
-								)}
-							>
-								Admin
-							</Anchor>
+							<AuthStatus />
 						</nav>
 					</div>
 				</header>

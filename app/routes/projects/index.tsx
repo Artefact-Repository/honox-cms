@@ -1,5 +1,4 @@
 import { css, cx } from "design-system/css";
-import { button } from "design-system/recipes";
 import { createRoute } from "honox/factory";
 import {
 	Anchor,
@@ -13,6 +12,7 @@ import {
 } from "../../components/ui";
 import { colorPaletteClass } from "../../components/ui/color-palette";
 import { Toaster } from "../../components/ui/toast";
+import AuthStatus from "../../islands/auth-status";
 import PmsCreateMenu from "../../islands/pms-create-menu";
 import {
 	listProjects,
@@ -108,15 +108,7 @@ export default createRoute(async (c) => {
 							Tasks
 						</Anchor>
 						<PmsCreateMenu projects={projectItems} />
-						<Anchor
-							href="/admin"
-							class={cx(
-								button({ variant: "outline", size: "sm" }),
-								css({ textStyle: "sm", fontWeight: "medium" }),
-							)}
-						>
-							Admin
-						</Anchor>
+						<AuthStatus />
 					</nav>
 				</div>
 			</header>

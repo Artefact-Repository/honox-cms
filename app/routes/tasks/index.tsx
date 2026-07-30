@@ -3,6 +3,7 @@ import { createRoute } from "honox/factory";
 import { PageRenderer } from "../../components/page-renderer";
 import { Search } from "../../components/ui";
 import { Toaster } from "../../components/ui/toast";
+import AuthStatus from "../../islands/auth-status";
 import PmsCreateMenu from "../../islands/pms-create-menu";
 import { loadPage } from "../../lib/pages";
 import { listProjects } from "../../lib/projects";
@@ -79,6 +80,7 @@ export default createRoute(async (c) => {
 						<PageRenderer content={data.headerNav ?? []} />
 						<PmsCreateMenu projects={projectItems} tasks={taskItems} />
 						<PageRenderer content={data.headerActions ?? []} />
+						<AuthStatus />
 					</nav>
 				</div>
 			</header>

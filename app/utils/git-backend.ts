@@ -137,6 +137,38 @@ export function getSveltiaToken(): string | null {
 	}
 }
 
+export interface SveltiaUser {
+	name: string | null;
+	login: string | null;
+	avatarURL: string | null;
+}
+
+/** Reads the logged-in identity out of Sveltia's own session (same storage
+ * key as `getSveltiaToken`) — `name`/`login`/`avatarURL` are set by Sveltia's
+ * `fetchUserProfile()` alongside the token. There's no server-side session
+ * here (see git-backend.ts module comment), so this is the only "who's
+ * logged in" signal the app has, and it only exists client-side. */
+export function getSveltiaUser(): SveltiaUser | null {
+	if (typeof localStorage === "undefined") return null;
+	const raw = localStorage.getItem(SVELTIA_USER_STORAGE_KEY);
+	if (!raw) return null;
+	try {
+		const user = JSON.parse(raw) as {
+			name?: string;
+			login?: string;
+			avatarURL?: string;
+		};
+		if (!user.name && !user.login) return null;
+		return {
+			name: user.name ?? null,
+			login: user.login ?? null,
+			avatarURL: user.avatarURL ?? null,
+		};
+	} catch {
+		return null;
+	}
+}
+
 export function getStoredToken(): string | null {
 	if (typeof localStorage === "undefined") return null;
 	return localStorage.getItem(TOKEN_STORAGE_KEY);

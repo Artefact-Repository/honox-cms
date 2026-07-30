@@ -1,5 +1,4 @@
 import { css, cx } from "design-system/css";
-import { button } from "design-system/recipes";
 import { ssgParams } from "hono/ssg";
 import { createRoute } from "honox/factory";
 import {
@@ -17,6 +16,7 @@ import {
 } from "../../components/ui";
 import { colorPaletteClass } from "../../components/ui/color-palette";
 import { Toaster } from "../../components/ui/toast";
+import AuthStatus from "../../islands/auth-status";
 import PmsCreateMenu from "../../islands/pms-create-menu";
 import TaskBoard from "../../islands/task-board";
 import {
@@ -166,15 +166,7 @@ export default createRoute(
 								defaultProjectSlug={slug}
 								tasks={tasks.map((t) => ({ label: t.title, value: t.slug }))}
 							/>
-							<Anchor
-								href="/admin"
-								class={cx(
-									button({ variant: "outline", size: "sm" }),
-									css({ textStyle: "sm", fontWeight: "medium" }),
-								)}
-							>
-								Admin
-							</Anchor>
+							<AuthStatus />
 						</nav>
 					</div>
 				</header>
