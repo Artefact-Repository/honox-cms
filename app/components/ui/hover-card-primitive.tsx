@@ -26,6 +26,11 @@ export interface HoverCardContextValue {
 	lazyMount?: boolean;
 	unmountOnExit?: boolean;
 	hasOpenedRef?: { current: boolean };
+	/** Which edge of the trigger the positioner hangs off. Positioner always
+	 * renders below the trigger (no vertical flipping); "end" hangs it off
+	 * the trigger's right edge instead of its left, for triggers near the
+	 * right side of the viewport (e.g. a header's trailing avatar). */
+	align?: "start" | "end";
 }
 
 const HoverCardContext = createContext<HoverCardContextValue | null>(null);
@@ -44,6 +49,8 @@ export interface HoverCardRootProps extends PropsWithChildren {
 	closeDelay?: number;
 	lazyMount?: boolean;
 	unmountOnExit?: boolean;
+	/** @default "start" */
+	align?: "start" | "end";
 }
 
 export function Root(props: HoverCardRootProps) {
@@ -53,6 +60,7 @@ export function Root(props: HoverCardRootProps) {
 		children,
 		lazyMount,
 		unmountOnExit,
+		align = "start",
 	} = props;
 	const autoId = useId();
 	const id = idProp || autoId;
@@ -64,7 +72,7 @@ export function Root(props: HoverCardRootProps) {
 
 	return (
 		<HoverCardContext.Provider
-			value={{ id, open, styles, lazyMount, unmountOnExit, hasOpenedRef }}
+			value={{ id, open, styles, lazyMount, unmountOnExit, hasOpenedRef, align }}
 		>
 			{children}
 		</HoverCardContext.Provider>
@@ -127,6 +135,7 @@ export function Positioner(props: HoverCardPositionerProps) {
 	const lazyMount = context?.lazyMount;
 	const unmountOnExit = context?.unmountOnExit;
 	const hasOpenedRef = context?.hasOpenedRef;
+	const align = context?.align ?? "start";
 
 	if (open && hasOpenedRef) {
 		hasOpenedRef.current = true;
@@ -152,7 +161,7 @@ export function Positioner(props: HoverCardPositionerProps) {
 			style={{
 				position: "absolute",
 				top: "100%",
-				left: "0",
+				...(align === "end" ? { right: "0" } : { left: "0" }),
 				zIndex: 1000,
 			}}
 			{...restProps}
