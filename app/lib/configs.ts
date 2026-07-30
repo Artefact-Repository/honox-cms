@@ -63,26 +63,22 @@ export interface DocsSiteConfig {
 	showHydrationTierBadge?: boolean;
 }
 
-/** One status/priority → accent color override (configs singleton's `pms`
- * field). `status`/`priority` are matching keys — one of the fixed values
- * from the tasks/projects collections' own `select` options in
- * public/admin/config.yml (task_statuses/task_priorities/project_statuses),
- * not freely renamable, since task/project frontmatter still stores the
- * English string. Any status/priority not listed here keeps its built-in
- * default color (see app/lib/tasks.ts, app/lib/projects.ts). */
-export interface PmsColorOverride {
-	status?: string;
-	priority?: string;
-	colorPalette: string;
-}
-
 /** Project/task board behavior (configs singleton's `pms` field) — not
  * translated content, so every field is a matching key duplicated across all
- * locale files (i18n: duplicate in config.yml), same as `docOrder` above. */
+ * locale files (i18n: duplicate in config.yml), same as `docOrder` above.
+ *
+ * `statusColors`/`priorityColors`/`projectStatusColors` are status/priority →
+ * accent color maps, edited via the CMS's `keyvalue` widget — free-text keys
+ * and values there, unlike the constrained `select` this was before. A key
+ * that doesn't match one of the tasks/projects collections' real
+ * status/priority values (task_statuses/task_priorities/project_statuses in
+ * public/admin/config.yml) is simply ignored by mergeColorOverrides rather
+ * than erroring, and any status/priority missing from the map keeps its
+ * built-in default color (see app/lib/tasks.ts, app/lib/projects.ts). */
 export interface PmsSiteConfig {
-	statusColors?: PmsColorOverride[];
-	priorityColors?: PmsColorOverride[];
-	projectStatusColors?: PmsColorOverride[];
+	statusColors?: Record<string, string>;
+	priorityColors?: Record<string, string>;
+	projectStatusColors?: Record<string, string>;
 	/** Whether a task with subtasks starts expanded on the /tasks table and
 	 * the project board. Defaults to true when omitted. */
 	subtasksExpandedByDefault?: boolean;

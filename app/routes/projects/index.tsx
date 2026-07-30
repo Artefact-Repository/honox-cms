@@ -38,7 +38,6 @@ export default createRoute(async (c) => {
 	const projectStatusColor = mergeColorOverrides(
 		PROJECT_STATUS_COLOR,
 		config.pms?.projectStatusColors,
-		"status",
 	);
 	const projectItems = projects.map((project) => ({
 		label: project.title,

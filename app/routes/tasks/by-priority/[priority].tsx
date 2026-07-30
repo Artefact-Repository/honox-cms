@@ -46,12 +46,10 @@ export default createRoute(
 		const statusColor = mergeColorOverrides(
 			TASK_STATUS_COLOR,
 			config.pms?.statusColors,
-			"status",
 		);
 		const priorityColor = mergeColorOverrides(
 			TASK_PRIORITY_COLOR,
 			config.pms?.priorityColors,
-			"priority",
 		);
 
 		const tasks = allTasks.filter((task) => task.priority === priorityParam);

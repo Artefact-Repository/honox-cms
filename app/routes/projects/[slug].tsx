@@ -57,17 +57,14 @@ export default createRoute(
 		const projectStatusColor = mergeColorOverrides(
 			PROJECT_STATUS_COLOR,
 			config.pms?.projectStatusColors,
-			"status",
 		);
 		const statusColor = mergeColorOverrides(
 			TASK_STATUS_COLOR,
 			config.pms?.statusColors,
-			"status",
 		);
 		const priorityColor = mergeColorOverrides(
 			TASK_PRIORITY_COLOR,
 			config.pms?.priorityColors,
-			"priority",
 		);
 		const done = tasks.filter((task) => task.status === "Done").length;
 		const projectItems = allProjects.map((p) => ({

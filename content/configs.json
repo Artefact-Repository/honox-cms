@@ -496,64 +496,25 @@
     "showHydrationTierBadge": true
   },
   "pms": {
-    "statusColors": [
-      {
-        "status": "To Do",
-        "colorPalette": "gray"
-      },
-      {
-        "status": "In Progress",
-        "colorPalette": "blue"
-      },
-      {
-        "status": "In Review",
-        "colorPalette": "purple"
-      },
-      {
-        "status": "Done",
-        "colorPalette": "green"
-      }
-    ],
-    "priorityColors": [
-      {
-        "priority": "Low",
-        "colorPalette": "gray"
-      },
-      {
-        "priority": "Medium",
-        "colorPalette": "blue"
-      },
-      {
-        "priority": "High",
-        "colorPalette": "orange"
-      },
-      {
-        "priority": "Urgent",
-        "colorPalette": "red"
-      }
-    ],
-    "projectStatusColors": [
-      {
-        "status": "Planning",
-        "colorPalette": "gray"
-      },
-      {
-        "status": "Active",
-        "colorPalette": "blue"
-      },
-      {
-        "status": "On Hold",
-        "colorPalette": "amber"
-      },
-      {
-        "status": "Completed",
-        "colorPalette": "green"
-      },
-      {
-        "status": "Archived",
-        "colorPalette": "gray"
-      }
-    ],
+    "statusColors": {
+      "To Do": "gray",
+      "In Progress": "blue",
+      "In Review": "purple",
+      "Done": "green"
+    },
+    "priorityColors": {
+      "Low": "gray",
+      "Medium": "blue",
+      "High": "orange",
+      "Urgent": "red"
+    },
+    "projectStatusColors": {
+      "Planning": "gray",
+      "Active": "blue",
+      "On Hold": "amber",
+      "Completed": "green",
+      "Archived": "gray"
+    },
     "subtasksExpandedByDefault": true
   },
   "hydrationTiers": [

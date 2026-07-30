@@ -2117,6 +2117,27 @@ collections:
         types: *root_components
         typeKey: blockType
 
+  # Sidenav title/description copy for each /settings/<slug> section page —
+  # not the settings values themselves (those live on the `configs`
+  # singleton, edited via /settings' own direct-commit forms, or in the
+  # `configs`/`pms` fields above). Fixed set of entries matching the app's
+  # hardcoded section slugs (app/lib/settings-sections.ts) — `create: false`
+  # since adding a 6th section also needs a new form/route in code, not just
+  # a CMS entry.
+  - name: settings
+    label: Settings
+    label_singular: Settings Section
+    folder: content/pages/settings
+    extension: json
+    format: json
+    create: false
+    delete: false
+    slug: "{{slug}}"
+    summary: "{{title}}"
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Description, name: description, widget: string }
+
 # Singletons - Single-instance config files, edited as one entry (not a list)
 # Docs: https://sveltiacms.app/en/docs/collections/singletons
 singletons:
@@ -2435,28 +2456,25 @@ singletons:
         fields:
           - label: Task Status Colors
             name: statusColors
-            widget: list
+            widget: keyvalue
             required: false
-            hint: "Overrides the accent color used for each task Status badge (table, board, and detail pages). Any status left out keeps its built-in default color."
-            fields:
-              - { label: Status, name: status, widget: select, options: *task_statuses }
-              - { label: Color Palette, name: colorPalette, widget: select, options: [gray, blue, green, red, orange, purple, cyan, amber] }
+            key_label: Status
+            value_label: Color Palette
+            hint: "Overrides the accent color used for each task Status badge (table, board, and detail pages). Key must exactly match a real status (To Do, In Progress, In Review, Done); value should be one of gray/blue/green/red/orange/purple/cyan/amber. Any status left out keeps its built-in default color — an unrecognized key or value is silently ignored rather than validated."
           - label: Task Priority Colors
             name: priorityColors
-            widget: list
+            widget: keyvalue
             required: false
-            hint: "Overrides the accent color used for each task Priority badge. Any priority left out keeps its built-in default color."
-            fields:
-              - { label: Priority, name: priority, widget: select, options: *task_priorities }
-              - { label: Color Palette, name: colorPalette, widget: select, options: [gray, blue, green, red, orange, purple, cyan, amber] }
+            key_label: Priority
+            value_label: Color Palette
+            hint: "Overrides the accent color used for each task Priority badge. Key must exactly match a real priority (Low, Medium, High, Urgent); value should be one of gray/blue/green/red/orange/purple/cyan/amber. Any priority left out keeps its built-in default color — an unrecognized key or value is silently ignored rather than validated."
           - label: Project Status Colors
             name: projectStatusColors
-            widget: list
+            widget: keyvalue
             required: false
-            hint: "Overrides the accent color used for each project Status badge. Any status left out keeps its built-in default color."
-            fields:
-              - { label: Status, name: status, widget: select, options: *project_statuses }
-              - { label: Color Palette, name: colorPalette, widget: select, options: [gray, blue, green, red, orange, purple, cyan, amber] }
+            key_label: Status
+            value_label: Color Palette
+            hint: "Overrides the accent color used for each project Status badge. Key must exactly match a real project status (Planning, Active, On Hold, Completed, Archived); value should be one of gray/blue/green/red/orange/purple/cyan/amber. Any status left out keeps its built-in default color — an unrecognized key or value is silently ignored rather than validated."
           - label: Subtasks Expanded By Default
             name: subtasksExpandedByDefault
             widget: boolean

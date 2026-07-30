@@ -1,0 +1,4 @@
+{
+  "title": "CMS Admin",
+  "description": "Sveltia CMS's own bootstrap config (public/admin/config.yml) — backend connection, i18n locales, and media storage paths."
+}

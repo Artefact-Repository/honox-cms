@@ -62,7 +62,6 @@ const dataSources: Record<string, DataSourceResolver> = {
 		const statusColor = mergeColorOverrides(
 			TASK_STATUS_COLOR,
 			config.pms?.statusColors,
-			"status",
 		);
 		return TASK_STATUSES.map((status) => ({
 			label: status,
@@ -77,7 +76,6 @@ const dataSources: Record<string, DataSourceResolver> = {
 		const priorityColor = mergeColorOverrides(
 			TASK_PRIORITY_COLOR,
 			config.pms?.priorityColors,
-			"priority",
 		);
 		return TASK_PRIORITIES.map((priority) => ({
 			label: priority,
@@ -128,12 +126,10 @@ const customTableDataResolvers: Record<string, CustomTableDataResolver> = {
 		const statusColors = mergeColorOverrides(
 			TASK_STATUS_COLOR,
 			config.pms?.statusColors,
-			"status",
 		);
 		const priorityColors = mergeColorOverrides(
 			TASK_PRIORITY_COLOR,
 			config.pms?.priorityColors,
-			"priority",
 		);
 		const subtasksExpandedByDefault =
 			config.pms?.subtasksExpandedByDefault ?? true;

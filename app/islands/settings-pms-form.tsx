@@ -76,15 +76,9 @@ export default function PmsSettingsForm({ initial }: PmsSettingsFormProps) {
 				{
 					pms: {
 						subtasksExpandedByDefault: form.subtasksExpandedByDefault,
-						statusColors: Object.entries(form.statusColors).map(
-							([status, colorPalette]) => ({ status, colorPalette }),
-						),
-						priorityColors: Object.entries(form.priorityColors).map(
-							([priority, colorPalette]) => ({ priority, colorPalette }),
-						),
-						projectStatusColors: Object.entries(
-							form.projectStatusColors,
-						).map(([status, colorPalette]) => ({ status, colorPalette })),
+						statusColors: form.statusColors,
+						priorityColors: form.priorityColors,
+						projectStatusColors: form.projectStatusColors,
 					},
 				},
 				"Update PMS settings",

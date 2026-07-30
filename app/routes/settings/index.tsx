@@ -1,133 +1,105 @@
-// Editable overview of every site-wide setting stored on the `configs`
-// singleton (content/configs.json) — homepage/branding, blog, docs, and PMS
-// (projects/tasks) behavior. Each card below is a client island that saves
-// straight to the git host via app/utils/settings-save.ts (same direct-commit
-// path as the tasks/projects editors) — no separate backend, same as every
-// other collection. The singleton is also still fully editable through the
-// CMS itself (public/admin/config.yml's `singletons: configs`); this page
-// exists so these specific, frequently-tweaked values don't require opening
-// the full CMS entry.
-import { readFileSync } from "node:fs";
-import path from "node:path";
+// /settings — sidenav shell (every section from the "settings" CMS
+// collection, content/pages/settings/<slug>.json) defaulting to the
+// "Homepage & Branding" section. Each section's actual editable values still
+// live on the `configs` singleton (content/configs.json), saved straight to
+// the git host via app/utils/settings-save.ts — same direct-commit path as
+// the tasks/projects editors — see app/components/settings-section-form.tsx
+// for the slug → form mapping shared with app/routes/settings/[section].tsx.
 import { css } from "design-system/css";
 import { createRoute } from "honox/factory";
-import { parseDocument } from "yaml";
 import { PageRenderer } from "../../components/page-renderer";
-import { Card } from "../../components/ui";
+import { renderSettingsSectionForm } from "../../components/settings-section-form";
+import { Card, Layout, type LayoutProps } from "../../components/ui";
 import { Toaster } from "../../components/ui/toast";
 import AuthStatus from "../../islands/auth-status";
 import SettingsAuthBanner from "../../islands/settings-auth-banner";
-import BlogSettingsForm from "../../islands/settings-blog-form";
-import CmsAdminSettingsForm from "../../islands/settings-cms-admin-form";
-import DocsSettingsForm from "../../islands/settings-docs-form";
-import HomeSettingsForm from "../../islands/settings-home-form";
-import PmsSettingsForm from "../../islands/settings-pms-form";
-import { loadDocsConfig } from "../../lib/configs";
 import { loadPage } from "../../lib/pages";
-import { mergeColorOverrides } from "../../lib/pms-config";
-import { PROJECT_STATUS_COLOR } from "../../lib/projects";
-import { TASK_PRIORITY_COLOR, TASK_STATUS_COLOR } from "../../lib/tasks";
+import { loadAllSettingsSections } from "../../lib/settings-sections";
 
-/** Reads public/admin/config.yml straight off disk — this only ever runs at
- * build time (every route handler here executes once per static page during
- * `vite build`, see app/lib/configs.ts's module comment on the SSG model),
- * never in the deployed static site, so plain Node fs access is safe. Vite's
- * `import.meta.glob` can't reach this file since it lives under `public/`,
- * which Vite deliberately excludes from its module graph (that's the whole
- * reason this file has to be read as YAML off disk instead of imported like
- * content/configs.json). `maxAliasCount: -1` disables the parser's default
- * anti-DoS alias limit (100) — this file's page-builder component schema
- * reuses far more anchors than that (same reason git-backend.ts's
- * getRepoConfig needs the same option to read this file client-side). */
-function loadCmsAdminSettingsFromDisk() {
-	const filePath = path.join(process.cwd(), "public/admin/config.yml");
-	const raw = readFileSync(filePath, "utf-8");
-	const doc = parseDocument(raw, { maxAliasCount: -1 });
-	// `maxAliasCount` on parseDocument only bounds the parse step — toJS()
-	// re-checks it independently when resolving aliases into plain values,
-	// so it has to be passed here too or this throws on this exact file.
-	const data = doc.toJS({ maxAliasCount: -1 }) as {
-		backend?: { name?: string; repo?: string; branch?: string; base_url?: string };
-		i18n?: {
-			structure?: string;
-			locales?: string[];
-			default_locale?: string;
-			omit_default_locale_from_file_path?: boolean;
-		};
-		media_folder?: string;
-		public_folder?: string;
-	};
-	return {
-		backend: {
-			name: data.backend?.name ?? "github",
-			repo: data.backend?.repo ?? "",
-			branch: data.backend?.branch ?? "main",
-			baseUrl: data.backend?.base_url ?? "",
-		},
-		i18n: {
-			structure: data.i18n?.structure ?? "multiple_folders",
-			locales: data.i18n?.locales ?? ["en"],
-			defaultLocale: data.i18n?.default_locale ?? "en",
-			omitDefaultLocaleFromFilePath:
-				data.i18n?.omit_default_locale_from_file_path ?? true,
-		},
-		media: {
-			mediaFolder: data.media_folder ?? "/public/media",
-			publicFolder: data.public_folder ?? "/media",
-		},
-	};
+/** Flat list of every settings section — no groups needed (unlike docs'
+ * sidenav), so this is much simpler than DocsSidenav. Duplicated (not
+ * imported) into app/routes/settings/[section].tsx, matching this repo's
+ * established preference for each settings/docs route staying fully
+ * self-contained rather than sharing a nav shell component (see
+ * app/routes/docs/index.tsx's module comment). */
+function SettingsSidenav({
+	sections,
+	activeSlug,
+}: {
+	sections: { slug: string; title: string }[];
+	activeSlug: string;
+}) {
+	return (
+		<nav class={css({ display: "flex", flexDirection: "column", gap: "0.5" })}>
+			{sections.map((section) => {
+				const isActive = section.slug === activeSlug;
+				const href =
+					section.slug === "home" ? "/settings" : `/settings/${section.slug}`;
+				return (
+					<a
+						key={section.slug}
+						href={href}
+						aria-current={isActive ? "page" : undefined}
+						class={css({
+							display: "block",
+							px: "3",
+							py: { base: "2.5", md: "1.5" },
+							borderRadius: "md",
+							fontSize: "sm",
+							textDecoration: "none",
+							color: isActive ? "fg" : "fg.muted",
+							bg: isActive ? "blue.4" : "transparent",
+							fontWeight: isActive ? "semibold" : "normal",
+							_hover: { bg: isActive ? "blue.4" : "bg.subtle", color: "fg" },
+						})}
+					>
+						{section.title}
+					</a>
+				);
+			})}
+		</nav>
+	);
 }
 
+const settingsShellProps = {
+	fullHeight: true,
+	stickyHeader: true,
+	stickySider: true,
+	siderHideBelow: "md",
+	mobileNav: true,
+	mobileNavLabel: "Menu",
+	class: css({ bg: "bg.canvas" }),
+	headerClass: css({
+		borderBottomWidth: "1px",
+		borderColor: { _light: "white.a4", _dark: "black.a4" },
+		bg: { _light: "white.a7", _dark: "black.a7" },
+		backdropFilter: "blur(20px) saturate(180%)",
+	}),
+	bodyClass: css({
+		maxWidth: "5xl",
+		width: "full",
+		mx: "auto",
+		px: { base: "4", md: "6", lg: "8" },
+		py: { base: "8", md: "12" },
+		gap: "8",
+	}),
+	siderClass: css({ top: "20", maxH: "calc(100vh - 6rem)" }),
+} satisfies Partial<LayoutProps>;
+
 export default createRoute(async (c) => {
-	const [config, data] = await Promise.all([
-		loadDocsConfig("en"),
+	const [sections, pageData, form] = await Promise.all([
+		loadAllSettingsSections(),
 		loadPage("settings", "en", { currentUrl: c.req.url }).then(
 			(page) => page ?? { content: [] },
 		),
+		renderSettingsSectionForm("home"),
 	]);
-	const cmsAdmin = loadCmsAdminSettingsFromDisk();
-	const home = config.home ?? {};
-	const blog = config.blog ?? {};
-	const docsUi = config.docsUi ?? {};
-	const docsCfg = config.docs ?? {};
-	const pms = config.pms ?? {};
-
-	const statusColor = mergeColorOverrides(
-		TASK_STATUS_COLOR,
-		pms.statusColors,
-		"status",
-	);
-	const priorityColor = mergeColorOverrides(
-		TASK_PRIORITY_COLOR,
-		pms.priorityColors,
-		"priority",
-	);
-	const projectStatusColor = mergeColorOverrides(
-		PROJECT_STATUS_COLOR,
-		pms.projectStatusColors,
-		"status",
-	);
-	const groupsSummary =
-		config.groups.length > 0
-			? config.groups.map((g) => g.label).join(", ")
-			: "—";
+	const home = sections.find((s) => s.slug === "home");
 
 	return c.render(
-		<>
-			<title>{data.title ?? "Settings - Artefact"}</title>
-			<Toaster />
-
-			<header
-				class={css({
-					borderBottomWidth: "1px",
-					borderColor: { _light: "white.a4", _dark: "black.a4" },
-					bg: { _light: "white.a7", _dark: "black.a7" },
-					backdropFilter: "blur(20px) saturate(180%)",
-					position: "sticky",
-					top: "0",
-					zIndex: "10",
-				})}
-			>
+		<Layout
+			{...settingsShellProps}
+			header={
 				<div
 					class={css({
 						maxWidth: "5xl",
@@ -142,124 +114,36 @@ export default createRoute(async (c) => {
 						gap: "4",
 					})}
 				>
-					<PageRenderer content={data.headerBrand ?? []} />
-
+					<PageRenderer content={pageData.headerBrand ?? []} />
 					<nav class={css({ display: "flex", gap: "6", alignItems: "center" })}>
-						<PageRenderer content={data.headerNav ?? []} />
-						<PageRenderer content={data.headerActions ?? []} />
+						<PageRenderer content={pageData.headerNav ?? []} />
+						<PageRenderer content={pageData.headerActions ?? []} />
 						<AuthStatus />
 					</nav>
 				</div>
-			</header>
+			}
+			sider={<SettingsSidenav sections={sections} activeSlug="home" />}
+			mobileNavActions={<AuthStatus />}
+			content={
+				<>
+					<title>{pageData.title ?? "Settings - Artefact"}</title>
+					<Toaster />
 
-			<div
-				class={css({
-					py: { base: "8", md: "12" },
-					px: { base: "4", md: "6", lg: "8" },
-					maxWidth: "5xl",
-					mx: "auto",
-					display: "flex",
-					flexDirection: "column",
-					gap: "6",
-				})}
-			>
-				<div>
-					<PageRenderer content={data.content ?? []} />
-				</div>
+					<PageRenderer content={pageData.content ?? []} />
 
-				<SettingsAuthBanner />
+					<SettingsAuthBanner />
 
-				<Card
-					variant="outline"
-					title="Homepage & Branding"
-					description="Header brand name, <title> fallback, and footer content shown across the site."
-					headerClass={css({ p: "5", pb: "3" })}
-					bodyClass={css({ p: "5", pt: "0" })}
-				>
-					<HomeSettingsForm
-						initial={{
-							brandName: home.brandName ?? "",
-							titleFallback: home.titleFallback ?? "",
-							footerCopyright: home.footerCopyright ?? "",
-							footerLinks: (home.footerLinks ?? []).map((link) => ({
-								label: link.label,
-								href: link.href,
-								colorPalette: link.colorPalette || "gray",
-							})),
-						}}
-					/>
-				</Card>
-
-				<Card
-					variant="outline"
-					title="Blog"
-					description="Post byline display and the /blog newsletter widget's copy."
-					headerClass={css({ p: "5", pb: "3" })}
-					bodyClass={css({ p: "5", pt: "0" })}
-				>
-					<BlogSettingsForm
-						initial={{
-							showAuthor: blog.showAuthor !== false,
-							showReadTime: blog.showReadTime !== false,
-							excludeUntranslatedFromSearch:
-								blog.excludeUntranslatedFromSearch === true,
-							newsletterHeading: blog.newsletterHeading ?? "",
-							newsletterDescription: blog.newsletterDescription ?? "",
-						}}
-					/>
-				</Card>
-
-				<Card
-					variant="outline"
-					title="Docs"
-					description="Sidenav grouping and doc-page chrome for the /docs section."
-					headerClass={css({ p: "5", pb: "3" })}
-					bodyClass={css({ p: "5", pt: "0" })}
-				>
-					<DocsSettingsForm
-						initial={{
-							showHydrationTierBadge: docsCfg.showHydrationTierBadge !== false,
-							fallbackLabel: config.fallbackLabel || "Other",
-							docOrder: config.docOrder ?? [],
-							docsUi: {
-								edit: docsUi.edit ?? "Edit",
-								admin: docsUi.admin ?? "Admin",
-								menu: docsUi.menu ?? "Menu",
-								previous: docsUi.previous ?? "Previous",
-								next: docsUi.next ?? "Next",
-							},
-						}}
-						groupsSummary={groupsSummary}
-					/>
-				</Card>
-
-				<Card
-					variant="outline"
-					title="PMS (Projects & Tasks)"
-					description="Accent colors for status/priority badges across /tasks and /projects, and the subtask tree's default state."
-					headerClass={css({ p: "5", pb: "3" })}
-					bodyClass={css({ p: "5", pt: "0" })}
-				>
-					<PmsSettingsForm
-						initial={{
-							subtasksExpandedByDefault: pms.subtasksExpandedByDefault !== false,
-							statusColors: statusColor,
-							priorityColors: priorityColor,
-							projectStatusColors: projectStatusColor,
-						}}
-					/>
-				</Card>
-
-				<Card
-					variant="outline"
-					title="CMS Admin"
-					description="Sveltia CMS's own bootstrap config (public/admin/config.yml) — backend connection, i18n locales, and media storage paths."
-					headerClass={css({ p: "5", pb: "3" })}
-					bodyClass={css({ p: "5", pt: "0" })}
-				>
-					<CmsAdminSettingsForm initial={cmsAdmin} />
-				</Card>
-			</div>
-		</>,
+					<Card
+						variant="outline"
+						title={home?.title ?? "Homepage & Branding"}
+						description={home?.description}
+						headerClass={css({ p: "5", pb: "3" })}
+						bodyClass={css({ p: "5", pt: "0" })}
+					>
+						{form}
+					</Card>
+				</>
+			}
+		/>,
 	);
 });
