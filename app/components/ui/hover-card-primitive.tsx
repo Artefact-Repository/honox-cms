@@ -14,10 +14,14 @@ import { getArrowRotation, getArrowStyle } from "./overlay-position";
 
 type HoverCardStyles = ReturnType<typeof hoverCard>;
 
-// Positioner always renders below-left of the trigger (see Positioner below),
-// so the arrow is fixed to "bottom" placement — there's no dynamic flipping.
+// Positioner always renders below the trigger (see Positioner below), so the
+// arrow is fixed to "bottom" placement — there's no dynamic flipping. Its
+// cross-axis alignment must still match the Positioner's own `align`
+// ("start" hangs the box off the trigger's left edge, "end" off its right),
+// or the arrow ends up offset from the wrong edge of the box entirely.
 const ARROW_OFFSET = "16px";
-const PLACEMENT_CONFIG = { align: "start", arrowOffset: ARROW_OFFSET } as const;
+const getPlacementConfig = (align: "start" | "end") =>
+	({ align, arrowOffset: ARROW_OFFSET }) as const;
 
 export interface HoverCardContextValue {
 	id: string;
@@ -216,12 +220,13 @@ export function Arrow(props: PropsWithChildren<{ class?: string }>) {
 	const { children, class: classProp, ...restProps } = props;
 	const context = useHoverCardContext();
 	const styles = context?.styles || hoverCard();
+	const align = context?.align ?? "start";
 	return (
 		<div
 			class={cx(styles.arrow, classProp)}
 			data-scope="hover-card"
 			data-part="arrow"
-			style={getArrowStyle("bottom", PLACEMENT_CONFIG)}
+			style={getArrowStyle("bottom", getPlacementConfig(align))}
 			{...restProps}
 		>
 			{children || <ArrowTip />}
