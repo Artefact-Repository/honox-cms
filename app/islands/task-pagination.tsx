@@ -13,6 +13,7 @@ const FILTER_HIDDEN_ATTRS = [
 	"data-status-hidden",
 	"data-priority-hidden",
 	"data-assignee-hidden",
+	"data-project-hidden",
 ];
 
 function isFilteredOut(row: HTMLTableRowElement): boolean {
@@ -159,8 +160,9 @@ export default function TaskPagination({
 
 		// Two independent kinds of DOM change need to trigger a recompute, not
 		// just the initial one above:
-		// (1) TaskStatusFilter/TaskPriorityFilter/TaskAssigneeFilter (sibling
-		//     islands) each toggle their own `data-*-hidden` attribute on rows
+		// (1) TaskStatusFilter/TaskPriorityFilter/TaskAssigneeFilter/
+		//     TaskProjectFilter (sibling islands) each toggle their own
+		//     `data-*-hidden` attribute on rows
 		//     whenever the user changes a filter — that's exactly what should
 		//     shrink/grow the page count.
 		// (2) TaskTreeDnd (another sibling, wrapping the table) hydrates by
@@ -174,7 +176,7 @@ export default function TaskPagination({
 		//     defined order, so reacting to the replacement itself — rather
 		//     than assuming a fixed timing — is what actually makes this
 		//     reliable instead of racy.
-		// `attributeFilter` is deliberately just the three filter attributes
+		// `attributeFilter` is deliberately just the filter attributes above
 		// (not `data-page-hidden`), so this observer can't self-trigger on its
 		// own writes.
 		const observer = new MutationObserver(recompute);

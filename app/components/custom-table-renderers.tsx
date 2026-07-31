@@ -142,6 +142,7 @@ function TasksTable(data: Partial<TasksTableData>) {
 							"data-task-status": task.status,
 							"data-task-priority": task.priority,
 							"data-task-assignee": task.assignee || "",
+							"data-task-project": task.project || "",
 							"data-order-key": entry?.orderKey ?? 0,
 							"data-depth": depth,
 							"data-root-index": entry?.rootIndex ?? 0,
