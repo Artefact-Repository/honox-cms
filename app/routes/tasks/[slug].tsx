@@ -258,6 +258,7 @@ export default createRoute(
 							rows={8}
 							slug={task.slug}
 							field="body"
+							markdown
 						/>
 					)}
 

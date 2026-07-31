@@ -17,6 +17,8 @@ import { toaster } from "../components/ui/toast";
 import { CheckIcon } from "../icons/check";
 import { CloseIcon } from "../icons/close";
 import { EditIcon } from "../icons/edit";
+import { markdownToHtml } from "../utils/markdown";
+import { markdownContentClass } from "../utils/markdown-content-style";
 import { saveTaskField } from "../utils/task-save";
 
 export interface TaskEditableTextProps {
@@ -37,6 +39,9 @@ export interface TaskEditableTextProps {
 	 * the server-rendered parent. */
 	slug: string;
 	field: "title" | "body";
+	/** Renders the preview (non-editing) state as formatted markdown instead
+	 * of plain text — the raw source is still what the textarea edits. */
+	markdown?: boolean;
 }
 
 const controlsClass = css({
@@ -71,6 +76,13 @@ export default function TaskEditableText(props: TaskEditableTextProps) {
 	const savedValue = useRef(props.value);
 	const rootRef = useRef<HTMLDivElement>(null);
 	const Wrapper = props.as ?? "div";
+	// Recomputed on every render (not memoized), but gated on `!editing` so it
+	// doesn't reparse on every keystroke — the preview is hidden while editing
+	// anyway.
+	const previewHtml =
+		props.markdown && !editing && value.trim() !== ""
+			? markdownToHtml(value)
+			: undefined;
 
 	const handleSubmit = () => {
 		setEditing(false);
@@ -121,7 +133,12 @@ export default function TaskEditableText(props: TaskEditableTextProps) {
 				onSetValue={setValue}
 			>
 				<Area>
-					<Preview class={props.textClass} />
+					<Preview
+						class={cx(props.textClass, props.markdown && markdownContentClass)}
+						dangerouslySetInnerHTML={
+							previewHtml !== undefined ? { __html: previewHtml } : undefined
+						}
+					/>
 					<Input class={props.textClass} />
 				</Area>
 				<Control class={controlsClass}>
