@@ -5,6 +5,7 @@ import { Search } from "../../components/ui";
 import { Toaster } from "../../components/ui/toast";
 import AuthStatus from "../../islands/auth-status";
 import PmsCreateMenu from "../../islands/pms-create-menu";
+import TaskPriorityFilter from "../../islands/task-priority-filter";
 import TaskStatusFilter from "../../islands/task-status-filter";
 import { loadPage } from "../../lib/pages";
 import { listProjects } from "../../lib/projects";
@@ -36,13 +37,30 @@ export default createRoute(async (c) => {
 				(child) => child.blockType === "text" && child.content === "Status",
 			),
 	);
+	const priorityBlockIndex = originalContent.findIndex(
+		(block) =>
+			block.blockType === "stack" &&
+			block.children?.some(
+				(child) => child.blockType === "text" && child.content === "Priority",
+			),
+	);
 
-	let contentBefore = originalContent;
-	let contentAfter: typeof originalContent = [];
+	let part1 = originalContent;
+	let part2: typeof originalContent = [];
+	let part3: typeof originalContent = [];
 
-	if (statusBlockIndex !== -1) {
-		contentBefore = originalContent.slice(0, statusBlockIndex);
-		contentAfter = originalContent.slice(statusBlockIndex + 1);
+	if (statusBlockIndex !== -1 && priorityBlockIndex !== -1) {
+		const firstIdx = Math.min(statusBlockIndex, priorityBlockIndex);
+		const secondIdx = Math.max(statusBlockIndex, priorityBlockIndex);
+		part1 = originalContent.slice(0, firstIdx);
+		part2 = originalContent.slice(firstIdx + 1, secondIdx);
+		part3 = originalContent.slice(secondIdx + 1);
+	} else if (statusBlockIndex !== -1) {
+		part1 = originalContent.slice(0, statusBlockIndex);
+		part3 = originalContent.slice(statusBlockIndex + 1);
+	} else if (priorityBlockIndex !== -1) {
+		part1 = originalContent.slice(0, priorityBlockIndex);
+		part3 = originalContent.slice(priorityBlockIndex + 1);
 	}
 
 	return c.render(
@@ -52,7 +70,8 @@ export default createRoute(async (c) => {
 			<style
 				dangerouslySetInnerHTML={{
 					__html: `
-						tr[data-status-hidden="true"] {
+						tr[data-status-hidden="true"],
+						tr[data-priority-hidden="true"] {
 							display: none !important;
 						}
 					`,
@@ -133,7 +152,7 @@ export default createRoute(async (c) => {
 					mx: "auto",
 				})}
 			>
-				<PageRenderer content={contentBefore} />
+				<PageRenderer content={part1} />
 
 				{statusBlockIndex !== -1 && (
 					<div
@@ -160,7 +179,34 @@ export default createRoute(async (c) => {
 					</div>
 				)}
 
-				<PageRenderer content={contentAfter} />
+				<PageRenderer content={part2} />
+
+				{priorityBlockIndex !== -1 && (
+					<div
+						class={css({
+							display: "flex",
+							alignItems: "center",
+							gap: "2",
+							marginBottom: "2rem",
+						})}
+					>
+						<span
+							class={css({
+								fontSize: "xs",
+								fontWeight: "600",
+								textTransform: "uppercase",
+								letterSpacing: "0.05em",
+								color: "#71717a",
+								minWidth: "64px",
+							})}
+						>
+							Priority
+						</span>
+						<TaskPriorityFilter />
+					</div>
+				)}
+
+				<PageRenderer content={part3} />
 			</div>
 		</>,
 	);
