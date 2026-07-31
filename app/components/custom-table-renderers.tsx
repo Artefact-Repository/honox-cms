@@ -14,6 +14,7 @@ import TaskCloneAction from "../islands/task-clone-action";
 import TaskDeleteConfirm from "../islands/task-delete-confirm";
 import TaskDetailsDrawer from "../islands/task-details-drawer";
 import TaskEditAction from "../islands/task-edit-action";
+import TaskPagination from "../islands/task-pagination";
 import TaskRowActionsMenu from "../islands/task-row-actions-menu";
 import TaskTreeDnd from "../islands/task-tree-dnd";
 import TaskTreeToggle from "../islands/task-tree-toggle";
@@ -33,16 +34,11 @@ import { formatDate } from "../utils/date";
 import { Anchor, Avatar, Badge, DisplayValue, Stack, Table, Text } from "./ui";
 import type { ColorPalette } from "./ui/color-palette";
 import { colorPaletteClass } from "./ui/color-palette";
-import {
-	NextTrigger,
-	PaginationItems,
-	Root as PaginationRoot,
-	PrevTrigger,
-} from "./ui/pagination-primitive";
 
 const treeRowClass = css({
 	'&[data-tree-hidden="true"]': { display: "none" },
 	'&[data-status-hidden="true"]': { display: "none" },
+	'&[data-page-hidden="true"]': { display: "none" },
 });
 
 const treeToggleClass = css({
@@ -74,7 +70,12 @@ const dragHandleClass = css({
 
 interface TasksTableData {
 	tasks: Task[];
-	taskTree: TaskTreeEntry[];
+	/** Each entry carries a 0-indexed `rootIndex` — see `computeTaskTreePages`
+	 * in app/lib/tasks.ts — that TaskPagination reads off the rendered
+	 * `<tr>`'s `data-root-index` to chunk rows into pages entirely
+	 * client-side, including re-chunking around whatever a status/priority/
+	 * assignee filter currently hides. */
+	taskTree: (TaskTreeEntry & { rootIndex: number })[];
 	projectBySlug: Record<string, Project>;
 	projectTitleBySlug: Record<string, string>;
 	matchedSlugs: string[];
@@ -86,14 +87,9 @@ interface TasksTableData {
 	statusColors: Record<TaskStatus, ColorPalette>;
 	priorityColors: Record<TaskPriority, ColorPalette>;
 	subtasksExpandedByDefault: boolean;
-	/** Root-subtree pagination — see `paginateTaskTree` in app/lib/tasks.ts.
-	 * `isPaginated` is false while a search (`?q=`) is active, since search
-	 * needs every task's row present in the DOM to be found. */
-	page: number;
 	totalPages: number;
 	totalRootCount: number;
 	pageSize: number;
-	isPaginated: boolean;
 }
 
 function TasksTable(data: Partial<TasksTableData>) {
@@ -108,11 +104,8 @@ function TasksTable(data: Partial<TasksTableData>) {
 	const priorityColor = data.priorityColors ?? TASK_PRIORITY_COLOR;
 	const subtasksExpandedByDefault = data.subtasksExpandedByDefault ?? true;
 	const initialExpanded = subtasksExpandedByDefault ? "true" : "false";
-	const page = data.page ?? 1;
 	const totalPages = data.totalPages ?? 1;
-	const totalRootCount = data.totalRootCount ?? 0;
 	const pageSize = data.pageSize ?? TASKS_PAGE_SIZE;
-	const isPaginated = data.isPaginated ?? false;
 
 	if (tasks.length === 0) {
 		return <Text class={css({ color: "fg.muted" })}>No tasks yet.</Text>;
@@ -150,6 +143,7 @@ function TasksTable(data: Partial<TasksTableData>) {
 							"data-task-priority": task.priority,
 							"data-order-key": entry?.orderKey ?? 0,
 							"data-depth": depth,
+							"data-root-index": entry?.rootIndex ?? 0,
 							...(entry && depth > 0
 								? { "data-parent-slug": task.parentTask }
 								: {}),
@@ -378,21 +372,7 @@ function TasksTable(data: Partial<TasksTableData>) {
 					)}
 				/>
 			</TaskTreeDnd>
-			{isPaginated && totalPages > 1 && (
-				<div class={css({ display: "flex", justifyContent: "center", mt: "4" })}>
-					<PaginationRoot
-						type="link"
-						count={totalRootCount}
-						pageSize={pageSize}
-						page={page}
-						getPageUrl={({ page: targetPage }) => `/tasks?page=${targetPage}`}
-					>
-						<PrevTrigger />
-						<PaginationItems />
-						<NextTrigger />
-					</PaginationRoot>
-				</div>
-			)}
+			<TaskPagination totalPages={totalPages} pageSize={pageSize} />
 			<TaskDetailsDrawer
 				tasks={tasks}
 				projectTitleBySlug={projectTitleBySlug}

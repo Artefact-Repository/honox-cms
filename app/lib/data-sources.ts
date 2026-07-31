@@ -13,8 +13,8 @@ import { listProjects } from "./projects";
 import {
 	buildTaskSearchEntries,
 	buildTaskTree,
+	computeTaskTreePages,
 	listTasks,
-	paginateTaskTree,
 	TASK_PRIORITIES,
 	TASK_PRIORITY_COLOR,
 	TASK_STATUS_COLOR,
@@ -146,30 +146,26 @@ const customTableDataResolvers: Record<string, CustomTableDataResolver> = {
 			(entry) => entry.key,
 		);
 
-		// Pagination is skipped while searching — the whole tree needs to stay
-		// in the DOM for the Search island (and the no-JS ?q= fallback above)
-		// to find matches outside the current page, so a search "expands" to
-		// every result rather than being confined to one page of it.
-		const isSearching = searchQuery.trim().length > 0;
-		const requestedPage = ctx.currentUrl
-			? Number(new URL(ctx.currentUrl).searchParams.get("page") ?? "1")
-			: 1;
-		const paginated = isSearching
-			? {
-					entries: taskTree,
-					page: 1,
-					totalPages: 1,
-					totalRootCount: taskTree.filter((entry) => entry.depth === 0).length,
-				}
-			: paginateTaskTree(
-					taskTree,
-					Number.isFinite(requestedPage) ? requestedPage : 1,
-					TASKS_PAGE_SIZE,
-				);
+		// This site is a static (SSG) build — there's no per-request server to
+		// read a `?page=` query param at render time (see wrangler.jsonc: an
+		// assets-only deploy, no Worker), so every row renders here regardless
+		// of page, and `app/islands/task-pagination.tsx` toggles which page's
+		// rows are visible client-side — same reasoning as the Search island's
+		// `?q=` handling. This just stamps each row with which root-subtree
+		// group it belongs to, so that island can chunk pages (and re-chunk
+		// them around whatever a status/priority/assignee filter hides).
+		const { rootIndexByIndex, totalPages, totalRootCount } = computeTaskTreePages(
+			taskTree,
+			TASKS_PAGE_SIZE,
+		);
+		const pagedTaskTree = taskTree.map((entry, index) => ({
+			...entry,
+			rootIndex: rootIndexByIndex[index],
+		}));
 
 		return {
 			tasks,
-			taskTree: paginated.entries,
+			taskTree: pagedTaskTree,
 			projectBySlug: Object.fromEntries(projectBySlug),
 			projectTitleBySlug: Object.fromEntries(projectTitleBySlug),
 			matchedSlugs,
@@ -181,11 +177,9 @@ const customTableDataResolvers: Record<string, CustomTableDataResolver> = {
 			statusColors,
 			priorityColors,
 			subtasksExpandedByDefault,
-			page: paginated.page,
-			totalPages: paginated.totalPages,
-			totalRootCount: paginated.totalRootCount,
+			totalPages,
+			totalRootCount,
 			pageSize: TASKS_PAGE_SIZE,
-			isPaginated: !isSearching,
 		};
 	},
 };

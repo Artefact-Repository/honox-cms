@@ -274,6 +274,14 @@ export function InteractiveSearch(props: SearchBaseProps) {
 					emptyState.hidden = matches.length !== 0;
 				}
 			}
+			// Lets an unrelated island filtering the same elements (e.g.
+			// task-pagination.tsx, which pages the same `filterAttribute` rows)
+			// know a search is active, without coupling the two directly.
+			window.dispatchEvent(
+				new CustomEvent("search:filter", {
+					detail: { filterAttribute, query, matchCount: matches.length },
+				}),
+			);
 		}
 		if (syncUrl) {
 			const url = new URL(window.location.href);

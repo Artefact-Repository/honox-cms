@@ -238,44 +238,52 @@ export function buildTaskTree(tasks: Task[]): TaskTreeEntry[] {
 	return entries;
 }
 
-/** Root tasks rendered per page of the `/tasks` table's pagination — see
- * `paginateTaskTree`. */
+/** Root tasks per page of the `/tasks` table's pagination — see
+ * `computeTaskTreePages`. */
 export const TASKS_PAGE_SIZE = 25;
 
-export interface PaginatedTaskTree {
-	entries: TaskTreeEntry[];
-	/** Clamped into `[1, totalPages]`, so an out-of-range `?page=` (stale
-	 * link, hand-edited URL) degrades to the nearest valid page instead of
-	 * rendering empty. */
-	page: number;
+export interface TaskTreePages {
+	/** 0-indexed root-subtree group per `taskTree` entry, same array
+	 * length/order — a root task and all of its (recursively) nested
+	 * subtasks always share their root's index, since `buildTaskTree`'s
+	 * pre-order walk keeps each subtree contiguous. Stamped as
+	 * `data-root-index` (custom-table-renderers.tsx) so
+	 * `app/islands/task-pagination.tsx` can chunk rows into pages entirely
+	 * client-side — including *re*-chunking around whichever root tasks a
+	 * status/priority/assignee filter currently hides, which a fixed page
+	 * number computed once here can't do (those filters are independent
+	 * islands that hide rows well after this runs). */
+	rootIndexByIndex: number[];
+	/** Initial page count assuming no filter is active — just what an
+	 * unfiltered SSR paint (and the pre-hydration flash before
+	 * task-pagination.tsx's own effect recomputes it) should show. */
 	totalPages: number;
 	/** Root (depth 0) task count — what pagination is measured in, not the
 	 * flat entry count, so a page always holds whole subtrees. */
 	totalRootCount: number;
 }
 
-/** Slices `taskTree` (from `buildTaskTree`) into `pageSize` root subtrees per
- * page — a root task and all of its (recursively) nested subtasks always
- * land on the same page together, since `buildTaskTree`'s pre-order walk
- * keeps each subtree contiguous. */
-export function paginateTaskTree(
+/** Annotates (rather than slices) `taskTree` with which root-subtree group
+ * each entry belongs to. This site is a fully static (SSG) build — deployed
+ * as plain files with no per-request server, see wrangler.jsonc's asset-only
+ * config — so unlike a typical `?page=` query param, there's no request to
+ * read a page number from at render time: every row has to ship in the one
+ * prerendered HTML file, and an island toggles which page's rows are visible
+ * client-side (same reasoning as `InteractiveSearch`'s `?q=` handling in
+ * app/islands/search.tsx). */
+export function computeTaskTreePages(
 	taskTree: TaskTreeEntry[],
-	page: number,
 	pageSize: number,
-): PaginatedTaskTree {
-	const rootIndices: number[] = [];
+): TaskTreePages {
+	const rootIndexByIndex: number[] = new Array(taskTree.length);
+	let totalRootCount = 0;
 	taskTree.forEach((entry, index) => {
-		if (entry.depth === 0) rootIndices.push(index);
+		if (entry.depth === 0) totalRootCount++;
+		rootIndexByIndex[index] = totalRootCount - 1;
 	});
-	const totalRootCount = rootIndices.length;
-	const totalPages = Math.max(1, Math.ceil(totalRootCount / pageSize));
-	const clampedPage = Math.min(Math.max(1, page), totalPages);
-	const startIndex = rootIndices[(clampedPage - 1) * pageSize] ?? taskTree.length;
-	const endIndex = rootIndices[clampedPage * pageSize] ?? taskTree.length;
 	return {
-		entries: taskTree.slice(startIndex, endIndex),
-		page: clampedPage,
-		totalPages,
+		rootIndexByIndex,
+		totalPages: Math.max(1, Math.ceil(totalRootCount / pageSize)),
 		totalRootCount,
 	};
 }
