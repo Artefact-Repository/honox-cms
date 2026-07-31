@@ -1,5 +1,5 @@
 ---
-title: LLM Assist — natural-language editing of existing tasks & projects
+title: "[LLM Assist] natural-language editing of existing tasks & projects"
 project: pms-llm
 status: To Do
 priority: Medium

@@ -1,5 +1,5 @@
 ---
-title: LLM Assist — AI draft in the task write-up drawer
+title: "[LLM Assist] AI draft in the task write-up drawer"
 project: pms-llm
 status: To Do
 priority: High

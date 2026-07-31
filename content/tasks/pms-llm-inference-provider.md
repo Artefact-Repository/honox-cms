@@ -1,5 +1,5 @@
 ---
-title: LLM Assist — shared local-inference provider util
+title: "[LLM Assist] shared local-inference provider util"
 project: pms-llm
 status: To Do
 priority: Medium

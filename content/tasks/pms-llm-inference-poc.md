@@ -1,5 +1,5 @@
 ---
-title: LLM Assist — in-browser ONNX inference proof-of-concept (prod build)
+title: "[LLM Assist] in-browser ONNX inference proof-of-concept (prod build)"
 project: pms-llm
 status: To Do
 priority: High

@@ -1,5 +1,5 @@
 ---
-title: LLM Assist — review/edit grid for LLM-extracted tasks before commit
+title: "[LLM Assist] review/edit grid for LLM-extracted tasks before commit"
 project: pms-llm
 status: To Do
 priority: Medium

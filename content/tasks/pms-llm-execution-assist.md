@@ -1,5 +1,5 @@
 ---
-title: LLM Assist — AI execution assist on the task detail page
+title: "[LLM Assist] AI execution assist on the task detail page"
 project: pms-llm
 status: To Do
 priority: Medium

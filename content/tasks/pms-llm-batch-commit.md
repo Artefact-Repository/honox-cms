@@ -1,5 +1,5 @@
 ---
-title: LLM Assist — batched git commit for bulk-generated task/project files
+title: "[LLM Assist] batched git commit for bulk-generated task/project files"
 project: pms-llm
 status: To Do
 priority: Medium

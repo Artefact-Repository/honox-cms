@@ -1,5 +1,5 @@
 ---
-title: LLM Assist — bulk-create tasks from a roadmap/implementation doc
+title: "[LLM Assist] bulk-create tasks from a roadmap/implementation doc"
 project: pms-llm
 status: To Do
 priority: High

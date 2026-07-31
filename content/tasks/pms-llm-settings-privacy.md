@@ -1,5 +1,5 @@
 ---
-title: LLM Assist — settings, opt-in, and privacy notice
+title: "[LLM Assist] settings, opt-in, and privacy notice"
 project: pms-llm
 status: To Do
 priority: Medium

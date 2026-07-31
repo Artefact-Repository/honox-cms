@@ -1,5 +1,5 @@
 ---
-title: LLM Assist — document the local-inference feature (and avoid doc drift)
+title: "[LLM Assist] document the local-inference feature (and avoid doc drift)"
 project: pms-llm
 status: To Do
 priority: Low
