@@ -408,13 +408,11 @@ export function Preview(props: PreviewProps) {
 	// always trips its "only one of children or dangerouslySetInnerHTML"
 	// guard.
 	if (dangerouslySetInnerHTML) {
-		// biome-ignore lint/a11y/useSemanticElements: preview sits next to the input in the same area slot; Ark UI renders it as a plain element with role="button" too
 		return (
 			<span {...spanProps} dangerouslySetInnerHTML={dangerouslySetInnerHTML} />
 		);
 	}
 	return (
-		// biome-ignore lint/a11y/useSemanticElements: preview sits next to the input in the same area slot; Ark UI renders it as a plain element with role="button" too
 		<span {...spanProps}>
 			{context?.tags
 				? parseTags(context.value).map((tag) => (
