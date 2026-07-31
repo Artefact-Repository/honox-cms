@@ -77,7 +77,7 @@ See [content/docs/Architecture.md](content/docs/Architecture.md) (served at `/do
 
 ## Projects & Tasks (PMS example)
 
-A small Git-backed project management example, showing the same content-as-JSON/Markdown pattern used for pages and posts applied to a different domain — projects in `content/projects/*.json`, tasks in `content/tasks/*.md`. Both collections are editable via `/admin/` like any other CMS collection; there's no database and no drag-and-drop (the site is statically generated, so board changes are Git commits).
+A small Git-backed project management example, showing the same content-as-Markdown pattern used for pages and posts applied to a different domain — projects in `content/projects/*.md`, tasks in `content/tasks/*.md`. Both collections are editable via `/admin/` like any other CMS collection; there's no database and no drag-and-drop (the site is statically generated, so board changes are Git commits).
 
 - **`/projects`** — list of projects with live progress bars (done/total tasks per project), computed from `content/tasks/*.md`.
 - **`/projects/:slug`** — a single project's board/list view of its tasks.
@@ -222,7 +222,7 @@ content/posts/       # Blog post markdown files
 content/posts/<locale>/ # Translated posts, e.g. content/posts/zh/getting-started-with-honox.md
 content/pages/       # Page builder JSON layouts (index.json is the homepage; blog.json/docs.json are just title+intro content for /blog and /docs, not their header — see content/docs/PageBuilder.md)
 content/pages/<locale>/ # Translated page layouts, e.g. content/pages/zh/index.json
-content/projects/    # PMS example — project JSON files
+content/projects/    # PMS example — project markdown files
 content/tasks/       # PMS example — task markdown files
 public/admin/        # Sveltia CMS static files
   config.yml          # CMS configuration

@@ -133,15 +133,15 @@ collections:
       - { label: Body, name: body, widget: markdown, i18n: true }
 
   # Git-backed project management: projects + tasks. Not i18n (operational
-  # data, not marketing content) — plain JSON, one file per entry, no
-  # locale subfolders. `tasks.project` is this config's first use of the
+  # data, not marketing content) — markdown+frontmatter, one file per entry,
+  # no locale subfolders. `tasks.project` is this config's first use of the
   # `relation` widget, referencing `projects` by slug.
   - name: projects
     label: Projects
     label_singular: Project
     folder: /content/projects
-    extension: json
-    format: json
+    extension: md
+    format: frontmatter
     create: true
     slug: "{{slug}}"
     summary: "{{title}} — {{status}}"
@@ -152,7 +152,6 @@ collections:
     fields:
       - { label: Title, name: title, widget: string }
       - { label: Summary, name: summary, widget: string, hint: "One-line summary shown on the project card" }
-      - { label: Description, name: description, widget: text, required: false }
       - label: Status
         name: status
         widget: select
@@ -168,6 +167,7 @@ collections:
       - { label: Start Date, name: startDate, widget: datetime, type: date, required: false, default: "" }
       - { label: Due Date, name: dueDate, widget: datetime, type: date, required: false, default: "" }
       - { label: Tags, name: tags, widget: list, required: false }
+      - { label: Description, name: body, widget: markdown, required: false }
 
   - name: tasks
     label: Tasks

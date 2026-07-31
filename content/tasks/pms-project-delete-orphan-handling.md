@@ -12,7 +12,7 @@ tags:
   - engineering
 ---
 
-Deleting a project as specced in the Delete Project task will remove `content/projects/${slug}.json`, but every task that belongs to it keeps a dangling reference: a task's `project` field is the project slug as a plain string (a Sveltia `relation` widget resolved to `{{slug}}`, see `content/docs/PMS.md` and `app/lib/tasks.ts`), and `listTasksByProject(projectSlug)` just filters `task.project === projectSlug`. After the delete, those tasks still render under a project that no longer exists — the project detail page would 404, board/list filters by that project return empty, and any "View project →" link (e.g. `app/routes/tasks/[slug].tsx` line ~226) dangles.
+Deleting a project as specced in the Delete Project task will remove `content/projects/${slug}.md`, but every task that belongs to it keeps a dangling reference: a task's `project` field is the project slug as a plain string (a Sveltia `relation` widget resolved to `{{slug}}`, see `content/docs/PMS.md` and `app/lib/tasks.ts`), and `listTasksByProject(projectSlug)` just filters `task.project === projectSlug`. After the delete, those tasks still render under a project that no longer exists — the project detail page would 404, board/list filters by that project return empty, and any "View project →" link (e.g. `app/routes/tasks/[slug].tsx` line ~226) dangles.
 
 Make delete safe before it ships:
 

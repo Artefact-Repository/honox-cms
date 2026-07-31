@@ -1,15 +1,17 @@
 import type { ColorPalette } from "../components/ui/color-palette";
+import { parseFrontmatter } from "../utils/markdown";
 
-// Projects content lives under content/projects/*.json, one file per entry —
-// same glob-by-filename convention as app/lib/pages.ts, but flat (no i18n:
-// this is operational data, not translated marketing content).
+// Projects content lives under content/projects/*.md, one file per entry —
+// same markdown+frontmatter convention as app/lib/tasks.ts, but flat (no
+// i18n: this is operational data, not translated marketing content).
 const projectModules = (
 	typeof import.meta.glob === "function"
-		? import.meta.glob("/content/projects/*.json", {
+		? import.meta.glob("/content/projects/*.md", {
+				query: "?raw",
 				import: "default",
 			})
 		: {}
-) as Record<string, () => Promise<unknown>>;
+) as Record<string, () => Promise<string>>;
 
 export type ProjectStatus =
 	| "Planning"
@@ -61,25 +63,28 @@ export interface Project {
 }
 
 function slugFromPath(path: string): string {
-	const match = path.match(/^\/content\/projects\/([^/]+)\.json$/);
+	const match = path.match(/^\/content\/projects\/([^/]+)\.md$/);
 	if (!match) throw new Error(`Unexpected project content path: ${path}`);
 	return match[1]!;
 }
 
 async function loadProject(path: string): Promise<Project> {
 	const loader = projectModules[path]!;
-	const data = (await loader()) as Partial<Project>;
+	const raw = await loader();
+	const { data, content } = parseFrontmatter(raw);
+	const slug = slugFromPath(path);
+	const description = content.trim();
 	return {
-		slug: slugFromPath(path),
-		title: data.title ?? slugFromPath(path),
-		summary: data.summary ?? "",
-		description: data.description,
+		slug,
+		title: (data.title as string) ?? slug,
+		summary: (data.summary as string) ?? "",
+		description: description || undefined,
 		status: (data.status as ProjectStatus) ?? "Planning",
 		colorPalette: (data.colorPalette as ColorPalette) ?? "gray",
-		owner: data.owner,
-		startDate: data.startDate,
-		dueDate: data.dueDate,
-		tags: data.tags ?? [],
+		owner: data.owner as string | undefined,
+		startDate: data.startDate as string | undefined,
+		dueDate: data.dueDate as string | undefined,
+		tags: (data.tags as string[]) ?? [],
 	};
 }
 
@@ -94,7 +99,7 @@ export async function listProjects(): Promise<Project[]> {
 export async function loadProjectBySlug(
 	slug: string,
 ): Promise<Project | undefined> {
-	const path = `/content/projects/${slug}.json`;
+	const path = `/content/projects/${slug}.md`;
 	if (!projectModules[path]) return undefined;
 	return loadProject(path);
 }

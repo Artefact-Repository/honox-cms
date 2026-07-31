@@ -1,8 +1,9 @@
 // Direct-commit create path for the projects collection — same
-// fetch/check/write flow as app/utils/task-save.ts, just writing plain JSON
-// (content/projects/*.json, see app/lib/projects.ts) instead of
-// frontmatter+markdown.
+// fetch/check/write flow as app/utils/task-save.ts, writing
+// frontmatter+markdown (content/projects/*.md, see app/lib/projects.ts) the
+// same way task-save.ts does.
 import { createFile, fileExists, requireToken } from "./git-backend";
+import { stringifyFrontmatter } from "./markdown";
 import { slugify } from "./slug";
 
 export class ProjectSaveError extends Error {}
@@ -26,12 +27,12 @@ export interface NewProjectInput {
 	tags: string[];
 }
 
-/** Creates `content/projects/{slug}.json` straight on the git host, same
+/** Creates `content/projects/{slug}.md` straight on the git host, same
  * direct-commit path as `createTask`. */
 export async function createProject(input: NewProjectInput): Promise<string> {
 	const token = requireToken();
 	const slug = slugifyProjectTitle(input.title);
-	const path = `content/projects/${slug}.json`;
+	const path = `content/projects/${slug}.md`;
 
 	if (await fileExists(path, token)) {
 		throw new ProjectSaveError(
@@ -45,15 +46,12 @@ export async function createProject(input: NewProjectInput): Promise<string> {
 		status: input.status,
 		colorPalette: input.colorPalette,
 	};
-	if (input.description) data.description = input.description;
 	if (input.owner) data.owner = input.owner;
 	if (input.startDate) data.startDate = input.startDate;
 	if (input.dueDate) data.dueDate = input.dueDate;
 	if (input.tags.length > 0) data.tags = input.tags;
 
-	// Tab-indented to match the CMS's own JSON output (see any file under
-	// content/projects/).
-	const content = `${JSON.stringify(data, null, "\t")}\n`;
+	const content = stringifyFrontmatter(data, input.description ?? "");
 	await createFile(path, content, `Create project "${input.title}"`, token);
 	return slug;
 }

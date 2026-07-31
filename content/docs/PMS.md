@@ -4,7 +4,7 @@ title: Projects & Tasks (PMS Example)
 
 `/projects` and `/tasks` are a small **Git-backed project management example** — a second, differently-shaped content collection built on the exact same "content lives as files, CMS edits the files, SSG renders the files" pattern as the blog and Page Builder, to show that pattern isn't specific to marketing pages.
 
-Projects live as flat JSON in `content/projects/*.json`; tasks live as markdown-with-frontmatter in `content/tasks/*.md` (so a task's description can be real formatted markdown, like a blog post's body). Both collections are ordinary Sveltia CMS collections, editable at `/admin/` (**Projects** / **Tasks**) exactly like posts or pages. There is no database, no server-side write endpoint, and no drag-and-drop persistence layer in the usual sense — see "Direct-to-Git Writes" below for how board/inline edits actually get committed.
+Both projects and tasks live as markdown-with-frontmatter — `content/projects/*.md` and `content/tasks/*.md` — so each entry's description can be real formatted markdown, like a blog post's body. Both collections are ordinary Sveltia CMS collections, editable at `/admin/` (**Projects** / **Tasks**) exactly like posts or pages. There is no database, no server-side write endpoint, and no drag-and-drop persistence layer in the usual sense — see "Direct-to-Git Writes" below for how board/inline edits actually get committed.
 
 ---
 
@@ -27,23 +27,24 @@ All eight routes are statically generated (`ssgParams` enumerates every project/
 
 ## Content Shape
 
-### Projects (`content/projects/*.json`)
+### Projects (`content/projects/*.md`)
 
-```json
-{
-  "title": "Website Redesign",
-  "summary": "Refresh the marketing site's visual language.",
-  "description": "Full rebuild of the public site on the new design system.",
-  "status": "Active",
-  "colorPalette": "blue",
-  "owner": "Priya Shah",
-  "startDate": "2026-06-01",
-  "dueDate": "2026-09-15",
-  "tags": ["design", "web"]
-}
+```markdown
+---
+title: Website Redesign
+summary: Refresh the marketing site's visual language.
+status: Active
+colorPalette: blue
+owner: Priya Shah
+startDate: 2026-06-01
+dueDate: 2026-09-15
+tags: [design, web]
+---
+
+Full rebuild of the public site on the new design system.
 ```
 
-`status` is one of `Planning` / `Active` / `On Hold` / `Completed` / `Archived`; `colorPalette` drives the project's badge/progress-bar accent (`PROJECT_STATUS_COLOR` in `app/lib/projects.ts` also maps each status to a default color for badges elsewhere). Loaded via `listProjects()` / `loadProjectBySlug()` / `listProjectSlugs()`.
+`status` is one of `Planning` / `Active` / `On Hold` / `Completed` / `Archived`; `colorPalette` drives the project's badge/progress-bar accent (`PROJECT_STATUS_COLOR` in `app/lib/projects.ts` also maps each status to a default color for badges elsewhere). The markdown body is the project description, parsed with the same frontmatter/markdown pipeline as tasks (`app/utils/markdown.ts`). Loaded via `listProjects()` / `loadProjectBySlug()` / `listProjectSlugs()`.
 
 ### Tasks (`content/tasks/*.md`)
 
@@ -80,7 +81,7 @@ This mirrors exactly how Sveltia CMS itself publishes when `backend` isn't confi
 
 **Backend support**: GitHub, GitLab (gitlab.com or self-hosted via `base_url`), and Gitea/Forgejo (self-hosted, `base_url` required) — the same three Sveltia itself supports, read from `backend.name`/`backend.repo`/`backend.branch`/`backend.base_url` in `public/admin/config.yml` (fetched at runtime, not duplicated in app code, so it can't drift). GitHub and gitlab.com serve permissive CORS headers so this works with no extra setup; a self-hosted Gitea/Forgejo instance needs CORS enabled by its admin or every request fails as an opaque network error.
 
-**Write model**: every edit does a read-modify-write against the Contents API — fetch the current file + blob SHA, patch just the field that changed (frontmatter for tasks, whole JSON for projects), `PUT`/`POST`/`DELETE` it back with a descriptive commit message (e.g. `Move "Migrate color tokens to v2" to Done`). A conflicting SHA (someone else committed to the same file first) surfaces as "File changed on the remote since it was last read — reload and retry," rather than silently overwriting. Every commit lands on `main` directly — there's no PR/preview step — so the edit is only "live" once the static site rebuilds and redeploys.
+**Write model**: every edit does a read-modify-write against the Contents API — fetch the current file + blob SHA, patch just the field that changed (frontmatter for both tasks and projects), `PUT`/`POST`/`DELETE` it back with a descriptive commit message (e.g. `Move "Migrate color tokens to v2" to Done`). A conflicting SHA (someone else committed to the same file first) surfaces as "File changed on the remote since it was last read — reload and retry," rather than silently overwriting. Every commit lands on `main` directly — there's no PR/preview step — so the edit is only "live" once the static site rebuilds and redeploys.
 
 If no token is available yet, editors fall back to a **read-only state with a link into `/admin/`** so the underlying content can still be changed the normal CMS way.
 
