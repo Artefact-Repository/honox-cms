@@ -39,7 +39,8 @@ export function ComboboxRoot(props: ComboboxProps) {
 		rest.inputValue !== undefined ||
 		rest.onToggle !== undefined ||
 		rest.onInputChange !== undefined ||
-		rest.onItemSelect !== undefined;
+		rest.onItemSelect !== undefined ||
+		rest.multiple !== undefined;
 	const isInteractive = shouldHydrate(interactive, hasSignal);
 
 	if (isInteractive) {

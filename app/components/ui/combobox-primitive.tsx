@@ -23,7 +23,7 @@ export interface ComboboxContextValue {
 	open: boolean;
 	inputValue: string;
 	searchQuery?: string;
-	selectedValue?: string;
+	selectedValue?: string | string[];
 	highlightedIndex: number;
 	items: ComboboxItem[];
 	rootId: string;
@@ -31,6 +31,7 @@ export interface ComboboxContextValue {
 	invalid?: boolean;
 	readOnly?: boolean;
 	required?: boolean;
+	multiple?: boolean;
 	errorText?: Child;
 	onToggle?: () => void;
 	onClose?: () => void;
@@ -63,13 +64,14 @@ export interface RootProps extends ComboboxVariantProps, PropsWithChildren {
 	open?: boolean;
 	inputValue?: string;
 	searchQuery?: string;
-	selectedValue?: string;
+	selectedValue?: string | string[];
 	highlightedIndex?: number;
 	items?: ComboboxItem[];
 	disabled?: boolean;
 	invalid?: boolean;
 	readOnly?: boolean;
 	required?: boolean;
+	multiple?: boolean;
 	errorText?: Child;
 	onToggle?: () => void;
 	onClose?: () => void;
@@ -96,6 +98,7 @@ export function Root(props: RootProps) {
 		invalid,
 		readOnly,
 		required,
+		multiple,
 		errorText,
 		onToggle,
 		onClose,
@@ -116,6 +119,7 @@ export function Root(props: RootProps) {
 		closeOnSelect: _closeOnSelect,
 		helperText: _helperText,
 		onValueChange: _onValueChange,
+		multiple: _multipleLeak,
 		...domProps
 	} = rest;
 
@@ -137,6 +141,7 @@ export function Root(props: RootProps) {
 				invalid,
 				readOnly,
 				required,
+				multiple,
 				errorText,
 				onToggle,
 				onClose,
@@ -433,7 +438,9 @@ export function Item(
 	const currentItemValue = itemValue ?? value;
 	const isSelected =
 		context?.selectedValue !== undefined
-			? context.selectedValue === currentItemValue
+			? Array.isArray(context.selectedValue)
+				? context.selectedValue.includes(currentItemValue)
+				: context.selectedValue === currentItemValue
 			: context?.inputValue === value;
 
 	return (
@@ -485,7 +492,9 @@ export function ItemText(
 	const currentItemValue = itemValue ?? textValue;
 	const isSelected =
 		context?.selectedValue !== undefined
-			? context.selectedValue === currentItemValue
+			? Array.isArray(context.selectedValue)
+				? context.selectedValue.includes(currentItemValue)
+				: context.selectedValue === currentItemValue
 			: context?.inputValue === textValue;
 	const isHighlighted = context?.highlightedIndex === index;
 
@@ -518,7 +527,9 @@ export function ItemIndicator(
 	const currentItemValue = itemValue ?? textValue;
 	const isSelected =
 		context?.selectedValue !== undefined
-			? context.selectedValue === currentItemValue
+			? Array.isArray(context.selectedValue)
+				? context.selectedValue.includes(currentItemValue)
+				: context.selectedValue === currentItemValue
 			: context?.inputValue === textValue;
 
 	return (
@@ -689,26 +700,33 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 		highlightedIndex: highlightedIndexProp,
 		id: idProp,
 		items = [],
-		closeOnSelect = true,
+		closeOnSelect,
 		name,
 		value: valueProp,
 		defaultValue: defaultValueProp,
 		onValueChange,
+		multiple,
 		...rest
 	} = props;
 
 	// Manage controlled/uncontrolled selected value
-	const [localSelectedValue, setLocalSelectedValue] = useState(
-		valueProp ?? defaultValueProp ?? "",
-	);
+	const [localSelectedValue, setLocalSelectedValue] = useState<string | string[]>(() => {
+		const val = valueProp ?? defaultValueProp;
+		return multiple
+			? (Array.isArray(val) ? val : (val ? [val as string] : []))
+			: (val as string ?? "");
+	});
 	const isValueControlled = valueProp !== undefined;
 	const selectedValue = isValueControlled ? valueProp : localSelectedValue;
 
-	// Find initial input text based on selected value
-	const initialItem = items.find((item) => item.value === selectedValue);
-	const initialInputValue = initialItem
-		? initialItem.label
-		: (inputValueProp ?? "");
+	// Find initial input text based on selected value (empty for multiple)
+	const initialInputValue = multiple
+		? (inputValueProp ?? "")
+		: (() => {
+				const val = isValueControlled ? valueProp : localSelectedValue;
+				const initialItem = items.find((item) => item.value === val);
+				return initialItem ? initialItem.label : (inputValueProp ?? "");
+			})();
 
 	const [isOpen, setIsOpen] = useState(openProp ?? false);
 	const [inputValue, setInputValue] = useState(initialInputValue);
@@ -778,17 +796,40 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 	};
 
 	const handleItemSelect = (label: string, val: string) => {
-		if (!isValueControlled) {
-			setLocalSelectedValue(val);
+		if (multiple) {
+			const currentList = Array.isArray(selectedValue) ? selectedValue : [];
+			const nextList = currentList.includes(val)
+				? currentList.filter((item) => item !== val)
+				: [...currentList, val];
+
+			if (!isValueControlled) {
+				setLocalSelectedValue(nextList);
+			}
+			setInputValue("");
+			setSearchQuery("");
+			setHighlightedIndex(-1);
+
+			const closeOnSelectAttr = closeOnSelect ?? false;
+			if (!isControlled && closeOnSelectAttr) {
+				setIsOpen(false);
+			}
+
+			props.onItemSelect?.(val);
+			onValueChange?.(nextList);
+		} else {
+			if (!isValueControlled) {
+				setLocalSelectedValue(val);
+			}
+			setInputValue(label);
+			setSearchQuery(""); // clear search query on selection
+			setHighlightedIndex(-1);
+			const closeOnSelectAttr = closeOnSelect ?? true;
+			if (!isControlled && closeOnSelectAttr) {
+				setIsOpen(false);
+			}
+			props.onItemSelect?.(val);
+			onValueChange?.(val);
 		}
-		setInputValue(label);
-		setSearchQuery(""); // clear search query on selection
-		setHighlightedIndex(-1);
-		if (!isControlled) {
-			setIsOpen(false);
-		}
-		props.onItemSelect?.(val);
-		onValueChange?.(val);
 	};
 
 	const handleSetHighlightedIndex = (index: number) => {
@@ -813,14 +854,18 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 	// Sync inputValue with controlled valueProp changes
 	useEffect(() => {
 		if (valueProp !== undefined) {
-			const matchingItem = items.find((item) => item.value === valueProp);
-			if (matchingItem) {
-				setInputValue(matchingItem.label);
-			} else {
+			if (multiple) {
 				setInputValue("");
+			} else {
+				const matchingItem = items.find((item) => item.value === valueProp);
+				if (matchingItem) {
+					setInputValue(matchingItem.label);
+				} else {
+					setInputValue("");
+				}
 			}
 		}
-	}, [valueProp, items]);
+	}, [valueProp, items, multiple]);
 
 	// Scroll highlighted item into view automatically
 	useEffect(() => {
@@ -875,10 +920,10 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 				}
 				handleInputChangeRef.current("");
 				if (!isValueControlled) {
-					setLocalSelectedValue("");
+					setLocalSelectedValue(multiple ? [] : "");
 				}
 				props.onItemSelect?.("");
-				onValueChange?.("");
+				onValueChange?.(multiple ? [] : "");
 			} else if (dataPart === "item") {
 				const label = target.getAttribute("data-value") || "";
 				const val = target.getAttribute("data-item-value") || label;
@@ -886,7 +931,7 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 					'[data-part="input"]',
 				) as HTMLInputElement | null;
 				if (inputElement) {
-					inputElement.value = label;
+					inputElement.value = multiple ? "" : label;
 				}
 				handleItemSelectRef.current?.(label, val);
 			}
@@ -1000,7 +1045,7 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 							'[data-part="input"]',
 						) as HTMLInputElement;
 						if (input) {
-							input.value = label;
+							input.value = multiple ? "" : label;
 						}
 						handleItemSelectRef.current(label, val);
 					}
@@ -1049,7 +1094,7 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 			}
 		};
 		// `filteredItems` deliberately excluded — see `filteredItemsRef` above.
-	}, [rootId]);
+	}, [rootId, multiple]);
 
 	return (
 		<Root
@@ -1067,8 +1112,17 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 			onInputChange={handleInputChange}
 			onItemSelect={handleItemSelect}
 			setHighlightedIndex={setHighlightedIndex}
+			multiple={multiple}
 		>
-			{name && <input type="hidden" name={name} value={selectedValue} />}
+			{name && (
+				Array.isArray(selectedValue) ? (
+					selectedValue.map((val) => (
+						<input type="hidden" name={name} value={val} key={val} />
+					))
+				) : (
+					<input type="hidden" name={name} value={selectedValue} />
+				)
+			)}
 			<ComboboxStructure {...props} />
 		</Root>
 	);

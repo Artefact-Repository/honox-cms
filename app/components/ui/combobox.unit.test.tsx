@@ -162,4 +162,30 @@ describe("Combobox Unit Tests", () => {
 		expect(rootTag).not.toContain("helperText=");
 		expect(rootTag).not.toContain("errorText=");
 	});
+
+	test("should support multiple prop and render correct selections/inputs", () => {
+		const html = (
+			<Combobox
+				interactive={true}
+				multiple={true}
+				name="frameworks"
+				defaultValue={["react", "solid"]}
+				items={[
+					{ label: "React", value: "react" },
+					{ label: "Solid", value: "solid" },
+					{ label: "Vue", value: "vue" },
+				]}
+			/>
+		).toString();
+
+		expect(html).toContain('name="frameworks"');
+		expect(html).toContain('value="react"');
+		expect(html).toContain('value="solid"');
+		// When multiple, initial input text remains clear (empty value)
+		expect(html).toContain('data-part="input"');
+		// Correct checked states for items
+		expect(html).toContain('data-value="React" data-item-value="react" data-state="checked"');
+		expect(html).toContain('data-value="Solid" data-item-value="solid" data-state="checked"');
+		expect(html).toContain('data-value="Vue" data-item-value="vue" data-state="unchecked"');
+	});
 });
