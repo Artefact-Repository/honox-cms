@@ -6,6 +6,7 @@ import { Dropdown } from "../components/ui/dropdown";
 import { toaster } from "../components/ui/toast";
 import { EllipsisIcon } from "../icons/ellipsis";
 import { convertTaskToTopLevel, TaskSaveError } from "../utils/task-save";
+import { useGitToken } from "./git-token-banner";
 import TaskCloneDialog from "./task-clone-dialog";
 import TaskDeleteDialog from "./task-delete-dialog";
 import TaskToProject, { type TaskToProjectProps } from "./task-to-project";
@@ -23,10 +24,16 @@ export interface TaskActionsMenuProps
 
 export default function TaskActionsMenu(props: TaskActionsMenuProps) {
 	const { editHref, parentTask, tasks, ...taskProps } = props;
+	// Every item in this menu is a direct-commit write (edit/clone/convert/
+	// delete) — same "no token → no button" gate as PmsCreateMenu, since
+	// there's nothing read-only left to offer once every action is removed.
+	const { token } = useGitToken();
 	const [convertOpen, setConvertOpen] = useState(false);
 	const [subtaskOpen, setSubtaskOpen] = useState(false);
 	const [cloneOpen, setCloneOpen] = useState(false);
 	const [deleteOpen, setDeleteOpen] = useState(false);
+
+	if (!token) return null;
 
 	const handleConvertToTopLevel = async () => {
 		try {

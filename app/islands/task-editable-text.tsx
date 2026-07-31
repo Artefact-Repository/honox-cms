@@ -20,6 +20,7 @@ import { EditIcon } from "../icons/edit";
 import { markdownToHtml } from "../utils/markdown";
 import { markdownContentClass } from "../utils/markdown-content-style";
 import { saveTaskField } from "../utils/task-save";
+import { useGitToken } from "./git-token-banner";
 
 export interface TaskEditableTextProps {
 	value: string;
@@ -64,6 +65,13 @@ const controlsClass = css({
 // sha, a rejected token) falls back to a link into the CMS instead of
 // silently losing the edit.
 export default function TaskEditableText(props: TaskEditableTextProps) {
+	// Same "no token → no edit affordance" gate as every other direct-commit
+	// editor (TaskActionsMenu, PmsCreateMenu, ...) — plus `activationMode:
+	// "none"` since Preview's own onClick/onFocus enters edit mode regardless
+	// of the `readOnly` prop (that prop only affects styling/aria, per
+	// editable-primitive.tsx).
+	const { token } = useGitToken();
+	const readOnly = !token;
 	const [value, setValue] = useState(props.value);
 	const [editing, setEditing] = useState(false);
 	const [dirty, setDirty] = useState(false);
@@ -115,6 +123,8 @@ export default function TaskEditableText(props: TaskEditableTextProps) {
 				rootRef={rootRef}
 				value={value}
 				edit={editing}
+				readOnly={readOnly}
+				activationMode={readOnly ? "none" : "focus"}
 				multiline={props.multiline}
 				rows={props.rows}
 				placeholder={{
@@ -141,17 +151,19 @@ export default function TaskEditableText(props: TaskEditableTextProps) {
 					/>
 					<Input class={props.textClass} />
 				</Area>
-				<Control class={controlsClass}>
-					<EditTrigger>
-						<EditIcon width="14" height="14" />
-					</EditTrigger>
-					<SubmitTrigger>
-						<CheckIcon width="14" height="14" />
-					</SubmitTrigger>
-					<CancelTrigger>
-						<CloseIcon width="14" height="14" />
-					</CancelTrigger>
-				</Control>
+				{!readOnly && (
+					<Control class={controlsClass}>
+						<EditTrigger>
+							<EditIcon width="14" height="14" />
+						</EditTrigger>
+						<SubmitTrigger>
+							<CheckIcon width="14" height="14" />
+						</SubmitTrigger>
+						<CancelTrigger>
+							<CloseIcon width="14" height="14" />
+						</CancelTrigger>
+					</Control>
+				)}
 			</EditableRoot>
 
 			{saving && (

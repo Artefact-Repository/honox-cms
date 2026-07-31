@@ -13,6 +13,7 @@ import {
 import { Toaster } from "../../components/ui/toast";
 import AuthStatus from "../../islands/auth-status";
 import TaskActionsMenu from "../../islands/task-actions-menu";
+import TaskEditHint from "../../islands/task-edit-hint";
 import TaskEditableText from "../../islands/task-editable-text";
 import TaskProjectEditor from "../../islands/task-project-editor";
 import TaskSubtasks from "../../islands/task-subtasks";
@@ -198,6 +199,8 @@ export default createRoute(
 							</Anchor>
 						</Text>
 					)}
+
+					<TaskEditHint />
 
 					<Stack align="start" gap="3" wrap="wrap" class={css({ mb: "4" })}>
 						<TaskEditableText

@@ -8,6 +8,7 @@ import type { ColorPalette } from "../components/ui/color-palette";
 import { Stack } from "../components/ui/stack";
 import { Text } from "../components/ui/text";
 import { TASK_STATUS_COLOR, type Task, type TaskStatus } from "../lib/tasks";
+import { useGitToken } from "./git-token-banner";
 import TaskCreateDrawer from "./task-create-drawer";
 
 export interface TaskSubtasksProps {
@@ -35,6 +36,10 @@ export default function TaskSubtasks({
 	tasks,
 	statusColors = TASK_STATUS_COLOR,
 }: TaskSubtasksProps) {
+	// Same "no token → no button" gate as PmsCreateMenu — creating a subtask is
+	// a direct-commit write, and read-only visitors already get the subtask
+	// list itself (below) with no editable affordance stripped from it.
+	const { token } = useGitToken();
 	const [open, setOpen] = useState(false);
 	const done = subtasks.filter((subtask) => subtask.status === "Done").length;
 
@@ -51,13 +56,15 @@ export default function TaskSubtasks({
 						</Badge>
 					)}
 				</Stack>
-				<button
-					type="button"
-					onClick={() => setOpen(true)}
-					class={cx(button({ variant: "outline", size: "sm" }))}
-				>
-					+ Add subtask
-				</button>
+				{token && (
+					<button
+						type="button"
+						onClick={() => setOpen(true)}
+						class={cx(button({ variant: "outline", size: "sm" }))}
+					>
+						+ Add subtask
+					</button>
+				)}
 			</Stack>
 
 			{subtasks.length === 0 ? (

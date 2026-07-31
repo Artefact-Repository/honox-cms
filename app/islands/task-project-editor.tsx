@@ -5,6 +5,7 @@ import { InteractiveCombobox } from "../components/ui/combobox-primitive";
 import { Text } from "../components/ui/text";
 import { toaster } from "../components/ui/toast";
 import { saveTaskField } from "../utils/task-save";
+import { useGitToken } from "./git-token-banner";
 
 export interface TaskProjectEditorProps {
 	value: string;
@@ -20,9 +21,24 @@ export interface TaskProjectEditorProps {
 // back to the same "local draft, link to the CMS" messaging if no token is
 // connected or the request fails.
 export default function TaskProjectEditor(props: TaskProjectEditorProps) {
+	// Same "no token → no edit affordance" gate as TaskEditableText — read-only
+	// visitors get the project name as plain text instead of a combobox with
+	// nothing behind it.
+	const { token } = useGitToken();
 	const [value, setValue] = useState(props.value);
 	const [dirty, setDirty] = useState(false);
 	const [saving, setSaving] = useState(false);
+
+	if (!token) {
+		const label =
+			props.projects.find((project) => project.value === props.value)?.label ??
+			props.value;
+		return (
+			<Text size="sm" class={css({ color: "fg.muted" })}>
+				{label}
+			</Text>
+		);
+	}
 
 	return (
 		<div class={css({ minWidth: "48", maxWidth: "sm" })}>
