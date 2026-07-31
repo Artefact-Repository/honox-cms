@@ -29,11 +29,28 @@ export default createRoute(async (c) => {
 		label: task.title,
 		value: task.slug,
 	}));
-	const assignees = [...new Set(tasks.map((task) => task.assignee).filter((assignee): assignee is string => !!assignee))].sort();
-	const projectTitleBySlug = new Map(projects.map((project) => [project.slug, project.title]));
-	const taskProjectSlugs = [...new Set(tasks.map((task) => task.project).filter((slug): slug is string => !!slug))];
+	const assignees = [
+		...new Set(
+			tasks
+				.map((task) => task.assignee)
+				.filter((assignee): assignee is string => !!assignee),
+		),
+	].sort();
+	const projectTitleBySlug = new Map(
+		projects.map((project) => [project.slug, project.title]),
+	);
+	const taskProjectSlugs = [
+		...new Set(
+			tasks
+				.map((task) => task.project)
+				.filter((slug): slug is string => !!slug),
+		),
+	];
 	const taskProjectItems = taskProjectSlugs
-		.map((slug) => ({ label: projectTitleBySlug.get(slug) ?? slug, value: slug }))
+		.map((slug) => ({
+			label: projectTitleBySlug.get(slug) ?? slug,
+			value: slug,
+		}))
 		.sort((a, b) => a.label.localeCompare(b.label));
 	const searchQuery = new URL(c.req.url).searchParams.get("q") || "";
 
@@ -62,7 +79,8 @@ export default createRoute(async (c) => {
 				(block) =>
 					block.blockType === "stack" &&
 					block.children?.some(
-						(child) => child.blockType === "text" && child.content === row.label,
+						(child) =>
+							child.blockType === "text" && child.content === row.label,
 					),
 			),
 		}))

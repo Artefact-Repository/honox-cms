@@ -90,7 +90,9 @@ export default function AiExtractionTest(props: AiExtractionTestProps) {
 					rows={16}
 					style="width: 100%; font-family: monospace;"
 					value={doc}
-					onInput={(e: Event) => setDoc((e.target as HTMLTextAreaElement).value)}
+					onInput={(e: Event) =>
+						setDoc((e.target as HTMLTextAreaElement).value)
+					}
 				/>
 			</label>
 
