@@ -11,4 +11,8 @@ tags:
   - infra
 ---
 
-Second major version of the internal design system: new color/typography tokens, audited components, and migration of existing consumers.
+Second major version of the internal design system:
+
+- New color/typography tokens
+- Audited components
+- Migration of existing consumers

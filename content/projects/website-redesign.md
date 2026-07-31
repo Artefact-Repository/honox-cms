@@ -11,4 +11,8 @@ tags:
   - design
 ---
 
-Full redesign of the public marketing site covering the homepage, navigation, and core landing pages, aimed at improving conversion and accessibility.
+Full redesign of the public marketing site, aimed at improving conversion and accessibility. Covers:
+
+- Homepage
+- Navigation
+- Core landing pages

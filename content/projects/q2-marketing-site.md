@@ -11,4 +11,4 @@ tags:
   - campaign
 ---
 
-Short-lived campaign microsite promoting the Q2 feature launch, retired after the campaign window closed.
+Short-lived campaign microsite promoting the Q2 feature launch — **retired** after the campaign window closed.

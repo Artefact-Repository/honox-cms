@@ -11,4 +11,8 @@ tags:
   - mobile
 ---
 
-Cross-functional launch project covering onboarding, push notifications, and store listings for the first mobile app release.
+Cross-functional launch project for the first mobile app release, covering:
+
+- Onboarding
+- Push notifications
+- Store listings

@@ -13,4 +13,9 @@ tags:
   - engineering
 ---
 
-Tracks work on app/components/ui — porting new components from Ark UI, the design-token/colorPalette rollout, the git-backed CMS tooling, and the outstanding hydration/i18n bugs surfaced while building all of the above.
+Tracks work on `app/components/ui`:
+
+- Porting new components from Ark UI
+- The design-token/`colorPalette` rollout
+- The git-backed CMS tooling
+- Outstanding hydration/i18n bugs surfaced while building all of the above

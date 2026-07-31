@@ -13,4 +13,10 @@ tags:
   - engineering
 ---
 
-Improvement programme for /docs covering navigation UX (on-this-page TOC, sidenav ordering), content gaps (quickstart tutorial, component recipe patterns, static JSON API reference), and i18n translation coverage across the six supported locales. The current guides are deep and accurate but read like postmortems; the goal is a new user going from clone to a custom deployed page in one session, and every long-form guide being navigable rather than a wall of prose.
+Improvement programme for `/docs` covering:
+
+- Navigation UX (on-this-page TOC, sidenav ordering)
+- Content gaps (quickstart tutorial, component recipe patterns, static JSON API reference)
+- i18n translation coverage across the six supported locales
+
+The current guides are deep and accurate but read like postmortems. **Goal:** a new user going from clone to a custom deployed page in one session, with every long-form guide navigable rather than a wall of prose.
