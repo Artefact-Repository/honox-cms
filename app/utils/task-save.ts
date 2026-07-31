@@ -116,7 +116,10 @@ export async function createTasksBulk(
 		const baseSlug = slugifyTaskTitle(item.title);
 		let cloneSlug = baseSlug;
 		let attempt = 2;
-		while (await fileExists(`content/tasks/${cloneSlug}.md`, token)) {
+		while (
+			(await fileExists(`content/tasks/${cloneSlug}.md`, token)) ||
+			filesToCommit.some((f) => f.path === `content/tasks/${cloneSlug}.md`)
+		) {
 			cloneSlug = `${baseSlug}-${attempt}`;
 			attempt += 1;
 		}
