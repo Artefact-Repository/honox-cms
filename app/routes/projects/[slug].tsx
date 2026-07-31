@@ -37,6 +37,7 @@ import {
 	type Task,
 } from "../../lib/tasks";
 import { formatDate } from "../../utils/date";
+import { markdownContentClass } from "../../utils/markdown-content-style";
 import { filterEntries } from "../../utils/search";
 
 export default createRoute(
@@ -219,10 +220,14 @@ export default createRoute(
 						</Badge>
 					</Stack>
 
-					{project.description && (
-						<Text class={css({ color: "fg.muted", mb: "4", maxWidth: "3xl" })}>
-							{project.description}
-						</Text>
+					{project.html && (
+						<div
+							class={cx(
+								markdownContentClass,
+								css({ mb: "4", maxWidth: "3xl" }),
+							)}
+							dangerouslySetInnerHTML={{ __html: project.html }}
+						/>
 					)}
 
 					<Stack gap="5" wrap="wrap" class={css({ mb: "6" })}>

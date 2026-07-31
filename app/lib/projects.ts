@@ -1,5 +1,5 @@
 import type { ColorPalette } from "../components/ui/color-palette";
-import { parseFrontmatter } from "../utils/markdown";
+import { markdownToHtml, parseFrontmatter } from "../utils/markdown";
 
 // Projects content lives under content/projects/*.md, one file per entry —
 // same markdown+frontmatter convention as app/lib/tasks.ts, but flat (no
@@ -62,6 +62,11 @@ export interface Project {
 	tags: string[];
 }
 
+/** `Project` plus the description rendered to HTML, for the detail page. */
+export interface ProjectDetail extends Project {
+	html: string;
+}
+
 function slugFromPath(path: string): string {
 	const match = path.match(/^\/content\/projects\/([^/]+)\.md$/);
 	if (!match) throw new Error(`Unexpected project content path: ${path}`);
@@ -98,10 +103,14 @@ export async function listProjects(): Promise<Project[]> {
 
 export async function loadProjectBySlug(
 	slug: string,
-): Promise<Project | undefined> {
+): Promise<ProjectDetail | undefined> {
 	const path = `/content/projects/${slug}.md`;
 	if (!projectModules[path]) return undefined;
-	return loadProject(path);
+	const project = await loadProject(path);
+	return {
+		...project,
+		html: project.description ? markdownToHtml(project.description) : "",
+	};
 }
 
 /** All project slugs, for ssgParams. */
