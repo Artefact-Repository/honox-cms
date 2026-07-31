@@ -2,7 +2,7 @@ import { cx } from "design-system/css";
 import { button } from "design-system/recipes";
 import { useEffect, useState } from "hono/jsx";
 import { Dropdown } from "../components/ui/dropdown";
-import { isWebGpuSupported } from "../utils/ai-engine";
+import { isAiAssistEnabled, isWebGpuSupported } from "../utils/ai-engine";
 import { useGitToken } from "./git-token-banner";
 import ProjectCreateDrawer from "./project-create-drawer";
 import TaskBulkCreate from "./task-bulk-create";
@@ -27,10 +27,15 @@ export default function PmsCreateMenu(props: PmsCreateMenuProps) {
 	const [taskOpen, setTaskOpen] = useState(false);
 	const [projectOpen, setProjectOpen] = useState(false);
 	const [bulkOpen, setBulkOpen] = useState(false);
+	// "webGpuSupported" gates the "Bulk Create (AI)" item — both device
+	// capability (WebGPU) and user opt-in (/settings/local-llm, default off)
+	// have to hold, since a supported device with the feature turned off
+	// should look identical to an unsupported one, not offer a disabled
+	// button that explains why.
 	const [webGpuSupported, setWebGpuSupported] = useState(false);
 
 	useEffect(() => {
-		setWebGpuSupported(isWebGpuSupported());
+		setWebGpuSupported(isWebGpuSupported() && isAiAssistEnabled());
 	}, []);
 
 	if (!token) return null;

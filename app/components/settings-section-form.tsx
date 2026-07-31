@@ -11,6 +11,7 @@ import BlogSettingsForm from "../islands/settings-blog-form";
 import CmsAdminSettingsForm from "../islands/settings-cms-admin-form";
 import DocsSettingsForm from "../islands/settings-docs-form";
 import HomeSettingsForm from "../islands/settings-home-form";
+import LocalLlmSettingsForm from "../islands/settings-local-llm-form";
 import PmsSettingsForm from "../islands/settings-pms-form";
 import { loadDocsConfig } from "../lib/configs";
 import { mergeColorOverrides } from "../lib/pms-config";
@@ -163,6 +164,9 @@ export async function renderSettingsSectionForm(slug: SettingsSectionSlug) {
 					descriptions={descriptions}
 				/>
 			);
+		}
+		case "local-llm": {
+			return <LocalLlmSettingsForm descriptions={descriptions} />;
 		}
 		case "cms-admin": {
 			return (

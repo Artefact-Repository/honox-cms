@@ -38,6 +38,7 @@ export const SETTINGS_SECTION_SLUGS = [
 	"blog",
 	"docs",
 	"pms",
+	"local-llm",
 	"cms-admin",
 ] as const;
 
@@ -58,6 +59,7 @@ const FALLBACK_TITLE: Record<SettingsSectionSlug, string> = {
 	blog: "Blog",
 	docs: "Docs",
 	pms: "PMS (Projects & Tasks)",
+	"local-llm": "Local AI Models",
 	"cms-admin": "CMS Admin",
 };
 

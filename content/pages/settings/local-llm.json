@@ -1,0 +1,16 @@
+{
+  "title": "Local AI Models",
+  "description": "Opt-in, on-device LLM assist for Projects & Tasks — runs entirely in your browser via WebGPU, nothing is ever sent to a server.",
+  "fields": [
+    {
+      "id": "aiAssistEnabled",
+      "label": "Enable local AI assist",
+      "description": "Turns on the \"Bulk Create (AI)\" entry point on /tasks and /projects. Off by default — downloads a multi-GB model to this browser the first time it runs. This is a per-browser preference, not committed to git."
+    },
+    {
+      "id": "aiAssistModel",
+      "label": "Model",
+      "description": "Which quantized instruct model to run locally. The 3B model gives better extraction quality; the 1.5B model is lighter for lower-end devices. Switching models re-downloads (or reuses a cached) model the next time AI assist runs."
+    }
+  ]
+}

@@ -151,6 +151,22 @@ export const DEFAULT_SETTINGS_FIELDS: SettingsFieldMeta[] = [
 			"Accent color for each project Status badge on /projects and a project's own page. Any status left unset keeps its built-in default color.",
 	},
 
+	// Local AI Models
+	{
+		id: "aiAssistEnabled",
+		section: "local-llm",
+		label: "Enable local AI assist",
+		description:
+			'Turns on the "Bulk Create (AI)" entry point on /tasks and /projects. Off by default — downloads a multi-GB model to this browser the first time it runs. This is a per-browser preference, not committed to git.',
+	},
+	{
+		id: "aiAssistModel",
+		section: "local-llm",
+		label: "Model",
+		description:
+			"Which quantized instruct model to run locally. The 3B model gives better extraction quality; the 1.5B model is lighter for lower-end devices. Switching models re-downloads (or reuses a cached) model the next time AI assist runs.",
+	},
+
 	// CMS Admin
 	{
 		id: "backendName",
