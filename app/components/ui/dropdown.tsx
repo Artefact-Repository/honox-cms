@@ -193,7 +193,11 @@ function renderDropdownItem(
 					disabled={checkboxItem.disabled}
 					class={checkboxItem.class}
 				>
-					<ItemIndicator>{checkboxItem.icon}</ItemIndicator>
+					{checkboxItem.icon ? (
+						<ItemIndicator>{checkboxItem.icon}</ItemIndicator>
+					) : (
+						<ItemIndicator />
+					)}
 					<ItemText>{checkboxItem.label}</ItemText>
 				</CheckboxItem>
 			);
@@ -209,7 +213,11 @@ function renderDropdownItem(
 					disabled={radioItem.disabled}
 					class={radioItem.class}
 				>
-					<ItemIndicator>{radioItem.icon}</ItemIndicator>
+					{radioItem.icon ? (
+						<ItemIndicator>{radioItem.icon}</ItemIndicator>
+					) : (
+						<ItemIndicator />
+					)}
 					<ItemText>{radioItem.label}</ItemText>
 				</RadioItem>
 			);

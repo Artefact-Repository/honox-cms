@@ -2,7 +2,6 @@ import { cx } from "design-system/css";
 import { button } from "design-system/recipes";
 import { useEffect, useState } from "hono/jsx";
 import { Dropdown } from "../components/ui/dropdown";
-import { ChevronDownIcon } from "../icons/chevron-down";
 
 export default function TaskStatusFilter() {
 	const [checkedStatuses, setCheckedStatuses] = useState<
@@ -49,14 +48,10 @@ export default function TaskStatusFilter() {
 					type="button"
 					class={cx(button({ variant: "outline", size: "sm" }))}
 					style={{
-						display: "inline-flex",
-						alignItems: "center",
-						gap: "0.5rem",
 						cursor: "pointer",
 					}}
 				>
 					{buttonText}
-					<ChevronDownIcon width="16" height="16" />
 				</button>
 			}
 			placement="bottomStart"
