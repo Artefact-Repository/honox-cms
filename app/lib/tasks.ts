@@ -112,11 +112,25 @@ async function loadTask(path: string): Promise<Task> {
 	return buildTask(slugFromPath(path), data, content);
 }
 
-/** Every task across every project, sorted by due date (undated tasks last). */
+/** Every task across every project, sorted by due date (undated tasks last).
+ * A single task file that fails to load (e.g. invalid YAML frontmatter) is
+ * logged and skipped rather than failing the whole listing — same resilience
+ * `loadPosts` already has for blog posts. */
 export async function listTasks(): Promise<Task[]> {
-	const tasks = await Promise.all(
+	const loaded = await Promise.allSettled(
 		Object.keys(taskModules).map((path) => loadTask(path)),
 	);
+	const tasks: Task[] = [];
+	for (const [index, result] of loaded.entries()) {
+		if (result.status === "fulfilled") {
+			tasks.push(result.value);
+		} else {
+			console.error(
+				`Error loading task ${Object.keys(taskModules)[index]}:`,
+				result.reason,
+			);
+		}
+	}
 	tasks.sort((a, b) => {
 		if (!a.dueDate && !b.dueDate) return a.title.localeCompare(b.title);
 		if (!a.dueDate) return 1;
