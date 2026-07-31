@@ -16,6 +16,7 @@
 		"start": "bun run src/main.ts"
 	},
 	"dependencies": {
+		"@mlc-ai/web-llm": "^0.2.84",
 		"hono": "^4.12.32",
 		"honox": "0.1.59",
 		"mdast-util-to-string": "^4.0.0",
