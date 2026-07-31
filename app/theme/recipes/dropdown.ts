@@ -125,9 +125,12 @@ export const dropdown = defineSlotRecipe({
 			pointerEvents: "none",
 		},
 		itemIndicator: {
-			justifyContent: "flex-end",
+			alignItems: "center",
 			display: "flex",
-			flex: "1",
+			justifyContent: "center",
+			flexShrink: "0",
+			width: "4",
+			height: "4",
 			pointerEvents: "none",
 			_checked: {
 				_icon: {

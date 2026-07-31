@@ -857,7 +857,7 @@ export function DropdownItemIndicator(props: DropdownItemIndicatorProps) {
 				checked === undefined ? undefined : checked ? "checked" : "unchecked"
 			}
 			class={cx(context.styles.itemIndicator, classProp)}
-			style={{ display: checked === false ? "none" : "flex" }}
+			style={{ visibility: checked === false ? "hidden" : "visible", display: "flex" }}
 			{...restProps}
 		>
 			{children ??
@@ -1102,7 +1102,7 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 			// style (see DropdownItemIndicator), not a re-render — toggling
 			// only the data-state attribute here would leave it stuck at
 			// whatever it looked like on page load.
-			indicator.style.display = checked ? "flex" : "none";
+			indicator.style.visibility = checked ? "visible" : "hidden";
 		}
 		const value = item.getAttribute("data-value");
 		if (value) checkedOverridesRef.current.set(value, checked);
@@ -1142,7 +1142,7 @@ export function InteractiveDropdownRoot(props: InteractiveDropdownRootProps) {
 						"data-state",
 						checked ? "checked" : "unchecked",
 					);
-					indicator.style.display = checked ? "flex" : "none";
+					indicator.style.visibility = checked ? "visible" : "hidden";
 				}
 			}
 		});
