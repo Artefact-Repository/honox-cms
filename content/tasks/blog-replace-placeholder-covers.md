@@ -1,5 +1,5 @@
 ---
-title: Replace placeholder covers and add covers to cover-less posts
+title: "[Bug] Replace placeholder covers and add covers to cover-less posts"
 project: blog-website
 status: To Do
 priority: Medium

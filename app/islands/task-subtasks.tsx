@@ -7,7 +7,7 @@ import { Badge } from "../components/ui/badge";
 import type { ColorPalette } from "../components/ui/color-palette";
 import { Stack } from "../components/ui/stack";
 import { Text } from "../components/ui/text";
-import { TASK_STATUS_COLOR, type Task, type TaskStatus } from "../lib/tasks";
+import { TASK_STATUS_COLOR, type Task, type TaskStatus, splitTitleTag, colorForTag } from "../lib/tasks";
 import { useGitToken } from "./git-token-banner";
 import TaskCreateDrawer from "./task-create-drawer";
 
@@ -107,9 +107,30 @@ export default function TaskSubtasks({
 										overflow: "hidden",
 										textOverflow: "ellipsis",
 										whiteSpace: "nowrap",
+										display: "inline-flex",
+										alignItems: "center",
+										gap: "1.5",
 									})}
 								>
-									{subtask.title}
+									{(() => {
+										const { tag, rest } = splitTitleTag(subtask.title);
+										if (tag) {
+											return (
+												<>
+													<Badge
+														variant="subtle"
+														size="sm"
+														colorPalette={colorForTag(tag)}
+														class={css({ flexShrink: "0" })}
+													>
+														{tag}
+													</Badge>
+													<span>{rest}</span>
+												</>
+											);
+										}
+										return subtask.title;
+									})()}
 								</Anchor>
 							</Stack>
 							{subtask.assignee && <Avatar size="xs" name={subtask.assignee} />}

@@ -15,6 +15,8 @@ import {
 	type Task,
 	type TaskPriority,
 	type TaskStatus,
+	splitTitleTag,
+	colorForTag,
 } from "../lib/tasks";
 import { formatDate } from "../utils/date";
 import { fetchFile, updateFile } from "../utils/git-backend";
@@ -197,7 +199,25 @@ export default function TaskBoard({
 														mb: task.parentTask ? "0.5" : "2",
 													})}
 												>
-													{task.title}
+													{(() => {
+														const { tag, rest } = splitTitleTag(task.title);
+														if (tag) {
+															return (
+																<>
+																	<Badge
+																		variant="subtle"
+																		size="sm"
+																		colorPalette={colorForTag(tag)}
+																		class={css({ mr: "1.5" })}
+																	>
+																		{tag}
+																	</Badge>
+																	<span>{rest}</span>
+																</>
+															);
+														}
+														return task.title;
+													})()}
 												</Text>
 											</Anchor>
 											{task.parentTask &&

@@ -346,11 +346,12 @@ export interface PreviewProps {
 	 * navigates instead of entering edit mode, since focus (which drives
 	 * `activationMode: "focus"`) lands on the link, not this wrapper. */
 	dangerouslySetInnerHTML?: { __html: string };
+	children?: Child;
 	[key: string]: unknown;
 }
 
 export function Preview(props: PreviewProps) {
-	const { class: classProp, dangerouslySetInnerHTML, ...rest } = props;
+	const { class: classProp, dangerouslySetInnerHTML, children, ...rest } = props;
 	const context = useEditableContext();
 	const styles = context?.styles ?? editable();
 	const interactive = !(context?.disabled || context?.readOnly);
@@ -414,13 +415,15 @@ export function Preview(props: PreviewProps) {
 	}
 	return (
 		<span {...spanProps}>
-			{context?.tags
-				? parseTags(context.value).map((tag) => (
-						<span key={tag} class={styles.tag}>
-							{tag}
-						</span>
-					))
-				: context?.valueText}
+			{children !== undefined ? children : (
+				context?.tags
+					? parseTags(context.value).map((tag) => (
+							<span key={tag} class={styles.tag}>
+								{tag}
+							</span>
+						))
+					: context?.valueText
+			)}
 		</span>
 	);
 }

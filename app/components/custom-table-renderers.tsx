@@ -29,6 +29,8 @@ import {
 	type TaskPriority,
 	type TaskStatus,
 	type TaskTreeEntry,
+	splitTitleTag,
+	colorForTag,
 } from "../lib/tasks";
 import { formatDate } from "../utils/date";
 import { Anchor, Avatar, Badge, DisplayValue, Stack, Table, Text } from "./ui";
@@ -216,13 +218,33 @@ function TasksTable(data: Partial<TasksTableData>) {
 											data-task-details-trigger
 											data-task-slug={task.slug}
 											class={css({
-												display: "block",
+												display: "inline-flex",
+												alignItems: "center",
+												gap: "1.5",
 												overflow: "hidden",
 												textOverflow: "ellipsis",
 												whiteSpace: "nowrap",
 											})}
 										>
-											{task.title}
+											{(() => {
+												const { tag, rest } = splitTitleTag(task.title);
+												if (tag) {
+													return (
+														<>
+															<Badge
+																variant="subtle"
+																size="sm"
+																colorPalette={colorForTag(tag)}
+																class={css({ flexShrink: "0" })}
+															>
+																{tag}
+															</Badge>
+															<span>{rest}</span>
+														</>
+													);
+												}
+												return task.title;
+											})()}
 										</Anchor>
 									</div>
 								);

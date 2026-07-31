@@ -14,6 +14,8 @@ import {
 	type Task,
 	type TaskPriority,
 	type TaskStatus,
+	splitTitleTag,
+	colorForTag,
 } from "../lib/tasks";
 import { formatDate } from "../utils/date";
 
@@ -82,7 +84,28 @@ export default function TaskDetailsDrawer({
 				if (!next) setTask(null);
 			}}
 			size="lg"
-			title={task?.title ?? ""}
+			title={
+				task
+					? (() => {
+							const { tag, rest } = splitTitleTag(task.title);
+							if (tag) {
+								return (
+									<span class={css({ display: "flex", alignItems: "center", gap: "1.5" })}>
+										<Badge
+											variant="subtle"
+											size="sm"
+											colorPalette={colorForTag(tag)}
+										>
+											{tag}
+										</Badge>
+										<span>{rest}</span>
+									</span>
+								);
+							}
+							return task.title;
+						})()
+					: ""
+			}
 			description="Task details"
 			footer={
 				task ? (

@@ -36,6 +36,8 @@ import {
 	TASK_STATUS_COLOR,
 	TASK_STATUSES,
 	type Task,
+	splitTitleTag,
+	colorForTag,
 } from "../../lib/tasks";
 import { formatDate } from "../../utils/date";
 import { markdownContentClass } from "../../utils/markdown-content-style";
@@ -314,13 +316,33 @@ export default createRoute(
 													href={`/tasks/${task.slug}`}
 													variant="plain"
 													class={css({
-														display: "block",
+														display: "inline-flex",
+														alignItems: "center",
+														gap: "1.5",
 														overflow: "hidden",
 														textOverflow: "ellipsis",
 														whiteSpace: "nowrap",
 													})}
 												>
-													{task.title}
+													{(() => {
+														const { tag, rest } = splitTitleTag(task.title);
+														if (tag) {
+															return (
+																<>
+																	<Badge
+																		variant="subtle"
+																		size="sm"
+																		colorPalette={colorForTag(tag)}
+																		class={css({ flexShrink: "0" })}
+																	>
+																		{tag}
+																	</Badge>
+																	<span>{rest}</span>
+																</>
+															);
+														}
+														return task.title;
+													})()}
 												</Anchor>
 											),
 										},

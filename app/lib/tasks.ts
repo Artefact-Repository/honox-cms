@@ -4,6 +4,27 @@ import {
 	parseFrontmatter,
 	stripMarkdown,
 } from "../utils/markdown";
+
+export function splitTitleTag(title: string): { tag?: string; rest: string } {
+	const m = /^\s*\[([^\]\n]{1,24})\]\s*(.*)$/s.exec(title);
+	return m ? { tag: m[1], rest: m[2] || "" } : { rest: title };
+}
+
+export const DEFAULT_TAG_COLORS: Record<string, ColorPalette> = {
+	bug: "red",
+	fe: "blue",
+	be: "green",
+	epic: "purple",
+	spike: "amber",
+	qa: "orange",
+	chore: "gray",
+	docs: "cyan",
+};
+
+export function colorForTag(tag: string): ColorPalette {
+	const key = tag.toLowerCase();
+	return DEFAULT_TAG_COLORS[key] ?? "gray";
+}
 import { buildHaystack, type SearchIndexEntry } from "../utils/search";
 
 // Tasks content lives under content/tasks/*.md, one file per entry — same

@@ -21,6 +21,8 @@ import { markdownToHtml } from "../utils/markdown";
 import { markdownContentClass } from "../utils/markdown-content-style";
 import { saveTaskField } from "../utils/task-save";
 import { useGitToken } from "./git-token-banner";
+import { Badge } from "../components/ui/badge";
+import { splitTitleTag, colorForTag } from "../lib/tasks";
 
 export interface TaskEditableTextProps {
 	value: string;
@@ -92,6 +94,8 @@ export default function TaskEditableText(props: TaskEditableTextProps) {
 			? markdownToHtml(value)
 			: undefined;
 
+	const { tag, rest: titleRest } = splitTitleTag(value);
+
 	const handleSubmit = () => {
 		setEditing(false);
 		if (value === savedValue.current) return;
@@ -148,7 +152,21 @@ export default function TaskEditableText(props: TaskEditableTextProps) {
 						dangerouslySetInnerHTML={
 							previewHtml !== undefined ? { __html: previewHtml } : undefined
 						}
-					/>
+					>
+						{props.field === "title" && tag ? (
+							<>
+								<Badge
+									variant="subtle"
+									size="sm"
+									colorPalette={colorForTag(tag)}
+									class={css({ mr: "1.5" })}
+								>
+									{tag}
+								</Badge>
+								<span>{titleRest}</span>
+							</>
+						) : undefined}
+					</Preview>
 					<Input class={props.textClass} />
 				</Area>
 				{!readOnly && (
