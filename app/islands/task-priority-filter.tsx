@@ -2,14 +2,12 @@ import { cx } from "design-system/css";
 import { button } from "design-system/recipes";
 import { useEffect, useState } from "hono/jsx";
 import { Dropdown } from "../components/ui/dropdown";
+import { TASK_PRIORITIES } from "../lib/tasks";
 
 export default function TaskPriorityFilter() {
-	const [checkedPriorities, setCheckedPriorities] = useState<Record<string, boolean>>({
-		Low: true,
-		Medium: true,
-		High: true,
-		Urgent: true,
-	});
+	const [checkedPriorities, setCheckedPriorities] = useState<Record<string, boolean>>(
+		Object.fromEntries(TASK_PRIORITIES.map((priority) => [priority, true])),
+	);
 
 	const checkedList = Object.entries(checkedPriorities)
 		.filter(([_, checked]) => checked)
@@ -18,7 +16,7 @@ export default function TaskPriorityFilter() {
 	let buttonText = "Priority: All";
 	if (checkedList.length === 0) {
 		buttonText = "Priority: None";
-	} else if (checkedList.length === 4) {
+	} else if (checkedList.length === TASK_PRIORITIES.length) {
 		buttonText = "Priority: All";
 	} else if (checkedList.length === 1) {
 		buttonText = `Priority: ${checkedList[0]}`;
@@ -53,12 +51,12 @@ export default function TaskPriorityFilter() {
 				</button>
 			}
 			placement="bottomStart"
-			items={[
-				{ type: "checkbox", label: "Low", value: "Low", checked: checkedPriorities["Low"] },
-				{ type: "checkbox", label: "Medium", value: "Medium", checked: checkedPriorities["Medium"] },
-				{ type: "checkbox", label: "High", value: "High", checked: checkedPriorities["High"] },
-				{ type: "checkbox", label: "Urgent", value: "Urgent", checked: checkedPriorities["Urgent"] },
-			]}
+			items={TASK_PRIORITIES.map((priority) => ({
+				type: "checkbox" as const,
+				label: priority,
+				value: priority,
+				checked: checkedPriorities[priority],
+			}))}
 			onSelect={(value) => {
 				setCheckedPriorities((prev) => {
 					const next = { ...prev, [value]: !prev[value] };

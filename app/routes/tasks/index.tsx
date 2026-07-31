@@ -5,6 +5,7 @@ import { Search } from "../../components/ui";
 import { Toaster } from "../../components/ui/toast";
 import AuthStatus from "../../islands/auth-status";
 import PmsCreateMenu from "../../islands/pms-create-menu";
+import TaskAssigneeFilter from "../../islands/task-assignee-filter";
 import TaskPriorityFilter from "../../islands/task-priority-filter";
 import TaskStatusFilter from "../../islands/task-status-filter";
 import { loadPage } from "../../lib/pages";
@@ -27,9 +28,17 @@ export default createRoute(async (c) => {
 		label: task.title,
 		value: task.slug,
 	}));
+	const assignees = [...new Set(tasks.map((task) => task.assignee).filter((assignee): assignee is string => !!assignee))].sort();
 	const searchQuery = new URL(c.req.url).searchParams.get("q") || "";
 
 	const originalContent = data.content ?? [];
+	const assigneeBlockIndex = originalContent.findIndex(
+		(block) =>
+			block.blockType === "stack" &&
+			block.children?.some(
+				(child) => child.blockType === "text" && child.content === "Assignee",
+			),
+	);
 	const statusBlockIndex = originalContent.findIndex(
 		(block) =>
 			block.blockType === "stack" &&
@@ -48,19 +57,26 @@ export default createRoute(async (c) => {
 	let part1 = originalContent;
 	let part2: typeof originalContent = [];
 	let part3: typeof originalContent = [];
+	let part4: typeof originalContent = [];
 
-	if (statusBlockIndex !== -1 && priorityBlockIndex !== -1) {
+	if (assigneeBlockIndex !== -1 && statusBlockIndex !== -1 && priorityBlockIndex !== -1) {
+		const idxs = [assigneeBlockIndex, statusBlockIndex, priorityBlockIndex].sort((a, b) => a - b);
+		part1 = originalContent.slice(0, idxs[0]);
+		part2 = originalContent.slice(idxs[0] + 1, idxs[1]);
+		part3 = originalContent.slice(idxs[1] + 1, idxs[2]);
+		part4 = originalContent.slice(idxs[2] + 1);
+	} else if (statusBlockIndex !== -1 && priorityBlockIndex !== -1) {
 		const firstIdx = Math.min(statusBlockIndex, priorityBlockIndex);
 		const secondIdx = Math.max(statusBlockIndex, priorityBlockIndex);
 		part1 = originalContent.slice(0, firstIdx);
 		part2 = originalContent.slice(firstIdx + 1, secondIdx);
-		part3 = originalContent.slice(secondIdx + 1);
+		part4 = originalContent.slice(secondIdx + 1);
 	} else if (statusBlockIndex !== -1) {
 		part1 = originalContent.slice(0, statusBlockIndex);
-		part3 = originalContent.slice(statusBlockIndex + 1);
+		part4 = originalContent.slice(statusBlockIndex + 1);
 	} else if (priorityBlockIndex !== -1) {
 		part1 = originalContent.slice(0, priorityBlockIndex);
-		part3 = originalContent.slice(priorityBlockIndex + 1);
+		part4 = originalContent.slice(priorityBlockIndex + 1);
 	}
 
 	return c.render(
@@ -70,6 +86,7 @@ export default createRoute(async (c) => {
 			<style
 				dangerouslySetInnerHTML={{
 					__html: `
+						tr[data-assignee-hidden="true"],
 						tr[data-status-hidden="true"],
 						tr[data-priority-hidden="true"] {
 							display: none !important;
@@ -154,6 +171,34 @@ export default createRoute(async (c) => {
 			>
 				<PageRenderer content={part1} />
 
+				{assigneeBlockIndex !== -1 && (
+					<div
+						class={css({
+							display: "flex",
+							alignItems: "flex-start",
+							gap: "2",
+							marginBottom: "0.75rem",
+						})}
+					>
+						<span
+							class={css({
+								fontSize: "xs",
+								fontWeight: "600",
+								textTransform: "uppercase",
+								letterSpacing: "0.05em",
+								color: "#71717a",
+								minWidth: "64px",
+								paddingTop: "2",
+							})}
+						>
+							Assignee
+						</span>
+						<TaskAssigneeFilter assignees={assignees} />
+					</div>
+				)}
+
+				<PageRenderer content={part2} />
+
 				{statusBlockIndex !== -1 && (
 					<div
 						class={css({
@@ -179,7 +224,7 @@ export default createRoute(async (c) => {
 					</div>
 				)}
 
-				<PageRenderer content={part2} />
+				<PageRenderer content={part3} />
 
 				{priorityBlockIndex !== -1 && (
 					<div
@@ -206,7 +251,7 @@ export default createRoute(async (c) => {
 					</div>
 				)}
 
-				<PageRenderer content={part3} />
+				<PageRenderer content={part4} />
 			</div>
 		</>,
 	);
