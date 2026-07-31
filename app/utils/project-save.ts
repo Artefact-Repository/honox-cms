@@ -2,7 +2,13 @@
 // fetch/check/write flow as app/utils/task-save.ts, writing
 // frontmatter+markdown (content/projects/*.md, see app/lib/projects.ts) the
 // same way task-save.ts does.
-import { createFile, fileExists, requireToken } from "./git-backend";
+import {
+	createFile,
+	deleteFile,
+	fetchFile,
+	fileExists,
+	requireToken,
+} from "./git-backend";
 import { stringifyFrontmatter } from "./markdown";
 import { slugify } from "./slug";
 
@@ -54,4 +60,13 @@ export async function createProject(input: NewProjectInput): Promise<string> {
 	const content = stringifyFrontmatter(data, input.description ?? "");
 	await createFile(path, content, `Create project "${input.title}"`, token);
 	return slug;
+}
+
+/** Deletes `content/projects/{slug}.md` straight on the git host — same
+ * fetch-then-write path as `deleteTask`. */
+export async function deleteProject(slug: string): Promise<void> {
+	const token = requireToken();
+	const path = `content/projects/${slug}.md`;
+	const file = await fetchFile(path, token);
+	await deleteFile(path, file.sha, `Delete project "${slug}"`, token);
 }

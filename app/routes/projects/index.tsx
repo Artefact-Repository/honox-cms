@@ -1,4 +1,5 @@
 import { css, cx } from "design-system/css";
+import { button } from "design-system/recipes";
 import { createRoute } from "honox/factory";
 import {
 	Anchor,
@@ -12,8 +13,10 @@ import {
 } from "../../components/ui";
 import { colorPaletteClass } from "../../components/ui/color-palette";
 import { Toaster } from "../../components/ui/toast";
+import { EllipsisIcon } from "../../icons/ellipsis";
 import AuthStatus from "../../islands/auth-status";
 import PmsCreateMenu from "../../islands/pms-create-menu";
+import ProjectRowActionsMenu from "../../islands/project-row-actions-menu";
 import { loadDocsConfig } from "../../lib/configs";
 import { mergeColorOverrides } from "../../lib/pms-config";
 import {
@@ -171,9 +174,10 @@ export default createRoute(async (c) => {
 						return (
 							<Anchor
 								key={project.slug}
+								id={`project-${project.slug}`}
 								href={`/projects/${project.slug}`}
 								variant="plain"
-								class={css({ textDecoration: "none" })}
+								class={css({ textDecoration: "none", position: "relative" })}
 							>
 								<Card
 									variant="outline"
@@ -191,6 +195,21 @@ export default createRoute(async (c) => {
 									description={project.summary}
 									headerClass={css({ p: "5", pb: "0" })}
 									bodyClass={css({ p: "5", pt: "3" })}
+									headerAction={
+										<button
+											type="button"
+											data-project-row-actions-trigger
+											data-project-slug={project.slug}
+											data-project-title={project.title}
+											aria-label={`More actions for "${project.title}"`}
+											class={cx(
+												button({ variant: "outline", size: "sm" }),
+												css({ px: "1.5", pointerEvents: "auto" }),
+											)}
+										>
+											<EllipsisIcon width="16" height="16" />
+										</button>
+									}
 								>
 									<Stack gap="2" wrap="wrap" class={css({ mb: "4" })}>
 										<Badge
@@ -248,6 +267,7 @@ export default createRoute(async (c) => {
 					})}
 				</div>
 			</div>
+			<ProjectRowActionsMenu />
 		</>,
 	);
 });

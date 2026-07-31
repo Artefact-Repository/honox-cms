@@ -18,6 +18,7 @@ import { colorPaletteClass } from "../../components/ui/color-palette";
 import { Toaster } from "../../components/ui/toast";
 import AuthStatus from "../../islands/auth-status";
 import PmsCreateMenu from "../../islands/pms-create-menu";
+import ProjectActionsMenu from "../../islands/project-actions-menu";
 import ReadMore from "../../islands/read-more";
 import TaskBoard from "../../islands/task-board";
 import { loadDocsConfig } from "../../lib/configs";
@@ -185,6 +186,7 @@ export default createRoute(
 								defaultProjectSlug={slug}
 								tasks={tasks.map((t) => ({ label: t.title, value: t.slug }))}
 							/>
+							<ProjectActionsMenu slug={project.slug} title={project.title} />
 							<AuthStatus />
 						</nav>
 					</div>
