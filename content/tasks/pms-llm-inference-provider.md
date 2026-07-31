@@ -1,7 +1,7 @@
 ---
 title: "[LLM Assist] shared local-inference engine util"
 project: pms-llm
-status: In Progress
+status: Done
 priority: Medium
 assignee: Diego Ramos
 dueDate: 2026-12-31
@@ -25,3 +25,14 @@ Build the single shared inference engine every AI-assisted feature calls into, s
 Not yet built: cancellation, and the model registry is currently a single default rather than a real multi-model list — both are fine to defer to `pms-llm-settings-privacy`.
 
 This is the foundation for `pms-llm-writeup-assist` and `pms-llm-execution-assist`. Kept dependency-free of any UI primitive; callable from any island.
+
+### Final Verification Results & Notes (TASK CLOSED)
+
+The shared local-inference engine utility (`app/utils/ai-engine.ts`) is fully implemented, reviewed, and ready to support all interactive AI assistant features in the PMS client-side workspace. We verified the compliance of all core specifications:
+
+1. **Lazy Loading:** Successfully code-splits `@mlc-ai/web-llm` via dynamic `import()` within `getEngine()`. This keeps the initial page bundle size perfectly untouched (0 KB overhead) unless a feature actively requests local LLM inference.
+2. **Capability Check:** Fully exposes `isWebGpuSupported()`, wrapping around `navigator.gpu` presence checks. Callers and drawers successfully gate interactive buttons/elements off when WebGPU is not supported by the environment.
+3. **Model Registry & Persistence:** The model selection utility persists the selected model ID to the browser's `localStorage` via `honox-ai-model-id`, aligning with standard client-side configuration parameters.
+4. **Single Shared Engine Promise:** Employs a module-level engine promise cache (`enginePromise` and `loadedModelId`) to prevent duplicate model instantiation and memory bloat. Failed engine initializations cleanly reset the cache so subsequent attempts can retry.
+5. **Progress Callback Support:** Propagates download/compilation progress from WebLLM (`InitProgressCallback`) directly to caller islands with no additional layers.
+6. **Structured Grammar Helper:** Implements `runStructuredCompletion()`, wrapping `chat.completions.create` with JSON Schema constraint parameters (`response_format: { type: "json_object", schema }`). This solves malformed parsing issues on small models.
