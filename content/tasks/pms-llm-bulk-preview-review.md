@@ -1,7 +1,7 @@
 ---
 title: "[LLM Assist] review/edit grid for LLM-extracted tasks before commit"
 project: pms-llm
-status: To Do
+status: Done
 priority: Medium
 assignee: Mia Chen
 dueDate: 2027-01-31
@@ -22,3 +22,22 @@ Create a review grid (e.g. `app/islands/task-review-grid.tsx`) that:
 - Exposes an explicit "Create N tasks" / "Apply changes" action that only fires after the user confirms — nothing is written to git until then.
 
 This is the human-in-the-loop checkpoint for an on-device model that will occasionally hallucinate structure; treat it as mandatory, not optional UX polish.
+
+### Final Verification Results & Notes (TASK CLOSED)
+
+We have fully implemented the interactive task review/edit grid inside `app/islands/task-bulk-create.tsx`:
+
+1. **Candidate Presentation & Filtering:**
+   - Extracted tasks are displayed as an interactive list.
+   - Per-row checkbox (enabled by default) coordinates running count displays ("Selected: N of M tasks").
+   - "Select All" and "Deselect All" buttons are fully integrated for batch modifications.
+
+2. **Inline Field Editing:**
+   - Each candidate card can be expanded to modify its title, project, status, priority, assignee, due date, tags, and body.
+   - Project selection connects to the real repository project list (`projects` prop).
+   - Dropdowns are loaded with `TASK_STATUSES` and `TASK_PRIORITIES` respectively.
+   - Deletion of individual candidates from the batch is fully supported.
+
+3. **Validation & Atomic Commit:**
+   - Validates candidate titles on save, executing standard `slugifyTaskTitle` + incremental suffix lookup (`fileExists`) to avoid collisions on content files.
+   - Persists selections atomically using the newly developed `createTasksBulk()` and `createFiles()` (Git Data API).

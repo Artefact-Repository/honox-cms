@@ -1,7 +1,7 @@
 ---
 title: "[LLM Assist] batched git commit for bulk-generated task/project files"
 project: pms-llm
-status: To Do
+status: Done
 priority: Medium
 assignee: Diego Ramos
 dueDate: 2027-01-31
@@ -24,3 +24,15 @@ Then:
 - `pms-llm-prompt-editor`'s edit-mode batch reuses the same `createFiles` path, but for *updates* — needs each file's current `sha` fetched immediately before commit (not cached from page load), same staleness guard `updateFile` already has.
 
 Depends on nothing beyond the existing git-backend layer; this is pure infrastructure with no LLM dependency, callable by `pms-llm-bulk-create-from-doc` once it exists.
+
+### Final Verification Results & Notes (TASK CLOSED)
+
+We have fully implemented the batched git commit infrastructure:
+
+1. **`createFiles` in `app/utils/git-backend.ts`:**
+   - **GitHub:** Uses the Git Data API. Creates a blob for each file (`POST .../git/blobs`), a single new tree containing references to all blobs (`POST .../git/trees` with `base_tree` pointing to the current commit), a single commit (`POST .../git/commits`), and updates the branch reference (`PATCH .../git/refs/heads/...`). This achieves an atomic write in exactly one commit.
+   - **GitLab:** Leverages the native bulk commit endpoint (`POST .../repository/commits`) with an array of `"create"` actions, which is natively atomic.
+   - **Gitea:** Sequentially creates files with structured, explicit partial-failure reporting, listing successful vs failed paths upon failures.
+
+2. **`createTasksBulk` in `app/utils/task-save.ts`:**
+   - Formulates the frontmatter and body for each candidate, validates path collisions dynamically, and dispatches the array of files to `createFiles()` for a clean, atomic git write.

@@ -6,6 +6,7 @@
 // against whichever git backend is configured (see git-backend.ts).
 import {
 	createFile,
+	createFiles,
 	deleteFile,
 	fetchFile,
 	fileExists,
@@ -104,6 +105,41 @@ export interface NewTaskInput {
  * plain 404 from `fetchFile`) since create/update use different API calls
  * (see `createFile` in git-backend.ts) and can't rely on a single
  * conflict-status check across every backend. */
+export async function createTasksBulk(
+	items: NewTaskInput[],
+	message = "AI bulk tasks creation",
+): Promise<void> {
+	const token = requireToken();
+	const filesToCommit: { path: string; content: string }[] = [];
+
+	for (const item of items) {
+		const baseSlug = slugifyTaskTitle(item.title);
+		let cloneSlug = baseSlug;
+		let attempt = 2;
+		while (await fileExists(`content/tasks/${cloneSlug}.md`, token)) {
+			cloneSlug = `${baseSlug}-${attempt}`;
+			attempt += 1;
+		}
+		const path = `content/tasks/${cloneSlug}.md`;
+
+		const data: Record<string, unknown> = {
+			title: item.title,
+			project: item.project,
+			status: item.status,
+			priority: item.priority,
+		};
+		if (item.parentTask) data.parentTask = item.parentTask;
+		if (item.assignee) data.assignee = item.assignee;
+		if (item.dueDate) data.dueDate = item.dueDate;
+		if (item.tags && item.tags.length > 0) data.tags = item.tags;
+
+		const content = stringifyFrontmatter(data, item.body ?? "");
+		filesToCommit.push({ path, content });
+	}
+
+	await createFiles(filesToCommit, message, token);
+}
+
 export async function createTask(input: NewTaskInput): Promise<string> {
 	const token = requireToken();
 	const slug = slugifyTaskTitle(input.title);

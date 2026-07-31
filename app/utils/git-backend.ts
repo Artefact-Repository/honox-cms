@@ -419,6 +419,160 @@ export async function deleteFile(
 	}
 }
 
+export async function createFiles(
+	files: { path: string; content: string }[],
+	message: string,
+	token: string,
+): Promise<void> {
+	if (files.length === 0) return;
+	const config = await getRepoConfig();
+	const headers = authHeaders(config.name, token);
+
+	if (config.name === "gitlab") {
+		const projectId = encodeURIComponent(`${config.owner}/${config.repo}`);
+		const url = `${config.apiRoot}/projects/${projectId}/repository/commits`;
+		const actions = files.map((file) => ({
+			action: "create",
+			file_path: file.path,
+			content: encodeBase64Utf8(file.content),
+			encoding: "base64",
+		}));
+		const response = await fetch(url, {
+			method: "POST",
+			headers: { ...headers, "Content-Type": "application/json" },
+			body: JSON.stringify({
+				branch: config.branch,
+				commit_message: message,
+				actions,
+			}),
+		});
+		if (!response.ok) {
+			throw new GitBackendError(
+				`GitLab bulk commit failed: ${response.statusText}`,
+				response.status,
+			);
+		}
+		return;
+	}
+
+	if (config.name === "gitea") {
+		const committedPaths: string[] = [];
+		const failedPaths: { path: string; error: string }[] = [];
+		for (const file of files) {
+			try {
+				await createFile(file.path, file.content, message, token);
+				committedPaths.push(file.path);
+			} catch (err) {
+				failedPaths.push({
+					path: file.path,
+					error: err instanceof Error ? err.message : String(err),
+				});
+			}
+		}
+		if (failedPaths.length > 0) {
+			throw new Error(
+				`Gitea bulk commit partially failed. Committed paths: ${committedPaths.join(", ")}. Failed: ${failedPaths.map((f) => `${f.path} (${f.error})`).join("; ")}`,
+			);
+		}
+		return;
+	}
+
+	// GitHub: Git Data API
+	// 1. Get current commit reference
+	const refUrl = `${config.apiRoot}/repos/${config.owner}/${config.repo}/git/refs/heads/${config.branch}`;
+	const refResponse = await fetch(refUrl, { headers });
+	if (!refResponse.ok) {
+		throw new GitBackendError(
+			`Failed to get ref of branch ${config.branch}: ${refResponse.statusText}`,
+			refResponse.status,
+		);
+	}
+	const refJson = (await refResponse.json()) as { object: { sha: string } };
+	const baseCommitSha = refJson.object.sha;
+
+	// 2. Create blobs for each file
+	const treeItems = [];
+	for (const file of files) {
+		const blobUrl = `${config.apiRoot}/repos/${config.owner}/${config.repo}/git/blobs`;
+		const blobResponse = await fetch(blobUrl, {
+			method: "POST",
+			headers: { ...headers, "Content-Type": "application/json" },
+			body: JSON.stringify({
+				content: encodeBase64Utf8(file.content),
+				encoding: "base64",
+			}),
+		});
+		if (!blobResponse.ok) {
+			throw new GitBackendError(
+				`Failed to create blob for ${file.path}: ${blobResponse.statusText}`,
+				blobResponse.status,
+			);
+		}
+		const blobJson = (await blobResponse.json()) as { sha: string };
+		treeItems.push({
+			path: file.path,
+			mode: "100644",
+			type: "blob",
+			sha: blobJson.sha,
+		});
+	}
+
+	// 3. Create a new tree with base_tree
+	const treeUrl = `${config.apiRoot}/repos/${config.owner}/${config.repo}/git/trees`;
+	const treeResponse = await fetch(treeUrl, {
+		method: "POST",
+		headers: { ...headers, "Content-Type": "application/json" },
+		body: JSON.stringify({
+			base_tree: baseCommitSha,
+			tree: treeItems,
+		}),
+	});
+	if (!treeResponse.ok) {
+		throw new GitBackendError(
+			`Failed to create tree: ${treeResponse.statusText}`,
+			treeResponse.status,
+		);
+	}
+	const treeJson = (await treeResponse.json()) as { sha: string };
+	const newTreeSha = treeJson.sha;
+
+	// 4. Create a new commit
+	const commitUrl = `${config.apiRoot}/repos/${config.owner}/${config.repo}/git/commits`;
+	const commitResponse = await fetch(commitUrl, {
+		method: "POST",
+		headers: { ...headers, "Content-Type": "application/json" },
+		body: JSON.stringify({
+			message,
+			tree: newTreeSha,
+			parents: [baseCommitSha],
+		}),
+	});
+	if (!commitResponse.ok) {
+		throw new GitBackendError(
+			`Failed to create commit: ${commitResponse.statusText}`,
+			commitResponse.status,
+		);
+	}
+	const commitJson = (await commitResponse.json()) as { sha: string };
+	const newCommitSha = commitJson.sha;
+
+	// 5. Update reference
+	const updateRefResponse = await fetch(refUrl, {
+		method: "PATCH",
+		headers: { ...headers, "Content-Type": "application/json" },
+		body: JSON.stringify({
+			sha: newCommitSha,
+			force: false,
+		}),
+	});
+	if (!updateRefResponse.ok) {
+		throw new GitBackendError(
+			`Failed to update ref ${config.branch}: ${updateRefResponse.statusText}`,
+			updateRefResponse.status,
+		);
+	}
+}
+
 export async function updateFile(
 	path: string,
 	content: string,

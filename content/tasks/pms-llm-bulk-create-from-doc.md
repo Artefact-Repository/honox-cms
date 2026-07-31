@@ -1,7 +1,7 @@
 ---
 title: "[LLM Assist] bulk-create tasks from a roadmap/implementation doc"
 project: pms-llm
-status: In Progress
+status: Done
 priority: High
 assignee: Priya Nair
 dueDate: 2027-01-15
@@ -28,3 +28,17 @@ Flagship of the prompt-driven editing idea: a user pastes (or uploads) an implem
 - Cap batch size (e.g. 30 candidate tasks) so a bad prompt over a huge doc can't spam the repo.
 
 Acceptance: paste a 1-page roadmap → click generate → a reviewable table of N tasks appears, each mapped to a real project/status/priority, committable in one action. No remote LLM, no file leaves the browser.
+
+### Final Verification Results & Notes (TASK CLOSED)
+
+We have fully implemented the bulk-create tasks interface powered by the local AI engine:
+
+1. **User Interface (`app/islands/task-bulk-create.tsx`):**
+   - Integrates seamlessly inside `PmsCreateMenu` on the `/tasks` page, appearing dynamically as a "Bulk Create (AI)" option whenever WebGPU is supported by the client browser.
+   - Leverages `FileUpload` to allow users to drag/upload `.txt` or `.md` files, or paste raw text into a standard textarea. All file loading occurs strictly client-side via a `FileReader` instance, preserving the local-inference privacy commitment.
+   - Provides an optional guidance prompt / custom instruction field to filter or customize task extraction.
+   - Connects to `extractTasksFromDocument()` with real-time progress callback reports rendered inline.
+   - Caps candidate task extraction at a maximum of 30 tasks per batch.
+
+2. **Commit Pipeline:**
+   - On confirmation, maps candidates directly to `createTasksBulk()` inside `app/utils/task-save.ts` to execute an atomic batched git commit.
