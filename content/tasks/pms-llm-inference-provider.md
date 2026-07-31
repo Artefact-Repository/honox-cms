@@ -1,7 +1,7 @@
 ---
-title: "[LLM Assist] shared local-inference provider util"
+title: "[LLM Assist] shared local-inference engine util"
 project: pms-llm
-status: To Do
+status: In Progress
 priority: Medium
 assignee: Diego Ramos
 dueDate: 2026-12-31
@@ -12,14 +12,16 @@ tags:
   - engineering
 ---
 
-Build the single shared inference engine the write-up and execution assists both call, so we don't instantiate the ONNX pipeline twice. Depends on `pms-llm-inference-poc` landing first.
+Build the single shared inference engine every AI-assisted feature calls into, so we don't instantiate the model twice. Depends on `pms-llm-inference-poc`. Superseded the original `app/utils/llm-inference.ts` (Transformers.js/ONNX) plan — see that task for the WebLLM decision.
 
-Create `app/utils/llm-inference.ts` (client-only — never imported by any SSR/route module):
-1. **Lazy load only.** Never `import` `@huggingface/transformers` at module top. Wrap it in a function that does `await import('@huggingface/transformers')` on first use, so it stays out of the SSG/SSR bundle (same discipline `vite.config.ts` uses for `yaml`/`extend`).
-2. **Device selection.** Try `device: 'webgpu'`, fall back to `'wasm'` if `navigator.gpu` is absent or init throws.
-3. **Model registry.** A small exported map of allowed local models (default `SmolLM2-1.1B-Instruct` q4; leave room for the picker in `pms-llm-settings-privacy` to select among them). Keep the list tiny — these are the only ones that fit on-device.
-4. **Single shared pipeline.** Lazily construct one `pipeline('text-generation', ...)` session and reuse it across calls; don't re-init per request.
-5. **Progress + cancellation.** Accept an `onProgress(downloadPct)` callback (weights download once but should show a bar) and an `AbortSignal` so the UI can cancel generation.
-6. **Capability check.** Export `supportsLocalInference(): boolean` — true only when not in SSR AND `fetch` is available AND (WebGPU or WASM is viable). This is what the UI uses to decide whether to show the assist buttons at all.
+`app/utils/ai-engine.ts` now exists with:
+1. **Lazy load only.** `@mlc-ai/web-llm` is `await import()`ed inside `getEngine()`, never at module top — keeps it out of the SSG/SSR bundle entirely (no `vite.config.ts` `ssr.external` entry needed, since it's never touched server-side at all, unlike the `yaml`/`extend` CJS cases that pattern was built for).
+2. **Capability check.** `isWebGpuSupported()` — `'gpu' in navigator`. No WASM/CPU fallback exists for WebLLM, so this is a hard gate, not a soft degrade: `getEngine()` throws immediately if it's false, and callers should check it before even offering the AI buttons.
+3. **Model registry.** `DEFAULT_MODEL_ID = "Qwen2.5-3B-Instruct-q4f16_1-MLC"`, plus `getStoredModelId()`/`setStoredModelId()` persisting the user's pick to `localStorage` (`honox-ai-model-id` key, same convention as `git-backend.ts`'s `TOKEN_STORAGE_KEY`). The actual picker UI is `pms-llm-settings-privacy`'s job; this just stores/reads the choice.
+4. **Single shared engine.** `getEngine(modelId, onProgress)` is a module-level singleton promise, reloaded only if a different `modelId` is requested; a failed load clears the cached promise so the next attempt retries instead of failing forever.
+5. **Progress.** `onProgress({ progress, text })` mirrors WebLLM's own `InitProgressCallback` — no re-wrapping needed. No `AbortSignal` yet (WebLLM's own API doesn't take one for `chat.completions.create`; cancellation would need to be modeled at the call-site level — open question for whoever builds the first UI on top).
+6. **Structured completion helper.** `runStructuredCompletion(engine, systemPrompt, userPrompt, schema)` — the shared low-level call `pms-llm-bulk-create-from-doc`'s extraction and `pms-llm-prompt-editor`'s edit-ops both build on, using `response_format: { type: "json_object", schema }` for grammar-constrained JSON output.
 
-This is the foundation for `pms-llm-writeup-assist` and `pms-llm-execution-assist`. Keep it dependency-free of any UI primitive; it should be callable from any island.
+Not yet built: cancellation, and the model registry is currently a single default rather than a real multi-model list — both are fine to defer to `pms-llm-settings-privacy`.
+
+This is the foundation for `pms-llm-writeup-assist` and `pms-llm-execution-assist`. Kept dependency-free of any UI primitive; callable from any island.
