@@ -29,34 +29,17 @@ export default createRoute(async (c) => {
 		label: task.title,
 		value: task.slug,
 	}));
-	const assignees = [
-		...new Set(
-			tasks
-				.map((task) => task.assignee)
-				.filter((assignee): assignee is string => !!assignee),
-		),
-	].sort();
-	const projectTitleBySlug = new Map(
-		projects.map((project) => [project.slug, project.title]),
-	);
-	const taskProjectSlugs = [
-		...new Set(
-			tasks
-				.map((task) => task.project)
-				.filter((slug): slug is string => !!slug),
-		),
-	];
+	const assignees = [...new Set(tasks.map((task) => task.assignee).filter((assignee): assignee is string => !!assignee))].sort();
+	const projectTitleBySlug = new Map(projects.map((project) => [project.slug, project.title]));
+	const taskProjectSlugs = [...new Set(tasks.map((task) => task.project).filter((slug): slug is string => !!slug))];
 	const taskProjectItems = taskProjectSlugs
-		.map((slug) => ({
-			label: projectTitleBySlug.get(slug) ?? slug,
-			value: slug,
-		}))
+		.map((slug) => ({ label: projectTitleBySlug.get(slug) ?? slug, value: slug }))
 		.sort((a, b) => a.label.localeCompare(b.label));
 	const searchQuery = new URL(c.req.url).searchParams.get("q") || "";
 
 	const originalContent = data.content ?? [];
 
-	// Each row below is a static "Project"/"Assignee"/"Status"/"Priority"
+	// Each row below is a static "Project"/"Assignee"
 	// badge-links stack in the CMS content JSON; we splice it out and render
 	// the matching client-side filter island in its place instead. Found
 	// generically (rather than a fixed set of named combinations) so any
@@ -70,8 +53,6 @@ export default createRoute(async (c) => {
 			label: "Assignee",
 			render: () => <TaskAssigneeFilter assignees={assignees} />,
 		},
-		{ label: "Status", render: () => <TaskStatusFilter /> },
-		{ label: "Priority", render: () => <TaskPriorityFilter /> },
 	];
 
 	const foundFilterRows = filterRows
@@ -81,19 +62,32 @@ export default createRoute(async (c) => {
 				(block) =>
 					block.blockType === "stack" &&
 					block.children?.some(
-						(child) =>
-							child.blockType === "text" && child.content === row.label,
+						(child) => child.blockType === "text" && child.content === row.label,
 					),
 			),
 		}))
 		.filter((row) => row.index !== -1)
 		.sort((a, b) => a.index - b.index);
 
+	const allFilterLabels = ["Project", "Assignee", "Status", "Priority"];
+	const allFilterIndices = allFilterLabels
+		.map((label) =>
+			originalContent.findIndex(
+				(block) =>
+					block.blockType === "stack" &&
+					block.children?.some(
+						(child) => child.blockType === "text" && child.content === label,
+					),
+			),
+		)
+		.filter((idx) => idx !== -1)
+		.sort((a, b) => a - b);
+
 	let beforeFilters = originalContent;
 	let afterFilters: typeof originalContent = [];
-	if (foundFilterRows.length > 0) {
-		const firstIndex = foundFilterRows[0].index;
-		const lastIndex = foundFilterRows[foundFilterRows.length - 1].index;
+	if (allFilterIndices.length > 0) {
+		const firstIndex = allFilterIndices[0];
+		const lastIndex = allFilterIndices[allFilterIndices.length - 1];
 		beforeFilters = originalContent.slice(0, firstIndex);
 		afterFilters = originalContent.slice(lastIndex + 1);
 	}
@@ -146,7 +140,7 @@ export default createRoute(async (c) => {
 						<div
 							class={css({
 								flex: "1",
-								maxWidth: "sm",
+								maxWidth: "md",
 								minWidth: "160px",
 								display: "flex",
 								gap: "2",
@@ -166,8 +160,9 @@ export default createRoute(async (c) => {
 									showCount={false}
 								/>
 							</div>
-							<div class={css({ flexShrink: 0 })}>
+							<div class={css({ flexShrink: 0, display: "flex", gap: "2" })}>
 								<TaskStatusFilter />
+								<TaskPriorityFilter />
 							</div>
 						</div>
 					)}
@@ -193,7 +188,7 @@ export default createRoute(async (c) => {
 
 				{foundFilterRows.length > 0 && (
 					<Grid
-						columns={{ base: 1, sm: 2, md: 4 }}
+						columns={{ base: 1, md: 2 }}
 						gap="6"
 						class={css({
 							marginBottom: "2rem",
