@@ -23,6 +23,7 @@ import {
 	TASK_PRIORITY_COLOR,
 	TASK_STATUS_COLOR,
 	TASK_STATUSES,
+	TASKS_PAGE_SIZE,
 	type Task,
 	type TaskPriority,
 	type TaskStatus,
@@ -32,6 +33,12 @@ import { formatDate } from "../utils/date";
 import { Anchor, Avatar, Badge, DisplayValue, Stack, Table, Text } from "./ui";
 import type { ColorPalette } from "./ui/color-palette";
 import { colorPaletteClass } from "./ui/color-palette";
+import {
+	NextTrigger,
+	PaginationItems,
+	Root as PaginationRoot,
+	PrevTrigger,
+} from "./ui/pagination-primitive";
 
 const treeRowClass = css({
 	'&[data-tree-hidden="true"]': { display: "none" },
@@ -79,6 +86,14 @@ interface TasksTableData {
 	statusColors: Record<TaskStatus, ColorPalette>;
 	priorityColors: Record<TaskPriority, ColorPalette>;
 	subtasksExpandedByDefault: boolean;
+	/** Root-subtree pagination — see `paginateTaskTree` in app/lib/tasks.ts.
+	 * `isPaginated` is false while a search (`?q=`) is active, since search
+	 * needs every task's row present in the DOM to be found. */
+	page: number;
+	totalPages: number;
+	totalRootCount: number;
+	pageSize: number;
+	isPaginated: boolean;
 }
 
 function TasksTable(data: Partial<TasksTableData>) {
@@ -93,6 +108,11 @@ function TasksTable(data: Partial<TasksTableData>) {
 	const priorityColor = data.priorityColors ?? TASK_PRIORITY_COLOR;
 	const subtasksExpandedByDefault = data.subtasksExpandedByDefault ?? true;
 	const initialExpanded = subtasksExpandedByDefault ? "true" : "false";
+	const page = data.page ?? 1;
+	const totalPages = data.totalPages ?? 1;
+	const totalRootCount = data.totalRootCount ?? 0;
+	const pageSize = data.pageSize ?? TASKS_PAGE_SIZE;
+	const isPaginated = data.isPaginated ?? false;
 
 	if (tasks.length === 0) {
 		return <Text class={css({ color: "fg.muted" })}>No tasks yet.</Text>;
@@ -357,6 +377,21 @@ function TasksTable(data: Partial<TasksTableData>) {
 					)}
 				/>
 			</TaskTreeDnd>
+			{isPaginated && totalPages > 1 && (
+				<div class={css({ display: "flex", justifyContent: "center", mt: "4" })}>
+					<PaginationRoot
+						type="link"
+						count={totalRootCount}
+						pageSize={pageSize}
+						page={page}
+						getPageUrl={({ page: targetPage }) => `/tasks?page=${targetPage}`}
+					>
+						<PrevTrigger />
+						<PaginationItems />
+						<NextTrigger />
+					</PaginationRoot>
+				</div>
+			)}
 			<TaskDetailsDrawer
 				tasks={tasks}
 				projectTitleBySlug={projectTitleBySlug}

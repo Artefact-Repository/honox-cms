@@ -224,6 +224,48 @@ export function buildTaskTree(tasks: Task[]): TaskTreeEntry[] {
 	return entries;
 }
 
+/** Root tasks rendered per page of the `/tasks` table's pagination — see
+ * `paginateTaskTree`. */
+export const TASKS_PAGE_SIZE = 25;
+
+export interface PaginatedTaskTree {
+	entries: TaskTreeEntry[];
+	/** Clamped into `[1, totalPages]`, so an out-of-range `?page=` (stale
+	 * link, hand-edited URL) degrades to the nearest valid page instead of
+	 * rendering empty. */
+	page: number;
+	totalPages: number;
+	/** Root (depth 0) task count — what pagination is measured in, not the
+	 * flat entry count, so a page always holds whole subtrees. */
+	totalRootCount: number;
+}
+
+/** Slices `taskTree` (from `buildTaskTree`) into `pageSize` root subtrees per
+ * page — a root task and all of its (recursively) nested subtasks always
+ * land on the same page together, since `buildTaskTree`'s pre-order walk
+ * keeps each subtree contiguous. */
+export function paginateTaskTree(
+	taskTree: TaskTreeEntry[],
+	page: number,
+	pageSize: number,
+): PaginatedTaskTree {
+	const rootIndices: number[] = [];
+	taskTree.forEach((entry, index) => {
+		if (entry.depth === 0) rootIndices.push(index);
+	});
+	const totalRootCount = rootIndices.length;
+	const totalPages = Math.max(1, Math.ceil(totalRootCount / pageSize));
+	const clampedPage = Math.min(Math.max(1, page), totalPages);
+	const startIndex = rootIndices[(clampedPage - 1) * pageSize] ?? taskTree.length;
+	const endIndex = rootIndices[clampedPage * pageSize] ?? taskTree.length;
+	return {
+		entries: taskTree.slice(startIndex, endIndex),
+		page: clampedPage,
+		totalPages,
+		totalRootCount,
+	};
+}
+
 /** Every task nested (directly or transitively) under `slug`, via
  * `buildTaskTree` — entries in a pre-order tree walk are contiguous, so
  * everything after `slug`'s own entry with a greater depth is its subtree.

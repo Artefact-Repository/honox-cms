@@ -14,10 +14,12 @@ import {
 	buildTaskSearchEntries,
 	buildTaskTree,
 	listTasks,
+	paginateTaskTree,
 	TASK_PRIORITIES,
 	TASK_PRIORITY_COLOR,
 	TASK_STATUS_COLOR,
 	TASK_STATUSES,
+	TASKS_PAGE_SIZE,
 } from "./tasks";
 
 export interface DataSourceContext {
@@ -144,9 +146,30 @@ const customTableDataResolvers: Record<string, CustomTableDataResolver> = {
 			(entry) => entry.key,
 		);
 
+		// Pagination is skipped while searching — the whole tree needs to stay
+		// in the DOM for the Search island (and the no-JS ?q= fallback above)
+		// to find matches outside the current page, so a search "expands" to
+		// every result rather than being confined to one page of it.
+		const isSearching = searchQuery.trim().length > 0;
+		const requestedPage = ctx.currentUrl
+			? Number(new URL(ctx.currentUrl).searchParams.get("page") ?? "1")
+			: 1;
+		const paginated = isSearching
+			? {
+					entries: taskTree,
+					page: 1,
+					totalPages: 1,
+					totalRootCount: taskTree.filter((entry) => entry.depth === 0).length,
+				}
+			: paginateTaskTree(
+					taskTree,
+					Number.isFinite(requestedPage) ? requestedPage : 1,
+					TASKS_PAGE_SIZE,
+				);
+
 		return {
 			tasks,
-			taskTree,
+			taskTree: paginated.entries,
 			projectBySlug: Object.fromEntries(projectBySlug),
 			projectTitleBySlug: Object.fromEntries(projectTitleBySlug),
 			matchedSlugs,
@@ -158,6 +181,11 @@ const customTableDataResolvers: Record<string, CustomTableDataResolver> = {
 			statusColors,
 			priorityColors,
 			subtasksExpandedByDefault,
+			page: paginated.page,
+			totalPages: paginated.totalPages,
+			totalRootCount: paginated.totalRootCount,
+			pageSize: TASKS_PAGE_SIZE,
+			isPaginated: !isSearching,
 		};
 	},
 };
