@@ -5,9 +5,9 @@ import { Dropdown } from "../components/ui/dropdown";
 import { TASK_PRIORITIES } from "../lib/tasks";
 
 export default function TaskPriorityFilter() {
-	const [checkedPriorities, setCheckedPriorities] = useState<Record<string, boolean>>(
-		Object.fromEntries(TASK_PRIORITIES.map((priority) => [priority, true])),
-	);
+	const [checkedPriorities, setCheckedPriorities] = useState<
+		Record<string, boolean>
+	>(Object.fromEntries(TASK_PRIORITIES.map((priority) => [priority, true])));
 
 	const checkedList = Object.entries(checkedPriorities)
 		.filter(([_, checked]) => checked)
@@ -25,7 +25,9 @@ export default function TaskPriorityFilter() {
 	}
 
 	useEffect(() => {
-		const rows = document.querySelectorAll<HTMLElement>("tr[data-task-priority]");
+		const rows = document.querySelectorAll<HTMLElement>(
+			"tr[data-task-priority]",
+		);
 		for (const row of rows) {
 			const priority = row.getAttribute("data-task-priority") ?? "";
 			const isChecked = checkedPriorities[priority] ?? false;

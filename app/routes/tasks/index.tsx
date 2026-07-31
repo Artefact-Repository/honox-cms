@@ -1,7 +1,7 @@
 import { css } from "design-system/css";
 import { createRoute } from "honox/factory";
 import { PageRenderer } from "../../components/page-renderer";
-import { Search } from "../../components/ui";
+import { Grid, Search } from "../../components/ui";
 import { Toaster } from "../../components/ui/toast";
 import AuthStatus from "../../islands/auth-status";
 import PmsCreateMenu from "../../islands/pms-create-menu";
@@ -29,11 +29,28 @@ export default createRoute(async (c) => {
 		label: task.title,
 		value: task.slug,
 	}));
-	const assignees = [...new Set(tasks.map((task) => task.assignee).filter((assignee): assignee is string => !!assignee))].sort();
-	const projectTitleBySlug = new Map(projects.map((project) => [project.slug, project.title]));
-	const taskProjectSlugs = [...new Set(tasks.map((task) => task.project).filter((slug): slug is string => !!slug))];
+	const assignees = [
+		...new Set(
+			tasks
+				.map((task) => task.assignee)
+				.filter((assignee): assignee is string => !!assignee),
+		),
+	].sort();
+	const projectTitleBySlug = new Map(
+		projects.map((project) => [project.slug, project.title]),
+	);
+	const taskProjectSlugs = [
+		...new Set(
+			tasks
+				.map((task) => task.project)
+				.filter((slug): slug is string => !!slug),
+		),
+	];
 	const taskProjectItems = taskProjectSlugs
-		.map((slug) => ({ label: projectTitleBySlug.get(slug) ?? slug, value: slug }))
+		.map((slug) => ({
+			label: projectTitleBySlug.get(slug) ?? slug,
+			value: slug,
+		}))
 		.sort((a, b) => a.label.localeCompare(b.label));
 	const searchQuery = new URL(c.req.url).searchParams.get("q") || "";
 
@@ -64,20 +81,22 @@ export default createRoute(async (c) => {
 				(block) =>
 					block.blockType === "stack" &&
 					block.children?.some(
-						(child) => child.blockType === "text" && child.content === row.label,
+						(child) =>
+							child.blockType === "text" && child.content === row.label,
 					),
 			),
 		}))
 		.filter((row) => row.index !== -1)
 		.sort((a, b) => a.index - b.index);
 
-	const contentParts: (typeof originalContent)[] = [];
-	let sliceStart = 0;
-	for (const row of foundFilterRows) {
-		contentParts.push(originalContent.slice(sliceStart, row.index));
-		sliceStart = row.index + 1;
+	let beforeFilters = originalContent;
+	let afterFilters: typeof originalContent = [];
+	if (foundFilterRows.length > 0) {
+		const firstIndex = foundFilterRows[0].index;
+		const lastIndex = foundFilterRows[foundFilterRows.length - 1].index;
+		beforeFilters = originalContent.slice(0, firstIndex);
+		afterFilters = originalContent.slice(lastIndex + 1);
 	}
-	contentParts.push(originalContent.slice(sliceStart));
 
 	return c.render(
 		<>
@@ -170,16 +189,24 @@ export default createRoute(async (c) => {
 					mx: "auto",
 				})}
 			>
-				{contentParts.map((part, i) => (
-					<>
-						<PageRenderer content={part} />
-						{foundFilterRows[i] && (
+				<PageRenderer content={beforeFilters} />
+
+				{foundFilterRows.length > 0 && (
+					<Grid
+						columns={{ base: 1, sm: 2, md: 4 }}
+						gap="6"
+						class={css({
+							marginBottom: "2rem",
+						})}
+					>
+						{foundFilterRows.map((row) => (
 							<div
+								key={row.label}
 								class={css({
 									display: "flex",
+									flexDirection: "column",
 									alignItems: "flex-start",
 									gap: "2",
-									marginBottom: i === foundFilterRows.length - 1 ? "2rem" : "0.75rem",
 								})}
 							>
 								<span
@@ -189,17 +216,18 @@ export default createRoute(async (c) => {
 										textTransform: "uppercase",
 										letterSpacing: "0.05em",
 										color: "#71717a",
-										minWidth: "64px",
-										paddingTop: "2",
+										paddingTop: "1",
 									})}
 								>
-									{foundFilterRows[i].label}
+									{row.label}
 								</span>
-								{foundFilterRows[i].render()}
+								{row.render()}
 							</div>
-						)}
-					</>
-				))}
+						))}
+					</Grid>
+				)}
+
+				<PageRenderer content={afterFilters} />
 			</div>
 		</>,
 	);

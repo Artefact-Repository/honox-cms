@@ -2,11 +2,19 @@ import { css } from "design-system/css";
 import { useEffect, useState } from "hono/jsx";
 import { Combobox } from "../components/ui/combobox";
 
-export default function TaskProjectFilter({ projects }: { projects: { label: string; value: string }[] }) {
-	const [selected, setSelected] = useState<string[]>(projects.map((project) => project.value));
+export default function TaskProjectFilter({
+	projects,
+}: {
+	projects: { label: string; value: string }[];
+}) {
+	const [selected, setSelected] = useState<string[]>(
+		projects.map((project) => project.value),
+	);
 
 	useEffect(() => {
-		const rows = document.querySelectorAll<HTMLElement>("tr[data-task-project]");
+		const rows = document.querySelectorAll<HTMLElement>(
+			"tr[data-task-project]",
+		);
 		for (const row of rows) {
 			const project = row.getAttribute("data-task-project") ?? "";
 			if (project === "") {
@@ -22,10 +30,20 @@ export default function TaskProjectFilter({ projects }: { projects: { label: str
 		}
 	}, [selected]);
 
-	const labelByValue = Object.fromEntries(projects.map((project) => [project.value, project.label]));
+	const labelByValue = Object.fromEntries(
+		projects.map((project) => [project.value, project.label]),
+	);
 
 	return (
-		<div class={css({ display: "flex", flexDirection: "column", gap: "2", width: "100%", maxWidth: "sm" })}>
+		<div
+			class={css({
+				display: "flex",
+				flexDirection: "column",
+				gap: "2",
+				width: "100%",
+				maxWidth: "sm",
+			})}
+		>
 			<Combobox
 				interactive={true}
 				multiple={true}
@@ -38,7 +56,14 @@ export default function TaskProjectFilter({ projects }: { projects: { label: str
 			/>
 
 			{selected.length > 0 && (
-				<div class={css({ display: "flex", flexWrap: "wrap", gap: "1.5", marginTop: "1" })}>
+				<div
+					class={css({
+						display: "flex",
+						flexWrap: "wrap",
+						gap: "1.5",
+						marginTop: "1",
+					})}
+				>
 					{selected.map((value) => (
 						<span
 							key={value}

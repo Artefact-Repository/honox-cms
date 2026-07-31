@@ -710,11 +710,17 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 	} = props;
 
 	// Manage controlled/uncontrolled selected value
-	const [localSelectedValue, setLocalSelectedValue] = useState<string | string[]>(() => {
+	const [localSelectedValue, setLocalSelectedValue] = useState<
+		string | string[]
+	>(() => {
 		const val = valueProp ?? defaultValueProp;
 		return multiple
-			? (Array.isArray(val) ? val : (val ? [val as string] : []))
-			: (val as string ?? "");
+			? Array.isArray(val)
+				? val
+				: val
+					? [val as string]
+					: []
+			: ((val as string) ?? "");
 	});
 	const isValueControlled = valueProp !== undefined;
 	const selectedValue = isValueControlled ? valueProp : localSelectedValue;
@@ -1114,15 +1120,14 @@ export function InteractiveCombobox(props: InteractiveComboboxProps) {
 			setHighlightedIndex={setHighlightedIndex}
 			multiple={multiple}
 		>
-			{name && (
-				Array.isArray(selectedValue) ? (
+			{name &&
+				(Array.isArray(selectedValue) ? (
 					selectedValue.map((val) => (
 						<input type="hidden" name={name} value={val} key={val} />
 					))
 				) : (
 					<input type="hidden" name={name} value={selectedValue} />
-				)
-			)}
+				))}
 			<ComboboxStructure {...props} />
 		</Root>
 	);

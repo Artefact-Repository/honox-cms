@@ -857,7 +857,10 @@ export function DropdownItemIndicator(props: DropdownItemIndicatorProps) {
 				checked === undefined ? undefined : checked ? "checked" : "unchecked"
 			}
 			class={cx(context.styles.itemIndicator, classProp)}
-			style={{ visibility: checked === false ? "hidden" : "visible", display: "flex" }}
+			style={{
+				visibility: checked === false ? "hidden" : "visible",
+				display: "flex",
+			}}
 			{...restProps}
 		>
 			{children ??

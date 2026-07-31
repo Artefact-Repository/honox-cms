@@ -28,14 +28,18 @@ function isFilteredOut(row: HTMLTableRowElement): boolean {
  * `data-root-index` (stamped by `computeTaskTreePages` in app/lib/tasks.ts)
  * rather than DOM position, since a sortable column can reorder rows without
  * changing which subtree they belong to. */
-function computePageByRootIndex(
-	pageSize: number,
-): { pageByRootIndex: Map<number, number>; totalPages: number } {
+function computePageByRootIndex(pageSize: number): {
+	pageByRootIndex: Map<number, number>;
+	totalPages: number;
+} {
 	const roots = Array.from(
-		document.querySelectorAll<HTMLTableRowElement>('tr[data-task-slug][data-depth="0"]'),
+		document.querySelectorAll<HTMLTableRowElement>(
+			'tr[data-task-slug][data-depth="0"]',
+		),
 	).sort(
 		(a, b) =>
-			Number(a.getAttribute("data-root-index")) - Number(b.getAttribute("data-root-index")),
+			Number(a.getAttribute("data-root-index")) -
+			Number(b.getAttribute("data-root-index")),
 	);
 	const visibleRootIndices = roots
 		.filter((row) => !isFilteredOut(row))
@@ -52,7 +56,10 @@ function computePageByRootIndex(
 	};
 }
 
-function applyPageVisibility(page: number | null, pageByRootIndex: Map<number, number>) {
+function applyPageVisibility(
+	page: number | null,
+	pageByRootIndex: Map<number, number>,
+) {
 	for (const row of document.querySelectorAll<HTMLTableRowElement>(
 		"tr[data-task-slug]",
 	)) {

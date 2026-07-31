@@ -154,10 +154,8 @@ const customTableDataResolvers: Record<string, CustomTableDataResolver> = {
 		// `?q=` handling. This just stamps each row with which root-subtree
 		// group it belongs to, so that island can chunk pages (and re-chunk
 		// them around whatever a status/priority/assignee filter hides).
-		const { rootIndexByIndex, totalPages, totalRootCount } = computeTaskTreePages(
-			taskTree,
-			TASKS_PAGE_SIZE,
-		);
+		const { rootIndexByIndex, totalPages, totalRootCount } =
+			computeTaskTreePages(taskTree, TASKS_PAGE_SIZE);
 		const pagedTaskTree = taskTree.map((entry, index) => ({
 			...entry,
 			rootIndex: rootIndexByIndex[index],

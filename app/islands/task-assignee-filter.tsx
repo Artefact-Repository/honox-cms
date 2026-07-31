@@ -2,11 +2,17 @@ import { css } from "design-system/css";
 import { useEffect, useState } from "hono/jsx";
 import { Combobox } from "../components/ui/combobox";
 
-export default function TaskAssigneeFilter({ assignees }: { assignees: string[] }) {
+export default function TaskAssigneeFilter({
+	assignees,
+}: {
+	assignees: string[];
+}) {
 	const [selected, setSelected] = useState<string[]>(assignees);
 
 	useEffect(() => {
-		const rows = document.querySelectorAll<HTMLElement>("tr[data-task-assignee]");
+		const rows = document.querySelectorAll<HTMLElement>(
+			"tr[data-task-assignee]",
+		);
 		for (const row of rows) {
 			const assignee = row.getAttribute("data-task-assignee") ?? "";
 			if (assignee === "") {
@@ -25,7 +31,15 @@ export default function TaskAssigneeFilter({ assignees }: { assignees: string[] 
 	const items = assignees.map((name) => ({ label: name, value: name }));
 
 	return (
-		<div class={css({ display: "flex", flexDirection: "column", gap: "2", width: "100%", maxWidth: "sm" })}>
+		<div
+			class={css({
+				display: "flex",
+				flexDirection: "column",
+				gap: "2",
+				width: "100%",
+				maxWidth: "sm",
+			})}
+		>
 			<Combobox
 				interactive={true}
 				multiple={true}
@@ -38,7 +52,14 @@ export default function TaskAssigneeFilter({ assignees }: { assignees: string[] 
 			/>
 
 			{selected.length > 0 && (
-				<div class={css({ display: "flex", flexWrap: "wrap", gap: "1.5", marginTop: "1" })}>
+				<div
+					class={css({
+						display: "flex",
+						flexWrap: "wrap",
+						gap: "1.5",
+						marginTop: "1",
+					})}
+				>
 					{selected.map((name) => (
 						<span
 							key={name}

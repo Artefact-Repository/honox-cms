@@ -184,8 +184,14 @@ describe("Combobox Unit Tests", () => {
 		// When multiple, initial input text remains clear (empty value)
 		expect(html).toContain('data-part="input"');
 		// Correct checked states for items
-		expect(html).toContain('data-value="React" data-item-value="react" data-state="checked"');
-		expect(html).toContain('data-value="Solid" data-item-value="solid" data-state="checked"');
-		expect(html).toContain('data-value="Vue" data-item-value="vue" data-state="unchecked"');
+		expect(html).toContain(
+			'data-value="React" data-item-value="react" data-state="checked"',
+		);
+		expect(html).toContain(
+			'data-value="Solid" data-item-value="solid" data-state="checked"',
+		);
+		expect(html).toContain(
+			'data-value="Vue" data-item-value="vue" data-state="unchecked"',
+		);
 	});
 });
