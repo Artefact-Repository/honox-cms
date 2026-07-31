@@ -1,6 +1,6 @@
 ---
 title: LLM Assist — settings, opt-in, and privacy notice
-project: pms
+project: pms-llm
 status: To Do
 priority: Medium
 assignee: Priya Nair

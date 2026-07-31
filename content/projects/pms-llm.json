@@ -1,0 +1,11 @@
+{
+	"title": "PMS — LLM Assist (local inference)",
+	"summary": "Greenfield, spike-gated workstream that adds on-device LLM help to the Git-backed Projects & Tasks surface: task write-up drafting, execution assist, and prompt-driven bulk editing (e.g. turn an implementation roadmap doc into a batch of tasks). All inference runs in the browser via @huggingface/transformers (ONNX Runtime Web, WebGPU + WASM fallback) — there is no server runtime in this app, so task text never leaves the device.",
+	"description": "Separate from the operational PMS programme (content/projects/pms.json). This is the LLM Assist initiative for the Projects & Tasks surface: run small, quantized models entirely client-side, because the app ships to Cloudflare Pages (edge, static assets) + Vercel and every write goes straight to the git host via app/utils/git-backend.ts — there is no backend to host ONNX. Inference therefore runs in-browser through @huggingface/transformers (Transformers.js = ONNX Runtime Web under the hood, exactly the HuggingFace + ONNX combo requested), WebGPU with a WASM fallback. Scope, in dependency order: (1) a production-build proof-of-concept (pms-llm-inference-poc) that de-risks whether in-browser ONNX even runs in this bundle — this gates the whole idea; (2) a shared client-only provider util (pms-llm-inference-provider) at app/utils/llm-inference.ts; (3) write-up drafting in the task-create drawer (pms-llm-writeup-assist); (4) execution assist on the task detail page (pms-llm-execution-assist); (5) prompt-driven bulk editing — ingest a roadmap/implementation doc and batch-create tasks, with a review grid and a batched git commit, plus natural-language editing of existing items (pms-llm-bulk-create-from-doc, pms-llm-bulk-preview-review, pms-llm-batch-commit, pms-llm-prompt-editor); (6) an opt-in settings/privacy section (pms-llm-settings-privacy); (7) documentation that avoids the doc-drift we already flagged (pms-llm-docs). Status is Proposed because everything is contingent on the PoC.",
+	"status": "Proposed",
+	"colorPalette": "gray",
+	"owner": "Diego Ramos",
+	"startDate": "2026-08-01",
+	"dueDate": "2027-02-15",
+	"tags": ["pms", "ai", "local-inference"]
+}

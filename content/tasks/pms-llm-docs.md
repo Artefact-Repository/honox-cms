@@ -1,6 +1,6 @@
 ---
 title: LLM Assist — document the local-inference feature (and avoid doc drift)
-project: pms
+project: pms-llm
 status: To Do
 priority: Low
 assignee: Mia Chen

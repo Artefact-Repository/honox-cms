@@ -1,6 +1,6 @@
 ---
 title: LLM Assist — in-browser ONNX inference proof-of-concept (prod build)
-project: pms
+project: pms-llm
 status: To Do
 priority: High
 assignee: Diego Ramos

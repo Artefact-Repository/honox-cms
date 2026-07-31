@@ -1,6 +1,6 @@
 ---
 title: LLM Assist — AI draft in the task write-up drawer
-project: pms
+project: pms-llm
 status: To Do
 priority: High
 assignee: Priya Nair

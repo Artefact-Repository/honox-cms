@@ -1,6 +1,6 @@
 ---
 title: LLM Assist — shared local-inference provider util
-project: pms
+project: pms-llm
 status: To Do
 priority: Medium
 assignee: Diego Ramos

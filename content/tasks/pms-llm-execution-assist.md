@@ -1,6 +1,6 @@
 ---
 title: LLM Assist — AI execution assist on the task detail page
-project: pms
+project: pms-llm
 status: To Do
 priority: Medium
 assignee: Mia Chen
