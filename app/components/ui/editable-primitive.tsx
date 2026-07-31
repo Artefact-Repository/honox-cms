@@ -340,65 +340,82 @@ export function Label(props: LabelProps) {
 
 export interface PreviewProps {
 	class?: string;
+	/** Renders this HTML instead of the plain-text value — e.g. a task
+	 * description rendered as formatted markdown. The caller is responsible
+	 * for trusting/sanitizing the source; a click on a link inside still
+	 * navigates instead of entering edit mode, since focus (which drives
+	 * `activationMode: "focus"`) lands on the link, not this wrapper. */
+	dangerouslySetInnerHTML?: { __html: string };
 	[key: string]: unknown;
 }
 
 export function Preview(props: PreviewProps) {
-	const { class: classProp, ...rest } = props;
+	const { class: classProp, dangerouslySetInnerHTML, ...rest } = props;
 	const context = useEditableContext();
 	const styles = context?.styles ?? editable();
 	const interactive = !(context?.disabled || context?.readOnly);
+	const spanProps = {
+		id: context?.ids.preview,
+		role: "button" as const,
+		class: cx(styles.preview, classProp),
+		"data-scope": "editable",
+		"data-part": "preview",
+		"data-placeholder-shown": context?.empty ? "" : undefined,
+		"data-readonly": context?.readOnly ? "" : undefined,
+		"data-disabled": context?.disabled ? "" : undefined,
+		"aria-disabled": context?.disabled ? "true" : undefined,
+		"aria-invalid": context?.invalid ? "true" : undefined,
+		"data-invalid": context?.invalid ? "" : undefined,
+		"data-autoresize": context?.autoResize ? "" : undefined,
+		"aria-label": context?.translations.edit,
+		hidden: context?.autoResize ? undefined : context?.editing,
+		tabIndex: interactive ? 0 : undefined,
+		onClick: () => {
+			if (context?.activationMode === "click") context?.edit();
+		},
+		onFocus: () => {
+			if (context?.activationMode === "focus") context?.edit();
+		},
+		onDoubleClick: () => {
+			if (context?.activationMode === "dblclick") context?.edit();
+		},
+		onKeyDown: (e: KeyboardEvent) => {
+			if (
+				(e.key === "Enter" || e.key === " ") &&
+				(context?.activationMode === "click" ||
+					context?.activationMode === "dblclick")
+			) {
+				e.preventDefault();
+				context?.edit();
+			}
+		},
+		style: context?.autoResize
+			? {
+					whiteSpace: "pre",
+					gridArea: "1 / 1 / auto / auto",
+					visibility: context.editing ? "hidden" : undefined,
+					overflow: "hidden",
+					textOverflow: "ellipsis",
+					minWidth: context.empty ? "3ch" : "0",
+				}
+			: undefined,
+		...rest,
+	};
+	// The two branches must be genuinely separate elements (not one `<span>`
+	// conditionally fed `dangerouslySetInnerHTML` vs. `children`) — hono/jsx's
+	// JSX runtime builds a `children` array from the `{...}` expression even
+	// when its value is `undefined`, so passing both props on the same call
+	// always trips its "only one of children or dangerouslySetInnerHTML"
+	// guard.
+	if (dangerouslySetInnerHTML) {
+		// biome-ignore lint/a11y/useSemanticElements: preview sits next to the input in the same area slot; Ark UI renders it as a plain element with role="button" too
+		return (
+			<span {...spanProps} dangerouslySetInnerHTML={dangerouslySetInnerHTML} />
+		);
+	}
 	return (
 		// biome-ignore lint/a11y/useSemanticElements: preview sits next to the input in the same area slot; Ark UI renders it as a plain element with role="button" too
-		<span
-			id={context?.ids.preview}
-			role="button"
-			class={cx(styles.preview, classProp)}
-			data-scope="editable"
-			data-part="preview"
-			data-placeholder-shown={context?.empty ? "" : undefined}
-			data-readonly={context?.readOnly ? "" : undefined}
-			data-disabled={context?.disabled ? "" : undefined}
-			aria-disabled={context?.disabled ? "true" : undefined}
-			aria-invalid={context?.invalid ? "true" : undefined}
-			data-invalid={context?.invalid ? "" : undefined}
-			data-autoresize={context?.autoResize ? "" : undefined}
-			aria-label={context?.translations.edit}
-			hidden={context?.autoResize ? undefined : context?.editing}
-			tabIndex={interactive ? 0 : undefined}
-			onClick={() => {
-				if (context?.activationMode === "click") context.edit();
-			}}
-			onFocus={() => {
-				if (context?.activationMode === "focus") context.edit();
-			}}
-			onDoubleClick={() => {
-				if (context?.activationMode === "dblclick") context.edit();
-			}}
-			onKeyDown={(e) => {
-				if (
-					(e.key === "Enter" || e.key === " ") &&
-					(context?.activationMode === "click" ||
-						context?.activationMode === "dblclick")
-				) {
-					e.preventDefault();
-					context.edit();
-				}
-			}}
-			style={
-				context?.autoResize
-					? {
-							whiteSpace: "pre",
-							gridArea: "1 / 1 / auto / auto",
-							visibility: context.editing ? "hidden" : undefined,
-							overflow: "hidden",
-							textOverflow: "ellipsis",
-							minWidth: context.empty ? "3ch" : "0",
-						}
-					: undefined
-			}
-			{...rest}
-		>
+		<span {...spanProps}>
 			{context?.tags
 				? parseTags(context.value).map((tag) => (
 						<span key={tag} class={styles.tag}>
