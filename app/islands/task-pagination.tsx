@@ -78,7 +78,7 @@ function applyPageVisibility(
 
 // Static builds prerender with no query string, so pick up a shareable
 // `?page=` once hydrated — same as InteractiveSearch's `?q=` handling. Read
-// synchronously via useState's lazy initializer (not a follow-up effect that
+// synchronously via useState's lazy initialiser (not a follow-up effect that
 // calls setPage) so the client's first render already has the right page —
 // two renders (1, then corrected) left a stale-closure window where the
 // visibility effect below could apply the old page.

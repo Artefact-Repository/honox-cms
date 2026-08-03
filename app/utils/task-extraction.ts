@@ -126,7 +126,7 @@ ${projectList}
 Output only the JSON object — no commentary.`;
 }
 
-function normalizeTitle(title: string): string {
+function normaliseTitle(title: string): string {
 	return title.trim().toLowerCase().replace(/\s+/g, " ");
 }
 
@@ -155,7 +155,7 @@ function parseChunkResponse(raw: string): CandidateTask[] {
 
 /** Runs extraction chunk-by-chunk, carrying forward already-extracted titles
  * in each subsequent prompt to suppress obvious cross-chunk duplicates, then
- * does a final client-side dedupe pass on normalized titles. On a
+ * does a final client-side dedupe pass on normalised titles. On a
  * schema-invalid response, retries that one chunk once with the parse error
  * appended before giving up on it (surfaced via `error` on that chunk's
  * result, not thrown — a single bad chunk shouldn't sink the whole batch). */
@@ -205,7 +205,7 @@ export async function extractTasksFromDocument(
 		}
 
 		for (const task of tasks) {
-			const key = normalizeTitle(task.title);
+			const key = normaliseTitle(task.title);
 			if (seenTitles.has(key)) continue;
 			seenTitles.add(key);
 			allTasks.push(task);

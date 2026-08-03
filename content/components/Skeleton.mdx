@@ -130,5 +130,5 @@ Once data finishes loading on client machines, setting `loaded` to `true` instan
 # Architecture Notes
 
 - **Zero Layout Shifts:** Geometric sizing parameters (like CSS grid height and width) are parsed on the server before client-side hydration. This preserves proportional layout boundaries and avoids cumulative layout shifts (CLS).
-- **GPU-Accelerated Shimmer:** High-shine reflections and glowing pulse loops utilize high-performance CSS transforms. This guarantees 60fps animations even on lower-end mobile devices.
+- **GPU-Accelerated Shimmer:** High-shine reflections and glowing pulse loops utilise high-performance CSS transforms. This guarantees 60fps animations even on lower-end mobile devices.
 - **Dynamic Content Mapping:** Wrapping components with a Skeleton lets developers fetch client-side data feeds asynchronously, safely transitioning elements from placeholders to visible states seamlessly.

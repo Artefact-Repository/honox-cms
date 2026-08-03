@@ -17,7 +17,7 @@ A highly responsive and flexible CSS Grid layout container for constructing grid
 - **Auto-Fit Scaling:** Define a minimum child width threshold (`minChildWidth`) to let the container automatically flow children into columns as space permits.
 - **Responsive Breakpoints:** Native support for responsive configurations across predefined system breakpoints (`base`, `sm`, `md`, `lg`, `xl`, `2xl`).
 - **Polymorphic Rendering:** Render as any semantic HTML tag via the `as` prop, or delegate grid styles onto a single child component via the `asChild` prop.
-- **Zero-Layout Shift Performance:** Styles compile down to optimized, static Panda CSS utilities, avoiding client-side Javascript measurement overhead.
+- **Zero-Layout Shift Performance:** Styles compile down to optimised, static Panda CSS utilities, avoiding client-side Javascript measurement overhead.
 
 ---
 
@@ -252,7 +252,7 @@ The `Grid` component is classified as a **Tier-3 Presentational Component** unde
 ### Developer Implementation Notes
 
 - **Panda CSS Pattern Integration:** Under the hood, this component translates columns, rows, and gap definitions into Panda CSS `grid` utility structures, generating high-performance atomic CSS classes.
-- **Responsive JSON Strings:** When authoring pages within Sveltia CMS, responsive values (like breakpoint column configurations) should be written as JSON-serialized strings (e.g. `'{"base": 1, "md": 2}'`). These are automatically parsed and translated to breakpoint styles at runtime.
+- **Responsive JSON Strings:** When authoring pages within Sveltia CMS, responsive values (like breakpoint column configurations) should be written as JSON-serialised strings (e.g. `'{"base": 1, "md": 2}'`). These are automatically parsed and translated to breakpoint styles at runtime.
 
 ### Accessibility Compliance
 

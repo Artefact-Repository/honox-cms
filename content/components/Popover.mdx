@@ -145,5 +145,5 @@ For more complex dashboard panels, popovers can embed custom SVG triggers (using
 # Architecture Notes
 
 - **Smart Viewport Boundary Alignments:** The interactive Preact island dynamically tracks screen space. If the popover opens near viewport edges, it flips directions automatically (e.g. from bottom to top alignment) and shifts along its axis to prevent content clipping.
-- **Unified Event Delegation:** Opening and closing interactions, along with close-on-click-outside and escape-key handling, are delegated cleanly from a central listener on the popover's root element. This minimizes client-side event binding.
+- **Unified Event Delegation:** Opening and closing interactions, along with close-on-click-outside and escape-key handling, are delegated cleanly from a central listener on the popover's root element. This minimises client-side event binding.
 - **Semantic Overlays:** Popovers compile into native, accessible layouts incorporating semantic attributes like `role="dialog"`, `aria-haspopup="dialog"`, and `aria-expanded="true|false"` out-of-the-box, ensuring full screen-reader compliance.

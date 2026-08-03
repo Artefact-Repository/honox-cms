@@ -147,5 +147,5 @@ Demonstrates a fully disabled shipping parameters section. Deactivating the pare
 # Developer Notes & Accessibility
 
 - **Hydration Free (Static-Only):** Fieldset is a semantic layout component designated as a Static-Only component (`Tier 3`). It renders entirely as standard server-side HTML and is exempt from client-side hydration scripts.
-- **Context Propagation:** It utilizes context providers to propagate `disabled`, `invalid`, and `required` states downward. Direct child component blocks (such as `Field` and `Textarea`) automatically listen to this context and inherits group properties, eliminating duplicate key declarations.
+- **Context Propagation:** It utilises context providers to propagate `disabled`, `invalid`, and `required` states downward. Direct child component blocks (such as `Field` and `Textarea`) automatically listen to this context and inherits group properties, eliminating duplicate key declarations.
 - **WAI-ARIA Compliance:** Fieldset compiles strictly to semantic HTML `<fieldset>` containers containing direct `<legend>` elements, satisfying accessible browser heading requirements.

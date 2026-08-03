@@ -147,7 +147,7 @@ export function Trigger(props: HoverCardTriggerProps) {
 			// `undefined` and treat every child, native or not, as non-native.
 			// `.tag` is a plain string ("button") in real SSR output, but can
 			// come through as a named function in some jsx-runtime resolutions
-			// (observed under bun:test) — normalize both to be safe.
+			// (observed under bun:test) — normalise both to be safe.
 			tag?: unknown;
 			props?: { class?: string; tabIndex?: unknown; role?: unknown };
 		};

@@ -9,4 +9,4 @@ tags:
   - design
 ---
 
-Explore and finalize the new hero section layout and imagery.
+Explore and finalise the new hero section layout and imagery.

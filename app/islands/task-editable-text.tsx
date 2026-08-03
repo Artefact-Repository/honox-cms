@@ -38,7 +38,7 @@ export interface TaskEditableTextProps {
 	/** Task slug + which field this editor commits to via `saveTaskField` on
 	 * submit (same direct-commit path as task-project-editor.tsx) — a plain
 	 * string/enum pair rather than a save callback, since island props are
-	 * serialized across the hydration boundary and can't carry a closure from
+	 * serialised across the hydration boundary and can't carry a closure from
 	 * the server-rendered parent. */
 	slug: string;
 	field: "title" | "body";

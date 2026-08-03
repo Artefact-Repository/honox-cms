@@ -65,7 +65,7 @@ the shared `colorPaletteClass()` utility...
 
 `project` is a **`relation` widget** in `config.yml` (`collection: projects`, `value_field: "{{slug}}"`) — the CMS resolves it to a picker over existing projects, but on disk it's just the related project's slug as a plain string, so a hand-authored file works the same way. `status` is one of `To Do` / `In Progress` / `In Review` / `Done`; `priority` is one of `Low` / `Medium` / `High` / `Urgent`. The markdown body is the task description, parsed with the same frontmatter/markdown pipeline as blog posts (`app/utils/markdown.ts`). Loaded via `listTasks()` / `listTasksByProject()` / `loadTaskBySlug()` / `listTaskSlugs()`, all in `app/lib/tasks.ts`.
 
-Neither collection is translated — `content/projects/` and `content/tasks/` have no `<locale>/` subfolders, unlike posts/pages/docs, since this is operational data rather than localized marketing content.
+Neither collection is translated — `content/projects/` and `content/tasks/` have no `<locale>/` subfolders, unlike posts/pages/docs, since this is operational data rather than localised marketing content.
 
 ---
 

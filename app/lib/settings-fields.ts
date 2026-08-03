@@ -164,7 +164,7 @@ export const DEFAULT_SETTINGS_FIELDS: SettingsFieldMeta[] = [
 		section: "local-llm",
 		label: "Model",
 		description:
-			"Which quantized instruct model to run locally. The 3B model gives better extraction quality; the 1.5B model is lighter for lower-end devices. Switching models re-downloads (or reuses a cached) model the next time AI assist runs.",
+			"Which quantised instruct model to run locally. The 3B model gives better extraction quality; the 1.5B model is lighter for lower-end devices. Switching models re-downloads (or reuses a cached) model the next time AI assist runs.",
 	},
 
 	// CMS Admin

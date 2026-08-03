@@ -1,5 +1,5 @@
 ---
-title: Migrate components to centralized colorPalette utility
+title: Migrate components to centralised colorPalette utility
 project: ui-components
 status: Done
 priority: High

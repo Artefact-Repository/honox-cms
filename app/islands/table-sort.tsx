@@ -3,7 +3,7 @@ import { useEffect, useRef } from "hono/jsx";
 
 // A wrapping controller, not the table's own hydration. `TableBase`'s
 // `columns[].render`/`sortValue` are functions — HonoX hydrates islands by
-// `JSON.parse`-ing a serialized-props attribute (see
+// `JSON.parse`-ing a serialised-props attribute (see
 // node_modules/honox/dist/client/client.js), which silently drops any
 // function on a prop. If the table itself were the hydrated component, every
 // custom-rendered cell (links, badges, formatted dates) would revert to its
@@ -13,7 +13,7 @@ import { useEffect, useRef } from "hono/jsx";
 //
 // JSX passed as `children`, on the other hand, survives an island boundary
 // intact: HonoX slot-lifts element-valued props into a `<template>` that's
-// cloned back in as real DOM, not re-executed from serialized data (same
+// cloned back in as real DOM, not re-executed from serialised data (same
 // mechanism documented for other islands in this codebase). So this island
 // receives the *already fully server-rendered* `<TableBase>` output as
 // `children` and only ever touches it via plain DOM APIs — reading

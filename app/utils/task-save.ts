@@ -60,7 +60,7 @@ export async function deleteTask(slug: string): Promise<void> {
  * "Convert to... Task" action, offered instead of "...Subtask" once a task
  * already has a parent (see task-actions-menu.tsx). Same direct-commit path
  * as every other field edit; `data.parentTask = undefined` is enough to drop
- * the key entirely, since `stringifyFrontmatter`'s YAML serializer omits
+ * the key entirely, since `stringifyFrontmatter`'s YAML serialiser omits
  * `undefined` values the same way `JSON.stringify` would. */
 export async function convertTaskToTopLevel(slug: string): Promise<void> {
 	await saveTaskField(slug, (data) => ({

@@ -395,7 +395,7 @@ const registry: Record<string, BlockRenderer> = {
 	// `value` arrives as "" (not omitted) when a content author leaves the
 	// CMS field untouched — that must fall through to DisplayValue's own
 	// empty-state placeholder rather than rendering a blank string, so it's
-	// normalized to undefined here (same empty-string gotcha noted elsewhere
+	// normalised to undefined here (same empty-string gotcha noted elsewhere
 	// in this file for other optional CMS fields).
 	//
 	// `formatValue` arrives as a string naming an entry in

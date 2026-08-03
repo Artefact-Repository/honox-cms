@@ -112,6 +112,6 @@ Ideal for embedding compact URLs or system IDs in tight dashboard sidebars or co
 # Developer Notes & Accessibility
 
 - **Accessible Label & State Announcements:** Under the hood, this component handles screen reader accessibility natively:
-    - The copy button trigger receives localized `aria-label` updates (swapping between `"Copy to clipboard"` / `"Copied to clipboard"`), ensuring screen readers announce status changes immediately.
+    - The copy button trigger receives localised `aria-label` updates (swapping between `"Copy to clipboard"` / `"Copied to clipboard"`), ensuring screen readers announce status changes immediately.
 - **Select-on-Focus & Readonly Inputs:** The input field remains focusable (`readOnly` rather than `disabled`). When focused, it automatically selects its complete inner text so keyboard users can manually copy contents using `Ctrl+C` or `Cmd+C`.
 - **Active State Markers:** A `data-copied` attribute is dynamically mirrored onto the outer container and all descendant parts when active, facilitating custom CSS styling during copying.

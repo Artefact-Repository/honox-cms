@@ -137,7 +137,7 @@ When using `hoverActions` on a table that is fully or partially interactive (for
 | Property | CMS Field Type | Default | Description / Supported Options |
 | --- | --- | --- | --- |
 | **Columns** (`columns`) | `list` | - | An ordered list of column configurations (see Column item details below). |
-| **Rows Data** (`rows`) | `text` | - | A raw JSON-serialized array string representing table rows. (E.g. `"[{\"item\": \"Laptop\"}]"`). Parsed automatically at server render-time. |
+| **Rows Data** (`rows`) | `text` | - | A raw JSON-serialised array string representing table rows. (E.g. `"[{\"item\": \"Laptop\"}]"`). Parsed automatically at server render-time. |
 | **Variant** (`variant`) | `select` | `"plain"` | The general design layout style of the table container. <br/>• Options: `"plain"`, `"surface"`. |
 | **Zebra Striping** (`striped`) | `boolean` | `false` | When true, renders alternating rows with subtle shaded backgrounds for enhanced data legibility. |
 | **Row Highlights** (`interactive`) | `boolean` | `false` | Enables full mouse-hover background animations across active cells on desktop machines. |
@@ -159,6 +159,6 @@ Each entry in the `columns` list parameter accepts the following fields:
 
 # Architecture Notes
 
-- **Optimized JSON String Coercions:** Because raw row structures vary dynamically per table block, Sveltia CMS delivers row items as an escaped JSON array string under the `rows` field. This string is safely parsed at render-time, guaranteeing optimal bundle sizes without heavy payload serialization.
+- **Optimised JSON String Coercions:** Because raw row structures vary dynamically per table block, Sveltia CMS delivers row items as an escaped JSON array string under the `rows` field. This string is safely parsed at render-time, guaranteeing optimal bundle sizes without heavy payload serialization.
 - **Pure CSS Layout Hygiene:** Headers, column outlines, and zebra striping rely on lightweight, highly robust Panda CSS utility variables. This eliminates layout shifts while keeping table rendering instantaneous on mobile touchscreens.
-- **Scroll pinning:** Pinning column headers with `stickyHeader` utilizes standard `position: sticky` on headers inside an overflow wrap, bypassing expensive scroll event listeners in client-side script contexts.
+- **Scroll pinning:** Pinning column headers with `stickyHeader` utilises standard `position: sticky` on headers inside an overflow wrap, bypassing expensive scroll event listeners in client-side script contexts.

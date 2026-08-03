@@ -25,7 +25,7 @@ export default defineConfig({
 		// because values come from CMS content at runtime, never literal JSX, so
 		// Panda's static extractor can't discover them on its own — see the
 		// `recipes` comment below for the same limitation. Aliases like
-		// "success"/"error"/"warning" are normalized to a real palette name in
+		// "success"/"error"/"warning" are normalised to a real palette name in
 		// `app/components/ui/color-palette.ts` before reaching `css()`, so they
 		// don't need entries here.
 		css: [

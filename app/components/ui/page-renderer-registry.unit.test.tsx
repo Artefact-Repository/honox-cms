@@ -282,7 +282,7 @@ test("displayValue block renders the configured value", () => {
 });
 
 test("displayValue block renders the empty-state placeholder when value is untouched (empty string)", () => {
-	// Sveltia serializes an untouched optional string field as "", not
+	// Sveltia serialises an untouched optional string field as "", not
 	// omitted — same gotcha as other optional CMS fields in this registry.
 	const html = (
 		<PageRenderer content={[{ blockType: "displayValue", value: "" }]} />

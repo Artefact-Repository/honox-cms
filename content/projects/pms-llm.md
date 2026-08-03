@@ -16,7 +16,7 @@ tags:
   - local-inference
 ---
 
-Separate from the operational PMS programme (`content/projects/pms.md`). This is the LLM Assist initiative for the Projects & Tasks surface: run a small, quantized instruct model entirely client-side, because the app ships to Cloudflare Pages (edge, static assets) + Vercel and every write goes straight to the git host via `app/utils/git-backend.ts` — there is no backend to host inference.
+Separate from the operational PMS programme (`content/projects/pms.md`). This is the LLM Assist initiative for the Projects & Tasks surface: run a small, quantised instruct model entirely client-side, because the app ships to Cloudflare Pages (edge, static assets) + Vercel and every write goes straight to the git host via `app/utils/git-backend.ts` — there is no backend to host inference.
 
 Considered `@huggingface/transformers` (ONNX Runtime Web, WASM fallback available) as the alternative; went with `@mlc-ai/web-llm` instead because its TVM-compiled kernels decode faster on WebGPU and — the deciding factor for this feature — it has built-in JSON-schema-constrained (grammar) decoding via `response_format: {type: 'json_object', schema}`, which is what makes a 3B on-device model reliable enough for structured multi-task extraction. Trade-off accepted: WebGPU-only, no WASM/CPU fallback, so the assist UI simply hides itself when `navigator.gpu` is absent rather than degrading to a slow CPU path.
 

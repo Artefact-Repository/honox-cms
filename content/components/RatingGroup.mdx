@@ -68,7 +68,7 @@ Features half-star selection precision, a custom 10-star scale, size scale custo
 
 ## 3. Read-Only Average Rating Display
 
-Designed strictly to visualize aggregated ratings. Hover interactions and click selections are disabled, rendering a clean, read-only display.
+Designed strictly to visualise aggregated ratings. Hover interactions and click selections are disabled, rendering a clean, read-only display.
 
 <DemoPreview>
   <RatingGroup
@@ -114,7 +114,7 @@ Designed strictly to visualize aggregated ratings. Hover interactions and click 
 # Developer Notes & Accessibility
 
 - **Smart Switcher Hydration:** Like this system's other form controls, the Rating Group keeps a zero-JS footprint on initial render. If rendered as read-only or with no values, it is delivered as static SSR. Providing hover handlers, active value changes, or setting `"interactive": true` promotes it to a client-side hydrated island.
-- **WAI-ARIA Accessibility:** Complies with the WAI-ARIA rating widget pattern. It utilizes an accessible hidden input to support standard HTML form submissions, while managing `aria-valuenow`, `aria-valuemin`, and `aria-valuemax` states on the container.
+- **WAI-ARIA Accessibility:** Complies with the WAI-ARIA rating widget pattern. It utilises an accessible hidden input to support standard HTML form submissions, while managing `aria-valuenow`, `aria-valuemin`, and `aria-valuemax` states on the container.
 - **Keyboard Navigation:** Fully supports keyboard focus and navigation. Standard keyboard controls work seamlessly:
     - `ArrowRight` / `ArrowUp`: Increments score by 1 step (or 0.5 step if `allowHalf` is true).
     - `ArrowLeft` / `ArrowDown`: Decrements score by 1 step (or 0.5 step if `allowHalf` is true).

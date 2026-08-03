@@ -58,7 +58,7 @@ export async function saveCmsAdminSettings(
 
 	doc.setIn(["i18n", "structure"], next.i18n.structure);
 	// Built via createNode + flow:true rather than handing the plain array to
-	// setIn, so it re-serializes as the original file's compact inline
+	// setIn, so it re-serialises as the original file's compact inline
 	// `[en, zh, es]` style instead of a multi-line block list.
 	const localesNode = doc.createNode(next.i18n.locales);
 	localesNode.flow = true;
