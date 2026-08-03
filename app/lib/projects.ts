@@ -1,5 +1,6 @@
 import type { ColorPalette } from "../components/ui/color-palette";
 import { markdownToHtml, parseFrontmatter } from "../utils/markdown";
+import { buildHaystack, type SearchIndexEntry } from "../utils/search";
 
 // Projects content lives under content/projects/*.md, one file per entry —
 // same markdown+frontmatter convention as app/lib/tasks.ts, but flat (no
@@ -116,4 +117,23 @@ export async function loadProjectBySlug(
 /** All project slugs, for ssgParams. */
 export function listProjectSlugs(): string[] {
 	return Object.keys(projectModules).map((path) => slugFromPath(path));
+}
+
+export function buildProjectSearchEntries(
+	projects: Project[],
+): SearchIndexEntry[] {
+	return projects.map((project) => ({
+		key: project.slug,
+		href: `/projects/${project.slug}`,
+		title: project.title,
+		description: project.summary,
+		tags: project.tags,
+		haystack: buildHaystack([
+			project.title,
+			project.summary,
+			project.status,
+			project.owner,
+			project.tags,
+		]),
+	}));
 }

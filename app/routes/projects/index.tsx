@@ -8,6 +8,7 @@ import {
 	Card,
 	Heading,
 	Progress,
+	Search,
 	Stack,
 	Text,
 } from "../../components/ui";
@@ -17,14 +18,17 @@ import { EllipsisIcon } from "../../icons/ellipsis";
 import AuthStatus from "../../islands/auth-status";
 import PmsCreateMenu from "../../islands/pms-create-menu";
 import ProjectRowActionsMenu from "../../islands/project-row-actions-menu";
+import ProjectStatusFilter from "../../islands/project-status-filter";
 import { loadDocsConfig } from "../../lib/configs";
 import { mergeColorOverrides } from "../../lib/pms-config";
 import {
+	buildProjectSearchEntries,
 	listProjects,
 	PROJECT_STATUS_COLOR,
 	type Project,
 } from "../../lib/projects";
 import { listTasks, type Task } from "../../lib/tasks";
+import { filterEntries } from "../../utils/search";
 
 function projectProgress(project: Project, tasks: Task[]) {
 	const projectTasks = tasks.filter((task) => task.project === project.slug);
@@ -47,10 +51,34 @@ export default createRoute(async (c) => {
 		value: project.slug,
 	}));
 
+	const url = new URL(c.req.url);
+	const searchQuery = url.searchParams.get("q") || "";
+	const statusQuery = url.searchParams.get("status") || "";
+
+	// Server-side filtering for the no-JS fallback
+	const matchedSlugs = new Set(
+		filterEntries(buildProjectSearchEntries(projects), searchQuery).map(
+			(entry) => entry.key,
+		),
+	);
+
+	const allowedStatuses = statusQuery
+		? new Set(statusQuery.split(",").map((s) => s.trim()))
+		: null;
+
 	return c.render(
 		<>
 			<title>Projects - Artefact</title>
 			<Toaster />
+			<style
+				dangerouslySetInnerHTML={{
+					__html: `
+						[data-project-status-hidden="true"] {
+							display: none !important;
+						}
+					`,
+				}}
+			/>
 
 			<header
 				class={css({
@@ -93,6 +121,36 @@ export default createRoute(async (c) => {
 							Artefact UI
 						</Heading>
 					</Anchor>
+
+					{projects.length > 0 && (
+						<div
+							class={css({
+								flex: "1",
+								maxWidth: "md",
+								minWidth: "160px",
+								display: "flex",
+								gap: "2",
+							})}
+						>
+							<div class={css({ flex: "1" })}>
+								<Search
+									size="sm"
+									src="/api/projects/search.json"
+									action="/projects"
+									initialQuery={searchQuery}
+									placeholder="Search projects..."
+									itemLabel="projects"
+									total={projects.length}
+									filterAttribute="data-project-slug"
+									emptyStateId="projects-search-empty"
+									showCount={false}
+								/>
+							</div>
+							<div class={css({ flexShrink: 0, display: "flex", gap: "2" })}>
+								<ProjectStatusFilter />
+							</div>
+						</div>
+					)}
 
 					<nav class={css({ display: "flex", gap: "6", alignItems: "center" })}>
 						<Anchor
@@ -159,6 +217,16 @@ export default createRoute(async (c) => {
 				</Text>
 
 				<div
+					id="projects-search-empty"
+					hidden={projects.length === 0 || matchedSlugs.size !== 0}
+					class={css({ textAlign: "center", py: "16", px: "4" })}
+				>
+					<Text class={css({ color: "fg.muted" })}>
+						No projects match your search.
+					</Text>
+				</div>
+
+				<div
 					class={css({
 						display: "grid",
 						gridTemplateColumns: {
@@ -171,10 +239,21 @@ export default createRoute(async (c) => {
 				>
 					{projects.map((project) => {
 						const { done, total } = projectProgress(project, tasks);
+						const isSearchMatch = matchedSlugs.has(project.slug);
+						const isStatusMatch =
+							!allowedStatuses || allowedStatuses.has(project.status);
+						const isHidden = !isSearchMatch || !isStatusMatch;
+
 						return (
 							<Anchor
 								key={project.slug}
 								id={`project-${project.slug}`}
+								data-project-slug={project.slug}
+								data-project-status={project.status}
+								data-project-status-hidden={
+									!isStatusMatch ? "true" : undefined
+								}
+								hidden={isHidden}
 								href={`/projects/${project.slug}`}
 								variant="plain"
 								class={css({ textDecoration: "none", position: "relative" })}
