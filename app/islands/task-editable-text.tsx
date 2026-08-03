@@ -2,6 +2,7 @@ import { css, cx } from "design-system/css";
 import type { ElementType } from "hono/jsx";
 import { useRef, useState } from "hono/jsx";
 import { Anchor } from "../components/ui/anchor";
+import { Badge } from "../components/ui/badge";
 import {
 	Area,
 	CancelTrigger,
@@ -17,12 +18,11 @@ import { toaster } from "../components/ui/toast";
 import { CheckIcon } from "../icons/check";
 import { CloseIcon } from "../icons/close";
 import { EditIcon } from "../icons/edit";
+import { colorForTag, splitTitleTag } from "../lib/tasks";
 import { markdownToHtml } from "../utils/markdown";
 import { markdownContentClass } from "../utils/markdown-content-style";
 import { saveTaskField } from "../utils/task-save";
 import { useGitToken } from "./git-token-banner";
-import { Badge } from "../components/ui/badge";
-import { splitTitleTag, colorForTag } from "../lib/tasks";
 
 export interface TaskEditableTextProps {
 	value: string;

@@ -31,14 +31,14 @@ import {
 } from "../../lib/projects";
 import {
 	buildTaskSearchEntries,
+	colorForTag,
 	listTasksByProject,
+	splitTitleTag,
 	TASK_PRIORITIES,
 	TASK_PRIORITY_COLOR,
 	TASK_STATUS_COLOR,
 	TASK_STATUSES,
 	type Task,
-	splitTitleTag,
-	colorForTag,
 } from "../../lib/tasks";
 import { formatDate } from "../../utils/date";
 import { markdownContentClass } from "../../utils/markdown-content-style";

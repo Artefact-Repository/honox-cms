@@ -9,14 +9,14 @@ import { Stack } from "../components/ui/stack";
 import { Text } from "../components/ui/text";
 import { toaster } from "../components/ui/toast";
 import {
+	colorForTag,
+	splitTitleTag,
 	TASK_PRIORITY_COLOR,
 	TASK_STATUS_COLOR,
 	TASK_STATUSES,
 	type Task,
 	type TaskPriority,
 	type TaskStatus,
-	splitTitleTag,
-	colorForTag,
 } from "../lib/tasks";
 import { formatDate } from "../utils/date";
 import { fetchFile, updateFile } from "../utils/git-backend";

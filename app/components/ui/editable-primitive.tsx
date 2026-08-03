@@ -351,7 +351,12 @@ export interface PreviewProps {
 }
 
 export function Preview(props: PreviewProps) {
-	const { class: classProp, dangerouslySetInnerHTML, children, ...rest } = props;
+	const {
+		class: classProp,
+		dangerouslySetInnerHTML,
+		children,
+		...rest
+	} = props;
 	const context = useEditableContext();
 	const styles = context?.styles ?? editable();
 	const interactive = !(context?.disabled || context?.readOnly);
@@ -415,15 +420,15 @@ export function Preview(props: PreviewProps) {
 	}
 	return (
 		<span {...spanProps}>
-			{children !== undefined ? children : (
-				context?.tags
+			{children !== undefined
+				? children
+				: context?.tags
 					? parseTags(context.value).map((tag) => (
 							<span key={tag} class={styles.tag}>
 								{tag}
 							</span>
 						))
-					: context?.valueText
-			)}
+					: context?.valueText}
 		</span>
 	);
 }

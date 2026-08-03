@@ -1,5 +1,5 @@
-import { expect, test, describe } from "bun:test";
-import { splitTitleTag, colorForTag } from "./tasks";
+import { describe, expect, test } from "bun:test";
+import { colorForTag, splitTitleTag } from "./tasks";
 
 describe("splitTitleTag", () => {
 	test("should parse simple leading tags under 24 chars", () => {

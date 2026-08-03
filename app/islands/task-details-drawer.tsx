@@ -9,13 +9,13 @@ import { Drawer } from "../components/ui/drawer";
 import { Stack } from "../components/ui/stack";
 import { Text } from "../components/ui/text";
 import {
+	colorForTag,
+	splitTitleTag,
 	TASK_PRIORITY_COLOR,
 	TASK_STATUS_COLOR,
 	type Task,
 	type TaskPriority,
 	type TaskStatus,
-	splitTitleTag,
-	colorForTag,
 } from "../lib/tasks";
 import { formatDate } from "../utils/date";
 
@@ -90,7 +90,13 @@ export default function TaskDetailsDrawer({
 							const { tag, rest } = splitTitleTag(task.title);
 							if (tag) {
 								return (
-									<span class={css({ display: "flex", alignItems: "center", gap: "1.5" })}>
+									<span
+										class={css({
+											display: "flex",
+											alignItems: "center",
+											gap: "1.5",
+										})}
+									>
 										<Badge
 											variant="subtle"
 											size="sm"

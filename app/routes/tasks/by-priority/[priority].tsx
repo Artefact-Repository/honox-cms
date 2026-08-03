@@ -17,15 +17,15 @@ import { mergeColorOverrides } from "../../../lib/pms-config";
 import { listProjects, type Project } from "../../../lib/projects";
 import {
 	buildTaskSearchEntries,
+	colorForTag,
 	listTasks,
+	splitTitleTag,
 	TASK_PRIORITIES,
 	TASK_PRIORITY_COLOR,
 	TASK_STATUS_COLOR,
 	TASK_STATUSES,
 	type Task,
 	type TaskPriority,
-	splitTitleTag,
-	colorForTag,
 } from "../../../lib/tasks";
 import { formatDate } from "../../../utils/date";
 import { filterEntries } from "../../../utils/search";

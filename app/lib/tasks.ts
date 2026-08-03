@@ -25,6 +25,7 @@ export function colorForTag(tag: string): ColorPalette {
 	const key = tag.toLowerCase();
 	return DEFAULT_TAG_COLORS[key] ?? "gray";
 }
+
 import { buildHaystack, type SearchIndexEntry } from "../utils/search";
 
 // Tasks content lives under content/tasks/*.md, one file per entry — same

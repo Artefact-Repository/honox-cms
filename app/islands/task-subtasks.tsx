@@ -7,7 +7,13 @@ import { Badge } from "../components/ui/badge";
 import type { ColorPalette } from "../components/ui/color-palette";
 import { Stack } from "../components/ui/stack";
 import { Text } from "../components/ui/text";
-import { TASK_STATUS_COLOR, type Task, type TaskStatus, splitTitleTag, colorForTag } from "../lib/tasks";
+import {
+	colorForTag,
+	splitTitleTag,
+	TASK_STATUS_COLOR,
+	type Task,
+	type TaskStatus,
+} from "../lib/tasks";
 import { useGitToken } from "./git-token-banner";
 import TaskCreateDrawer from "./task-create-drawer";
 

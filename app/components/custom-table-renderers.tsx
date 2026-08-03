@@ -20,6 +20,8 @@ import TaskTreeDnd from "../islands/task-tree-dnd";
 import TaskTreeToggle from "../islands/task-tree-toggle";
 import type { Project } from "../lib/projects";
 import {
+	colorForTag,
+	splitTitleTag,
 	TASK_PRIORITIES,
 	TASK_PRIORITY_COLOR,
 	TASK_STATUS_COLOR,
@@ -29,8 +31,6 @@ import {
 	type TaskPriority,
 	type TaskStatus,
 	type TaskTreeEntry,
-	splitTitleTag,
-	colorForTag,
 } from "../lib/tasks";
 import { formatDate } from "../utils/date";
 import { Anchor, Avatar, Badge, DisplayValue, Stack, Table, Text } from "./ui";
