@@ -18,6 +18,10 @@ type DrawerStyles = ReturnType<typeof drawer>;
 interface DrawerContextValue {
 	styles: DrawerStyles;
 	open?: boolean;
+	/** Mount flag. Separate from `open` (intent) so the exit animation can play:
+	 *  `data-state` reflects intent, while `display: none` is deferred until the
+	 *  element is actually unmounted. See InteractiveDrawer + useOverlay. */
+	mounted?: boolean;
 	onOpenChange?: (open: boolean) => void;
 	id: string;
 	dialogRole?: "dialog" | "alertdialog";
@@ -32,6 +36,9 @@ const useDrawerContext = () => {
 
 export interface RootProps extends DrawerVariantProps, PropsWithChildren {
 	open?: boolean;
+	/** Mount flag (see DrawerContextValue). Defaults to `open` for the
+	 *  non-interactive Root so standalone usage keeps its old behavior. */
+	mounted?: boolean;
 	onOpenChange?: (open: boolean) => void;
 	id?: string;
 	rootRef?: any;
@@ -43,6 +50,7 @@ export function Root(props: RootProps) {
 	const {
 		children,
 		open,
+		mounted,
 		onOpenChange,
 		id: idProp,
 		rootRef,
@@ -55,6 +63,7 @@ export function Root(props: RootProps) {
 	const value = {
 		styles,
 		open,
+		mounted,
 		onOpenChange,
 		id,
 		dialogRole,
@@ -108,13 +117,14 @@ export function Backdrop(props: BackdropProps) {
 	const context = useDrawerContext();
 	const styles = context?.styles || drawer();
 	const open = context?.open;
+	const mounted = context?.mounted ?? open;
 	return (
 		<div
 			class={cx(
 				styles.backdrop,
 				"drawer__backdrop",
 				classProp,
-				!open && css({ display: "none" }),
+				!mounted && css({ display: "none" }),
 			)}
 			data-state={open ? "open" : "closed"}
 			data-part="backdrop"
@@ -133,6 +143,7 @@ export function Positioner(props: PositionerProps) {
 	const { children, class: classProp, ...restProps } = props;
 	const context = useDrawerContext();
 	const open = context?.open;
+	const mounted = context?.mounted ?? open;
 	// `classProp` is the recipe class computed up front by the flattened
 	// `Drawer` wrapper (drawer.tsx) — see the comment there. Falling back to
 	// `context.styles` is only for the raw compound API used standalone
@@ -145,7 +156,7 @@ export function Positioner(props: PositionerProps) {
 			class={cx(
 				styleClass,
 				"drawer__positioner",
-				!open && css({ display: "none" }),
+				!mounted && css({ display: "none" }),
 			)}
 			data-state={open ? "open" : "closed"}
 			data-part="positioner"
@@ -170,6 +181,7 @@ export function Content(props: ContentProps) {
 	} = props;
 	const context = useDrawerContext();
 	const open = context?.open;
+	const mounted = context?.mounted ?? open;
 	const id = context?.id;
 	const role = context?.dialogRole ?? "dialog";
 	// See Positioner's comment: `classProp` is the authoritative recipe
@@ -218,7 +230,7 @@ export function Content(props: ContentProps) {
 			class={cx(
 				styleClass,
 				"drawer__content",
-				!open && css({ display: "none" }),
+				!mounted && css({ display: "none" }),
 			)}
 			data-state={open ? "open" : "closed"}
 			{...restProps}
@@ -482,7 +494,8 @@ export function InteractiveDrawer(props: InteractiveDrawerProps) {
 		<Root
 			{...rest}
 			id={rootId}
-			open={renderOpen}
+			open={open}
+			mounted={renderOpen}
 			onOpenChange={handleOpenChange}
 			rootRef={rootRef}
 			dialogRole={dialogRole}

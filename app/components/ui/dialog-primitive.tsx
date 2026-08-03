@@ -18,6 +18,10 @@ type DialogStyles = ReturnType<typeof dialog>;
 interface DialogContextValue {
 	styles: DialogStyles;
 	open?: boolean;
+	/** Mount flag. Separate from `open` (intent) so the exit animation can play:
+	 *  `data-state` reflects intent, while `display: none` is deferred until the
+	 *  element is actually unmounted. See InteractiveDialog + useOverlay. */
+	mounted?: boolean;
 	onOpenChange?: (open: boolean) => void;
 	id: string;
 	dialogRole?: "dialog" | "alertdialog";
@@ -32,6 +36,9 @@ const useDialogContext = () => {
 
 export interface RootProps extends DialogVariantProps, PropsWithChildren {
 	open?: boolean;
+	/** Mount flag (see DialogContextValue). Defaults to `open` for the
+	 *  non-interactive Root so standalone usage keeps its old behavior. */
+	mounted?: boolean;
 	onOpenChange?: (open: boolean) => void;
 	id?: string;
 	rootRef?: any;
@@ -43,6 +50,7 @@ export function Root(props: RootProps) {
 	const {
 		children,
 		open,
+		mounted,
 		onOpenChange,
 		id: idProp,
 		rootRef,
@@ -55,6 +63,7 @@ export function Root(props: RootProps) {
 	const value = {
 		styles,
 		open,
+		mounted,
 		onOpenChange,
 		id,
 		dialogRole,
@@ -110,13 +119,14 @@ export function Backdrop(props: BackdropProps) {
 	const context = useDialogContext();
 	const styles = context?.styles || dialog();
 	const open = context?.open;
+	const mounted = context?.mounted ?? open;
 	return (
 		<div
 			class={cx(
 				styles.backdrop,
 				"dialog__backdrop",
 				classProp,
-				!open && css({ display: "none" }),
+				!mounted && css({ display: "none" }),
 			)}
 			data-state={open ? "open" : "closed"}
 			data-scope="dialog"
@@ -137,6 +147,7 @@ export function Positioner(props: PositionerProps) {
 	const context = useDialogContext();
 	const styles = context?.styles || dialog();
 	const open = context?.open;
+	const mounted = context?.mounted ?? open;
 
 	return (
 		<div
@@ -144,7 +155,7 @@ export function Positioner(props: PositionerProps) {
 				styles.positioner,
 				"dialog__positioner",
 				classProp,
-				!open && css({ display: "none" }),
+				!mounted && css({ display: "none" }),
 			)}
 			data-state={open ? "open" : "closed"}
 			data-scope="dialog"
@@ -171,6 +182,7 @@ export function Content(props: ContentProps) {
 	const context = useDialogContext();
 	const styles = context?.styles || dialog();
 	const open = context?.open;
+	const mounted = context?.mounted ?? open;
 	const id = context?.id;
 	const role = context?.dialogRole ?? "dialog";
 
@@ -217,7 +229,7 @@ export function Content(props: ContentProps) {
 				styles.content,
 				"dialog__content",
 				classProp,
-				!open && css({ display: "none" }),
+				!mounted && css({ display: "none" }),
 			)}
 			data-state={open ? "open" : "closed"}
 			{...restProps}
@@ -501,7 +513,8 @@ export function InteractiveDialog(props: InteractiveDialogProps) {
 		<Root
 			{...rest}
 			id={rootId}
-			open={renderOpen}
+			open={open}
+			mounted={renderOpen}
 			onOpenChange={handleOpenChange}
 			rootRef={rootRef}
 			dialogRole={dialogRole}
