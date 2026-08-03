@@ -4,6 +4,7 @@ import { IconButton } from "../components/ui/button";
 import { Dropdown } from "../components/ui/dropdown";
 import { EllipsisIcon } from "../icons/ellipsis";
 import { useGitToken } from "./git-token-banner";
+import ProjectCloneDialog from "./project-clone-dialog";
 import ProjectDeleteDialog from "./project-delete-dialog";
 
 export interface ProjectActionsMenuProps {
@@ -17,6 +18,7 @@ export default function ProjectActionsMenu({
 }: ProjectActionsMenuProps) {
 	const { token } = useGitToken();
 	const [deleteOpen, setDeleteOpen] = useState(false);
+	const [cloneOpen, setCloneOpen] = useState(false);
 
 	if (!token) return null;
 
@@ -37,6 +39,11 @@ export default function ProjectActionsMenu({
 						value: "edit",
 						href: `/admin/#/collections/projects/entries/${slug}`,
 					},
+					{
+						type: "item",
+						label: "Clone",
+						value: "clone",
+					},
 					{ type: "separator" },
 					{
 						type: "item",
@@ -47,7 +54,13 @@ export default function ProjectActionsMenu({
 				]}
 				onSelect={(value) => {
 					if (value === "delete") setDeleteOpen(true);
+					if (value === "clone") setCloneOpen(true);
 				}}
+			/>
+			<ProjectCloneDialog
+				project={{ slug, title }}
+				open={cloneOpen}
+				onOpenChange={setCloneOpen}
 			/>
 			<ProjectDeleteDialog
 				project={{ slug, title }}

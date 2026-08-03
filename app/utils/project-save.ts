@@ -9,7 +9,7 @@ import {
 	fileExists,
 	requireToken,
 } from "./git-backend";
-import { stringifyFrontmatter } from "./markdown";
+import { parseFrontmatter, stringifyFrontmatter } from "./markdown";
 import { slugify } from "./slug";
 
 export class ProjectSaveError extends Error {}
@@ -69,4 +69,41 @@ export async function deleteProject(slug: string): Promise<void> {
 	const path = `content/projects/${slug}.md`;
 	const file = await fetchFile(path, token);
 	await deleteFile(path, file.sha, `Delete project "${slug}"`, token);
+}
+
+/** Duplicates `content/projects/{slug}.md` as a new file titled `newTitle` —
+ * reads the source file's raw content first (rather than reconstructing it
+ * from the list page's `Project`, which only carries a truncated `excerpt`) so
+ * the full body survives the clone intact. Retries with a numeric suffix on
+ * a slug collision (e.g. two clones typed to the same name). */
+export async function cloneProject(
+	slug: string,
+	newTitle: string,
+): Promise<string> {
+	const token = requireToken();
+	const title = newTitle.trim();
+	if (!title) {
+		throw new ProjectSaveError("Enter a name for the copy.");
+	}
+
+	const source = await fetchFile(`content/projects/${slug}.md`, token);
+	const { data, content } = parseFrontmatter(source.content);
+	const sourceTitle = (data.title as string) || slug;
+
+	const baseSlug = slugifyProjectTitle(title);
+	let cloneSlug = baseSlug;
+	let attempt = 2;
+	while (await fileExists(`content/projects/${cloneSlug}.md`, token)) {
+		cloneSlug = `${baseSlug}-${attempt}`;
+		attempt += 1;
+	}
+
+	const newContent = stringifyFrontmatter({ ...data, title }, content);
+	await createFile(
+		`content/projects/${cloneSlug}.md`,
+		newContent,
+		`Clone project "${sourceTitle}" as "${title}"`,
+		token,
+	);
+	return cloneSlug;
 }

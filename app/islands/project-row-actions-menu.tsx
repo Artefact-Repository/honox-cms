@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "hono/jsx";
 import { Dropdown } from "../components/ui/dropdown";
+import ProjectCloneDialog from "./project-clone-dialog";
 import ProjectDeleteDialog from "./project-delete-dialog";
 
 export default function ProjectRowActionsMenu() {
@@ -8,6 +9,7 @@ export default function ProjectRowActionsMenu() {
 		title: string;
 	} | null>(null);
 	const [deleteOpen, setDeleteOpen] = useState(false);
+	const [cloneOpen, setCloneOpen] = useState(false);
 	const contextTriggerRef = useRef<HTMLDivElement | null>(null);
 	const pendingPointRef = useRef<{
 		x: number;
@@ -62,6 +64,7 @@ export default function ProjectRowActionsMenu() {
 
 	const handleSelect = (value: string) => {
 		if (value === "delete") setDeleteOpen(true);
+		if (value === "clone") setCloneOpen(true);
 	};
 
 	return (
@@ -89,6 +92,11 @@ export default function ProjectRowActionsMenu() {
 									value: "edit",
 									href: `/admin/#/collections/projects/entries/${selectedProject.slug}`,
 								},
+								{
+									type: "item",
+									label: "Clone",
+									value: "clone",
+								},
 								{ type: "separator" },
 								{
 									type: "item",
@@ -103,14 +111,21 @@ export default function ProjectRowActionsMenu() {
 				onSelect={handleSelect}
 			/>
 			{selectedProject && (
-				<ProjectDeleteDialog
-					project={selectedProject}
-					open={deleteOpen}
-					onOpenChange={setDeleteOpen}
-					onDeleted={(slug) => {
-						document.getElementById(`project-${slug}`)?.remove();
-					}}
-				/>
+				<>
+					<ProjectCloneDialog
+						project={selectedProject}
+						open={cloneOpen}
+						onOpenChange={setCloneOpen}
+					/>
+					<ProjectDeleteDialog
+						project={selectedProject}
+						open={deleteOpen}
+						onOpenChange={setDeleteOpen}
+						onDeleted={(slug) => {
+							document.getElementById(`project-${slug}`)?.remove();
+						}}
+					/>
+				</>
 			)}
 		</>
 	);

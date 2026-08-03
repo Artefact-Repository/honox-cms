@@ -91,7 +91,7 @@ If no token is available yet, editors fall back to a **read-only state with a li
 * **`TaskEditableText`** / **`TaskProjectEditor`** (`/tasks/:slug`) — click-to-edit title, description body, and project relation, each committing just that field via `app/utils/task-save.ts`'s `saveTaskField`.
 * **`TaskCreateDrawer`** / **`ProjectCreateDrawer`** (behind the header's **+ New** button, `PmsCreateMenu`) — create a new task/project file via the Contents API's create path (no `sha`, so it 409s instead of clobbering if the slug's already taken).
 * **`TaskCloneDialog`** / **`TaskDeleteDialog`** (the task detail page's "…" menu, and `/tasks`' row-hover actions) — copy or delete a task file.
-* **`ProjectDeleteDialog`** / **`ProjectActionsMenu`** / **`ProjectRowActionsMenu`** (the project detail page's "…" menu, and `/projects`' cards) — delete a project file or edit it in the CMS.
+* **`ProjectCloneDialog`** / **`ProjectDeleteDialog`** / **`ProjectActionsMenu`** / **`ProjectRowActionsMenu`** (the project detail page's "…" menu, and `/projects`' cards) — copy or delete a project file, or edit it in the CMS.
 
 ### Nested-island pattern for row-hover actions
 
