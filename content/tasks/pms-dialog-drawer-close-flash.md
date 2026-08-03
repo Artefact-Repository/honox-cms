@@ -1,11 +1,17 @@
 ---
-title: PMS — Dialog/Drawer close-animation flash — regression guard
+title: PMS — Dialog close-animation flash — regression guard
 project: pms
 status: Draft
 priority: Medium
 assignee: Diego Ramos
 dueDate: 2026-09-30
-tags: [pms, ui, dialog, drawer, bug, regression]
+tags:
+  - pms
+  - ui
+  - dialog
+  - drawer
+  - bug
+  - regression
 ---
 
 ## Context
