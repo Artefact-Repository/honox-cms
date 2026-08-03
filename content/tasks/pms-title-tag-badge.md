@@ -1,7 +1,7 @@
 ---
 title: Render a leading "[TAG]" in task titles as a styled badge
 project: pms
-status: To Do
+status: Done
 priority: Medium
 assignee: Mia Chen
 dueDate: 2026-10-30
