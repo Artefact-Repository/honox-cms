@@ -79,7 +79,7 @@
   "headerActions": [
     {
       "blockType": "button",
-      "text": "Explore Hub",
+      "text": "Explorer le Hub",
       "variant": "solid",
       "size": "sm",
       "onclick": "window.scrollTo({top: document.getElementById('hub').offsetTop - 80, behavior: 'smooth'})"

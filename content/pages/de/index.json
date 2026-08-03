@@ -56,7 +56,7 @@
           "children": [
             {
               "blockType": "text",
-              "content": "About"
+              "content": "Über"
             }
           ],
           "href": "/de/about",
@@ -79,7 +79,7 @@
   "headerActions": [
     {
       "blockType": "button",
-      "text": "Explore Hub",
+      "text": "Hub erkunden",
       "variant": "solid",
       "size": "sm",
       "onclick": "window.scrollTo({top: document.getElementById('hub').offsetTop - 80, behavior: 'smooth'})"
