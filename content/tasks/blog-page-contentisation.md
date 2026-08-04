@@ -1,0 +1,90 @@
+---
+title: [Blog] Contentise /blog, /blog/[slug] and the archives via CMS bindings (remove route chrome)
+project: blog-website
+status: Draft
+priority: Medium
+assignee: Mia Chen
+dueDate: 2026-09-30
+tags: [blog, content-extraction, cms, page-builder, bindings]
+---
+
+## Why
+
+The blog surface is the largest hand-written page set on the site — ~2,000 lines across `app/routes/blog/index.tsx` (~980), `blog/[slug].tsx` (~557), `blog/by-tag/[tag].tsx` and `blog/by-author/[author].tsx`. The routes hand-render the shell, the featured carousel, the search + tag-browse UI, the post-card grid, the newsletter section, the article chrome (meta, share, body mount), related posts, and the archive pages. Goal (same as `docs-page-contentisation.md`): express the **entire** page set as `content/pages/blog.json` + `content/pages/blog/[slug].json` + archive templates using CMS bindings/APIs, and remove as much TSX as possible — the routes become thin data-binders importing **zero** `components/ui` components.
+
+This is the "blog" test case for the same bindings end-state in `pms-i18n.md` and `docs-page-contentisation.md` — and the hardest one, because of the interactive chrome (carousel, share, search, popovers).
+
+## What's already CMS (grounded)
+
+- **Header** on all four routes: `config.headerItems` (CMS singleton) via `renderBlocks` + `AuthStatus`. The brand name comes from `config.home?.brandName`.
+- **Landing hero** already comes from `loadPage("blog", locale)` → `<PageRenderer>` (index.tsx:154) — but `content/pages/blog.json` is just `{ title, content: [one text block] }`. Locale variants exist (`content/pages/<locale>/blog.json`).
+- **Search strings** already localized via `BLOG_SEARCH_STRINGS` (`app/lib/i18n.ts`); `/api/posts/search.json` endpoint exists; posts are per-locale (`content/posts/<locale>/*.md`); locale-prefixed blog routes exist (`app/routes/[locale]/blog/*`).
+- Blog config (`content/configs.json` `blog.*`): `showAuthor`, `showReadTime`, `newsletterHeading/Description`, `home.brandName` — CMS-editable.
+- **The `layout` block type exists** (page-registry.tsx:1218) — same shell-as-content option as the docs task.
+
+## What's still hardcoded (the removal list)
+
+| Hardcoded in the route | CMS binding to replace it |
+|---|---|
+| Featured-posts hero carousel (index.tsx:156-381) | New bound block `featuredPosts` (carousel over `dataSource: "featuredPosts"`; own gradient overlay/badges/triggers; interactive bits stay islands inside the block) |
+| Search box (index.tsx:386-399) | Bound `searchBox` block (shared with the PMS plan; `src: /api/posts/search.json`, placeholder/itemLabel from content per locale, `emptyStateId: blog-search-empty`) |
+| Tag-browse popover (index.tsx:401-490) | Bound `tagBrowse` block (tags via `dataSource: "tags"`; labels "Browse tags"/"All"/"Filter by Tag" become block props per locale) |
+| Search empty state (index.tsx:492-538) | Content blocks (heading/text) — keep the `id="blog-search-empty"` + `hidden` contract so the search island still toggles it |
+| Post-card grid (index.tsx:540-810) | `each` block over new `dataSource: "posts"` + card template (cover/title/description/author/date/readTime/tags/draft badge) — or a bound `postGrid` if the card is too bespoke for a template |
+| Newsletter section (index.tsx:812-977) | See boundaries — NOT contentised as-is (the form submits nowhere); pairs with `blog-newsletter-capture` |
+| Article chrome: back link, cover, tags, title + draft badge, description, meta (author/date/readTime) (`[slug].tsx:158-385`) | `link` block + content blocks + new bound `postMeta` block (author/date/readTime from `post.*`, locale-aware date formatting) |
+| Share button (`[slug].tsx:394-418`) | New bound `postShare` block (client island: `navigator.share`/clipboard) |
+| Markdown body mount (`post.html` + `markdownContentClass`, `[slug].tsx:420-425`) | New bound `postBody` block (renders the existing markdown-pipeline HTML for the current slug) |
+| Related posts (`[slug].tsx:429-522`) | New bound `relatedPosts` block (data from `post.relatedPosts` via resolver) |
+| Back-to-all footer (`[slug].tsx:524-548`) | `link` block (exists) |
+| Archive pages (by-tag/by-author): header, title, pills, post list, pagination | One archive template (`content/pages/blog/by-tag/[tag].json` / `by-author/[author].json`) + `each`/`posts`-filtered grid + existing `pagination` recipe; tag/author pills via `dataSources.tags`/`authors` |
+| Header shell + brand (all routes) | Top-level `layout` block (header/sider/content) + existing brand/link blocks |
+
+## Component inventory — the routes must stop importing `components/ui`
+
+End-state: all four blog routes import **zero** UI components and **zero** icons — only loader/data helpers + the render primitive. Every component imported today has a binding replacement: `Carousel` → `featuredPosts`; `Search` → `searchBox`; `Popover`/`Button`/`FilterIcon` → `tagBrowse`; `Card`/`Avatar`/`Badge`/`ArrowRightIcon` → `each`/`posts` card template (or `postGrid`); `Heading`/`Text`/`Stack`/`Anchor` → existing content blocks; `MailIcon`/newsletter form → `newsletterForm` block (later, see boundaries); `CalendarIcon`/`ClockIcon`/`ShareIcon` → `postMeta`/`postShare`; `ArrowLeftIcon` → `link` block; `ChevronRightIcon` → `relatedPosts`; `AuthStatus` → `authStatus` block (per-post Edit href patch stays server-side); `markdownContentClass` div → `postBody`. The `currentLocale === "zh" ? "X" : "Y"` literals (Latest/Browse tags/No articles/Read more/Draft/Back to Blog/Share/Related Posts/Back to All Posts) become **block props** in each locale's JSON.
+
+Target import list for each route: `createRoute`, `ssgParams` (dynamic routes), `loadPosts` / `loadPostBySlug`, `loadPage`, `detectLocale` / `isLocale` / `localiseHref`, `renderBlocks` (or `PageRenderer`), `c.notFound()` — nothing from `../../components/ui`, no icons, no `markdown-content-style`.
+
+## Design
+
+1. **`content/pages/blog.json`** (landing): top-level `layout` block → `header` (config.headerItems + brand), `content` = hero blocks + `featuredPosts` + `searchBox` + `tagBrowse` + empty-state blocks + `each`/`posts` grid. Locale variants in sync.
+2. **`content/pages/blog/[slug].json`** (detail): a **data-driven template** resolved per slug — NOT per-post files (hundreds of posts). Content = back `link` + `postMeta` + `postBody` + `postShare` + `relatedPosts` + footer `link`, with post fields bound from the page context.
+3. **Archive templates** `content/pages/blog/by-tag/[tag].json` / `by-author/[author].json`: title/hero blocks + `each`/`posts`-filtered grid + `pagination` — resolved per tag/author. Second-phase if the landing/detail land first.
+4. **New bound block types** (registry `page-registry.tsx` **and** `public/admin/config.yml`): `featuredPosts`, `searchBox` (shared — see PMS plan), `tagBrowse`, `postMeta`, `postBody`, `postShare`, `relatedPosts`, optionally `postGrid` + `newsletterForm` (later). Land with `cms-registry-schema-drift-ci`.
+5. **New data sources** (`app/lib/data-sources.ts`): `posts` (rich `DataSourceItem`: cover/description/author/date/readTime/tags/draft for the card template), `featuredPosts` (posts with cover, sliced 5), `tags`, `authors`, `relatedPosts` (needs the current-post context). `DataSourceContext` gains `locale` (and a `post`/`currentSlug` field for related).
+6. **API seam — per-request page context:** extend the `renderBlocks` extras (currently `locale`/`currentPath`) with `post` so `postMeta`/`postBody`/`postShare`/`relatedPosts` resolve the current post without per-block props — same seam as the docs/PMS plans.
+7. **Routes shrink to thin loaders:** `blog/index.tsx` → `loadPosts` + `loadPage("blog", locale)` + render; `blog/[slug].tsx` → `ssgParams` + `loadPostBySlug` + `loadPage(postTemplate, locale)` + bind post + `renderBlocks` (keeping `isLocale` guard, 404); archives → `ssgParams` over tags/authors + same pattern.
+8. **i18n rides along:** posts already per-locale; `BLOG_SEARCH_STRINGS` moves into content props; the `currentLocale === "zh"` ternaries disappear into per-locale block props; date formatting stays locale-aware inside the bound blocks.
+
+## Honest boundaries — what cannot be removed (flag in the PR)
+
+- **The route file stays** — thin loader (~30-50 lines). The goal is removing *chrome*, not the loader.
+- **Per-post Edit deep-link** (AuthStatus href at `[slug].tsx:151-153`) — the CMS can't know which post the reader is on. Same as the docs `withDocEditHref`; stays server-side or an `authStatus` binding resolution.
+- **The markdown body** (`post.html` from the remark/rehype pipeline, `app/utils/markdown.ts`): authored content stays; only its mount becomes a block.
+- **The newsletter form is broken** (submits nowhere — see `blog-newsletter-capture`). Don't contentise the broken form: leave the section as content blocks now, and add a proper bound `newsletterForm` block when the capture feature ships. Flagged so contentisation doesn't accidentally bless the current no-op form.
+- **Client-only features** (share button, carousel controls, search-as-you-type) remain islands — but mounted *by* bound blocks, so the route still has zero component imports.
+
+## Acceptance criteria
+
+- `/blog`, `/blog/[slug]`, and the archives render from `content/pages/blog.json` + templates + bound blocks — routes contain **no visible chrome literals** and **no `currentLocale === "zh" ? …` ternaries**.
+- **The four route files import zero `../../components/ui` components and zero icons** — only loader/data helpers + render primitive.
+- Rendered HTML matches current output (visual regression over all posts + every locale): carousel, grid, meta, share, related, archives, pagination identical.
+- Carousel/search/tag-browse/share still function (interactive bits intact inside bound blocks).
+- Locale detection/prefix, `localiseHref`, 404s, `ssgParams` output unchanged.
+- New block types present in both registry and `config.yml` (CI guard passes); `posts`/`featuredPosts`/`tags`/`relatedPosts` resolvers resolve under SSG.
+- Measurable line reduction across the four routes.
+
+## Decisions to settle in the PR
+
+- **Per-post template vs. per-post files** (`content/pages/blog/[slug].json` as a resolved template — recommended — vs. a file per post).
+- **Card grid**: `each` + card template vs. a dedicated `postGrid` bound block (the card is heavy — cover gradient, draft badge, tag pills, read-more; likely `postGrid`).
+- **Carousel**: dedicated `featuredPosts` bound block (recommended — bespoke overlay/triggers) vs. reusing an existing `carousel` block if one is registered.
+- **Newsletter**: content blocks now + `newsletterForm` bound block when `blog-newsletter-capture` ships, vs. a bound block with a placeholder.
+- **Archives scope**: include by-tag/by-author in this task or a fast-follow.
+
+## Notes / dependencies
+
+- Files: the four blog routes (thin out), `content/pages/blog.json` + `<locale>/blog.json` (layout + bound blocks), `content/pages/blog/[slug].json` (new template), archive templates, `app/lib/data-sources.ts` (4-5 resolvers + `locale`/`post` in context), `app/components/page-registry.tsx` + `public/admin/config.yml` (new block types), `app/lib/pages.ts` (page-context extras), `app/utils/markdown.ts` / `markdown-content-style.ts` (unchanged).
+- Pairs with: `blog-newsletter-capture` (newsletter form), `blog-author-readtime-metadata` (meta display), `blog-draft-preview-banner` (draft badge/banner), `pms-i18n.md` bindings section (shared `searchBox` block, page-context seam), `docs-page-contentisation.md` (same pattern, `postBody` mirrors `docBody`), `cms-registry-schema-drift-ci`, `cms-datasource-showcase` (`each`/`dataSource` grid), `cms-static-css-presets` (no raw `style` strings in new content).
+- Mia Chen owns Blog Website; she also carries `blog-newsletter-capture`, `blog-replace-placeholder-covers`, `blog-draft-preview-banner` — this is the biggest single task on her plate; consider sequencing it after the landing/detail split lands or rebalancing.
