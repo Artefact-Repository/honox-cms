@@ -43,6 +43,42 @@ export default defineConfig({
 					],
 				},
 			},
+			// The categorical slice of the CMS block `style`-string vocabulary
+			// (content/pages/**/*.json) — measured, enumerated, and validated
+			// against exactly this list in app/components/block-style.ts's
+			// `CATEGORICAL_VALIDATORS`/`resolveStyleString`. Same reasoning as
+			// `colorPalette` above: these values come from CMS content at
+			// runtime, never literal JSX, so Panda's static extractor can't
+			// discover them on its own. Keep this enumeration and the
+			// validators in block-style.ts in lockstep — the two are meant to
+			// be kept in sync by scripts/check-cms-style-vocab.mjs, which fails
+			// CI if new content introduces a validated pair missing here.
+			// NOTE: verifying this enumeration against generated CSS requires a
+			// real rebuild — `bunx panda codegen` only regenerates the `css`/
+			// `tokens`/`patterns`/`recipes` *functions*, not `design-system/
+			// styles.css` (that's a separate, easily-stale artifact). Use
+			// `bunx panda cssgen --clean -o design-system/styles.css` to check
+			// what's actually pre-generated.
+			{
+				properties: {
+					textAlign: ["left", "center", "right", "justify", "start", "end"],
+					// Kept as strings (not numbers) — `resolveStyleString` always
+					// produces string values, parsed straight out of CSS text, and
+					// the enumeration here has to match exactly what the runtime
+					// `css()` call in `cmsCategoricalClass` actually passes.
+					fontWeight: ["600", "bold"],
+					textTransform: ["uppercase"],
+					textDecoration: ["none"],
+					justifyContent: ["flex-end"],
+					flexWrap: ["wrap"],
+					flexShrink: ["0"],
+					letterSpacing: ["0.05em"],
+					borderRadius: ["9999px"],
+					color: ["var(--colors-fg-muted)"],
+					borderBottom: ["1px solid var(--colors-border)"],
+					borderTop: ["1px solid var(--colors-border)"],
+				},
+			},
 		],
 
 		// Every recipe here must keep `["*"]`: none of them (aside from alert,

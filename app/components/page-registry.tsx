@@ -2,7 +2,7 @@ import { css, cx } from "design-system/css";
 import { ChevronDownIcon } from "../icons/chevron-down";
 import { localeToggleUrl, localiseHref } from "../lib/i18n";
 import { listPageSlugs } from "../lib/pages";
-import { extractLayoutStyle } from "./block-style";
+import { extractCmsStyle, extractLayoutStyle } from "./block-style";
 import { type BlockProps, type ComponentBlock, propsOf } from "./block-types";
 import { customTableRenderers } from "./custom-table-renderers";
 import { displayValueFormatters } from "./display-value-formatters";
@@ -353,7 +353,12 @@ const registry: Record<string, BlockRenderer> = {
 
 	badge: (b) => {
 		const { text, ...rest } = propsOf(b);
-		return <Badge {...rest}>{text}</Badge>;
+		const cmsStyle = extractCmsStyle(rest);
+		return (
+			<Badge class={cmsStyle.class} style={cmsStyle.style} {...rest}>
+				{text}
+			</Badge>
+		);
 	},
 
 	// The generic repeater — no rendering opinion of its own. `children` has
@@ -384,12 +389,22 @@ const registry: Record<string, BlockRenderer> = {
 
 	heading: (b) => {
 		const { text, ...rest } = propsOf(b);
-		return <Heading {...rest}>{text}</Heading>;
+		const cmsStyle = extractCmsStyle(rest);
+		return (
+			<Heading class={cmsStyle.class} style={cmsStyle.style} {...rest}>
+				{text}
+			</Heading>
+		);
 	},
 
 	text: (b) => {
 		const { content, ...rest } = propsOf(b);
-		return <Text {...rest}>{content}</Text>;
+		const cmsStyle = extractCmsStyle(rest);
+		return (
+			<Text class={cmsStyle.class} style={cmsStyle.style} {...rest}>
+				{content}
+			</Text>
+		);
 	},
 
 	// `value` arrives as "" (not omitted) when a content author leaves the
@@ -449,8 +464,14 @@ const registry: Record<string, BlockRenderer> = {
 		} else if (typeof href === "string" && typeof locale === "string") {
 			resolvedHref = localiseHref(href, locale);
 		}
+		const cmsStyle = extractCmsStyle(rest);
 		return (
-			<Anchor href={resolvedHref} {...rest}>
+			<Anchor
+				href={resolvedHref}
+				class={cmsStyle.class}
+				style={cmsStyle.style}
+				{...rest}
+			>
 				{renderChildren(children as ComponentBlock[])}
 			</Anchor>
 		);

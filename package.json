@@ -5,6 +5,7 @@
 	"private": true,
 	"scripts": {
 		"prepare": "panda codegen",
+		"check:cms-style-vocab": "bun scripts/check-cms-style-vocab.mjs",
 		"dev": "vite",
 		"build": "vite build --mode client && vite build",
 		"preview": "wrangler dev",

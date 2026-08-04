@@ -1,7 +1,7 @@
 ---
 title: Static CSS for CMS blocks — generalise the `--cms-*` bridge, real classes for categorical fields
 project: cms-page-builder
-status: To Do
+status: In Review
 priority: Medium
 assignee: Diego Ramos
 dueDate: 2026-10-15
@@ -90,3 +90,20 @@ No new files-of-generated-code, no CMS content migration, no `config.yml` author
 - Pairs with `cms-security-escape-hatches`: closes the one unvalidated CSS-injection surface (`manual` branch) the current bridge left open.
 - References: https://panda-css.com/docs/guides/dynamic-styling and https://panda-css.com/docs/guides/static (both fetched and quoted directly above, not paraphrased from memory).
 - Supersedes `cms-static-css-presets.md` (Draft 2 — `cva` presets), which itself superseded `cms-static-css-codegen.md` (Draft 1). Draft 2's vocabulary measurement is retained and re-cited above; only the design changed.
+
+## Implementation notes (2026-08-04)
+
+Implemented and browser-verified against a real `bun run dev` render of `content/pages/blog.json` — the block cited in "Why" now renders `class="text ... c_var(--colors-fg-muted)" style="--cms-max-width: 42rem; --cms-margin-bottom: 2rem"` instead of a raw `style="color:#71717a;max-width:42rem;margin-bottom:2rem"`. No regressions found; anti-drift script passes clean against current content.
+
+Decisions resolved:
+- **Categorical vs. bridge split**, from a ground-truth re-scan (matched Draft 2's numbers exactly): `textAlign`, `fontWeight`, `textTransform`, `textDecoration`, `justifyContent`, `flexWrap`, `flexShrink`, `letterSpacing`, `borderRadius`, `color`, `borderBottom`/`borderTop` (shorthand, collapses to one canonical combo) → categorical/class. `margin`, `padding`, `maxWidth`, `marginBottom`, `paddingBottom`, `minWidth`, `rowGap`, `width`, `fontSize` → `--cms-*` bridge (extended `layoutStyleClass` in `block-style.ts` with the new vars).
+- **Token mapping**: `#71717a`/`#6b7280` → `var(--colors-fg-muted)`, `#e5e7eb` → `var(--colors-border)` — confirmed these are already the exact intent (36 blocks already used the token form for the same visual purpose; the hexes were inconsistent authoring, not a different color).
+- **Anti-drift script**: fails CI (`.github/workflows/deploy.yml`, wired in before `Build`) rather than warn-only — cheap enough (small JSON scan) that warn-only added no value.
+
+Real pitfall hit during implementation, worth flagging for anyone touching this again: **`bunx panda codegen` does not regenerate `design-system/styles.css`** — it only rebuilds the `css`/`tokens`/`patterns`/`recipes` output *functions*. The actual CSS file is a separate artifact (`bunx panda cssgen --clean -o design-system/styles.css`, or the real Vite/PostCSS build via `app/style.css`). Checking `staticCss.css` changes against a `codegen`-only run gives false negatives — several properties in this task briefly looked unsupported by Panda and were routed around before a clean `cssgen` run proved they worked fine all along. Verify against a clean `cssgen`, not `codegen`.
+
+Files touched: `app/components/block-style.ts`, `panda.config.ts`, `app/components/page-registry.tsx` (import + `badge`/`heading`/`text`/`anchor` renderers — the only block types that actually carry `style` in content, per a real scan of `content/pages/**/*.json`; `stack`/`grid`/`layout`/`card` already went through `extractLayoutStyle`), `scripts/check-cms-style-vocab.mjs` (new), `package.json` (new script), `.github/workflows/deploy.yml` (new step).
+
+Not done in this pass (`block-types.ts`'s `propsOf` was **not** modified as the original plan suggested — style resolution is applied per-renderer instead, matching how `extractLayoutStyle` already works, since centralizing in `propsOf` risked JSX prop-spread-order bugs across renderers untouched here):
+- Visual regression across all locale variants (only spot-checked en `/blog`, `/`, `/docs` in dev).
+- Dark-mode is structurally verified (the token cascade is confirmed theme-scoped in generated CSS: `[data-theme=light]`/`[data-theme=dark]` both define `--colors-fg-muted` from `--colors-gray-11`, which itself differs by theme) but not screenshot-verified in a browser.

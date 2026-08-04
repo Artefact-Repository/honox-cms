@@ -28,6 +28,9 @@ jobs:
       - name: Panda Codegen
         run: bun run prepare
 
+      - name: Check CMS style vocabulary
+        run: bun run check:cms-style-vocab
+
       - name: Build
         run: bun run build
 
