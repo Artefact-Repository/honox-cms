@@ -230,7 +230,7 @@ export interface ResolvedStyleString {
  * Validates every declaration in a free-text CMS `style` string against the
  * measured, allowlisted vocabulary above. Anything that isn't recognized —
  * an unmeasured property, or a value outside the enumerated set — is
- * silently dropped rather than reaching the DOM unsanitized.
+ * silently dropped rather than reaching the DOM unsanitised.
  */
 export function resolveStyleString(
 	style: string | undefined,
