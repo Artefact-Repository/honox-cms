@@ -2,7 +2,7 @@
 
 Full-stack [HonoX](https://github.com/honojs/honox) starter with type-safe CSS-in-JS ([PandaCSS](https://panda-css.com/)), and a Git-backed CMS ([Sveltia CMS](https://sveltiacms.app/)).
 
-Live demo: [https://honox.chen.so](https://honox.chen.so), [https://honox-ts.vercel.app](https://honox-ts.vercel.app)
+Live demo: [https://honox.chen.so](https://honox.chen.so)
 
 ---
 
@@ -16,7 +16,7 @@ Live demo: [https://honox.chen.so](https://honox.chen.so), [https://honox-ts.ver
 | **Blog** | Markdown posts in `content/posts/`, rendered at `/blog` |
 | **API** | Read-only JSON REST API for posts at `/api/posts/*` |
 | **SSG** | Static site generation via `@hono/vite-ssg` |
-| **Deploy** | Cloudflare Pages (`wrangler.jsonc`) |
+| **Deploy** | Cloudflare Pages (`wrangler.jsonc`) or Vercel (`vercel.json`) or GitHub Pages (`.github/workflows/deploy.yml`) or GitLab Pages (`.gitlab-ci.yml`) |
 | **PMS example** | Git-backed project/task tracker at `/projects` and `/tasks`, sourced from CMS-editable collections |
 
 ---
@@ -228,3 +228,11 @@ public/admin/        # Sveltia CMS static files
   config.yml          # CMS configuration
   index.html          # CMS UI
 ````
+
+## Contributing
+
+See [Contributing.md](Contributing.md) for how to get involved — either by picking up an existing task from [Tasks](https://honox.chen.software/tasks) or by proposing your own change. Any contribution is more than welcome.
+
+## Licence
+
+[UNLICENSE](https://unlicense.org) yourself - see the [Licence](Licence) file for details.
