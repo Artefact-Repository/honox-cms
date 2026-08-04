@@ -1,0 +1,53 @@
+# GitLab CI — build + publish to GitLab Pages
+# Mirrors the GitHub Actions workflow in .github/workflows/deploy.yml.
+
+stages:
+  - build
+  - deploy
+
+variables:
+  # Pin for reproducible builds; bump as needed.
+  BUN_VERSION: "1.2"
+
+# ---------------------------------------------------------------------------
+# Build: install deps, run panda codegen, then SSG-build into dist/
+# ---------------------------------------------------------------------------
+build:
+  stage: build
+  image: oven/bun:${BUN_VERSION}
+  cache:
+    key:
+      files:
+        - bun.lock
+    paths:
+      - ~/.bun/install/cache
+  script:
+    - bun install --frozen-lockfile
+    - bun run prepare                 # panda codegen (styles/css tokens)
+    # NOTE: scripts/check-cms-style-vocab.mjs is referenced by
+    # package.json but currently absent from the repo — remove this line
+    # until the script is committed, or the job will fail.
+    - bun run check:cms-style-vocab
+    - bun run build                   # vite build --mode client && vite build -> dist/
+  artifacts:
+    paths:
+      - dist
+    expire_in: 1 day
+
+# ---------------------------------------------------------------------------
+# Publish: deploy dist/ to GitLab Pages on main.
+# GitLab Pages requires a job named `pages` producing a `public/` artifact.
+# ---------------------------------------------------------------------------
+pages:
+  stage: deploy
+  image: alpine:3.20
+  dependencies:
+    - build
+  script:
+    - cp -r dist public
+  artifacts:
+    paths:
+      - public
+    expire_in: never
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
